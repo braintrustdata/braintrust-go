@@ -39,7 +39,7 @@ func TestProjectLogFeedback(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
-				Source: braintrust.F(braintrust.ProjectLogFeedbackParamsFeedbackSourceApp),
+				Source: braintrust.F("string"),
 			}, {
 				ID: braintrust.F("string"),
 				Scores: braintrust.F(map[string]float64{
@@ -50,7 +50,7 @@ func TestProjectLogFeedback(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
-				Source: braintrust.F(braintrust.ProjectLogFeedbackParamsFeedbackSourceApp),
+				Source: braintrust.F("string"),
 			}, {
 				ID: braintrust.F("string"),
 				Scores: braintrust.F(map[string]float64{
@@ -61,7 +61,7 @@ func TestProjectLogFeedback(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
-				Source: braintrust.F(braintrust.ProjectLogFeedbackParamsFeedbackSourceApp),
+				Source: braintrust.F("string"),
 			}}),
 		},
 	)
@@ -122,15 +122,15 @@ func TestProjectLogFetchPostWithOptionalParams(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectLogFetchPostParams{
 			Filters: braintrust.F([]braintrust.ProjectLogFetchPostParamsFilter{{
-				Type:  braintrust.F(braintrust.ProjectLogFetchPostParamsFiltersTypePathLookup),
+				Type:  braintrust.F("string"),
 				Path:  braintrust.F([]string{"string", "string", "string"}),
 				Value: braintrust.F[any](map[string]interface{}{}),
 			}, {
-				Type:  braintrust.F(braintrust.ProjectLogFetchPostParamsFiltersTypePathLookup),
+				Type:  braintrust.F("string"),
 				Path:  braintrust.F([]string{"string", "string", "string"}),
 				Value: braintrust.F[any](map[string]interface{}{}),
 			}, {
-				Type:  braintrust.F(braintrust.ProjectLogFetchPostParamsFiltersTypePathLookup),
+				Type:  braintrust.F("string"),
 				Path:  braintrust.F([]string{"string", "string", "string"}),
 				Value: braintrust.F[any](map[string]interface{}{}),
 			}}),
@@ -186,11 +186,11 @@ func TestProjectLogInsert(t *testing.T) {
 				}),
 				SpanAttributes: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributes{
 					Name: braintrust.F("string"),
-					Type: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeLlm),
+					Type: braintrust.F("string"),
 				}),
 				ID:           braintrust.F("string"),
 				ObjectDelete: braintrust.F(true),
-				IsMerge:      braintrust.F[braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMerge](braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMergeBoolean(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMergeBooleanTrue)),
+				IsMerge:      braintrust.F(true),
 				ParentID:     braintrust.F("string"),
 			}), braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
@@ -213,11 +213,11 @@ func TestProjectLogInsert(t *testing.T) {
 				}),
 				SpanAttributes: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributes{
 					Name: braintrust.F("string"),
-					Type: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeLlm),
+					Type: braintrust.F("string"),
 				}),
 				ID:           braintrust.F("string"),
 				ObjectDelete: braintrust.F(true),
-				IsMerge:      braintrust.F[braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMerge](braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMergeBoolean(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMergeBooleanTrue)),
+				IsMerge:      braintrust.F(true),
 				ParentID:     braintrust.F("string"),
 			}), braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
@@ -240,11 +240,11 @@ func TestProjectLogInsert(t *testing.T) {
 				}),
 				SpanAttributes: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributes{
 					Name: braintrust.F("string"),
-					Type: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeLlm),
+					Type: braintrust.F("string"),
 				}),
 				ID:           braintrust.F("string"),
 				ObjectDelete: braintrust.F(true),
-				IsMerge:      braintrust.F[braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMerge](braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMergeBoolean(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMergeBooleanTrue)),
+				IsMerge:      braintrust.F(true),
 				ParentID:     braintrust.F("string"),
 			})}),
 		},

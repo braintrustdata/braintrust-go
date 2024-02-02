@@ -208,6 +208,11 @@ type DatasetFetchResponseEvent struct {
 	DatasetID string `json:"dataset_id,required" format:"uuid"`
 	// The `span_id` of the root of the trace this dataset event belongs to
 	RootSpanID string `json:"root_span_id,required"`
+	// A unique identifier used to link different dataset events together as part of a
+	// full trace. See the
+	// [tracing guide](https://www.braintrustdata.com/docs/guides/tracing) for full
+	// details on tracing
+	SpanID string `json:"span_id,required"`
 	// The timestamp the dataset event was created
 	Created time.Time `json:"created,nullable" format:"date-time"`
 	// The argument that uniquely define an input case (an arbitrary, JSON serializable
@@ -234,6 +239,7 @@ type datasetFetchResponseEventJSON struct {
 	XactID      apijson.Field
 	DatasetID   apijson.Field
 	RootSpanID  apijson.Field
+	SpanID      apijson.Field
 	Created     apijson.Field
 	Input       apijson.Field
 	Metadata    apijson.Field
@@ -278,6 +284,11 @@ type DatasetFetchPostResponseEvent struct {
 	DatasetID string `json:"dataset_id,required" format:"uuid"`
 	// The `span_id` of the root of the trace this dataset event belongs to
 	RootSpanID string `json:"root_span_id,required"`
+	// A unique identifier used to link different dataset events together as part of a
+	// full trace. See the
+	// [tracing guide](https://www.braintrustdata.com/docs/guides/tracing) for full
+	// details on tracing
+	SpanID string `json:"span_id,required"`
 	// The timestamp the dataset event was created
 	Created time.Time `json:"created,nullable" format:"date-time"`
 	// The argument that uniquely define an input case (an arbitrary, JSON serializable
@@ -304,6 +315,7 @@ type datasetFetchPostResponseEventJSON struct {
 	XactID      apijson.Field
 	DatasetID   apijson.Field
 	RootSpanID  apijson.Field
+	SpanID      apijson.Field
 	Created     apijson.Field
 	Input       apijson.Field
 	Metadata    apijson.Field
@@ -406,21 +418,12 @@ type DatasetFeedbackParamsFeedback struct {
 	// you can log it here and access it in the Braintrust UI.
 	Metadata param.Field[map[string]interface{}] `json:"metadata"`
 	// The source of the feedback. Must be one of "external" (default), "app", or "api"
-	Source param.Field[DatasetFeedbackParamsFeedbackSource] `json:"source"`
+	Source param.Field[string] `json:"source"`
 }
 
 func (r DatasetFeedbackParamsFeedback) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
-
-// The source of the feedback. Must be one of "external" (default), "app", or "api"
-type DatasetFeedbackParamsFeedbackSource string
-
-const (
-	DatasetFeedbackParamsFeedbackSourceApp      DatasetFeedbackParamsFeedbackSource = "app"
-	DatasetFeedbackParamsFeedbackSourceAPI      DatasetFeedbackParamsFeedbackSource = "api"
-	DatasetFeedbackParamsFeedbackSourceExternal DatasetFeedbackParamsFeedbackSource = "external"
-)
 
 type DatasetFetchParams struct {
 	// Fetch queries may be paginated if the total result size is expected to be large
@@ -509,7 +512,7 @@ type DatasetFetchPostParamsFilter struct {
 	// `{"input": {"a": {"b": {"c": "hello"}}}}`, pass `path=["input", "a", "b", "c"]`
 	Path param.Field[[]string] `json:"path,required"`
 	// Denotes the type of filter as a path-lookup filter
-	Type param.Field[DatasetFetchPostParamsFiltersType] `json:"type,required"`
+	Type param.Field[string] `json:"type,required"`
 	// The value to compare equality-wise against the event value at the specified
 	// `path`. The value must be a "primitive", that is, any JSON-serializable object
 	// except for objects and arrays. For instance, if you wish to filter on the value
@@ -521,13 +524,6 @@ type DatasetFetchPostParamsFilter struct {
 func (r DatasetFetchPostParamsFilter) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
-
-// Denotes the type of filter as a path-lookup filter
-type DatasetFetchPostParamsFiltersType string
-
-const (
-	DatasetFetchPostParamsFiltersTypePathLookup DatasetFetchPostParamsFiltersType = "path_lookup"
-)
 
 type DatasetInsertParams struct {
 	// A list of dataset events to insert
@@ -559,7 +555,7 @@ type DatasetInsertParamsEventsInsertDatasetEventReplace struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[DatasetInsertParamsEventsInsertDatasetEventReplaceIsMerge] `json:"_is_merge"`
+	IsMerge param.Field[bool] `json:"_is_merge"`
 	// Pass `_object_delete=true` to mark the dataset event deleted. Deleted events
 	// will not show up in subsequent fetches for this dataset
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
@@ -596,30 +592,6 @@ func (r DatasetInsertParamsEventsInsertDatasetEventReplace) MarshalJSON() (data 
 
 func (r DatasetInsertParamsEventsInsertDatasetEventReplace) implementsDatasetInsertParamsEvent() {}
 
-// The `_is_merge` field controls how the row is merged with any existing row with
-// the same id in the DB. By default (or when set to `false`), the existing row is
-// completely replaced by the new row. When set to `true`, the new row is
-// deep-merged into the existing row
-//
-// For example, say there is an existing row in the DB
-// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
-// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
-// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
-// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
-// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-//
-// Satisfied by [DatasetInsertParamsEventsInsertDatasetEventReplaceIsMergeBoolean],
-// [DatasetInsertParamsEventsInsertDatasetEventReplaceIsMergeUnknown].
-type DatasetInsertParamsEventsInsertDatasetEventReplaceIsMerge interface {
-	ImplementsDatasetInsertParamsEventsInsertDatasetEventReplaceIsMerge()
-}
-
-type DatasetInsertParamsEventsInsertDatasetEventReplaceIsMergeBoolean bool
-
-const (
-	DatasetInsertParamsEventsInsertDatasetEventReplaceIsMergeBooleanFalse DatasetInsertParamsEventsInsertDatasetEventReplaceIsMergeBoolean = false
-)
-
 type DatasetInsertParamsEventsInsertDatasetEventMerge struct {
 	// The `_is_merge` field controls how the row is merged with any existing row with
 	// the same id in the DB. By default (or when set to `false`), the existing row is
@@ -632,7 +604,7 @@ type DatasetInsertParamsEventsInsertDatasetEventMerge struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[DatasetInsertParamsEventsInsertDatasetEventMergeIsMerge] `json:"_is_merge,required"`
+	IsMerge param.Field[bool] `json:"_is_merge,required"`
 	// A unique identifier for the dataset event. If you don't provide one, BrainTrust
 	// will generate one for you
 	ID param.Field[string] `json:"id"`
@@ -672,23 +644,6 @@ func (r DatasetInsertParamsEventsInsertDatasetEventMerge) MarshalJSON() (data []
 }
 
 func (r DatasetInsertParamsEventsInsertDatasetEventMerge) implementsDatasetInsertParamsEvent() {}
-
-// The `_is_merge` field controls how the row is merged with any existing row with
-// the same id in the DB. By default (or when set to `false`), the existing row is
-// completely replaced by the new row. When set to `true`, the new row is
-// deep-merged into the existing row
-//
-// For example, say there is an existing row in the DB
-// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
-// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
-// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
-// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
-// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-type DatasetInsertParamsEventsInsertDatasetEventMergeIsMerge bool
-
-const (
-	DatasetInsertParamsEventsInsertDatasetEventMergeIsMergeTrue DatasetInsertParamsEventsInsertDatasetEventMergeIsMerge = true
-)
 
 type DatasetReplaceParams struct {
 	// Name of the dataset. Within a project, dataset names are unique

@@ -96,7 +96,7 @@ type ProjectLogFetchResponseEvent struct {
 	// `version` parameter)
 	XactID int64 `json:"_xact_id,required"`
 	// A literal 'g' which identifies the log as a project log
-	LogID ProjectLogFetchResponseEventsLogID `json:"log_id,required"`
+	LogID string `json:"log_id,required"`
 	// Unique id for the organization that the project belongs under
 	OrgID string `json:"org_id,required" format:"uuid"`
 	// Unique identifier for the project
@@ -187,13 +187,6 @@ func (r *ProjectLogFetchResponseEvent) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// A literal 'g' which identifies the log as a project log
-type ProjectLogFetchResponseEventsLogID string
-
-const (
-	ProjectLogFetchResponseEventsLogIDG ProjectLogFetchResponseEventsLogID = "g"
-)
-
 // Context is additional information about the code that produced the project logs
 // event. It is essentially the textual counterpart to `metrics`. Use the
 // `caller_*` attributes to track the location in code which produced the project
@@ -255,7 +248,7 @@ type ProjectLogFetchResponseEventsSpanAttributes struct {
 	// Name of the span, for display purposes only
 	Name string `json:"name,nullable"`
 	// Type of the span, for display purposes only
-	Type        ProjectLogFetchResponseEventsSpanAttributesType `json:"type,nullable"`
+	Type        string                                          `json:"type,nullable"`
 	ExtraFields map[string]interface{}                          `json:"-,extras"`
 	JSON        projectLogFetchResponseEventsSpanAttributesJSON `json:"-"`
 }
@@ -272,18 +265,6 @@ type projectLogFetchResponseEventsSpanAttributesJSON struct {
 func (r *ProjectLogFetchResponseEventsSpanAttributes) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-// Type of the span, for display purposes only
-type ProjectLogFetchResponseEventsSpanAttributesType string
-
-const (
-	ProjectLogFetchResponseEventsSpanAttributesTypeLlm      ProjectLogFetchResponseEventsSpanAttributesType = "llm"
-	ProjectLogFetchResponseEventsSpanAttributesTypeScore    ProjectLogFetchResponseEventsSpanAttributesType = "score"
-	ProjectLogFetchResponseEventsSpanAttributesTypeFunction ProjectLogFetchResponseEventsSpanAttributesType = "function"
-	ProjectLogFetchResponseEventsSpanAttributesTypeEval     ProjectLogFetchResponseEventsSpanAttributesType = "eval"
-	ProjectLogFetchResponseEventsSpanAttributesTypeTask     ProjectLogFetchResponseEventsSpanAttributesType = "task"
-	ProjectLogFetchResponseEventsSpanAttributesTypeTool     ProjectLogFetchResponseEventsSpanAttributesType = "tool"
-)
 
 type ProjectLogFetchPostResponse struct {
 	// A list of fetched events
@@ -313,7 +294,7 @@ type ProjectLogFetchPostResponseEvent struct {
 	// `version` parameter)
 	XactID int64 `json:"_xact_id,required"`
 	// A literal 'g' which identifies the log as a project log
-	LogID ProjectLogFetchPostResponseEventsLogID `json:"log_id,required"`
+	LogID string `json:"log_id,required"`
 	// Unique id for the organization that the project belongs under
 	OrgID string `json:"org_id,required" format:"uuid"`
 	// Unique identifier for the project
@@ -404,13 +385,6 @@ func (r *ProjectLogFetchPostResponseEvent) UnmarshalJSON(data []byte) (err error
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// A literal 'g' which identifies the log as a project log
-type ProjectLogFetchPostResponseEventsLogID string
-
-const (
-	ProjectLogFetchPostResponseEventsLogIDG ProjectLogFetchPostResponseEventsLogID = "g"
-)
-
 // Context is additional information about the code that produced the project logs
 // event. It is essentially the textual counterpart to `metrics`. Use the
 // `caller_*` attributes to track the location in code which produced the project
@@ -472,7 +446,7 @@ type ProjectLogFetchPostResponseEventsSpanAttributes struct {
 	// Name of the span, for display purposes only
 	Name string `json:"name,nullable"`
 	// Type of the span, for display purposes only
-	Type        ProjectLogFetchPostResponseEventsSpanAttributesType `json:"type,nullable"`
+	Type        string                                              `json:"type,nullable"`
 	ExtraFields map[string]interface{}                              `json:"-,extras"`
 	JSON        projectLogFetchPostResponseEventsSpanAttributesJSON `json:"-"`
 }
@@ -489,18 +463,6 @@ type projectLogFetchPostResponseEventsSpanAttributesJSON struct {
 func (r *ProjectLogFetchPostResponseEventsSpanAttributes) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-// Type of the span, for display purposes only
-type ProjectLogFetchPostResponseEventsSpanAttributesType string
-
-const (
-	ProjectLogFetchPostResponseEventsSpanAttributesTypeLlm      ProjectLogFetchPostResponseEventsSpanAttributesType = "llm"
-	ProjectLogFetchPostResponseEventsSpanAttributesTypeScore    ProjectLogFetchPostResponseEventsSpanAttributesType = "score"
-	ProjectLogFetchPostResponseEventsSpanAttributesTypeFunction ProjectLogFetchPostResponseEventsSpanAttributesType = "function"
-	ProjectLogFetchPostResponseEventsSpanAttributesTypeEval     ProjectLogFetchPostResponseEventsSpanAttributesType = "eval"
-	ProjectLogFetchPostResponseEventsSpanAttributesTypeTask     ProjectLogFetchPostResponseEventsSpanAttributesType = "task"
-	ProjectLogFetchPostResponseEventsSpanAttributesTypeTool     ProjectLogFetchPostResponseEventsSpanAttributesType = "tool"
-)
 
 type ProjectLogInsertResponse struct {
 	// The ids of all rows that were inserted, aligning one-to-one with the rows
@@ -546,21 +508,12 @@ type ProjectLogFeedbackParamsFeedback struct {
 	// merged into the existing scores for the project logs event
 	Scores param.Field[map[string]float64] `json:"scores"`
 	// The source of the feedback. Must be one of "external" (default), "app", or "api"
-	Source param.Field[ProjectLogFeedbackParamsFeedbackSource] `json:"source"`
+	Source param.Field[string] `json:"source"`
 }
 
 func (r ProjectLogFeedbackParamsFeedback) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
-
-// The source of the feedback. Must be one of "external" (default), "app", or "api"
-type ProjectLogFeedbackParamsFeedbackSource string
-
-const (
-	ProjectLogFeedbackParamsFeedbackSourceApp      ProjectLogFeedbackParamsFeedbackSource = "app"
-	ProjectLogFeedbackParamsFeedbackSourceAPI      ProjectLogFeedbackParamsFeedbackSource = "api"
-	ProjectLogFeedbackParamsFeedbackSourceExternal ProjectLogFeedbackParamsFeedbackSource = "external"
-)
 
 type ProjectLogFetchParams struct {
 	// Fetch queries may be paginated if the total result size is expected to be large
@@ -649,7 +602,7 @@ type ProjectLogFetchPostParamsFilter struct {
 	// `{"input": {"a": {"b": {"c": "hello"}}}}`, pass `path=["input", "a", "b", "c"]`
 	Path param.Field[[]string] `json:"path,required"`
 	// Denotes the type of filter as a path-lookup filter
-	Type param.Field[ProjectLogFetchPostParamsFiltersType] `json:"type,required"`
+	Type param.Field[string] `json:"type,required"`
 	// The value to compare equality-wise against the event value at the specified
 	// `path`. The value must be a "primitive", that is, any JSON-serializable object
 	// except for objects and arrays. For instance, if you wish to filter on the value
@@ -661,13 +614,6 @@ type ProjectLogFetchPostParamsFilter struct {
 func (r ProjectLogFetchPostParamsFilter) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
-
-// Denotes the type of filter as a path-lookup filter
-type ProjectLogFetchPostParamsFiltersType string
-
-const (
-	ProjectLogFetchPostParamsFiltersTypePathLookup ProjectLogFetchPostParamsFiltersType = "path_lookup"
-)
 
 type ProjectLogInsertParams struct {
 	// A list of project logs events to insert
@@ -699,7 +645,7 @@ type ProjectLogInsertParamsEventsInsertProjectLogsEventReplace struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMerge] `json:"_is_merge"`
+	IsMerge param.Field[bool] `json:"_is_merge"`
 	// Pass `_object_delete=true` to mark the project logs event deleted. Deleted
 	// events will not show up in subsequent fetches for this project logs
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
@@ -767,31 +713,6 @@ func (r ProjectLogInsertParamsEventsInsertProjectLogsEventReplace) MarshalJSON()
 func (r ProjectLogInsertParamsEventsInsertProjectLogsEventReplace) implementsProjectLogInsertParamsEvent() {
 }
 
-// The `_is_merge` field controls how the row is merged with any existing row with
-// the same id in the DB. By default (or when set to `false`), the existing row is
-// completely replaced by the new row. When set to `true`, the new row is
-// deep-merged into the existing row
-//
-// For example, say there is an existing row in the DB
-// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
-// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
-// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
-// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
-// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-//
-// Satisfied by
-// [ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMergeBoolean],
-// [ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMergeUnknown].
-type ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMerge interface {
-	ImplementsProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMerge()
-}
-
-type ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMergeBoolean bool
-
-const (
-	ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMergeBooleanFalse ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMergeBoolean = false
-)
-
 // Context is additional information about the code that produced the project logs
 // event. It is essentially the textual counterpart to `metrics`. Use the
 // `caller_*` attributes to track the location in code which produced the project
@@ -832,25 +753,13 @@ type ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributes str
 	// Name of the span, for display purposes only
 	Name param.Field[string] `json:"name"`
 	// Type of the span, for display purposes only
-	Type        param.Field[ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesType] `json:"type"`
-	ExtraFields map[string]interface{}                                                                   `json:"-,extras"`
+	Type        param.Field[string]    `json:"type"`
+	ExtraFields map[string]interface{} `json:"-,extras"`
 }
 
 func (r ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributes) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
-
-// Type of the span, for display purposes only
-type ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesType string
-
-const (
-	ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeLlm      ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesType = "llm"
-	ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeScore    ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesType = "score"
-	ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeFunction ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesType = "function"
-	ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeEval     ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesType = "eval"
-	ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeTask     ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesType = "task"
-	ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeTool     ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesType = "tool"
-)
 
 type ProjectLogInsertParamsEventsInsertProjectLogsEventMerge struct {
 	// The `_is_merge` field controls how the row is merged with any existing row with
@@ -864,7 +773,7 @@ type ProjectLogInsertParamsEventsInsertProjectLogsEventMerge struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[ProjectLogInsertParamsEventsInsertProjectLogsEventMergeIsMerge] `json:"_is_merge,required"`
+	IsMerge param.Field[bool] `json:"_is_merge,required"`
 	// A unique identifier for the project logs event. If you don't provide one,
 	// BrainTrust will generate one for you
 	ID param.Field[string] `json:"id"`
@@ -936,23 +845,6 @@ func (r ProjectLogInsertParamsEventsInsertProjectLogsEventMerge) MarshalJSON() (
 func (r ProjectLogInsertParamsEventsInsertProjectLogsEventMerge) implementsProjectLogInsertParamsEvent() {
 }
 
-// The `_is_merge` field controls how the row is merged with any existing row with
-// the same id in the DB. By default (or when set to `false`), the existing row is
-// completely replaced by the new row. When set to `true`, the new row is
-// deep-merged into the existing row
-//
-// For example, say there is an existing row in the DB
-// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
-// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
-// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
-// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
-// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-type ProjectLogInsertParamsEventsInsertProjectLogsEventMergeIsMerge bool
-
-const (
-	ProjectLogInsertParamsEventsInsertProjectLogsEventMergeIsMergeTrue ProjectLogInsertParamsEventsInsertProjectLogsEventMergeIsMerge = true
-)
-
 // Context is additional information about the code that produced the project logs
 // event. It is essentially the textual counterpart to `metrics`. Use the
 // `caller_*` attributes to track the location in code which produced the project
@@ -993,22 +885,10 @@ type ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributes struc
 	// Name of the span, for display purposes only
 	Name param.Field[string] `json:"name"`
 	// Type of the span, for display purposes only
-	Type        param.Field[ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesType] `json:"type"`
-	ExtraFields map[string]interface{}                                                                 `json:"-,extras"`
+	Type        param.Field[string]    `json:"type"`
+	ExtraFields map[string]interface{} `json:"-,extras"`
 }
 
 func (r ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributes) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
-
-// Type of the span, for display purposes only
-type ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesType string
-
-const (
-	ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesTypeLlm      ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesType = "llm"
-	ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesTypeScore    ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesType = "score"
-	ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesTypeFunction ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesType = "function"
-	ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesTypeEval     ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesType = "eval"
-	ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesTypeTask     ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesType = "task"
-	ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesTypeTool     ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesType = "tool"
-)
