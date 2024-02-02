@@ -699,7 +699,7 @@ type ProjectLogInsertParamsEventsInsertProjectLogsEventReplace struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMerge] `json:"_is_merge"`
+	IsMerge param.Field[bool] `json:"_is_merge"`
 	// Pass `_object_delete=true` to mark the project logs event deleted. Deleted
 	// events will not show up in subsequent fetches for this project logs
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
@@ -766,23 +766,6 @@ func (r ProjectLogInsertParamsEventsInsertProjectLogsEventReplace) MarshalJSON()
 
 func (r ProjectLogInsertParamsEventsInsertProjectLogsEventReplace) implementsProjectLogInsertParamsEvent() {
 }
-
-// The `_is_merge` field controls how the row is merged with any existing row with
-// the same id in the DB. By default (or when set to `false`), the existing row is
-// completely replaced by the new row. When set to `true`, the new row is
-// deep-merged into the existing row
-//
-// For example, say there is an existing row in the DB
-// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
-// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
-// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
-// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
-// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-type ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMerge bool
-
-const (
-	ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMergeFalse ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMerge = false
-)
 
 // Context is additional information about the code that produced the project logs
 // event. It is essentially the textual counterpart to `metrics`. Use the
@@ -856,7 +839,7 @@ type ProjectLogInsertParamsEventsInsertProjectLogsEventMerge struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[ProjectLogInsertParamsEventsInsertProjectLogsEventMergeIsMerge] `json:"_is_merge,required"`
+	IsMerge param.Field[bool] `json:"_is_merge,required"`
 	// A unique identifier for the project logs event. If you don't provide one,
 	// BrainTrust will generate one for you
 	ID param.Field[string] `json:"id"`
@@ -927,23 +910,6 @@ func (r ProjectLogInsertParamsEventsInsertProjectLogsEventMerge) MarshalJSON() (
 
 func (r ProjectLogInsertParamsEventsInsertProjectLogsEventMerge) implementsProjectLogInsertParamsEvent() {
 }
-
-// The `_is_merge` field controls how the row is merged with any existing row with
-// the same id in the DB. By default (or when set to `false`), the existing row is
-// completely replaced by the new row. When set to `true`, the new row is
-// deep-merged into the existing row
-//
-// For example, say there is an existing row in the DB
-// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
-// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
-// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
-// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
-// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-type ProjectLogInsertParamsEventsInsertProjectLogsEventMergeIsMerge bool
-
-const (
-	ProjectLogInsertParamsEventsInsertProjectLogsEventMergeIsMergeTrue ProjectLogInsertParamsEventsInsertProjectLogsEventMergeIsMerge = true
-)
 
 // Context is additional information about the code that produced the project logs
 // event. It is essentially the textual counterpart to `metrics`. Use the
