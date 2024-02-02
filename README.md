@@ -7,17 +7,25 @@ API](https://www.braintrustdata.com/docs/api/spec) from applications written in 
 
 ## Installation
 
+<!-- x-release-please-start-version -->
+
 ```go
 import (
 	"github.com/braintrustdata/braintrust-go" // imported as braintrust
 )
 ```
 
+<!-- x-release-please-end -->
+
 Or to pin the version:
+
+<!-- x-release-please-start-version -->
 
 ```sh
 go get -u 'github.com/braintrustdata/braintrust-go@v0.0.1'
 ```
+
+<!-- x-release-please-end -->
 
 ## Requirements
 
