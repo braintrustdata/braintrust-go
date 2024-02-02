@@ -203,7 +203,7 @@ func TestExperimentFeedback(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
-				Source: braintrust.F(braintrust.ExperimentFeedbackParamsFeedbackSourceApp),
+				Source: braintrust.F("string"),
 			}, {
 				ID: braintrust.F("string"),
 				Scores: braintrust.F(map[string]float64{
@@ -214,7 +214,7 @@ func TestExperimentFeedback(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
-				Source: braintrust.F(braintrust.ExperimentFeedbackParamsFeedbackSourceApp),
+				Source: braintrust.F("string"),
 			}, {
 				ID: braintrust.F("string"),
 				Scores: braintrust.F(map[string]float64{
@@ -225,7 +225,7 @@ func TestExperimentFeedback(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
-				Source: braintrust.F(braintrust.ExperimentFeedbackParamsFeedbackSourceApp),
+				Source: braintrust.F("string"),
 			}}),
 		},
 	)
@@ -286,15 +286,15 @@ func TestExperimentFetchPostWithOptionalParams(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ExperimentFetchPostParams{
 			Filters: braintrust.F([]braintrust.ExperimentFetchPostParamsFilter{{
-				Type:  braintrust.F(braintrust.ExperimentFetchPostParamsFiltersTypePathLookup),
+				Type:  braintrust.F("string"),
 				Path:  braintrust.F([]string{"string", "string", "string"}),
 				Value: braintrust.F[any](map[string]interface{}{}),
 			}, {
-				Type:  braintrust.F(braintrust.ExperimentFetchPostParamsFiltersTypePathLookup),
+				Type:  braintrust.F("string"),
 				Path:  braintrust.F([]string{"string", "string", "string"}),
 				Value: braintrust.F[any](map[string]interface{}{}),
 			}, {
-				Type:  braintrust.F(braintrust.ExperimentFetchPostParamsFiltersTypePathLookup),
+				Type:  braintrust.F("string"),
 				Path:  braintrust.F([]string{"string", "string", "string"}),
 				Value: braintrust.F[any](map[string]interface{}{}),
 			}}),
@@ -350,12 +350,12 @@ func TestExperimentInsert(t *testing.T) {
 				}),
 				SpanAttributes: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributes{
 					Name: braintrust.F("string"),
-					Type: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesTypeLlm),
+					Type: braintrust.F("string"),
 				}),
 				ID:              braintrust.F("string"),
 				DatasetRecordID: braintrust.F("string"),
 				ObjectDelete:    braintrust.F(true),
-				IsMerge:         braintrust.F[braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMerge](braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBoolean(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBooleanTrue)),
+				IsMerge:         braintrust.F(true),
 				ParentID:        braintrust.F("string"),
 			}), braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
@@ -378,12 +378,12 @@ func TestExperimentInsert(t *testing.T) {
 				}),
 				SpanAttributes: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributes{
 					Name: braintrust.F("string"),
-					Type: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesTypeLlm),
+					Type: braintrust.F("string"),
 				}),
 				ID:              braintrust.F("string"),
 				DatasetRecordID: braintrust.F("string"),
 				ObjectDelete:    braintrust.F(true),
-				IsMerge:         braintrust.F[braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMerge](braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBoolean(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBooleanTrue)),
+				IsMerge:         braintrust.F(true),
 				ParentID:        braintrust.F("string"),
 			}), braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
@@ -406,12 +406,12 @@ func TestExperimentInsert(t *testing.T) {
 				}),
 				SpanAttributes: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributes{
 					Name: braintrust.F("string"),
-					Type: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesTypeLlm),
+					Type: braintrust.F("string"),
 				}),
 				ID:              braintrust.F("string"),
 				DatasetRecordID: braintrust.F("string"),
 				ObjectDelete:    braintrust.F(true),
-				IsMerge:         braintrust.F[braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMerge](braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBoolean(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBooleanTrue)),
+				IsMerge:         braintrust.F(true),
 				ParentID:        braintrust.F("string"),
 			})}),
 		},

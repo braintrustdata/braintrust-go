@@ -430,7 +430,7 @@ type ExperimentFetchResponseEventsSpanAttributes struct {
 	// Name of the span, for display purposes only
 	Name string `json:"name,nullable"`
 	// Type of the span, for display purposes only
-	Type        ExperimentFetchResponseEventsSpanAttributesType `json:"type,nullable"`
+	Type        string                                          `json:"type,nullable"`
 	ExtraFields map[string]interface{}                          `json:"-,extras"`
 	JSON        experimentFetchResponseEventsSpanAttributesJSON `json:"-"`
 }
@@ -447,18 +447,6 @@ type experimentFetchResponseEventsSpanAttributesJSON struct {
 func (r *ExperimentFetchResponseEventsSpanAttributes) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-// Type of the span, for display purposes only
-type ExperimentFetchResponseEventsSpanAttributesType string
-
-const (
-	ExperimentFetchResponseEventsSpanAttributesTypeLlm      ExperimentFetchResponseEventsSpanAttributesType = "llm"
-	ExperimentFetchResponseEventsSpanAttributesTypeScore    ExperimentFetchResponseEventsSpanAttributesType = "score"
-	ExperimentFetchResponseEventsSpanAttributesTypeFunction ExperimentFetchResponseEventsSpanAttributesType = "function"
-	ExperimentFetchResponseEventsSpanAttributesTypeEval     ExperimentFetchResponseEventsSpanAttributesType = "eval"
-	ExperimentFetchResponseEventsSpanAttributesTypeTask     ExperimentFetchResponseEventsSpanAttributesType = "task"
-	ExperimentFetchResponseEventsSpanAttributesTypeTool     ExperimentFetchResponseEventsSpanAttributesType = "tool"
-)
 
 type ExperimentFetchPostResponse struct {
 	// A list of fetched events
@@ -645,7 +633,7 @@ type ExperimentFetchPostResponseEventsSpanAttributes struct {
 	// Name of the span, for display purposes only
 	Name string `json:"name,nullable"`
 	// Type of the span, for display purposes only
-	Type        ExperimentFetchPostResponseEventsSpanAttributesType `json:"type,nullable"`
+	Type        string                                              `json:"type,nullable"`
 	ExtraFields map[string]interface{}                              `json:"-,extras"`
 	JSON        experimentFetchPostResponseEventsSpanAttributesJSON `json:"-"`
 }
@@ -662,18 +650,6 @@ type experimentFetchPostResponseEventsSpanAttributesJSON struct {
 func (r *ExperimentFetchPostResponseEventsSpanAttributes) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-// Type of the span, for display purposes only
-type ExperimentFetchPostResponseEventsSpanAttributesType string
-
-const (
-	ExperimentFetchPostResponseEventsSpanAttributesTypeLlm      ExperimentFetchPostResponseEventsSpanAttributesType = "llm"
-	ExperimentFetchPostResponseEventsSpanAttributesTypeScore    ExperimentFetchPostResponseEventsSpanAttributesType = "score"
-	ExperimentFetchPostResponseEventsSpanAttributesTypeFunction ExperimentFetchPostResponseEventsSpanAttributesType = "function"
-	ExperimentFetchPostResponseEventsSpanAttributesTypeEval     ExperimentFetchPostResponseEventsSpanAttributesType = "eval"
-	ExperimentFetchPostResponseEventsSpanAttributesTypeTask     ExperimentFetchPostResponseEventsSpanAttributesType = "task"
-	ExperimentFetchPostResponseEventsSpanAttributesTypeTool     ExperimentFetchPostResponseEventsSpanAttributesType = "tool"
-)
 
 type ExperimentInsertResponse struct {
 	// The ids of all rows that were inserted, aligning one-to-one with the rows
@@ -854,21 +830,12 @@ type ExperimentFeedbackParamsFeedback struct {
 	// merged into the existing scores for the experiment event
 	Scores param.Field[map[string]float64] `json:"scores"`
 	// The source of the feedback. Must be one of "external" (default), "app", or "api"
-	Source param.Field[ExperimentFeedbackParamsFeedbackSource] `json:"source"`
+	Source param.Field[string] `json:"source"`
 }
 
 func (r ExperimentFeedbackParamsFeedback) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
-
-// The source of the feedback. Must be one of "external" (default), "app", or "api"
-type ExperimentFeedbackParamsFeedbackSource string
-
-const (
-	ExperimentFeedbackParamsFeedbackSourceApp      ExperimentFeedbackParamsFeedbackSource = "app"
-	ExperimentFeedbackParamsFeedbackSourceAPI      ExperimentFeedbackParamsFeedbackSource = "api"
-	ExperimentFeedbackParamsFeedbackSourceExternal ExperimentFeedbackParamsFeedbackSource = "external"
-)
 
 type ExperimentFetchParams struct {
 	// Fetch queries may be paginated if the total result size is expected to be large
@@ -957,7 +924,7 @@ type ExperimentFetchPostParamsFilter struct {
 	// `{"input": {"a": {"b": {"c": "hello"}}}}`, pass `path=["input", "a", "b", "c"]`
 	Path param.Field[[]string] `json:"path,required"`
 	// Denotes the type of filter as a path-lookup filter
-	Type param.Field[ExperimentFetchPostParamsFiltersType] `json:"type,required"`
+	Type param.Field[string] `json:"type,required"`
 	// The value to compare equality-wise against the event value at the specified
 	// `path`. The value must be a "primitive", that is, any JSON-serializable object
 	// except for objects and arrays. For instance, if you wish to filter on the value
@@ -969,13 +936,6 @@ type ExperimentFetchPostParamsFilter struct {
 func (r ExperimentFetchPostParamsFilter) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
-
-// Denotes the type of filter as a path-lookup filter
-type ExperimentFetchPostParamsFiltersType string
-
-const (
-	ExperimentFetchPostParamsFiltersTypePathLookup ExperimentFetchPostParamsFiltersType = "path_lookup"
-)
 
 type ExperimentInsertParams struct {
 	// A list of experiment events to insert
@@ -1007,7 +967,7 @@ type ExperimentInsertParamsEventsInsertExperimentEventReplace struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMerge] `json:"_is_merge"`
+	IsMerge param.Field[bool] `json:"_is_merge"`
 	// Pass `_object_delete=true` to mark the experiment event deleted. Deleted events
 	// will not show up in subsequent fetches for this experiment
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
@@ -1082,31 +1042,6 @@ func (r ExperimentInsertParamsEventsInsertExperimentEventReplace) MarshalJSON() 
 func (r ExperimentInsertParamsEventsInsertExperimentEventReplace) implementsExperimentInsertParamsEvent() {
 }
 
-// The `_is_merge` field controls how the row is merged with any existing row with
-// the same id in the DB. By default (or when set to `false`), the existing row is
-// completely replaced by the new row. When set to `true`, the new row is
-// deep-merged into the existing row
-//
-// For example, say there is an existing row in the DB
-// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
-// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
-// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
-// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
-// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-//
-// Satisfied by
-// [ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBoolean],
-// [ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeUnknown].
-type ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMerge interface {
-	ImplementsExperimentInsertParamsEventsInsertExperimentEventReplaceIsMerge()
-}
-
-type ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBoolean bool
-
-const (
-	ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBooleanFalse ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBoolean = false
-)
-
 // Context is additional information about the code that produced the experiment
 // event. It is essentially the textual counterpart to `metrics`. Use the
 // `caller_*` attributes to track the location in code which produced the
@@ -1147,25 +1082,13 @@ type ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributes stru
 	// Name of the span, for display purposes only
 	Name param.Field[string] `json:"name"`
 	// Type of the span, for display purposes only
-	Type        param.Field[ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesType] `json:"type"`
-	ExtraFields map[string]interface{}                                                                  `json:"-,extras"`
+	Type        param.Field[string]    `json:"type"`
+	ExtraFields map[string]interface{} `json:"-,extras"`
 }
 
 func (r ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributes) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
-
-// Type of the span, for display purposes only
-type ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesType string
-
-const (
-	ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesTypeLlm      ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesType = "llm"
-	ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesTypeScore    ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesType = "score"
-	ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesTypeFunction ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesType = "function"
-	ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesTypeEval     ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesType = "eval"
-	ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesTypeTask     ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesType = "task"
-	ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesTypeTool     ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesType = "tool"
-)
 
 type ExperimentInsertParamsEventsInsertExperimentEventMerge struct {
 	// The `_is_merge` field controls how the row is merged with any existing row with
@@ -1179,7 +1102,7 @@ type ExperimentInsertParamsEventsInsertExperimentEventMerge struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[ExperimentInsertParamsEventsInsertExperimentEventMergeIsMerge] `json:"_is_merge,required"`
+	IsMerge param.Field[bool] `json:"_is_merge,required"`
 	// A unique identifier for the experiment event. If you don't provide one,
 	// BrainTrust will generate one for you
 	ID param.Field[string] `json:"id"`
@@ -1258,23 +1181,6 @@ func (r ExperimentInsertParamsEventsInsertExperimentEventMerge) MarshalJSON() (d
 func (r ExperimentInsertParamsEventsInsertExperimentEventMerge) implementsExperimentInsertParamsEvent() {
 }
 
-// The `_is_merge` field controls how the row is merged with any existing row with
-// the same id in the DB. By default (or when set to `false`), the existing row is
-// completely replaced by the new row. When set to `true`, the new row is
-// deep-merged into the existing row
-//
-// For example, say there is an existing row in the DB
-// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
-// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
-// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
-// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
-// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-type ExperimentInsertParamsEventsInsertExperimentEventMergeIsMerge bool
-
-const (
-	ExperimentInsertParamsEventsInsertExperimentEventMergeIsMergeTrue ExperimentInsertParamsEventsInsertExperimentEventMergeIsMerge = true
-)
-
 // Context is additional information about the code that produced the experiment
 // event. It is essentially the textual counterpart to `metrics`. Use the
 // `caller_*` attributes to track the location in code which produced the
@@ -1315,25 +1221,13 @@ type ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributes struct
 	// Name of the span, for display purposes only
 	Name param.Field[string] `json:"name"`
 	// Type of the span, for display purposes only
-	Type        param.Field[ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributesType] `json:"type"`
-	ExtraFields map[string]interface{}                                                                `json:"-,extras"`
+	Type        param.Field[string]    `json:"type"`
+	ExtraFields map[string]interface{} `json:"-,extras"`
 }
 
 func (r ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributes) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
-
-// Type of the span, for display purposes only
-type ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributesType string
-
-const (
-	ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributesTypeLlm      ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributesType = "llm"
-	ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributesTypeScore    ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributesType = "score"
-	ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributesTypeFunction ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributesType = "function"
-	ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributesTypeEval     ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributesType = "eval"
-	ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributesTypeTask     ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributesType = "task"
-	ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributesTypeTool     ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributesType = "tool"
-)
 
 type ExperimentReplaceParams struct {
 	// Unique identifier for the project that the experiment belongs under
