@@ -190,7 +190,7 @@ func TestProjectLogInsert(t *testing.T) {
 				}),
 				ID:           braintrust.F("string"),
 				ObjectDelete: braintrust.F(true),
-				IsMerge:      braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMergeTrue),
+				IsMerge:      braintrust.F(true),
 				ParentID:     braintrust.F("string"),
 			}), braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
@@ -217,7 +217,7 @@ func TestProjectLogInsert(t *testing.T) {
 				}),
 				ID:           braintrust.F("string"),
 				ObjectDelete: braintrust.F(true),
-				IsMerge:      braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMergeTrue),
+				IsMerge:      braintrust.F(true),
 				ParentID:     braintrust.F("string"),
 			}), braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
@@ -244,7 +244,7 @@ func TestProjectLogInsert(t *testing.T) {
 				}),
 				ID:           braintrust.F("string"),
 				ObjectDelete: braintrust.F(true),
-				IsMerge:      braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceIsMergeTrue),
+				IsMerge:      braintrust.F(true),
 				ParentID:     braintrust.F("string"),
 			})}),
 		},
