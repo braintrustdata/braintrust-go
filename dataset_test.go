@@ -289,7 +289,7 @@ func TestDatasetInsert(t *testing.T) {
 				}),
 				ID:           braintrust.F("string"),
 				ObjectDelete: braintrust.F(true),
-				IsMerge:      braintrust.F[braintrust.DatasetInsertParamsEventsInsertDatasetEventReplaceIsMerge](braintrust.DatasetInsertParamsEventsInsertDatasetEventReplaceIsMergeBoolean(braintrust.DatasetInsertParamsEventsInsertDatasetEventReplaceIsMergeBooleanTrue)),
+				IsMerge:      braintrust.F(true),
 				ParentID:     braintrust.F("string"),
 			}), braintrust.DatasetInsertParamsEventsInsertDatasetEventReplace(braintrust.DatasetInsertParamsEventsInsertDatasetEventReplace{
 				Input:  braintrust.F[any](map[string]interface{}{}),
@@ -299,7 +299,7 @@ func TestDatasetInsert(t *testing.T) {
 				}),
 				ID:           braintrust.F("string"),
 				ObjectDelete: braintrust.F(true),
-				IsMerge:      braintrust.F[braintrust.DatasetInsertParamsEventsInsertDatasetEventReplaceIsMerge](braintrust.DatasetInsertParamsEventsInsertDatasetEventReplaceIsMergeBoolean(braintrust.DatasetInsertParamsEventsInsertDatasetEventReplaceIsMergeBooleanTrue)),
+				IsMerge:      braintrust.F(true),
 				ParentID:     braintrust.F("string"),
 			}), braintrust.DatasetInsertParamsEventsInsertDatasetEventReplace(braintrust.DatasetInsertParamsEventsInsertDatasetEventReplace{
 				Input:  braintrust.F[any](map[string]interface{}{}),
@@ -309,7 +309,7 @@ func TestDatasetInsert(t *testing.T) {
 				}),
 				ID:           braintrust.F("string"),
 				ObjectDelete: braintrust.F(true),
-				IsMerge:      braintrust.F[braintrust.DatasetInsertParamsEventsInsertDatasetEventReplaceIsMerge](braintrust.DatasetInsertParamsEventsInsertDatasetEventReplaceIsMergeBoolean(braintrust.DatasetInsertParamsEventsInsertDatasetEventReplaceIsMergeBooleanTrue)),
+				IsMerge:      braintrust.F(true),
 				ParentID:     braintrust.F("string"),
 			})}),
 		},

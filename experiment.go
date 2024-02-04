@@ -1007,7 +1007,7 @@ type ExperimentInsertParamsEventsInsertExperimentEventReplace struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMerge] `json:"_is_merge"`
+	IsMerge param.Field[bool] `json:"_is_merge"`
 	// Pass `_object_delete=true` to mark the experiment event deleted. Deleted events
 	// will not show up in subsequent fetches for this experiment
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
@@ -1082,31 +1082,6 @@ func (r ExperimentInsertParamsEventsInsertExperimentEventReplace) MarshalJSON() 
 func (r ExperimentInsertParamsEventsInsertExperimentEventReplace) implementsExperimentInsertParamsEvent() {
 }
 
-// The `_is_merge` field controls how the row is merged with any existing row with
-// the same id in the DB. By default (or when set to `false`), the existing row is
-// completely replaced by the new row. When set to `true`, the new row is
-// deep-merged into the existing row
-//
-// For example, say there is an existing row in the DB
-// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
-// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
-// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
-// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
-// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-//
-// Satisfied by
-// [ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBoolean],
-// [ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeUnknown].
-type ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMerge interface {
-	ImplementsExperimentInsertParamsEventsInsertExperimentEventReplaceIsMerge()
-}
-
-type ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBoolean bool
-
-const (
-	ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBooleanFalse ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBoolean = false
-)
-
 // Context is additional information about the code that produced the experiment
 // event. It is essentially the textual counterpart to `metrics`. Use the
 // `caller_*` attributes to track the location in code which produced the
@@ -1179,7 +1154,7 @@ type ExperimentInsertParamsEventsInsertExperimentEventMerge struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[ExperimentInsertParamsEventsInsertExperimentEventMergeIsMerge] `json:"_is_merge,required"`
+	IsMerge param.Field[bool] `json:"_is_merge,required"`
 	// A unique identifier for the experiment event. If you don't provide one,
 	// BrainTrust will generate one for you
 	ID param.Field[string] `json:"id"`
@@ -1257,23 +1232,6 @@ func (r ExperimentInsertParamsEventsInsertExperimentEventMerge) MarshalJSON() (d
 
 func (r ExperimentInsertParamsEventsInsertExperimentEventMerge) implementsExperimentInsertParamsEvent() {
 }
-
-// The `_is_merge` field controls how the row is merged with any existing row with
-// the same id in the DB. By default (or when set to `false`), the existing row is
-// completely replaced by the new row. When set to `true`, the new row is
-// deep-merged into the existing row
-//
-// For example, say there is an existing row in the DB
-// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
-// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
-// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
-// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
-// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-type ExperimentInsertParamsEventsInsertExperimentEventMergeIsMerge bool
-
-const (
-	ExperimentInsertParamsEventsInsertExperimentEventMergeIsMergeTrue ExperimentInsertParamsEventsInsertExperimentEventMergeIsMerge = true
-)
 
 // Context is additional information about the code that produced the experiment
 // event. It is essentially the textual counterpart to `metrics`. Use the

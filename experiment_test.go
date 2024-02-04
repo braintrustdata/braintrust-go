@@ -355,7 +355,7 @@ func TestExperimentInsert(t *testing.T) {
 				ID:              braintrust.F("string"),
 				DatasetRecordID: braintrust.F("string"),
 				ObjectDelete:    braintrust.F(true),
-				IsMerge:         braintrust.F[braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMerge](braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBoolean(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBooleanTrue)),
+				IsMerge:         braintrust.F(true),
 				ParentID:        braintrust.F("string"),
 			}), braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
@@ -383,7 +383,7 @@ func TestExperimentInsert(t *testing.T) {
 				ID:              braintrust.F("string"),
 				DatasetRecordID: braintrust.F("string"),
 				ObjectDelete:    braintrust.F(true),
-				IsMerge:         braintrust.F[braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMerge](braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBoolean(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBooleanTrue)),
+				IsMerge:         braintrust.F(true),
 				ParentID:        braintrust.F("string"),
 			}), braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
@@ -411,7 +411,7 @@ func TestExperimentInsert(t *testing.T) {
 				ID:              braintrust.F("string"),
 				DatasetRecordID: braintrust.F("string"),
 				ObjectDelete:    braintrust.F(true),
-				IsMerge:         braintrust.F[braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMerge](braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBoolean(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceIsMergeBooleanTrue)),
+				IsMerge:         braintrust.F(true),
 				ParentID:        braintrust.F("string"),
 			})}),
 		},
