@@ -14,7 +14,7 @@ import (
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
-func TestProjectNewWithOptionalParams(t *testing.T) {
+func TestRoleNewWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -26,9 +26,12 @@ func TestProjectNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Project.New(context.TODO(), braintrust.ProjectNewParams{
-		Name:    braintrust.F("string"),
-		OrgName: braintrust.F("string"),
+	_, err := client.Role.New(context.TODO(), braintrust.RoleNewParams{
+		Name:              braintrust.F("string"),
+		Description:       braintrust.F("string"),
+		MemberPermissions: braintrust.F([]braintrust.RoleNewParamsMemberPermission{braintrust.RoleNewParamsMemberPermissionCreate, braintrust.RoleNewParamsMemberPermissionRead, braintrust.RoleNewParamsMemberPermissionUpdate}),
+		MemberRoles:       braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
+		OrgName:           braintrust.F("string"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -39,7 +42,7 @@ func TestProjectNewWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestProjectGet(t *testing.T) {
+func TestRoleGet(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -51,7 +54,7 @@ func TestProjectGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Project.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.Role.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -61,7 +64,7 @@ func TestProjectGet(t *testing.T) {
 	}
 }
 
-func TestProjectUpdateWithOptionalParams(t *testing.T) {
+func TestRoleUpdateWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -73,11 +76,14 @@ func TestProjectUpdateWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Project.Update(
+	_, err := client.Role.Update(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		braintrust.ProjectUpdateParams{
-			Name: braintrust.F("string"),
+		braintrust.RoleUpdateParams{
+			Description:       braintrust.F("string"),
+			MemberPermissions: braintrust.F([]braintrust.RoleUpdateParamsMemberPermission{braintrust.RoleUpdateParamsMemberPermissionCreate, braintrust.RoleUpdateParamsMemberPermissionRead, braintrust.RoleUpdateParamsMemberPermissionUpdate}),
+			MemberRoles:       braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
+			Name:              braintrust.F("string"),
 		},
 	)
 	if err != nil {
@@ -89,7 +95,7 @@ func TestProjectUpdateWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestProjectListWithOptionalParams(t *testing.T) {
+func TestRoleListWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -101,12 +107,12 @@ func TestProjectListWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Project.List(context.TODO(), braintrust.ProjectListParams{
+	_, err := client.Role.List(context.TODO(), braintrust.RoleListParams{
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:           braintrust.F[braintrust.ProjectListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
+		IDs:           braintrust.F[braintrust.RoleListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
 		OrgName:       braintrust.F("string"),
-		ProjectName:   braintrust.F("string"),
+		RoleName:      braintrust.F("string"),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
@@ -118,7 +124,7 @@ func TestProjectListWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestProjectDelete(t *testing.T) {
+func TestRoleDelete(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -130,7 +136,7 @@ func TestProjectDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Project.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.Role.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -140,7 +146,7 @@ func TestProjectDelete(t *testing.T) {
 	}
 }
 
-func TestProjectReplaceWithOptionalParams(t *testing.T) {
+func TestRoleReplaceWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -152,9 +158,12 @@ func TestProjectReplaceWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Project.Replace(context.TODO(), braintrust.ProjectReplaceParams{
-		Name:    braintrust.F("string"),
-		OrgName: braintrust.F("string"),
+	_, err := client.Role.Replace(context.TODO(), braintrust.RoleReplaceParams{
+		Name:              braintrust.F("string"),
+		Description:       braintrust.F("string"),
+		MemberPermissions: braintrust.F([]braintrust.RoleReplaceParamsMemberPermission{braintrust.RoleReplaceParamsMemberPermissionCreate, braintrust.RoleReplaceParamsMemberPermissionRead, braintrust.RoleReplaceParamsMemberPermissionUpdate}),
+		MemberRoles:       braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
+		OrgName:           braintrust.F("string"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error

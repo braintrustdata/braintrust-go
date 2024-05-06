@@ -1,4 +1,4 @@
-// File generated from our OpenAPI spec by Stainless.
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 package braintrust
 
@@ -11,9 +11,9 @@ import (
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
+	"github.com/braintrustdata/braintrust-go/internal/pagination"
 	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
-	"github.com/braintrustdata/braintrust-go/internal/shared"
 	"github.com/braintrustdata/braintrust-go/option"
 )
 
@@ -55,9 +55,7 @@ func (r *ProjectService) Get(ctx context.Context, projectID string, opts ...opti
 
 // Partially update a project object. Specify the fields to update in the payload.
 // Any object-type fields will be deep-merged with existing content. Currently we
-// do not support removing fields or setting them to null. As a workaround, you may
-// retrieve the full object with `GET /project/{id}` and then replace it with
-// `PUT /project`.
+// do not support removing fields or setting them to null.
 func (r *ProjectService) Update(ctx context.Context, projectID string, body ProjectUpdateParams, opts ...option.RequestOption) (res *Project, err error) {
 	opts = append(r.Options[:], opts...)
 	path := fmt.Sprintf("v1/project/%s", projectID)
@@ -67,7 +65,7 @@ func (r *ProjectService) Update(ctx context.Context, projectID string, body Proj
 
 // List out all projects. The projects are sorted by creation date, with the most
 // recently-created projects coming first
-func (r *ProjectService) List(ctx context.Context, query ProjectListParams, opts ...option.RequestOption) (res *shared.ListObjects[Project], err error) {
+func (r *ProjectService) List(ctx context.Context, query ProjectListParams, opts ...option.RequestOption) (res *pagination.ListObjects[Project], err error) {
 	var raw *http.Response
 	opts = append(r.Options, opts...)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
@@ -86,8 +84,8 @@ func (r *ProjectService) List(ctx context.Context, query ProjectListParams, opts
 
 // List out all projects. The projects are sorted by creation date, with the most
 // recently-created projects coming first
-func (r *ProjectService) ListAutoPaging(ctx context.Context, query ProjectListParams, opts ...option.RequestOption) *shared.ListObjectsAutoPager[Project] {
-	return shared.NewListObjectsAutoPager(r.List(ctx, query, opts...))
+func (r *ProjectService) ListAutoPaging(ctx context.Context, query ProjectListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[Project] {
+	return pagination.NewListObjectsAutoPager(r.List(ctx, query, opts...))
 }
 
 // Delete a project object by its id
@@ -98,9 +96,10 @@ func (r *ProjectService) Delete(ctx context.Context, projectID string, opts ...o
 	return
 }
 
-// Create or replace a new project. If there is an existing project with the same
-// name as the one specified in the request, will replace the existing project with
-// the provided fields
+// NOTE: This operation is deprecated and will be removed in a future revision of
+// the API. Create or replace a new project. If there is an existing project with
+// the same name as the one specified in the request, will return the existing
+// project unmodified, will replace the existing project with the provided fields
 func (r *ProjectService) Replace(ctx context.Context, body ProjectReplaceParams, opts ...option.RequestOption) (res *Project, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/project"
@@ -140,6 +139,10 @@ func (r *Project) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+func (r projectJSON) RawJSON() string {
+	return r.raw
+}
+
 type ProjectNewParams struct {
 	// Name of the project
 	Name param.Field[string] `json:"name,required"`
@@ -163,19 +166,26 @@ func (r ProjectUpdateParams) MarshalJSON() (data []byte, err error) {
 }
 
 type ProjectListParams struct {
-	// A cursor for pagination. For example, if the initial item in the last page you
-	// fetched had an id of `foo`, pass `ending_before=foo` to fetch the previous page.
-	// Note: you may only pass one of `starting_after` and `ending_before`
+	// Pagination cursor id.
+	//
+	// For example, if the initial item in the last page you fetched had an id of
+	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
+	// pass one of `starting_after` and `ending_before`
 	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs param.Field[ProjectListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
 	Limit param.Field[int64] `query:"limit"`
 	// Filter search results to within a particular organization
 	OrgName param.Field[string] `query:"org_name"`
 	// Name of the project to search for
 	ProjectName param.Field[string] `query:"project_name"`
-	// A cursor for pagination. For example, if the final item in the last page you
-	// fetched had an id of `foo`, pass `starting_after=foo` to fetch the next page.
-	// Note: you may only pass one of `starting_after` and `ending_before`
+	// Pagination cursor id.
+	//
+	// For example, if the final item in the last page you fetched had an id of `foo`,
+	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
+	// `starting_after` and `ending_before`
 	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
 }
 
@@ -186,6 +196,18 @@ func (r ProjectListParams) URLQuery() (v url.Values) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter search results to a particular set of object IDs. To specify a list of
+// IDs, include the query param multiple times
+//
+// Satisfied by [shared.UnionString], [ProjectListParamsIDsArray].
+type ProjectListParamsIDsUnion interface {
+	ImplementsProjectListParamsIDsUnion()
+}
+
+type ProjectListParamsIDsArray []string
+
+func (r ProjectListParamsIDsArray) ImplementsProjectListParamsIDsUnion() {}
 
 type ProjectReplaceParams struct {
 	// Name of the project

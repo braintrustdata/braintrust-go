@@ -1,4 +1,4 @@
-// File generated from our OpenAPI spec by Stainless.
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 package braintrust_test
 
@@ -11,6 +11,7 @@ import (
 	"github.com/braintrustdata/braintrust-go"
 	"github.com/braintrustdata/braintrust-go/internal/testutil"
 	"github.com/braintrustdata/braintrust-go/option"
+	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 func TestExperimentNewWithOptionalParams(t *testing.T) {
@@ -31,6 +32,7 @@ func TestExperimentNewWithOptionalParams(t *testing.T) {
 		DatasetID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		DatasetVersion: braintrust.F("string"),
 		Description:    braintrust.F("string"),
+		EnsureNew:      braintrust.F(true),
 		Metadata: braintrust.F(map[string]interface{}{
 			"foo": map[string]interface{}{},
 		}),
@@ -141,6 +143,7 @@ func TestExperimentListWithOptionalParams(t *testing.T) {
 	_, err := client.Experiment.List(context.TODO(), braintrust.ExperimentListParams{
 		EndingBefore:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ExperimentName: braintrust.F("string"),
+		IDs:            braintrust.F[braintrust.ExperimentListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:          braintrust.F(int64(0)),
 		OrgName:        braintrust.F("string"),
 		ProjectName:    braintrust.F("string"),
@@ -256,8 +259,8 @@ func TestExperimentFetchWithOptionalParams(t *testing.T) {
 		braintrust.ExperimentFetchParams{
 			Limit:         braintrust.F(int64(0)),
 			MaxRootSpanID: braintrust.F("string"),
-			MaxXactID:     braintrust.F(int64(0)),
-			Version:       braintrust.F(int64(0)),
+			MaxXactID:     braintrust.F("string"),
+			Version:       braintrust.F("string"),
 		},
 	)
 	if err != nil {
@@ -300,8 +303,8 @@ func TestExperimentFetchPostWithOptionalParams(t *testing.T) {
 			}}),
 			Limit:         braintrust.F(int64(0)),
 			MaxRootSpanID: braintrust.F("string"),
-			MaxXactID:     braintrust.F(int64(0)),
-			Version:       braintrust.F(int64(0)),
+			MaxXactID:     braintrust.F("string"),
+			Version:       braintrust.F("string"),
 		},
 	)
 	if err != nil {
@@ -329,7 +332,7 @@ func TestExperimentInsert(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ExperimentInsertParams{
-			Events: braintrust.F([]braintrust.ExperimentInsertParamsEvent{braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace{
+			Events: braintrust.F([]braintrust.ExperimentInsertParamsEventUnion{braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
 				Output:   braintrust.F[any](map[string]interface{}{}),
 				Expected: braintrust.F[any](map[string]interface{}{}),
@@ -339,9 +342,13 @@ func TestExperimentInsert(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
+				Tags: braintrust.F([]string{"string", "string", "string"}),
 				Metrics: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceMetrics{
-					Start: braintrust.F(0.000000),
-					End:   braintrust.F(0.000000),
+					Start:            braintrust.F(0.000000),
+					End:              braintrust.F(0.000000),
+					PromptTokens:     braintrust.F(int64(0)),
+					CompletionTokens: braintrust.F(int64(0)),
+					Tokens:           braintrust.F(int64(0)),
 				}),
 				Context: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceContext{
 					CallerFunctionname: braintrust.F("string"),
@@ -357,7 +364,7 @@ func TestExperimentInsert(t *testing.T) {
 				ObjectDelete:    braintrust.F(true),
 				IsMerge:         braintrust.F(true),
 				ParentID:        braintrust.F("string"),
-			}), braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace{
+			}, braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
 				Output:   braintrust.F[any](map[string]interface{}{}),
 				Expected: braintrust.F[any](map[string]interface{}{}),
@@ -367,9 +374,13 @@ func TestExperimentInsert(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
+				Tags: braintrust.F([]string{"string", "string", "string"}),
 				Metrics: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceMetrics{
-					Start: braintrust.F(0.000000),
-					End:   braintrust.F(0.000000),
+					Start:            braintrust.F(0.000000),
+					End:              braintrust.F(0.000000),
+					PromptTokens:     braintrust.F(int64(0)),
+					CompletionTokens: braintrust.F(int64(0)),
+					Tokens:           braintrust.F(int64(0)),
 				}),
 				Context: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceContext{
 					CallerFunctionname: braintrust.F("string"),
@@ -385,7 +396,7 @@ func TestExperimentInsert(t *testing.T) {
 				ObjectDelete:    braintrust.F(true),
 				IsMerge:         braintrust.F(true),
 				ParentID:        braintrust.F("string"),
-			}), braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace{
+			}, braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
 				Output:   braintrust.F[any](map[string]interface{}{}),
 				Expected: braintrust.F[any](map[string]interface{}{}),
@@ -395,9 +406,13 @@ func TestExperimentInsert(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
+				Tags: braintrust.F([]string{"string", "string", "string"}),
 				Metrics: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceMetrics{
-					Start: braintrust.F(0.000000),
-					End:   braintrust.F(0.000000),
+					Start:            braintrust.F(0.000000),
+					End:              braintrust.F(0.000000),
+					PromptTokens:     braintrust.F(int64(0)),
+					CompletionTokens: braintrust.F(int64(0)),
+					Tokens:           braintrust.F(int64(0)),
 				}),
 				Context: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceContext{
 					CallerFunctionname: braintrust.F("string"),
@@ -413,7 +428,7 @@ func TestExperimentInsert(t *testing.T) {
 				ObjectDelete:    braintrust.F(true),
 				IsMerge:         braintrust.F(true),
 				ParentID:        braintrust.F("string"),
-			})}),
+			}}),
 		},
 	)
 	if err != nil {
@@ -443,6 +458,7 @@ func TestExperimentReplaceWithOptionalParams(t *testing.T) {
 		DatasetID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		DatasetVersion: braintrust.F("string"),
 		Description:    braintrust.F("string"),
+		EnsureNew:      braintrust.F(true),
 		Metadata: braintrust.F(map[string]interface{}{
 			"foo": map[string]interface{}{},
 		}),
