@@ -1,6 +1,6 @@
-// File generated from our OpenAPI spec by Stainless.
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package shared
+package pagination
 
 import (
 	"net/http"
@@ -27,6 +27,10 @@ type listObjectsJSON struct {
 
 func (r *ListObjects[T]) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r listObjectsJSON) RawJSON() string {
+	return r.raw
 }
 
 // NextPage returns the next page as defined by this pagination style. When there

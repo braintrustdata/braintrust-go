@@ -1,4 +1,4 @@
-// File generated from our OpenAPI spec by Stainless.
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 package braintrust
 
@@ -86,6 +86,10 @@ func (r *ProjectLogFetchResponse) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+func (r projectLogFetchResponseJSON) RawJSON() string {
+	return r.raw
+}
+
 type ProjectLogFetchResponseEvent struct {
 	// A unique identifier for the project logs event. If you don't provide one,
 	// BrainTrust will generate one for you
@@ -94,7 +98,9 @@ type ProjectLogFetchResponseEvent struct {
 	// the event insertion. Transaction ids are monotonically increasing over time and
 	// can be used to retrieve a versioned snapshot of the project logs (see the
 	// `version` parameter)
-	XactID int64 `json:"_xact_id,required"`
+	XactID string `json:"_xact_id,required"`
+	// The timestamp the project logs event was created
+	Created time.Time `json:"created,required" format:"date-time"`
 	// A literal 'g' which identifies the log as a project log
 	LogID ProjectLogFetchResponseEventsLogID `json:"log_id,required"`
 	// Unique id for the organization that the project belongs under
@@ -113,8 +119,6 @@ type ProjectLogFetchResponseEvent struct {
 	// `caller_*` attributes to track the location in code which produced the project
 	// logs event
 	Context ProjectLogFetchResponseEventsContext `json:"context,nullable"`
-	// The timestamp the project logs event was created
-	Created time.Time `json:"created,nullable" format:"date-time"`
 	// The ground truth value (an arbitrary, JSON serializable object) that you'd
 	// compare to `output` to determine if your `output` value is correct or not.
 	// Braintrust currently does not compare `output` to `expected` for you, since
@@ -122,7 +126,7 @@ type ProjectLogFetchResponseEvent struct {
 	// just used to help you navigate while digging into analyses. However, we may
 	// later use these values to re-score outputs or fine-tune your models.
 	Expected interface{} `json:"expected"`
-	// The arguments that uniquely define a user input(an arbitrary, JSON serializable
+	// The arguments that uniquely define a user input (an arbitrary, JSON serializable
 	// object).
 	Input interface{} `json:"input"`
 	// A dictionary with additional data about the test example, model outputs, or just
@@ -155,8 +159,10 @@ type ProjectLogFetchResponseEvent struct {
 	// An array of the parent `span_ids` of this project logs event. This should be
 	// empty for the root span of a trace, and should most often contain just one
 	// parent element for subspans
-	SpanParents []string                         `json:"span_parents,nullable"`
-	JSON        projectLogFetchResponseEventJSON `json:"-"`
+	SpanParents []string `json:"span_parents,nullable"`
+	// A list of tags to log
+	Tags []string                         `json:"tags,nullable"`
+	JSON projectLogFetchResponseEventJSON `json:"-"`
 }
 
 // projectLogFetchResponseEventJSON contains the JSON metadata for the struct
@@ -164,13 +170,13 @@ type ProjectLogFetchResponseEvent struct {
 type projectLogFetchResponseEventJSON struct {
 	ID             apijson.Field
 	XactID         apijson.Field
+	Created        apijson.Field
 	LogID          apijson.Field
 	OrgID          apijson.Field
 	ProjectID      apijson.Field
 	RootSpanID     apijson.Field
 	SpanID         apijson.Field
 	Context        apijson.Field
-	Created        apijson.Field
 	Expected       apijson.Field
 	Input          apijson.Field
 	Metadata       apijson.Field
@@ -179,6 +185,7 @@ type projectLogFetchResponseEventJSON struct {
 	Scores         apijson.Field
 	SpanAttributes apijson.Field
 	SpanParents    apijson.Field
+	Tags           apijson.Field
 	raw            string
 	ExtraFields    map[string]apijson.Field
 }
@@ -187,12 +194,24 @@ func (r *ProjectLogFetchResponseEvent) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+func (r projectLogFetchResponseEventJSON) RawJSON() string {
+	return r.raw
+}
+
 // A literal 'g' which identifies the log as a project log
 type ProjectLogFetchResponseEventsLogID string
 
 const (
 	ProjectLogFetchResponseEventsLogIDG ProjectLogFetchResponseEventsLogID = "g"
 )
+
+func (r ProjectLogFetchResponseEventsLogID) IsKnown() bool {
+	switch r {
+	case ProjectLogFetchResponseEventsLogIDG:
+		return true
+	}
+	return false
+}
 
 // Context is additional information about the code that produced the project logs
 // event. It is essentially the textual counterpart to `metrics`. Use the
@@ -223,16 +242,28 @@ func (r *ProjectLogFetchResponseEventsContext) UnmarshalJSON(data []byte) (err e
 	return apijson.UnmarshalRoot(data, r)
 }
 
+func (r projectLogFetchResponseEventsContextJSON) RawJSON() string {
+	return r.raw
+}
+
 // Metrics are numerical measurements tracking the execution of the code that
 // produced the project logs event. Use "start" and "end" to track the time span
 // over which the project logs event was produced
 type ProjectLogFetchResponseEventsMetrics struct {
+	// The number of tokens in the completion generated by the model (only set if this
+	// is an LLM span)
+	CompletionTokens int64 `json:"completion_tokens,nullable"`
 	// A unix timestamp recording when the section of code which produced the project
 	// logs event finished
 	End float64 `json:"end,nullable"`
+	// The number of tokens in the prompt used to generate the project logs event (only
+	// set if this is an LLM span)
+	PromptTokens int64 `json:"prompt_tokens,nullable"`
 	// A unix timestamp recording when the section of code which produced the project
 	// logs event started
-	Start       float64                                  `json:"start,nullable"`
+	Start float64 `json:"start,nullable"`
+	// The total number of tokens in the input and output of the project logs event.
+	Tokens      int64                                    `json:"tokens,nullable"`
 	ExtraFields map[string]interface{}                   `json:"-,extras"`
 	JSON        projectLogFetchResponseEventsMetricsJSON `json:"-"`
 }
@@ -240,14 +271,21 @@ type ProjectLogFetchResponseEventsMetrics struct {
 // projectLogFetchResponseEventsMetricsJSON contains the JSON metadata for the
 // struct [ProjectLogFetchResponseEventsMetrics]
 type projectLogFetchResponseEventsMetricsJSON struct {
-	End         apijson.Field
-	Start       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
+	CompletionTokens apijson.Field
+	End              apijson.Field
+	PromptTokens     apijson.Field
+	Start            apijson.Field
+	Tokens           apijson.Field
+	raw              string
+	ExtraFields      map[string]apijson.Field
 }
 
 func (r *ProjectLogFetchResponseEventsMetrics) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r projectLogFetchResponseEventsMetricsJSON) RawJSON() string {
+	return r.raw
 }
 
 // Human-identifying attributes of the span, such as name, type, etc.
@@ -273,6 +311,10 @@ func (r *ProjectLogFetchResponseEventsSpanAttributes) UnmarshalJSON(data []byte)
 	return apijson.UnmarshalRoot(data, r)
 }
 
+func (r projectLogFetchResponseEventsSpanAttributesJSON) RawJSON() string {
+	return r.raw
+}
+
 // Type of the span, for display purposes only
 type ProjectLogFetchResponseEventsSpanAttributesType string
 
@@ -284,6 +326,14 @@ const (
 	ProjectLogFetchResponseEventsSpanAttributesTypeTask     ProjectLogFetchResponseEventsSpanAttributesType = "task"
 	ProjectLogFetchResponseEventsSpanAttributesTypeTool     ProjectLogFetchResponseEventsSpanAttributesType = "tool"
 )
+
+func (r ProjectLogFetchResponseEventsSpanAttributesType) IsKnown() bool {
+	switch r {
+	case ProjectLogFetchResponseEventsSpanAttributesTypeLlm, ProjectLogFetchResponseEventsSpanAttributesTypeScore, ProjectLogFetchResponseEventsSpanAttributesTypeFunction, ProjectLogFetchResponseEventsSpanAttributesTypeEval, ProjectLogFetchResponseEventsSpanAttributesTypeTask, ProjectLogFetchResponseEventsSpanAttributesTypeTool:
+		return true
+	}
+	return false
+}
 
 type ProjectLogFetchPostResponse struct {
 	// A list of fetched events
@@ -303,6 +353,10 @@ func (r *ProjectLogFetchPostResponse) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+func (r projectLogFetchPostResponseJSON) RawJSON() string {
+	return r.raw
+}
+
 type ProjectLogFetchPostResponseEvent struct {
 	// A unique identifier for the project logs event. If you don't provide one,
 	// BrainTrust will generate one for you
@@ -311,7 +365,9 @@ type ProjectLogFetchPostResponseEvent struct {
 	// the event insertion. Transaction ids are monotonically increasing over time and
 	// can be used to retrieve a versioned snapshot of the project logs (see the
 	// `version` parameter)
-	XactID int64 `json:"_xact_id,required"`
+	XactID string `json:"_xact_id,required"`
+	// The timestamp the project logs event was created
+	Created time.Time `json:"created,required" format:"date-time"`
 	// A literal 'g' which identifies the log as a project log
 	LogID ProjectLogFetchPostResponseEventsLogID `json:"log_id,required"`
 	// Unique id for the organization that the project belongs under
@@ -330,8 +386,6 @@ type ProjectLogFetchPostResponseEvent struct {
 	// `caller_*` attributes to track the location in code which produced the project
 	// logs event
 	Context ProjectLogFetchPostResponseEventsContext `json:"context,nullable"`
-	// The timestamp the project logs event was created
-	Created time.Time `json:"created,nullable" format:"date-time"`
 	// The ground truth value (an arbitrary, JSON serializable object) that you'd
 	// compare to `output` to determine if your `output` value is correct or not.
 	// Braintrust currently does not compare `output` to `expected` for you, since
@@ -339,7 +393,7 @@ type ProjectLogFetchPostResponseEvent struct {
 	// just used to help you navigate while digging into analyses. However, we may
 	// later use these values to re-score outputs or fine-tune your models.
 	Expected interface{} `json:"expected"`
-	// The arguments that uniquely define a user input(an arbitrary, JSON serializable
+	// The arguments that uniquely define a user input (an arbitrary, JSON serializable
 	// object).
 	Input interface{} `json:"input"`
 	// A dictionary with additional data about the test example, model outputs, or just
@@ -372,8 +426,10 @@ type ProjectLogFetchPostResponseEvent struct {
 	// An array of the parent `span_ids` of this project logs event. This should be
 	// empty for the root span of a trace, and should most often contain just one
 	// parent element for subspans
-	SpanParents []string                             `json:"span_parents,nullable"`
-	JSON        projectLogFetchPostResponseEventJSON `json:"-"`
+	SpanParents []string `json:"span_parents,nullable"`
+	// A list of tags to log
+	Tags []string                             `json:"tags,nullable"`
+	JSON projectLogFetchPostResponseEventJSON `json:"-"`
 }
 
 // projectLogFetchPostResponseEventJSON contains the JSON metadata for the struct
@@ -381,13 +437,13 @@ type ProjectLogFetchPostResponseEvent struct {
 type projectLogFetchPostResponseEventJSON struct {
 	ID             apijson.Field
 	XactID         apijson.Field
+	Created        apijson.Field
 	LogID          apijson.Field
 	OrgID          apijson.Field
 	ProjectID      apijson.Field
 	RootSpanID     apijson.Field
 	SpanID         apijson.Field
 	Context        apijson.Field
-	Created        apijson.Field
 	Expected       apijson.Field
 	Input          apijson.Field
 	Metadata       apijson.Field
@@ -396,6 +452,7 @@ type projectLogFetchPostResponseEventJSON struct {
 	Scores         apijson.Field
 	SpanAttributes apijson.Field
 	SpanParents    apijson.Field
+	Tags           apijson.Field
 	raw            string
 	ExtraFields    map[string]apijson.Field
 }
@@ -404,12 +461,24 @@ func (r *ProjectLogFetchPostResponseEvent) UnmarshalJSON(data []byte) (err error
 	return apijson.UnmarshalRoot(data, r)
 }
 
+func (r projectLogFetchPostResponseEventJSON) RawJSON() string {
+	return r.raw
+}
+
 // A literal 'g' which identifies the log as a project log
 type ProjectLogFetchPostResponseEventsLogID string
 
 const (
 	ProjectLogFetchPostResponseEventsLogIDG ProjectLogFetchPostResponseEventsLogID = "g"
 )
+
+func (r ProjectLogFetchPostResponseEventsLogID) IsKnown() bool {
+	switch r {
+	case ProjectLogFetchPostResponseEventsLogIDG:
+		return true
+	}
+	return false
+}
 
 // Context is additional information about the code that produced the project logs
 // event. It is essentially the textual counterpart to `metrics`. Use the
@@ -440,16 +509,28 @@ func (r *ProjectLogFetchPostResponseEventsContext) UnmarshalJSON(data []byte) (e
 	return apijson.UnmarshalRoot(data, r)
 }
 
+func (r projectLogFetchPostResponseEventsContextJSON) RawJSON() string {
+	return r.raw
+}
+
 // Metrics are numerical measurements tracking the execution of the code that
 // produced the project logs event. Use "start" and "end" to track the time span
 // over which the project logs event was produced
 type ProjectLogFetchPostResponseEventsMetrics struct {
+	// The number of tokens in the completion generated by the model (only set if this
+	// is an LLM span)
+	CompletionTokens int64 `json:"completion_tokens,nullable"`
 	// A unix timestamp recording when the section of code which produced the project
 	// logs event finished
 	End float64 `json:"end,nullable"`
+	// The number of tokens in the prompt used to generate the project logs event (only
+	// set if this is an LLM span)
+	PromptTokens int64 `json:"prompt_tokens,nullable"`
 	// A unix timestamp recording when the section of code which produced the project
 	// logs event started
-	Start       float64                                      `json:"start,nullable"`
+	Start float64 `json:"start,nullable"`
+	// The total number of tokens in the input and output of the project logs event.
+	Tokens      int64                                        `json:"tokens,nullable"`
 	ExtraFields map[string]interface{}                       `json:"-,extras"`
 	JSON        projectLogFetchPostResponseEventsMetricsJSON `json:"-"`
 }
@@ -457,14 +538,21 @@ type ProjectLogFetchPostResponseEventsMetrics struct {
 // projectLogFetchPostResponseEventsMetricsJSON contains the JSON metadata for the
 // struct [ProjectLogFetchPostResponseEventsMetrics]
 type projectLogFetchPostResponseEventsMetricsJSON struct {
-	End         apijson.Field
-	Start       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
+	CompletionTokens apijson.Field
+	End              apijson.Field
+	PromptTokens     apijson.Field
+	Start            apijson.Field
+	Tokens           apijson.Field
+	raw              string
+	ExtraFields      map[string]apijson.Field
 }
 
 func (r *ProjectLogFetchPostResponseEventsMetrics) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r projectLogFetchPostResponseEventsMetricsJSON) RawJSON() string {
+	return r.raw
 }
 
 // Human-identifying attributes of the span, such as name, type, etc.
@@ -490,6 +578,10 @@ func (r *ProjectLogFetchPostResponseEventsSpanAttributes) UnmarshalJSON(data []b
 	return apijson.UnmarshalRoot(data, r)
 }
 
+func (r projectLogFetchPostResponseEventsSpanAttributesJSON) RawJSON() string {
+	return r.raw
+}
+
 // Type of the span, for display purposes only
 type ProjectLogFetchPostResponseEventsSpanAttributesType string
 
@@ -501,6 +593,14 @@ const (
 	ProjectLogFetchPostResponseEventsSpanAttributesTypeTask     ProjectLogFetchPostResponseEventsSpanAttributesType = "task"
 	ProjectLogFetchPostResponseEventsSpanAttributesTypeTool     ProjectLogFetchPostResponseEventsSpanAttributesType = "tool"
 )
+
+func (r ProjectLogFetchPostResponseEventsSpanAttributesType) IsKnown() bool {
+	switch r {
+	case ProjectLogFetchPostResponseEventsSpanAttributesTypeLlm, ProjectLogFetchPostResponseEventsSpanAttributesTypeScore, ProjectLogFetchPostResponseEventsSpanAttributesTypeFunction, ProjectLogFetchPostResponseEventsSpanAttributesTypeEval, ProjectLogFetchPostResponseEventsSpanAttributesTypeTask, ProjectLogFetchPostResponseEventsSpanAttributesTypeTool:
+		return true
+	}
+	return false
+}
 
 type ProjectLogInsertResponse struct {
 	// The ids of all rows that were inserted, aligning one-to-one with the rows
@@ -519,6 +619,10 @@ type projectLogInsertResponseJSON struct {
 
 func (r *ProjectLogInsertResponse) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r projectLogInsertResponseJSON) RawJSON() string {
+	return r.raw
 }
 
 type ProjectLogFeedbackParams struct {
@@ -562,7 +666,17 @@ const (
 	ProjectLogFeedbackParamsFeedbackSourceExternal ProjectLogFeedbackParamsFeedbackSource = "external"
 )
 
+func (r ProjectLogFeedbackParamsFeedbackSource) IsKnown() bool {
+	switch r {
+	case ProjectLogFeedbackParamsFeedbackSourceApp, ProjectLogFeedbackParamsFeedbackSourceAPI, ProjectLogFeedbackParamsFeedbackSourceExternal:
+		return true
+	}
+	return false
+}
+
 type ProjectLogFetchParams struct {
+	// limit the number of traces fetched
+	//
 	// Fetch queries may be paginated if the total result size is expected to be large
 	// (e.g. project_logs which accumulate over a long time). Note that fetch queries
 	// only support pagination in descending time order (from latest to earliest
@@ -576,21 +690,26 @@ type ProjectLogFetchParams struct {
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
 	Limit param.Field[int64] `query:"limit"`
-	// Together, `max_xact_id` and `max_root_span_id` form a cursor for paginating
-	// event fetches. Given a previous fetch with a list of rows, you can determine
-	// `max_root_span_id` as the maximum of the `root_span_id` field over all rows. See
-	// the documentation for `limit` for an overview of paginating fetch queries.
+	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
+	//
+	// Since a paginated fetch query returns results in order from latest to earliest,
+	// the cursor for the next page can be found as the row with the minimum (earliest)
+	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
+	// for an overview of paginating fetch queries.
 	MaxRootSpanID param.Field[string] `query:"max_root_span_id"`
-	// Together, `max_xact_id` and `max_root_span_id` form a cursor for paginating
-	// event fetches. Given a previous fetch with a list of rows, you can determine
-	// `max_xact_id` as the maximum of the `_xact_id` field over all rows. See the
-	// documentation for `limit` for an overview of paginating fetch queries.
-	MaxXactID param.Field[int64] `query:"max_xact_id"`
-	// You may specify a version id to retrieve a snapshot of the events from a past
-	// time. The version id is essentially a filter on the latest event transaction id.
-	// You can use the `max_xact_id` returned by a past fetch as the version to
-	// reproduce that exact fetch.
-	Version param.Field[int64] `query:"version"`
+	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
+	//
+	// Since a paginated fetch query returns results in order from latest to earliest,
+	// the cursor for the next page can be found as the row with the minimum (earliest)
+	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
+	// for an overview of paginating fetch queries.
+	MaxXactID param.Field[string] `query:"max_xact_id"`
+	// Retrieve a snapshot of events from a past time
+	//
+	// The version id is essentially a filter on the latest event transaction id. You
+	// can use the `max_xact_id` returned by a past fetch as the version to reproduce
+	// that exact fetch.
+	Version param.Field[string] `query:"version"`
 }
 
 // URLQuery serializes [ProjectLogFetchParams]'s query parameters as `url.Values`.
@@ -605,6 +724,8 @@ type ProjectLogFetchPostParams struct {
 	// A list of filters on the events to fetch. Currently, only path-lookup type
 	// filters are supported, but we may add more in the future
 	Filters param.Field[[]ProjectLogFetchPostParamsFilter] `json:"filters"`
+	// limit the number of traces fetched
+	//
 	// Fetch queries may be paginated if the total result size is expected to be large
 	// (e.g. project_logs which accumulate over a long time). Note that fetch queries
 	// only support pagination in descending time order (from latest to earliest
@@ -618,21 +739,26 @@ type ProjectLogFetchPostParams struct {
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
 	Limit param.Field[int64] `json:"limit"`
-	// Together, `max_xact_id` and `max_root_span_id` form a cursor for paginating
-	// event fetches. Given a previous fetch with a list of rows, you can determine
-	// `max_root_span_id` as the maximum of the `root_span_id` field over all rows. See
-	// the documentation for `limit` for an overview of paginating fetch queries.
+	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
+	//
+	// Since a paginated fetch query returns results in order from latest to earliest,
+	// the cursor for the next page can be found as the row with the minimum (earliest)
+	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
+	// for an overview of paginating fetch queries.
 	MaxRootSpanID param.Field[string] `json:"max_root_span_id"`
-	// Together, `max_xact_id` and `max_root_span_id` form a cursor for paginating
-	// event fetches. Given a previous fetch with a list of rows, you can determine
-	// `max_xact_id` as the maximum of the `_xact_id` field over all rows. See the
-	// documentation for `limit` for an overview of paginating fetch queries.
-	MaxXactID param.Field[int64] `json:"max_xact_id"`
-	// You may specify a version id to retrieve a snapshot of the events from a past
-	// time. The version id is essentially a filter on the latest event transaction id.
-	// You can use the `max_xact_id` returned by a past fetch as the version to
-	// reproduce that exact fetch.
-	Version param.Field[int64] `json:"version"`
+	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
+	//
+	// Since a paginated fetch query returns results in order from latest to earliest,
+	// the cursor for the next page can be found as the row with the minimum (earliest)
+	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
+	// for an overview of paginating fetch queries.
+	MaxXactID param.Field[string] `json:"max_xact_id"`
+	// Retrieve a snapshot of events from a past time
+	//
+	// The version id is essentially a filter on the latest event transaction id. You
+	// can use the `max_xact_id` returned by a past fetch as the version to reproduce
+	// that exact fetch.
+	Version param.Field[string] `json:"version"`
 }
 
 func (r ProjectLogFetchPostParams) MarshalJSON() (data []byte, err error) {
@@ -669,19 +795,81 @@ const (
 	ProjectLogFetchPostParamsFiltersTypePathLookup ProjectLogFetchPostParamsFiltersType = "path_lookup"
 )
 
+func (r ProjectLogFetchPostParamsFiltersType) IsKnown() bool {
+	switch r {
+	case ProjectLogFetchPostParamsFiltersTypePathLookup:
+		return true
+	}
+	return false
+}
+
 type ProjectLogInsertParams struct {
 	// A list of project logs events to insert
-	Events param.Field[[]ProjectLogInsertParamsEvent] `json:"events,required"`
+	Events param.Field[[]ProjectLogInsertParamsEventUnion] `json:"events,required"`
 }
 
 func (r ProjectLogInsertParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
+// A project logs event
+type ProjectLogInsertParamsEvent struct {
+	Input          param.Field[interface{}] `json:"input,required"`
+	Output         param.Field[interface{}] `json:"output,required"`
+	Expected       param.Field[interface{}] `json:"expected,required"`
+	Scores         param.Field[interface{}] `json:"scores,required"`
+	Metadata       param.Field[interface{}] `json:"metadata,required"`
+	Tags           param.Field[interface{}] `json:"tags,required"`
+	Metrics        param.Field[interface{}] `json:"metrics,required"`
+	Context        param.Field[interface{}] `json:"context,required"`
+	SpanAttributes param.Field[interface{}] `json:"span_attributes,required"`
+	// A unique identifier for the project logs event. If you don't provide one,
+	// BrainTrust will generate one for you
+	ID param.Field[string] `json:"id"`
+	// Pass `_object_delete=true` to mark the project logs event deleted. Deleted
+	// events will not show up in subsequent fetches for this project logs
+	ObjectDelete param.Field[bool] `json:"_object_delete"`
+	// The `_is_merge` field controls how the row is merged with any existing row with
+	// the same id in the DB. By default (or when set to `false`), the existing row is
+	// completely replaced by the new row. When set to `true`, the new row is
+	// deep-merged into the existing row
+	//
+	// For example, say there is an existing row in the DB
+	// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
+	// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
+	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
+	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
+	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
+	IsMerge param.Field[bool] `json:"_is_merge"`
+	// Use the `_parent_id` field to create this row as a subspan of an existing row.
+	// It cannot be specified alongside `_is_merge=true`. Tracking hierarchical
+	// relationships are important for tracing (see the
+	// [guide](https://www.braintrustdata.com/docs/guides/tracing) for full details).
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"_parent_id": "abc", "id": "llm_call", "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	ParentID   param.Field[string]      `json:"_parent_id"`
+	MergePaths param.Field[interface{}] `json:"_merge_paths,required"`
+}
+
+func (r ProjectLogInsertParamsEvent) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r ProjectLogInsertParamsEvent) implementsProjectLogInsertParamsEventUnion() {}
+
+// A project logs event
+//
 // Satisfied by [ProjectLogInsertParamsEventsInsertProjectLogsEventReplace],
-// [ProjectLogInsertParamsEventsInsertProjectLogsEventMerge].
-type ProjectLogInsertParamsEvent interface {
-	implementsProjectLogInsertParamsEvent()
+// [ProjectLogInsertParamsEventsInsertProjectLogsEventMerge],
+// [ProjectLogInsertParamsEvent].
+type ProjectLogInsertParamsEventUnion interface {
+	implementsProjectLogInsertParamsEventUnion()
 }
 
 type ProjectLogInsertParamsEventsInsertProjectLogsEventReplace struct {
@@ -728,7 +916,7 @@ type ProjectLogInsertParamsEventsInsertProjectLogsEventReplace struct {
 	// just used to help you navigate while digging into analyses. However, we may
 	// later use these values to re-score outputs or fine-tune your models.
 	Expected param.Field[interface{}] `json:"expected"`
-	// The arguments that uniquely define a user input(an arbitrary, JSON serializable
+	// The arguments that uniquely define a user input (an arbitrary, JSON serializable
 	// object).
 	Input param.Field[interface{}] `json:"input"`
 	// A dictionary with additional data about the test example, model outputs, or just
@@ -758,13 +946,15 @@ type ProjectLogInsertParamsEventsInsertProjectLogsEventReplace struct {
 	Scores param.Field[map[string]float64] `json:"scores"`
 	// Human-identifying attributes of the span, such as name, type, etc.
 	SpanAttributes param.Field[ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributes] `json:"span_attributes"`
+	// A list of tags to log
+	Tags param.Field[[]string] `json:"tags"`
 }
 
 func (r ProjectLogInsertParamsEventsInsertProjectLogsEventReplace) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r ProjectLogInsertParamsEventsInsertProjectLogsEventReplace) implementsProjectLogInsertParamsEvent() {
+func (r ProjectLogInsertParamsEventsInsertProjectLogsEventReplace) implementsProjectLogInsertParamsEventUnion() {
 }
 
 // Context is additional information about the code that produced the project logs
@@ -789,12 +979,20 @@ func (r ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceContext) Marsha
 // produced the project logs event. Use "start" and "end" to track the time span
 // over which the project logs event was produced
 type ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceMetrics struct {
+	// The number of tokens in the completion generated by the model (only set if this
+	// is an LLM span)
+	CompletionTokens param.Field[int64] `json:"completion_tokens"`
 	// A unix timestamp recording when the section of code which produced the project
 	// logs event finished
 	End param.Field[float64] `json:"end"`
+	// The number of tokens in the prompt used to generate the project logs event (only
+	// set if this is an LLM span)
+	PromptTokens param.Field[int64] `json:"prompt_tokens"`
 	// A unix timestamp recording when the section of code which produced the project
 	// logs event started
-	Start       param.Field[float64]   `json:"start"`
+	Start param.Field[float64] `json:"start"`
+	// The total number of tokens in the input and output of the project logs event.
+	Tokens      param.Field[int64]     `json:"tokens"`
 	ExtraFields map[string]interface{} `json:"-,extras"`
 }
 
@@ -826,6 +1024,14 @@ const (
 	ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeTask     ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesType = "task"
 	ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeTool     ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesType = "tool"
 )
+
+func (r ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesType) IsKnown() bool {
+	switch r {
+	case ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeLlm, ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeScore, ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeFunction, ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeEval, ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeTask, ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeTool:
+		return true
+	}
+	return false
+}
 
 type ProjectLogInsertParamsEventsInsertProjectLogsEventMerge struct {
 	// The `_is_merge` field controls how the row is merged with any existing row with
@@ -872,7 +1078,7 @@ type ProjectLogInsertParamsEventsInsertProjectLogsEventMerge struct {
 	// just used to help you navigate while digging into analyses. However, we may
 	// later use these values to re-score outputs or fine-tune your models.
 	Expected param.Field[interface{}] `json:"expected"`
-	// The arguments that uniquely define a user input(an arbitrary, JSON serializable
+	// The arguments that uniquely define a user input (an arbitrary, JSON serializable
 	// object).
 	Input param.Field[interface{}] `json:"input"`
 	// A dictionary with additional data about the test example, model outputs, or just
@@ -902,13 +1108,15 @@ type ProjectLogInsertParamsEventsInsertProjectLogsEventMerge struct {
 	Scores param.Field[map[string]float64] `json:"scores"`
 	// Human-identifying attributes of the span, such as name, type, etc.
 	SpanAttributes param.Field[ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributes] `json:"span_attributes"`
+	// A list of tags to log
+	Tags param.Field[[]string] `json:"tags"`
 }
 
 func (r ProjectLogInsertParamsEventsInsertProjectLogsEventMerge) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r ProjectLogInsertParamsEventsInsertProjectLogsEventMerge) implementsProjectLogInsertParamsEvent() {
+func (r ProjectLogInsertParamsEventsInsertProjectLogsEventMerge) implementsProjectLogInsertParamsEventUnion() {
 }
 
 // Context is additional information about the code that produced the project logs
@@ -933,12 +1141,20 @@ func (r ProjectLogInsertParamsEventsInsertProjectLogsEventMergeContext) MarshalJ
 // produced the project logs event. Use "start" and "end" to track the time span
 // over which the project logs event was produced
 type ProjectLogInsertParamsEventsInsertProjectLogsEventMergeMetrics struct {
+	// The number of tokens in the completion generated by the model (only set if this
+	// is an LLM span)
+	CompletionTokens param.Field[int64] `json:"completion_tokens"`
 	// A unix timestamp recording when the section of code which produced the project
 	// logs event finished
 	End param.Field[float64] `json:"end"`
+	// The number of tokens in the prompt used to generate the project logs event (only
+	// set if this is an LLM span)
+	PromptTokens param.Field[int64] `json:"prompt_tokens"`
 	// A unix timestamp recording when the section of code which produced the project
 	// logs event started
-	Start       param.Field[float64]   `json:"start"`
+	Start param.Field[float64] `json:"start"`
+	// The total number of tokens in the input and output of the project logs event.
+	Tokens      param.Field[int64]     `json:"tokens"`
 	ExtraFields map[string]interface{} `json:"-,extras"`
 }
 
@@ -970,3 +1186,11 @@ const (
 	ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesTypeTask     ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesType = "task"
 	ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesTypeTool     ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesType = "tool"
 )
+
+func (r ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesType) IsKnown() bool {
+	switch r {
+	case ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesTypeLlm, ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesTypeScore, ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesTypeFunction, ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesTypeEval, ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesTypeTask, ProjectLogInsertParamsEventsInsertProjectLogsEventMergeSpanAttributesTypeTool:
+		return true
+	}
+	return false
+}

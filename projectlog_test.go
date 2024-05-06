@@ -1,4 +1,4 @@
-// File generated from our OpenAPI spec by Stainless.
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 package braintrust_test
 
@@ -92,8 +92,8 @@ func TestProjectLogFetchWithOptionalParams(t *testing.T) {
 		braintrust.ProjectLogFetchParams{
 			Limit:         braintrust.F(int64(0)),
 			MaxRootSpanID: braintrust.F("string"),
-			MaxXactID:     braintrust.F(int64(0)),
-			Version:       braintrust.F(int64(0)),
+			MaxXactID:     braintrust.F("string"),
+			Version:       braintrust.F("string"),
 		},
 	)
 	if err != nil {
@@ -136,8 +136,8 @@ func TestProjectLogFetchPostWithOptionalParams(t *testing.T) {
 			}}),
 			Limit:         braintrust.F(int64(0)),
 			MaxRootSpanID: braintrust.F("string"),
-			MaxXactID:     braintrust.F(int64(0)),
-			Version:       braintrust.F(int64(0)),
+			MaxXactID:     braintrust.F("string"),
+			Version:       braintrust.F("string"),
 		},
 	)
 	if err != nil {
@@ -165,7 +165,7 @@ func TestProjectLogInsert(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectLogInsertParams{
-			Events: braintrust.F([]braintrust.ProjectLogInsertParamsEvent{braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace{
+			Events: braintrust.F([]braintrust.ProjectLogInsertParamsEventUnion{braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
 				Output:   braintrust.F[any](map[string]interface{}{}),
 				Expected: braintrust.F[any](map[string]interface{}{}),
@@ -175,9 +175,13 @@ func TestProjectLogInsert(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
+				Tags: braintrust.F([]string{"string", "string", "string"}),
 				Metrics: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceMetrics{
-					Start: braintrust.F(0.000000),
-					End:   braintrust.F(0.000000),
+					Start:            braintrust.F(0.000000),
+					End:              braintrust.F(0.000000),
+					PromptTokens:     braintrust.F(int64(0)),
+					CompletionTokens: braintrust.F(int64(0)),
+					Tokens:           braintrust.F(int64(0)),
 				}),
 				Context: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceContext{
 					CallerFunctionname: braintrust.F("string"),
@@ -192,7 +196,7 @@ func TestProjectLogInsert(t *testing.T) {
 				ObjectDelete: braintrust.F(true),
 				IsMerge:      braintrust.F(true),
 				ParentID:     braintrust.F("string"),
-			}), braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace{
+			}, braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
 				Output:   braintrust.F[any](map[string]interface{}{}),
 				Expected: braintrust.F[any](map[string]interface{}{}),
@@ -202,9 +206,13 @@ func TestProjectLogInsert(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
+				Tags: braintrust.F([]string{"string", "string", "string"}),
 				Metrics: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceMetrics{
-					Start: braintrust.F(0.000000),
-					End:   braintrust.F(0.000000),
+					Start:            braintrust.F(0.000000),
+					End:              braintrust.F(0.000000),
+					PromptTokens:     braintrust.F(int64(0)),
+					CompletionTokens: braintrust.F(int64(0)),
+					Tokens:           braintrust.F(int64(0)),
 				}),
 				Context: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceContext{
 					CallerFunctionname: braintrust.F("string"),
@@ -219,7 +227,7 @@ func TestProjectLogInsert(t *testing.T) {
 				ObjectDelete: braintrust.F(true),
 				IsMerge:      braintrust.F(true),
 				ParentID:     braintrust.F("string"),
-			}), braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace{
+			}, braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
 				Output:   braintrust.F[any](map[string]interface{}{}),
 				Expected: braintrust.F[any](map[string]interface{}{}),
@@ -229,9 +237,13 @@ func TestProjectLogInsert(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
+				Tags: braintrust.F([]string{"string", "string", "string"}),
 				Metrics: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceMetrics{
-					Start: braintrust.F(0.000000),
-					End:   braintrust.F(0.000000),
+					Start:            braintrust.F(0.000000),
+					End:              braintrust.F(0.000000),
+					PromptTokens:     braintrust.F(int64(0)),
+					CompletionTokens: braintrust.F(int64(0)),
+					Tokens:           braintrust.F(int64(0)),
 				}),
 				Context: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceContext{
 					CallerFunctionname: braintrust.F("string"),
@@ -246,7 +258,7 @@ func TestProjectLogInsert(t *testing.T) {
 				ObjectDelete: braintrust.F(true),
 				IsMerge:      braintrust.F(true),
 				ParentID:     braintrust.F("string"),
-			})}),
+			}}),
 		},
 	)
 	if err != nil {
