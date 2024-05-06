@@ -15,17 +15,16 @@ import (
 // interacting with the braintrust API. You should not instantiate this client
 // directly, and instead use the [NewClient] method instead.
 type Client struct {
-	Options       []option.RequestOption
-	TopLevel      *TopLevelService
-	Project       *ProjectService
-	Experiment    *ExperimentService
-	Dataset       *DatasetService
-	Prompt        *PromptService
-	PromptSession *PromptSessionService
-	Role          *RoleService
-	Group         *GroupService
-	ACL           *ACLService
-	User          *UserService
+	Options    []option.RequestOption
+	TopLevel   *TopLevelService
+	Project    *ProjectService
+	Experiment *ExperimentService
+	Dataset    *DatasetService
+	Prompt     *PromptService
+	Role       *RoleService
+	Group      *GroupService
+	ACL        *ACLService
+	User       *UserService
 }
 
 // NewClient generates a new client with the default option read from the
@@ -46,7 +45,6 @@ func NewClient(opts ...option.RequestOption) (r *Client) {
 	r.Experiment = NewExperimentService(opts...)
 	r.Dataset = NewDatasetService(opts...)
 	r.Prompt = NewPromptService(opts...)
-	r.PromptSession = NewPromptSessionService(opts...)
 	r.Role = NewRoleService(opts...)
 	r.Group = NewGroupService(opts...)
 	r.ACL = NewACLService(opts...)
