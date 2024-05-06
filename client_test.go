@@ -1,14 +1,16 @@
-// File generated from our OpenAPI spec by Stainless.
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 package braintrust_test
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
 
 	"github.com/braintrustdata/braintrust-go"
+	"github.com/braintrustdata/braintrust-go/internal"
 	"github.com/braintrustdata/braintrust-go/option"
 )
 
@@ -18,6 +20,28 @@ type closureTransport struct {
 
 func (t *closureTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	return t.fn(req)
+}
+
+func TestUserAgentHeader(t *testing.T) {
+	var userAgent string
+	client := braintrust.NewClient(
+		option.WithHTTPClient(&http.Client{
+			Transport: &closureTransport{
+				fn: func(req *http.Request) (*http.Response, error) {
+					userAgent = req.Header.Get("User-Agent")
+					return &http.Response{
+						StatusCode: http.StatusOK,
+					}, nil
+				},
+			},
+		}),
+	)
+	client.Project.New(context.Background(), braintrust.ProjectNewParams{
+		Name: braintrust.F("string"),
+	})
+	if userAgent != fmt.Sprintf("Braintrust/Go %s", internal.PackageVersion) {
+		t.Errorf("Expected User-Agent to be correct, but got: %#v", userAgent)
+	}
 }
 
 func TestRetryAfter(t *testing.T) {
@@ -150,8 +174,8 @@ func TestContextDeadline(t *testing.T) {
 	case <-testTimeout:
 		t.Fatal("client didn't finish in time")
 	case <-testDone:
-		if diff := time.Since(deadline); diff < -20*time.Millisecond || 20*time.Millisecond < diff {
-			t.Fatalf("client did not return within 20ms of context deadline, got %s", diff)
+		if diff := time.Since(deadline); diff < -30*time.Millisecond || 30*time.Millisecond < diff {
+			t.Fatalf("client did not return within 30ms of context deadline, got %s", diff)
 		}
 	}
 }

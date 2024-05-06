@@ -11,10 +11,9 @@ import (
 	"github.com/braintrustdata/braintrust-go"
 	"github.com/braintrustdata/braintrust-go/internal/testutil"
 	"github.com/braintrustdata/braintrust-go/option"
-	"github.com/braintrustdata/braintrust-go/shared"
 )
 
-func TestProjectNewWithOptionalParams(t *testing.T) {
+func TestACLNewWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -26,9 +25,14 @@ func TestProjectNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Project.New(context.TODO(), braintrust.ProjectNewParams{
-		Name:    braintrust.F("string"),
-		OrgName: braintrust.F("string"),
+	_, err := client.ACL.New(context.TODO(), braintrust.ACLNewParams{
+		Body: braintrust.ACLNewParamsBodyCreateUserPermissionACL{
+			ObjectType:         braintrust.F(braintrust.ACLNewParamsBodyCreateUserPermissionACLObjectTypeOrganization),
+			ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			RestrictObjectType: braintrust.F[braintrust.ACLNewParamsBodyCreateUserPermissionACLRestrictObjectTypeUnion](braintrust.ACLNewParamsBodyCreateUserPermissionACLRestrictObjectTypeString(braintrust.ACLNewParamsBodyCreateUserPermissionACLRestrictObjectTypeStringOrganization)),
+			UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Permission:         braintrust.F(braintrust.ACLNewParamsBodyCreateUserPermissionACLPermissionCreate),
+		},
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -39,7 +43,7 @@ func TestProjectNewWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestProjectGet(t *testing.T) {
+func TestACLGet(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -51,7 +55,7 @@ func TestProjectGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Project.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.ACL.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -61,7 +65,7 @@ func TestProjectGet(t *testing.T) {
 	}
 }
 
-func TestProjectUpdateWithOptionalParams(t *testing.T) {
+func TestACLListWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -73,40 +77,11 @@ func TestProjectUpdateWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Project.Update(
-		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		braintrust.ProjectUpdateParams{
-			Name: braintrust.F("string"),
-		},
-	)
-	if err != nil {
-		var apierr *braintrust.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestProjectListWithOptionalParams(t *testing.T) {
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := braintrust.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-	)
-	_, err := client.Project.List(context.TODO(), braintrust.ProjectListParams{
+	_, err := client.ACL.List(context.TODO(), braintrust.ACLListParams{
+		ObjectID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		ObjectType:    braintrust.F(braintrust.ACLListParamsObjectTypeOrganization),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:           braintrust.F[braintrust.ProjectListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
-		OrgName:       braintrust.F("string"),
-		ProjectName:   braintrust.F("string"),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
@@ -118,7 +93,7 @@ func TestProjectListWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestProjectDelete(t *testing.T) {
+func TestACLDelete(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -130,7 +105,7 @@ func TestProjectDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Project.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.ACL.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -140,7 +115,7 @@ func TestProjectDelete(t *testing.T) {
 	}
 }
 
-func TestProjectReplaceWithOptionalParams(t *testing.T) {
+func TestACLReplaceWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -152,9 +127,14 @@ func TestProjectReplaceWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Project.Replace(context.TODO(), braintrust.ProjectReplaceParams{
-		Name:    braintrust.F("string"),
-		OrgName: braintrust.F("string"),
+	_, err := client.ACL.Replace(context.TODO(), braintrust.ACLReplaceParams{
+		Body: braintrust.ACLReplaceParamsBodyCreateUserPermissionACL{
+			ObjectType:         braintrust.F(braintrust.ACLReplaceParamsBodyCreateUserPermissionACLObjectTypeOrganization),
+			ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			RestrictObjectType: braintrust.F[braintrust.ACLReplaceParamsBodyCreateUserPermissionACLRestrictObjectTypeUnion](braintrust.ACLReplaceParamsBodyCreateUserPermissionACLRestrictObjectTypeString(braintrust.ACLReplaceParamsBodyCreateUserPermissionACLRestrictObjectTypeStringOrganization)),
+			UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Permission:         braintrust.F(braintrust.ACLReplaceParamsBodyCreateUserPermissionACLPermissionCreate),
+		},
 	})
 	if err != nil {
 		var apierr *braintrust.Error

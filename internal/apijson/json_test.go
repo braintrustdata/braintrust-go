@@ -104,6 +104,29 @@ type InlineJSON struct {
 	raw         string
 }
 
+type UnionInteger int64
+
+func (UnionInteger) union() {}
+
+type UnionStructA struct {
+	Type string `json:"type"`
+	A    string `json:"a"`
+	B    string `json:"b"`
+}
+
+func (UnionStructA) union() {}
+
+type UnionStructB struct {
+	Type string `json:"type"`
+	A    string `json:"a"`
+}
+
+func (UnionStructB) union() {}
+
+type UnionTime time.Time
+
+func (UnionTime) union() {}
+
 func init() {
 	RegisterUnion(reflect.TypeOf((*Union)(nil)).Elem(), "type",
 		UnionVariant{
@@ -127,28 +150,84 @@ func init() {
 	)
 }
 
-type UnionInteger int64
-
-func (UnionInteger) union() {}
-
-type UnionStructA struct {
-	Type string `json:"type"`
-	A    string `json:"a"`
-	B    string `json:"b"`
+type ComplexUnionStruct struct {
+	Union ComplexUnion `json:"union"`
 }
 
-func (UnionStructA) union() {}
-
-type UnionStructB struct {
-	Type string `json:"type"`
-	A    string `json:"a"`
+type ComplexUnion interface {
+	complexUnion()
 }
 
-func (UnionStructB) union() {}
+type ComplexUnionA struct {
+	Boo string `json:"boo"`
+	Foo bool   `json:"foo"`
+}
 
-type UnionTime time.Time
+func (ComplexUnionA) complexUnion() {}
 
-func (UnionTime) union() {}
+type ComplexUnionB struct {
+	Boo bool   `json:"boo"`
+	Foo string `json:"foo"`
+}
+
+func (ComplexUnionB) complexUnion() {}
+
+type ComplexUnionC struct {
+	Boo int64 `json:"boo"`
+}
+
+func (ComplexUnionC) complexUnion() {}
+
+type ComplexUnionTypeA struct {
+	Baz  int64 `json:"baz"`
+	Type TypeA `json:"type"`
+}
+
+func (ComplexUnionTypeA) complexUnion() {}
+
+type TypeA string
+
+func (t TypeA) IsKnown() bool {
+	return t == "a"
+}
+
+type ComplexUnionTypeB struct {
+	Baz  int64 `json:"baz"`
+	Type TypeB `json:"type"`
+}
+
+type TypeB string
+
+func (t TypeB) IsKnown() bool {
+	return t == "b"
+}
+
+func (ComplexUnionTypeB) complexUnion() {}
+
+func init() {
+	RegisterUnion(reflect.TypeOf((*ComplexUnion)(nil)).Elem(), "",
+		UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(ComplexUnionA{}),
+		},
+		UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(ComplexUnionB{}),
+		},
+		UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(ComplexUnionC{}),
+		},
+		UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(ComplexUnionTypeA{}),
+		},
+		UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(ComplexUnionTypeB{}),
+		},
+	)
+}
 
 var tests = map[string]struct {
 	buf string
@@ -190,9 +269,11 @@ var tests = map[string]struct {
 	"date_time":             {`"2007-03-01T13:00:00Z"`, time.Date(2007, time.March, 1, 13, 0, 0, 0, time.UTC)},
 	"date_time_nano_coerce": {`"2007-03-01T13:03:05.123456789Z"`, time.Date(2007, time.March, 1, 13, 3, 5, 123456789, time.UTC)},
 
-	"date_time_missing_t_coerce":              {`"2007-03-01 13:03:05Z"`, time.Date(2007, time.March, 1, 13, 3, 5, 0, time.UTC)},
-	"date_time_missing_timezone_coerce":       {`"2007-03-01T13:03:05"`, time.Date(2007, time.March, 1, 13, 3, 5, 0, time.UTC)},
-	"date_time_missing_timezone_colon_coerce": {`"2007-03-01T13:03:05+0100"`, time.Date(2007, time.March, 1, 13, 3, 5, 0, time.FixedZone("", 60*60))},
+	"date_time_missing_t_coerce":        {`"2007-03-01 13:03:05Z"`, time.Date(2007, time.March, 1, 13, 3, 5, 0, time.UTC)},
+	"date_time_missing_timezone_coerce": {`"2007-03-01T13:03:05"`, time.Date(2007, time.March, 1, 13, 3, 5, 0, time.UTC)},
+	// note: using -1200 to minimize probability of conflicting with the local timezone of the test runner
+	// see https://en.wikipedia.org/wiki/UTC%E2%88%9212:00
+	"date_time_missing_timezone_colon_coerce": {`"2007-03-01T13:03:05-1200"`, time.Date(2007, time.March, 1, 13, 3, 5, 0, time.FixedZone("", -12*60*60))},
 	"date_time_nano_missing_t_coerce":         {`"2007-03-01 13:03:05.123456789Z"`, time.Date(2007, time.March, 1, 13, 3, 5, 123456789, time.UTC)},
 
 	"map_string":    {`{"foo":"bar"}`, map[string]string{"foo": "bar"}},
@@ -325,6 +406,31 @@ var tests = map[string]struct {
 		UnionStruct{
 			Union: UnionTime(time.Date(2010, 05, 23, 0, 0, 0, 0, time.UTC)),
 		},
+	},
+
+	"complex_union_a": {
+		`{"union":{"boo":"12","foo":true}}`,
+		ComplexUnionStruct{Union: ComplexUnionA{Boo: "12", Foo: true}},
+	},
+
+	"complex_union_b": {
+		`{"union":{"boo":true,"foo":"12"}}`,
+		ComplexUnionStruct{Union: ComplexUnionB{Boo: true, Foo: "12"}},
+	},
+
+	"complex_union_c": {
+		`{"union":{"boo":12}}`,
+		ComplexUnionStruct{Union: ComplexUnionC{Boo: 12}},
+	},
+
+	"complex_union_type_a": {
+		`{"union":{"baz":12,"type":"a"}}`,
+		ComplexUnionStruct{Union: ComplexUnionTypeA{Baz: 12, Type: TypeA("a")}},
+	},
+
+	"complex_union_type_b": {
+		`{"union":{"baz":12,"type":"b"}}`,
+		ComplexUnionStruct{Union: ComplexUnionTypeB{Baz: 12, Type: TypeB("b")}},
 	},
 
 	"inline_coerce": {
