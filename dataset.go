@@ -1,4 +1,4 @@
-// File generated from our OpenAPI spec by Stainless.
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 package braintrust
 
@@ -11,9 +11,9 @@ import (
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
+	"github.com/braintrustdata/braintrust-go/internal/pagination"
 	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
-	"github.com/braintrustdata/braintrust-go/internal/shared"
 	"github.com/braintrustdata/braintrust-go/option"
 )
 
@@ -54,9 +54,7 @@ func (r *DatasetService) Get(ctx context.Context, datasetID string, opts ...opti
 
 // Partially update a dataset object. Specify the fields to update in the payload.
 // Any object-type fields will be deep-merged with existing content. Currently we
-// do not support removing fields or setting them to null. As a workaround, you may
-// retrieve the full object with `GET /dataset/{id}` and then replace it with
-// `PUT /dataset`.
+// do not support removing fields or setting them to null.
 func (r *DatasetService) Update(ctx context.Context, datasetID string, body DatasetUpdateParams, opts ...option.RequestOption) (res *Dataset, err error) {
 	opts = append(r.Options[:], opts...)
 	path := fmt.Sprintf("v1/dataset/%s", datasetID)
@@ -66,7 +64,7 @@ func (r *DatasetService) Update(ctx context.Context, datasetID string, body Data
 
 // List out all datasets. The datasets are sorted by creation date, with the most
 // recently-created datasets coming first
-func (r *DatasetService) List(ctx context.Context, query DatasetListParams, opts ...option.RequestOption) (res *shared.ListObjects[Dataset], err error) {
+func (r *DatasetService) List(ctx context.Context, query DatasetListParams, opts ...option.RequestOption) (res *pagination.ListObjects[Dataset], err error) {
 	var raw *http.Response
 	opts = append(r.Options, opts...)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
@@ -85,8 +83,8 @@ func (r *DatasetService) List(ctx context.Context, query DatasetListParams, opts
 
 // List out all datasets. The datasets are sorted by creation date, with the most
 // recently-created datasets coming first
-func (r *DatasetService) ListAutoPaging(ctx context.Context, query DatasetListParams, opts ...option.RequestOption) *shared.ListObjectsAutoPager[Dataset] {
-	return shared.NewListObjectsAutoPager(r.List(ctx, query, opts...))
+func (r *DatasetService) ListAutoPaging(ctx context.Context, query DatasetListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[Dataset] {
+	return pagination.NewListObjectsAutoPager(r.List(ctx, query, opts...))
 }
 
 // Delete a dataset object by its id
@@ -132,9 +130,11 @@ func (r *DatasetService) Insert(ctx context.Context, datasetID string, body Data
 	return
 }
 
-// Create or replace a new dataset. If there is an existing dataset in the project
-// with the same name as the one specified in the request, will replace the
-// existing dataset with the provided fields
+// NOTE: This operation is deprecated and will be removed in a future revision of
+// the API. Create or replace a new dataset. If there is an existing dataset in the
+// project with the same name as the one specified in the request, will return the
+// existing dataset unmodified, will replace the existing dataset with the provided
+// fields
 func (r *DatasetService) Replace(ctx context.Context, body DatasetReplaceParams, opts ...option.RequestOption) (res *Dataset, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/dataset"
@@ -177,6 +177,10 @@ func (r *Dataset) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+func (r datasetJSON) RawJSON() string {
+	return r.raw
+}
+
 type DatasetFetchResponse struct {
 	// A list of fetched events
 	Events []DatasetFetchResponseEvent `json:"events,required"`
@@ -195,6 +199,10 @@ func (r *DatasetFetchResponse) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+func (r datasetFetchResponseJSON) RawJSON() string {
+	return r.raw
+}
+
 type DatasetFetchResponseEvent struct {
 	// A unique identifier for the dataset event. If you don't provide one, BrainTrust
 	// will generate one for you
@@ -203,7 +211,9 @@ type DatasetFetchResponseEvent struct {
 	// the event insertion. Transaction ids are monotonically increasing over time and
 	// can be used to retrieve a versioned snapshot of the dataset (see the `version`
 	// parameter)
-	XactID int64 `json:"_xact_id,required"`
+	XactID string `json:"_xact_id,required"`
+	// The timestamp the dataset event was created
+	Created time.Time `json:"created,required" format:"date-time"`
 	// Unique identifier for the dataset
 	DatasetID string `json:"dataset_id,required" format:"uuid"`
 	// The `span_id` of the root of the trace this dataset event belongs to
@@ -213,8 +223,9 @@ type DatasetFetchResponseEvent struct {
 	// [tracing guide](https://www.braintrustdata.com/docs/guides/tracing) for full
 	// details on tracing
 	SpanID string `json:"span_id,required"`
-	// The timestamp the dataset event was created
-	Created time.Time `json:"created,nullable" format:"date-time"`
+	// The output of your application, including post-processing (an arbitrary, JSON
+	// serializable object)
+	Expected interface{} `json:"expected"`
 	// The argument that uniquely define an input case (an arbitrary, JSON serializable
 	// object)
 	Input interface{} `json:"input"`
@@ -224,12 +235,11 @@ type DatasetFetchResponseEvent struct {
 	// anything else that would be useful to slice/dice later. The values in `metadata`
 	// can be any JSON-serializable type, but its keys must be strings
 	Metadata map[string]interface{} `json:"metadata,nullable"`
-	// The output of your application, including post-processing (an arbitrary, JSON
-	// serializable object)
-	Output interface{} `json:"output"`
 	// Unique identifier for the project that the dataset belongs under
-	ProjectID string                        `json:"project_id,nullable" format:"uuid"`
-	JSON      datasetFetchResponseEventJSON `json:"-"`
+	ProjectID string `json:"project_id,nullable" format:"uuid"`
+	// A list of tags to log
+	Tags []string                      `json:"tags,nullable"`
+	JSON datasetFetchResponseEventJSON `json:"-"`
 }
 
 // datasetFetchResponseEventJSON contains the JSON metadata for the struct
@@ -237,20 +247,25 @@ type DatasetFetchResponseEvent struct {
 type datasetFetchResponseEventJSON struct {
 	ID          apijson.Field
 	XactID      apijson.Field
+	Created     apijson.Field
 	DatasetID   apijson.Field
 	RootSpanID  apijson.Field
 	SpanID      apijson.Field
-	Created     apijson.Field
+	Expected    apijson.Field
 	Input       apijson.Field
 	Metadata    apijson.Field
-	Output      apijson.Field
 	ProjectID   apijson.Field
+	Tags        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
 func (r *DatasetFetchResponseEvent) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r datasetFetchResponseEventJSON) RawJSON() string {
+	return r.raw
 }
 
 type DatasetFetchPostResponse struct {
@@ -271,6 +286,10 @@ func (r *DatasetFetchPostResponse) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+func (r datasetFetchPostResponseJSON) RawJSON() string {
+	return r.raw
+}
+
 type DatasetFetchPostResponseEvent struct {
 	// A unique identifier for the dataset event. If you don't provide one, BrainTrust
 	// will generate one for you
@@ -279,7 +298,9 @@ type DatasetFetchPostResponseEvent struct {
 	// the event insertion. Transaction ids are monotonically increasing over time and
 	// can be used to retrieve a versioned snapshot of the dataset (see the `version`
 	// parameter)
-	XactID int64 `json:"_xact_id,required"`
+	XactID string `json:"_xact_id,required"`
+	// The timestamp the dataset event was created
+	Created time.Time `json:"created,required" format:"date-time"`
 	// Unique identifier for the dataset
 	DatasetID string `json:"dataset_id,required" format:"uuid"`
 	// The `span_id` of the root of the trace this dataset event belongs to
@@ -289,8 +310,9 @@ type DatasetFetchPostResponseEvent struct {
 	// [tracing guide](https://www.braintrustdata.com/docs/guides/tracing) for full
 	// details on tracing
 	SpanID string `json:"span_id,required"`
-	// The timestamp the dataset event was created
-	Created time.Time `json:"created,nullable" format:"date-time"`
+	// The output of your application, including post-processing (an arbitrary, JSON
+	// serializable object)
+	Expected interface{} `json:"expected"`
 	// The argument that uniquely define an input case (an arbitrary, JSON serializable
 	// object)
 	Input interface{} `json:"input"`
@@ -300,12 +322,11 @@ type DatasetFetchPostResponseEvent struct {
 	// anything else that would be useful to slice/dice later. The values in `metadata`
 	// can be any JSON-serializable type, but its keys must be strings
 	Metadata map[string]interface{} `json:"metadata,nullable"`
-	// The output of your application, including post-processing (an arbitrary, JSON
-	// serializable object)
-	Output interface{} `json:"output"`
 	// Unique identifier for the project that the dataset belongs under
-	ProjectID string                            `json:"project_id,nullable" format:"uuid"`
-	JSON      datasetFetchPostResponseEventJSON `json:"-"`
+	ProjectID string `json:"project_id,nullable" format:"uuid"`
+	// A list of tags to log
+	Tags []string                          `json:"tags,nullable"`
+	JSON datasetFetchPostResponseEventJSON `json:"-"`
 }
 
 // datasetFetchPostResponseEventJSON contains the JSON metadata for the struct
@@ -313,20 +334,25 @@ type DatasetFetchPostResponseEvent struct {
 type datasetFetchPostResponseEventJSON struct {
 	ID          apijson.Field
 	XactID      apijson.Field
+	Created     apijson.Field
 	DatasetID   apijson.Field
 	RootSpanID  apijson.Field
 	SpanID      apijson.Field
-	Created     apijson.Field
+	Expected    apijson.Field
 	Input       apijson.Field
 	Metadata    apijson.Field
-	Output      apijson.Field
 	ProjectID   apijson.Field
+	Tags        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
 func (r *DatasetFetchPostResponseEvent) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r datasetFetchPostResponseEventJSON) RawJSON() string {
+	return r.raw
 }
 
 type DatasetInsertResponse struct {
@@ -348,6 +374,10 @@ func (r *DatasetInsertResponse) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+func (r datasetInsertResponseJSON) RawJSON() string {
+	return r.raw
+}
+
 type DatasetNewParams struct {
 	// Name of the dataset. Within a project, dataset names are unique
 	Name param.Field[string] `json:"name,required"`
@@ -362,10 +392,10 @@ func (r DatasetNewParams) MarshalJSON() (data []byte, err error) {
 }
 
 type DatasetUpdateParams struct {
-	// Name of the dataset. Within a project, dataset names are unique
-	Name param.Field[string] `json:"name,required"`
 	// Textual description of the dataset
 	Description param.Field[string] `json:"description"`
+	// Name of the dataset. Within a project, dataset names are unique
+	Name param.Field[string] `json:"name"`
 }
 
 func (r DatasetUpdateParams) MarshalJSON() (data []byte, err error) {
@@ -375,19 +405,26 @@ func (r DatasetUpdateParams) MarshalJSON() (data []byte, err error) {
 type DatasetListParams struct {
 	// Name of the dataset to search for
 	DatasetName param.Field[string] `query:"dataset_name"`
-	// A cursor for pagination. For example, if the initial item in the last page you
-	// fetched had an id of `foo`, pass `ending_before=foo` to fetch the previous page.
-	// Note: you may only pass one of `starting_after` and `ending_before`
+	// Pagination cursor id.
+	//
+	// For example, if the initial item in the last page you fetched had an id of
+	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
+	// pass one of `starting_after` and `ending_before`
 	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs param.Field[DatasetListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
 	Limit param.Field[int64] `query:"limit"`
 	// Filter search results to within a particular organization
 	OrgName param.Field[string] `query:"org_name"`
 	// Name of the project to search for
 	ProjectName param.Field[string] `query:"project_name"`
-	// A cursor for pagination. For example, if the final item in the last page you
-	// fetched had an id of `foo`, pass `starting_after=foo` to fetch the next page.
-	// Note: you may only pass one of `starting_after` and `ending_before`
+	// Pagination cursor id.
+	//
+	// For example, if the final item in the last page you fetched had an id of `foo`,
+	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
+	// `starting_after` and `ending_before`
 	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
 }
 
@@ -398,6 +435,18 @@ func (r DatasetListParams) URLQuery() (v url.Values) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter search results to a particular set of object IDs. To specify a list of
+// IDs, include the query param multiple times
+//
+// Satisfied by [shared.UnionString], [DatasetListParamsIDsArray].
+type DatasetListParamsIDsUnion interface {
+	ImplementsDatasetListParamsIDsUnion()
+}
+
+type DatasetListParamsIDsArray []string
+
+func (r DatasetListParamsIDsArray) ImplementsDatasetListParamsIDsUnion() {}
 
 type DatasetFeedbackParams struct {
 	// A list of dataset feedback items
@@ -434,7 +483,17 @@ const (
 	DatasetFeedbackParamsFeedbackSourceExternal DatasetFeedbackParamsFeedbackSource = "external"
 )
 
+func (r DatasetFeedbackParamsFeedbackSource) IsKnown() bool {
+	switch r {
+	case DatasetFeedbackParamsFeedbackSourceApp, DatasetFeedbackParamsFeedbackSourceAPI, DatasetFeedbackParamsFeedbackSourceExternal:
+		return true
+	}
+	return false
+}
+
 type DatasetFetchParams struct {
+	// limit the number of traces fetched
+	//
 	// Fetch queries may be paginated if the total result size is expected to be large
 	// (e.g. project_logs which accumulate over a long time). Note that fetch queries
 	// only support pagination in descending time order (from latest to earliest
@@ -448,21 +507,26 @@ type DatasetFetchParams struct {
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
 	Limit param.Field[int64] `query:"limit"`
-	// Together, `max_xact_id` and `max_root_span_id` form a cursor for paginating
-	// event fetches. Given a previous fetch with a list of rows, you can determine
-	// `max_root_span_id` as the maximum of the `root_span_id` field over all rows. See
-	// the documentation for `limit` for an overview of paginating fetch queries.
+	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
+	//
+	// Since a paginated fetch query returns results in order from latest to earliest,
+	// the cursor for the next page can be found as the row with the minimum (earliest)
+	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
+	// for an overview of paginating fetch queries.
 	MaxRootSpanID param.Field[string] `query:"max_root_span_id"`
-	// Together, `max_xact_id` and `max_root_span_id` form a cursor for paginating
-	// event fetches. Given a previous fetch with a list of rows, you can determine
-	// `max_xact_id` as the maximum of the `_xact_id` field over all rows. See the
-	// documentation for `limit` for an overview of paginating fetch queries.
-	MaxXactID param.Field[int64] `query:"max_xact_id"`
-	// You may specify a version id to retrieve a snapshot of the events from a past
-	// time. The version id is essentially a filter on the latest event transaction id.
-	// You can use the `max_xact_id` returned by a past fetch as the version to
-	// reproduce that exact fetch.
-	Version param.Field[int64] `query:"version"`
+	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
+	//
+	// Since a paginated fetch query returns results in order from latest to earliest,
+	// the cursor for the next page can be found as the row with the minimum (earliest)
+	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
+	// for an overview of paginating fetch queries.
+	MaxXactID param.Field[string] `query:"max_xact_id"`
+	// Retrieve a snapshot of events from a past time
+	//
+	// The version id is essentially a filter on the latest event transaction id. You
+	// can use the `max_xact_id` returned by a past fetch as the version to reproduce
+	// that exact fetch.
+	Version param.Field[string] `query:"version"`
 }
 
 // URLQuery serializes [DatasetFetchParams]'s query parameters as `url.Values`.
@@ -477,6 +541,8 @@ type DatasetFetchPostParams struct {
 	// A list of filters on the events to fetch. Currently, only path-lookup type
 	// filters are supported, but we may add more in the future
 	Filters param.Field[[]DatasetFetchPostParamsFilter] `json:"filters"`
+	// limit the number of traces fetched
+	//
 	// Fetch queries may be paginated if the total result size is expected to be large
 	// (e.g. project_logs which accumulate over a long time). Note that fetch queries
 	// only support pagination in descending time order (from latest to earliest
@@ -490,21 +556,26 @@ type DatasetFetchPostParams struct {
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
 	Limit param.Field[int64] `json:"limit"`
-	// Together, `max_xact_id` and `max_root_span_id` form a cursor for paginating
-	// event fetches. Given a previous fetch with a list of rows, you can determine
-	// `max_root_span_id` as the maximum of the `root_span_id` field over all rows. See
-	// the documentation for `limit` for an overview of paginating fetch queries.
+	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
+	//
+	// Since a paginated fetch query returns results in order from latest to earliest,
+	// the cursor for the next page can be found as the row with the minimum (earliest)
+	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
+	// for an overview of paginating fetch queries.
 	MaxRootSpanID param.Field[string] `json:"max_root_span_id"`
-	// Together, `max_xact_id` and `max_root_span_id` form a cursor for paginating
-	// event fetches. Given a previous fetch with a list of rows, you can determine
-	// `max_xact_id` as the maximum of the `_xact_id` field over all rows. See the
-	// documentation for `limit` for an overview of paginating fetch queries.
-	MaxXactID param.Field[int64] `json:"max_xact_id"`
-	// You may specify a version id to retrieve a snapshot of the events from a past
-	// time. The version id is essentially a filter on the latest event transaction id.
-	// You can use the `max_xact_id` returned by a past fetch as the version to
-	// reproduce that exact fetch.
-	Version param.Field[int64] `json:"version"`
+	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
+	//
+	// Since a paginated fetch query returns results in order from latest to earliest,
+	// the cursor for the next page can be found as the row with the minimum (earliest)
+	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
+	// for an overview of paginating fetch queries.
+	MaxXactID param.Field[string] `json:"max_xact_id"`
+	// Retrieve a snapshot of events from a past time
+	//
+	// The version id is essentially a filter on the latest event transaction id. You
+	// can use the `max_xact_id` returned by a past fetch as the version to reproduce
+	// that exact fetch.
+	Version param.Field[string] `json:"version"`
 }
 
 func (r DatasetFetchPostParams) MarshalJSON() (data []byte, err error) {
@@ -541,19 +612,75 @@ const (
 	DatasetFetchPostParamsFiltersTypePathLookup DatasetFetchPostParamsFiltersType = "path_lookup"
 )
 
+func (r DatasetFetchPostParamsFiltersType) IsKnown() bool {
+	switch r {
+	case DatasetFetchPostParamsFiltersTypePathLookup:
+		return true
+	}
+	return false
+}
+
 type DatasetInsertParams struct {
 	// A list of dataset events to insert
-	Events param.Field[[]DatasetInsertParamsEvent] `json:"events,required"`
+	Events param.Field[[]DatasetInsertParamsEventUnion] `json:"events,required"`
 }
 
 func (r DatasetInsertParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
+// A dataset event
+type DatasetInsertParamsEvent struct {
+	Input    param.Field[interface{}] `json:"input,required"`
+	Expected param.Field[interface{}] `json:"expected,required"`
+	Metadata param.Field[interface{}] `json:"metadata,required"`
+	Tags     param.Field[interface{}] `json:"tags,required"`
+	// A unique identifier for the dataset event. If you don't provide one, BrainTrust
+	// will generate one for you
+	ID param.Field[string] `json:"id"`
+	// Pass `_object_delete=true` to mark the dataset event deleted. Deleted events
+	// will not show up in subsequent fetches for this dataset
+	ObjectDelete param.Field[bool] `json:"_object_delete"`
+	// The `_is_merge` field controls how the row is merged with any existing row with
+	// the same id in the DB. By default (or when set to `false`), the existing row is
+	// completely replaced by the new row. When set to `true`, the new row is
+	// deep-merged into the existing row
+	//
+	// For example, say there is an existing row in the DB
+	// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
+	// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
+	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
+	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
+	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
+	IsMerge param.Field[bool] `json:"_is_merge"`
+	// Use the `_parent_id` field to create this row as a subspan of an existing row.
+	// It cannot be specified alongside `_is_merge=true`. Tracking hierarchical
+	// relationships are important for tracing (see the
+	// [guide](https://www.braintrustdata.com/docs/guides/tracing) for full details).
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"_parent_id": "abc", "id": "llm_call", "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	ParentID   param.Field[string]      `json:"_parent_id"`
+	MergePaths param.Field[interface{}] `json:"_merge_paths,required"`
+}
+
+func (r DatasetInsertParamsEvent) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r DatasetInsertParamsEvent) implementsDatasetInsertParamsEventUnion() {}
+
+// A dataset event
+//
 // Satisfied by [DatasetInsertParamsEventsInsertDatasetEventReplace],
-// [DatasetInsertParamsEventsInsertDatasetEventMerge].
-type DatasetInsertParamsEvent interface {
-	implementsDatasetInsertParamsEvent()
+// [DatasetInsertParamsEventsInsertDatasetEventMerge], [DatasetInsertParamsEvent].
+type DatasetInsertParamsEventUnion interface {
+	implementsDatasetInsertParamsEventUnion()
 }
 
 type DatasetInsertParamsEventsInsertDatasetEventReplace struct {
@@ -588,6 +715,9 @@ type DatasetInsertParamsEventsInsertDatasetEventReplace struct {
 	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
 	// clicking on the "abc" row.
 	ParentID param.Field[string] `json:"_parent_id"`
+	// The output of your application, including post-processing (an arbitrary, JSON
+	// serializable object)
+	Expected param.Field[interface{}] `json:"expected"`
 	// The argument that uniquely define an input case (an arbitrary, JSON serializable
 	// object)
 	Input param.Field[interface{}] `json:"input"`
@@ -597,16 +727,16 @@ type DatasetInsertParamsEventsInsertDatasetEventReplace struct {
 	// anything else that would be useful to slice/dice later. The values in `metadata`
 	// can be any JSON-serializable type, but its keys must be strings
 	Metadata param.Field[map[string]interface{}] `json:"metadata"`
-	// The output of your application, including post-processing (an arbitrary, JSON
-	// serializable object)
-	Output param.Field[interface{}] `json:"output"`
+	// A list of tags to log
+	Tags param.Field[[]string] `json:"tags"`
 }
 
 func (r DatasetInsertParamsEventsInsertDatasetEventReplace) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r DatasetInsertParamsEventsInsertDatasetEventReplace) implementsDatasetInsertParamsEvent() {}
+func (r DatasetInsertParamsEventsInsertDatasetEventReplace) implementsDatasetInsertParamsEventUnion() {
+}
 
 type DatasetInsertParamsEventsInsertDatasetEventMerge struct {
 	// The `_is_merge` field controls how the row is merged with any existing row with
@@ -641,6 +771,9 @@ type DatasetInsertParamsEventsInsertDatasetEventMerge struct {
 	// Pass `_object_delete=true` to mark the dataset event deleted. Deleted events
 	// will not show up in subsequent fetches for this dataset
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
+	// The output of your application, including post-processing (an arbitrary, JSON
+	// serializable object)
+	Expected param.Field[interface{}] `json:"expected"`
 	// The argument that uniquely define an input case (an arbitrary, JSON serializable
 	// object)
 	Input param.Field[interface{}] `json:"input"`
@@ -650,16 +783,15 @@ type DatasetInsertParamsEventsInsertDatasetEventMerge struct {
 	// anything else that would be useful to slice/dice later. The values in `metadata`
 	// can be any JSON-serializable type, but its keys must be strings
 	Metadata param.Field[map[string]interface{}] `json:"metadata"`
-	// The output of your application, including post-processing (an arbitrary, JSON
-	// serializable object)
-	Output param.Field[interface{}] `json:"output"`
+	// A list of tags to log
+	Tags param.Field[[]string] `json:"tags"`
 }
 
 func (r DatasetInsertParamsEventsInsertDatasetEventMerge) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r DatasetInsertParamsEventsInsertDatasetEventMerge) implementsDatasetInsertParamsEvent() {}
+func (r DatasetInsertParamsEventsInsertDatasetEventMerge) implementsDatasetInsertParamsEventUnion() {}
 
 type DatasetReplaceParams struct {
 	// Name of the dataset. Within a project, dataset names are unique

@@ -1,4 +1,4 @@
-// File generated from our OpenAPI spec by Stainless.
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 package apierror
 
@@ -29,6 +29,10 @@ type errorJSON struct {
 
 func (r *Error) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r errorJSON) RawJSON() string {
+	return r.raw
 }
 
 func (r *Error) Error() string {
