@@ -4,16 +4,10 @@ package shared
 
 type UnionString string
 
-func (UnionString) ImplementsProjectListParamsIDsUnion()                                            {}
-func (UnionString) ImplementsExperimentListParamsIDsUnion()                                         {}
-func (UnionString) ImplementsDatasetListParamsIDsUnion()                                            {}
-func (UnionString) ImplementsPromptNewResponsePromptDataPromptObjectMessagesObjectContentUnion()    {}
-func (UnionString) ImplementsPromptGetResponsePromptDataPromptObjectMessagesObjectContentUnion()    {}
-func (UnionString) ImplementsPromptUpdateResponsePromptDataPromptObjectMessagesObjectContentUnion() {}
-func (UnionString) ImplementsPromptListResponsePromptDataPromptObjectMessagesObjectContentUnion()   {}
-func (UnionString) ImplementsPromptDeleteResponsePromptDataPromptObjectMessagesObjectContentUnion() {}
-func (UnionString) ImplementsPromptReplaceResponsePromptDataPromptObjectMessagesObjectContentUnion() {
-}
+func (UnionString) ImplementsProjectListParamsIDsUnion()                                           {}
+func (UnionString) ImplementsExperimentListParamsIDsUnion()                                        {}
+func (UnionString) ImplementsDatasetListParamsIDsUnion()                                           {}
+func (UnionString) ImplementsPromptPromptDataPromptObjectMessagesObjectContentUnion()              {}
 func (UnionString) ImplementsPromptNewParamsPromptDataPromptObjectMessagesObjectContentUnion()     {}
 func (UnionString) ImplementsPromptUpdateParamsPromptDataPromptObjectMessagesObjectContentUnion()  {}
 func (UnionString) ImplementsPromptListParamsIDsUnion()                                            {}
