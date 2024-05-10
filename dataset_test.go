@@ -239,6 +239,7 @@ func TestDatasetFetchPostWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.DatasetFetchPostParams{
+			Cursor: braintrust.F("string"),
 			Filters: braintrust.F([]braintrust.DatasetFetchPostParamsFilter{{
 				Type:  braintrust.F(braintrust.DatasetFetchPostParamsFiltersTypePathLookup),
 				Path:  braintrust.F([]string{"string", "string", "string"}),
@@ -345,6 +346,34 @@ func TestDatasetReplaceWithOptionalParams(t *testing.T) {
 		Description: braintrust.F("string"),
 		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
+	if err != nil {
+		var apierr *braintrust.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestDatasetSummarizeWithOptionalParams(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := braintrust.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.Dataset.Summarize(
+		context.TODO(),
+		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		braintrust.DatasetSummarizeParams{
+			SummarizeData: braintrust.F(true),
+		},
+	)
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {

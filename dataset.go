@@ -18,9 +18,11 @@ import (
 )
 
 // DatasetService contains methods and other services that help with interacting
-// with the braintrust API. Note, unlike clients, this service does not read
-// variables from the environment automatically. You should not instantiate this
-// service directly, and instead use the [NewDatasetService] method instead.
+// with the braintrust API.
+//
+// Note, unlike clients, this service does not read variables from the environment
+// automatically. You should not instantiate this service directly, and instead use
+// the [NewDatasetService] method instead.
 type DatasetService struct {
 	Options []option.RequestOption
 }
@@ -142,6 +144,14 @@ func (r *DatasetService) Replace(ctx context.Context, body DatasetReplaceParams,
 	return
 }
 
+// Summarize dataset
+func (r *DatasetService) Summarize(ctx context.Context, datasetID string, query DatasetSummarizeParams, opts ...option.RequestOption) (res *DatasetSummarizeResponse, err error) {
+	opts = append(r.Options[:], opts...)
+	path := fmt.Sprintf("v1/dataset/%s/summarize", datasetID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return
+}
+
 type Dataset struct {
 	// Unique identifier for the dataset
 	ID string `json:"id,required" format:"uuid"`
@@ -184,13 +194,19 @@ func (r datasetJSON) RawJSON() string {
 type DatasetFetchResponse struct {
 	// A list of fetched events
 	Events []DatasetFetchResponseEvent `json:"events,required"`
-	JSON   datasetFetchResponseJSON    `json:"-"`
+	// Pagination cursor
+	//
+	// Pass this string directly as the `cursor` param to your next fetch request to
+	// get the next page of results. Not provided if the returned result set is empty.
+	Cursor string                   `json:"cursor,nullable"`
+	JSON   datasetFetchResponseJSON `json:"-"`
 }
 
 // datasetFetchResponseJSON contains the JSON metadata for the struct
 // [DatasetFetchResponse]
 type datasetFetchResponseJSON struct {
 	Events      apijson.Field
+	Cursor      apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
@@ -271,13 +287,19 @@ func (r datasetFetchResponseEventJSON) RawJSON() string {
 type DatasetFetchPostResponse struct {
 	// A list of fetched events
 	Events []DatasetFetchPostResponseEvent `json:"events,required"`
-	JSON   datasetFetchPostResponseJSON    `json:"-"`
+	// Pagination cursor
+	//
+	// Pass this string directly as the `cursor` param to your next fetch request to
+	// get the next page of results. Not provided if the returned result set is empty.
+	Cursor string                       `json:"cursor,nullable"`
+	JSON   datasetFetchPostResponseJSON `json:"-"`
 }
 
 // datasetFetchPostResponseJSON contains the JSON metadata for the struct
 // [DatasetFetchPostResponse]
 type datasetFetchPostResponseJSON struct {
 	Events      apijson.Field
+	Cursor      apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
@@ -375,6 +397,64 @@ func (r *DatasetInsertResponse) UnmarshalJSON(data []byte) (err error) {
 }
 
 func (r datasetInsertResponseJSON) RawJSON() string {
+	return r.raw
+}
+
+// Summary of a dataset
+type DatasetSummarizeResponse struct {
+	// Name of the dataset
+	DatasetName string `json:"dataset_name,required"`
+	// URL to the dataset's page in the Braintrust app
+	DatasetURL string `json:"dataset_url,required" format:"uri"`
+	// Name of the project that the dataset belongs to
+	ProjectName string `json:"project_name,required"`
+	// URL to the project's page in the Braintrust app
+	ProjectURL string `json:"project_url,required" format:"uri"`
+	// Summary of a dataset's data
+	DataSummary DatasetSummarizeResponseDataSummary `json:"data_summary,nullable"`
+	JSON        datasetSummarizeResponseJSON        `json:"-"`
+}
+
+// datasetSummarizeResponseJSON contains the JSON metadata for the struct
+// [DatasetSummarizeResponse]
+type datasetSummarizeResponseJSON struct {
+	DatasetName apijson.Field
+	DatasetURL  apijson.Field
+	ProjectName apijson.Field
+	ProjectURL  apijson.Field
+	DataSummary apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *DatasetSummarizeResponse) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r datasetSummarizeResponseJSON) RawJSON() string {
+	return r.raw
+}
+
+// Summary of a dataset's data
+type DatasetSummarizeResponseDataSummary struct {
+	// Total number of records in the dataset
+	TotalRecords int64                                   `json:"total_records,required"`
+	JSON         datasetSummarizeResponseDataSummaryJSON `json:"-"`
+}
+
+// datasetSummarizeResponseDataSummaryJSON contains the JSON metadata for the
+// struct [DatasetSummarizeResponseDataSummary]
+type datasetSummarizeResponseDataSummaryJSON struct {
+	TotalRecords apijson.Field
+	raw          string
+	ExtraFields  map[string]apijson.Field
+}
+
+func (r *DatasetSummarizeResponseDataSummary) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r datasetSummarizeResponseDataSummaryJSON) RawJSON() string {
 	return r.raw
 }
 
@@ -507,6 +587,10 @@ type DatasetFetchParams struct {
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
 	Limit param.Field[int64] `query:"limit"`
+	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
+	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
+	// the 'cursor' argument going forwards.
+	//
 	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
 	//
 	// Since a paginated fetch query returns results in order from latest to earliest,
@@ -514,6 +598,10 @@ type DatasetFetchParams struct {
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
 	MaxRootSpanID param.Field[string] `query:"max_root_span_id"`
+	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
+	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
+	// the 'cursor' argument going forwards.
+	//
 	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
 	//
 	// Since a paginated fetch query returns results in order from latest to earliest,
@@ -538,6 +626,12 @@ func (r DatasetFetchParams) URLQuery() (v url.Values) {
 }
 
 type DatasetFetchPostParams struct {
+	// An opaque string to be used as a cursor for the next page of results, in order
+	// from latest to earliest.
+	//
+	// The string can be obtained directly from the `cursor` property of the previous
+	// fetch query
+	Cursor param.Field[string] `json:"cursor"`
 	// A list of filters on the events to fetch. Currently, only path-lookup type
 	// filters are supported, but we may add more in the future
 	Filters param.Field[[]DatasetFetchPostParamsFilter] `json:"filters"`
@@ -556,6 +650,10 @@ type DatasetFetchPostParams struct {
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
 	Limit param.Field[int64] `json:"limit"`
+	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
+	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
+	// the 'cursor' argument going forwards.
+	//
 	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
 	//
 	// Since a paginated fetch query returns results in order from latest to earliest,
@@ -563,6 +661,10 @@ type DatasetFetchPostParams struct {
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
 	MaxRootSpanID param.Field[string] `json:"max_root_span_id"`
+	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
+	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
+	// the 'cursor' argument going forwards.
+	//
 	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
 	//
 	// Since a paginated fetch query returns results in order from latest to earliest,
@@ -804,4 +906,18 @@ type DatasetReplaceParams struct {
 
 func (r DatasetReplaceParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
+}
+
+type DatasetSummarizeParams struct {
+	// Whether to summarize the data. If false (or omitted), only the metadata will be
+	// returned.
+	SummarizeData param.Field[bool] `query:"summarize_data"`
+}
+
+// URLQuery serializes [DatasetSummarizeParams]'s query parameters as `url.Values`.
+func (r DatasetSummarizeParams) URLQuery() (v url.Values) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
 }
