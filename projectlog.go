@@ -17,9 +17,11 @@ import (
 )
 
 // ProjectLogService contains methods and other services that help with interacting
-// with the braintrust API. Note, unlike clients, this service does not read
-// variables from the environment automatically. You should not instantiate this
-// service directly, and instead use the [NewProjectLogService] method instead.
+// with the braintrust API.
+//
+// Note, unlike clients, this service does not read variables from the environment
+// automatically. You should not instantiate this service directly, and instead use
+// the [NewProjectLogService] method instead.
 type ProjectLogService struct {
 	Options []option.RequestOption
 }
@@ -71,13 +73,19 @@ func (r *ProjectLogService) Insert(ctx context.Context, projectID string, body P
 type ProjectLogFetchResponse struct {
 	// A list of fetched events
 	Events []ProjectLogFetchResponseEvent `json:"events,required"`
-	JSON   projectLogFetchResponseJSON    `json:"-"`
+	// Pagination cursor
+	//
+	// Pass this string directly as the `cursor` param to your next fetch request to
+	// get the next page of results. Not provided if the returned result set is empty.
+	Cursor string                      `json:"cursor,nullable"`
+	JSON   projectLogFetchResponseJSON `json:"-"`
 }
 
 // projectLogFetchResponseJSON contains the JSON metadata for the struct
 // [ProjectLogFetchResponse]
 type projectLogFetchResponseJSON struct {
 	Events      apijson.Field
+	Cursor      apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
@@ -338,13 +346,19 @@ func (r ProjectLogFetchResponseEventsSpanAttributesType) IsKnown() bool {
 type ProjectLogFetchPostResponse struct {
 	// A list of fetched events
 	Events []ProjectLogFetchPostResponseEvent `json:"events,required"`
-	JSON   projectLogFetchPostResponseJSON    `json:"-"`
+	// Pagination cursor
+	//
+	// Pass this string directly as the `cursor` param to your next fetch request to
+	// get the next page of results. Not provided if the returned result set is empty.
+	Cursor string                          `json:"cursor,nullable"`
+	JSON   projectLogFetchPostResponseJSON `json:"-"`
 }
 
 // projectLogFetchPostResponseJSON contains the JSON metadata for the struct
 // [ProjectLogFetchPostResponse]
 type projectLogFetchPostResponseJSON struct {
 	Events      apijson.Field
+	Cursor      apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
@@ -690,6 +704,10 @@ type ProjectLogFetchParams struct {
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
 	Limit param.Field[int64] `query:"limit"`
+	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
+	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
+	// the 'cursor' argument going forwards.
+	//
 	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
 	//
 	// Since a paginated fetch query returns results in order from latest to earliest,
@@ -697,6 +715,10 @@ type ProjectLogFetchParams struct {
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
 	MaxRootSpanID param.Field[string] `query:"max_root_span_id"`
+	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
+	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
+	// the 'cursor' argument going forwards.
+	//
 	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
 	//
 	// Since a paginated fetch query returns results in order from latest to earliest,
@@ -721,6 +743,12 @@ func (r ProjectLogFetchParams) URLQuery() (v url.Values) {
 }
 
 type ProjectLogFetchPostParams struct {
+	// An opaque string to be used as a cursor for the next page of results, in order
+	// from latest to earliest.
+	//
+	// The string can be obtained directly from the `cursor` property of the previous
+	// fetch query
+	Cursor param.Field[string] `json:"cursor"`
 	// A list of filters on the events to fetch. Currently, only path-lookup type
 	// filters are supported, but we may add more in the future
 	Filters param.Field[[]ProjectLogFetchPostParamsFilter] `json:"filters"`
@@ -739,6 +767,10 @@ type ProjectLogFetchPostParams struct {
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
 	Limit param.Field[int64] `json:"limit"`
+	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
+	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
+	// the 'cursor' argument going forwards.
+	//
 	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
 	//
 	// Since a paginated fetch query returns results in order from latest to earliest,
@@ -746,6 +778,10 @@ type ProjectLogFetchPostParams struct {
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
 	MaxRootSpanID param.Field[string] `json:"max_root_span_id"`
+	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
+	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
+	// the 'cursor' argument going forwards.
+	//
 	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
 	//
 	// Since a paginated fetch query returns results in order from latest to earliest,
