@@ -30,8 +30,8 @@ func TestACLNewWithOptionalParams(t *testing.T) {
 		ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ObjectType:         braintrust.F(braintrust.ACLNewParamsObjectTypeOrganization),
 		GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Permission:         braintrust.F[braintrust.ACLNewParamsPermissionUnion](braintrust.ACLNewParamsPermissionString(braintrust.ACLNewParamsPermissionStringCreate)),
-		RestrictObjectType: braintrust.F[braintrust.ACLNewParamsRestrictObjectTypeUnion](braintrust.ACLNewParamsRestrictObjectTypeString(braintrust.ACLNewParamsRestrictObjectTypeStringOrganization)),
+		Permission:         braintrust.F(braintrust.ACLNewParamsPermissionCreate),
+		RestrictObjectType: braintrust.F(braintrust.ACLNewParamsRestrictObjectTypeOrganization),
 		RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
@@ -136,8 +136,8 @@ func TestACLReplaceWithOptionalParams(t *testing.T) {
 		ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ObjectType:         braintrust.F(braintrust.ACLReplaceParamsObjectTypeOrganization),
 		GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Permission:         braintrust.F[braintrust.ACLReplaceParamsPermissionUnion](braintrust.ACLReplaceParamsPermissionString(braintrust.ACLReplaceParamsPermissionStringCreate)),
-		RestrictObjectType: braintrust.F[braintrust.ACLReplaceParamsRestrictObjectTypeUnion](braintrust.ACLReplaceParamsRestrictObjectTypeString(braintrust.ACLReplaceParamsRestrictObjectTypeStringOrganization)),
+		Permission:         braintrust.F(braintrust.ACLReplaceParamsPermissionCreate),
+		RestrictObjectType: braintrust.F(braintrust.ACLReplaceParamsRestrictObjectTypeOrganization),
 		RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
