@@ -18,9 +18,11 @@ import (
 )
 
 // ExperimentService contains methods and other services that help with interacting
-// with the braintrust API. Note, unlike clients, this service does not read
-// variables from the environment automatically. You should not instantiate this
-// service directly, and instead use the [NewExperimentService] method instead.
+// with the braintrust API.
+//
+// Note, unlike clients, this service does not read variables from the environment
+// automatically. You should not instantiate this service directly, and instead use
+// the [NewExperimentService] method instead.
 type ExperimentService struct {
 	Options []option.RequestOption
 }
@@ -142,6 +144,14 @@ func (r *ExperimentService) Replace(ctx context.Context, body ExperimentReplaceP
 	return
 }
 
+// Summarize experiment
+func (r *ExperimentService) Summarize(ctx context.Context, experimentID string, query ExperimentSummarizeParams, opts ...option.RequestOption) (res *ExperimentSummarizeResponse, err error) {
+	opts = append(r.Options[:], opts...)
+	path := fmt.Sprintf("v1/experiment/%s/summarize", experimentID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return
+}
+
 type Experiment struct {
 	// Unique identifier for the experiment
 	ID string `json:"id,required" format:"uuid"`
@@ -256,13 +266,19 @@ func (r experimentRepoInfoJSON) RawJSON() string {
 type ExperimentFetchResponse struct {
 	// A list of fetched events
 	Events []ExperimentFetchResponseEvent `json:"events,required"`
-	JSON   experimentFetchResponseJSON    `json:"-"`
+	// Pagination cursor
+	//
+	// Pass this string directly as the `cursor` param to your next fetch request to
+	// get the next page of results. Not provided if the returned result set is empty.
+	Cursor string                      `json:"cursor,nullable"`
+	JSON   experimentFetchResponseJSON `json:"-"`
 }
 
 // experimentFetchResponseJSON contains the JSON metadata for the struct
 // [ExperimentFetchResponse]
 type experimentFetchResponseJSON struct {
 	Events      apijson.Field
+	Cursor      apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
@@ -513,13 +529,19 @@ func (r ExperimentFetchResponseEventsSpanAttributesType) IsKnown() bool {
 type ExperimentFetchPostResponse struct {
 	// A list of fetched events
 	Events []ExperimentFetchPostResponseEvent `json:"events,required"`
-	JSON   experimentFetchPostResponseJSON    `json:"-"`
+	// Pagination cursor
+	//
+	// Pass this string directly as the `cursor` param to your next fetch request to
+	// get the next page of results. Not provided if the returned result set is empty.
+	Cursor string                          `json:"cursor,nullable"`
+	JSON   experimentFetchPostResponseJSON `json:"-"`
 }
 
 // experimentFetchPostResponseJSON contains the JSON metadata for the struct
 // [ExperimentFetchPostResponse]
 type experimentFetchPostResponseJSON struct {
 	Events      apijson.Field
+	Cursor      apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
@@ -790,6 +812,120 @@ func (r experimentInsertResponseJSON) RawJSON() string {
 	return r.raw
 }
 
+// Summary of an experiment
+type ExperimentSummarizeResponse struct {
+	// Name of the experiment
+	ExperimentName string `json:"experiment_name,required"`
+	// URL to the experiment's page in the Braintrust app
+	ExperimentURL string `json:"experiment_url,required" format:"uri"`
+	// Name of the project that the experiment belongs to
+	ProjectName string `json:"project_name,required"`
+	// URL to the project's page in the Braintrust app
+	ProjectURL string `json:"project_url,required" format:"uri"`
+	// The experiment which scores are baselined against
+	ComparisonExperimentName string `json:"comparison_experiment_name,nullable"`
+	// Summary of the experiment's metrics
+	Metrics map[string]ExperimentSummarizeResponseMetric `json:"metrics,nullable"`
+	// Summary of the experiment's scores
+	Scores map[string]ExperimentSummarizeResponseScore `json:"scores,nullable"`
+	JSON   experimentSummarizeResponseJSON             `json:"-"`
+}
+
+// experimentSummarizeResponseJSON contains the JSON metadata for the struct
+// [ExperimentSummarizeResponse]
+type experimentSummarizeResponseJSON struct {
+	ExperimentName           apijson.Field
+	ExperimentURL            apijson.Field
+	ProjectName              apijson.Field
+	ProjectURL               apijson.Field
+	ComparisonExperimentName apijson.Field
+	Metrics                  apijson.Field
+	Scores                   apijson.Field
+	raw                      string
+	ExtraFields              map[string]apijson.Field
+}
+
+func (r *ExperimentSummarizeResponse) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r experimentSummarizeResponseJSON) RawJSON() string {
+	return r.raw
+}
+
+// Summary of a metric's performance
+type ExperimentSummarizeResponseMetric struct {
+	// Number of improvements in the metric
+	Improvements int64 `json:"improvements,required"`
+	// Average metric across all examples
+	Metric float64 `json:"metric,required"`
+	// Name of the metric
+	Name string `json:"name,required"`
+	// Number of regressions in the metric
+	Regressions int64 `json:"regressions,required"`
+	// Unit label for the metric
+	Unit string `json:"unit,required"`
+	// Difference in metric between the current and comparison experiment
+	Diff float64                               `json:"diff"`
+	JSON experimentSummarizeResponseMetricJSON `json:"-"`
+}
+
+// experimentSummarizeResponseMetricJSON contains the JSON metadata for the struct
+// [ExperimentSummarizeResponseMetric]
+type experimentSummarizeResponseMetricJSON struct {
+	Improvements apijson.Field
+	Metric       apijson.Field
+	Name         apijson.Field
+	Regressions  apijson.Field
+	Unit         apijson.Field
+	Diff         apijson.Field
+	raw          string
+	ExtraFields  map[string]apijson.Field
+}
+
+func (r *ExperimentSummarizeResponseMetric) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r experimentSummarizeResponseMetricJSON) RawJSON() string {
+	return r.raw
+}
+
+// Summary of a score's performance
+type ExperimentSummarizeResponseScore struct {
+	// Number of improvements in the score
+	Improvements int64 `json:"improvements,required"`
+	// Name of the score
+	Name string `json:"name,required"`
+	// Number of regressions in the score
+	Regressions int64 `json:"regressions,required"`
+	// Average score across all examples
+	Score float64 `json:"score,required"`
+	// Difference in score between the current and comparison experiment
+	Diff float64                              `json:"diff"`
+	JSON experimentSummarizeResponseScoreJSON `json:"-"`
+}
+
+// experimentSummarizeResponseScoreJSON contains the JSON metadata for the struct
+// [ExperimentSummarizeResponseScore]
+type experimentSummarizeResponseScoreJSON struct {
+	Improvements apijson.Field
+	Name         apijson.Field
+	Regressions  apijson.Field
+	Score        apijson.Field
+	Diff         apijson.Field
+	raw          string
+	ExtraFields  map[string]apijson.Field
+}
+
+func (r *ExperimentSummarizeResponseScore) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r experimentSummarizeResponseScoreJSON) RawJSON() string {
+	return r.raw
+}
+
 type ExperimentNewParams struct {
 	// Unique identifier for the project that the experiment belongs under
 	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
@@ -1014,6 +1150,10 @@ type ExperimentFetchParams struct {
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
 	Limit param.Field[int64] `query:"limit"`
+	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
+	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
+	// the 'cursor' argument going forwards.
+	//
 	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
 	//
 	// Since a paginated fetch query returns results in order from latest to earliest,
@@ -1021,6 +1161,10 @@ type ExperimentFetchParams struct {
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
 	MaxRootSpanID param.Field[string] `query:"max_root_span_id"`
+	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
+	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
+	// the 'cursor' argument going forwards.
+	//
 	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
 	//
 	// Since a paginated fetch query returns results in order from latest to earliest,
@@ -1045,6 +1189,12 @@ func (r ExperimentFetchParams) URLQuery() (v url.Values) {
 }
 
 type ExperimentFetchPostParams struct {
+	// An opaque string to be used as a cursor for the next page of results, in order
+	// from latest to earliest.
+	//
+	// The string can be obtained directly from the `cursor` property of the previous
+	// fetch query
+	Cursor param.Field[string] `json:"cursor"`
 	// A list of filters on the events to fetch. Currently, only path-lookup type
 	// filters are supported, but we may add more in the future
 	Filters param.Field[[]ExperimentFetchPostParamsFilter] `json:"filters"`
@@ -1063,6 +1213,10 @@ type ExperimentFetchPostParams struct {
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
 	Limit param.Field[int64] `json:"limit"`
+	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
+	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
+	// the 'cursor' argument going forwards.
+	//
 	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
 	//
 	// Since a paginated fetch query returns results in order from latest to earliest,
@@ -1070,6 +1224,10 @@ type ExperimentFetchPostParams struct {
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
 	MaxRootSpanID param.Field[string] `json:"max_root_span_id"`
+	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
+	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
+	// the 'cursor' argument going forwards.
+	//
 	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
 	//
 	// Since a paginated fetch query returns results in order from latest to earliest,
@@ -1594,4 +1752,24 @@ type ExperimentReplaceParamsRepoInfo struct {
 
 func (r ExperimentReplaceParamsRepoInfo) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
+}
+
+type ExperimentSummarizeParams struct {
+	// The experiment to compare against, if summarizing scores and metrics. If
+	// omitted, will fall back to the `base_exp_id` stored in the experiment metadata,
+	// and then to the most recent experiment run in the same project. Must pass
+	// `summarize_scores=true` for this id to be used
+	ComparisonExperimentID param.Field[string] `query:"comparison_experiment_id" format:"uuid"`
+	// Whether to summarize the scores and metrics. If false (or omitted), only the
+	// metadata will be returned.
+	SummarizeScores param.Field[bool] `query:"summarize_scores"`
+}
+
+// URLQuery serializes [ExperimentSummarizeParams]'s query parameters as
+// `url.Values`.
+func (r ExperimentSummarizeParams) URLQuery() (v url.Values) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
 }
