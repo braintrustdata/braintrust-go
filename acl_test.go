@@ -24,7 +24,6 @@ func TestACLNewWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.ACL.New(context.TODO(), braintrust.ACLNewParams{
 		ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
@@ -55,7 +54,6 @@ func TestACLGet(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.ACL.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
@@ -78,7 +76,6 @@ func TestACLListWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.ACL.List(context.TODO(), braintrust.ACLListParams{
 		ObjectID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
@@ -107,7 +104,6 @@ func TestACLDelete(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.ACL.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
@@ -130,7 +126,6 @@ func TestACLReplaceWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.ACL.Replace(context.TODO(), braintrust.ACLReplaceParams{
 		ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),

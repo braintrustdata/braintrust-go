@@ -235,11 +235,3 @@ func WithAPIKey(value string) RequestOption {
 		return r.Apply(WithHeader("authorization", fmt.Sprintf("Bearer %s", r.APIKey)))
 	}
 }
-
-// WithBaseURL returns a RequestOption that sets the client setting "base_url".
-func WithBaseURL(value string) RequestOption {
-	return func(r *requestconfig.RequestConfig) error {
-		r.BaseURL = value
-		return nil
-	}
-}

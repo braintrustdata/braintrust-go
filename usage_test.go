@@ -23,7 +23,6 @@ func TestUsage(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	project, err := client.Project.New(context.TODO(), braintrust.ProjectNewParams{
 		Name: braintrust.F("string"),
