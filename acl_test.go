@@ -26,13 +26,13 @@ func TestACLNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ACL.New(context.TODO(), braintrust.ACLNewParams{
-		Body: braintrust.ACLNewParamsBodyCreateUserPermissionACL{
-			ObjectType:         braintrust.F(braintrust.ACLNewParamsBodyCreateUserPermissionACLObjectTypeOrganization),
-			ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			RestrictObjectType: braintrust.F[braintrust.ACLNewParamsBodyCreateUserPermissionACLRestrictObjectTypeUnion](braintrust.ACLNewParamsBodyCreateUserPermissionACLRestrictObjectTypeString(braintrust.ACLNewParamsBodyCreateUserPermissionACLRestrictObjectTypeStringOrganization)),
-			UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			Permission:         braintrust.F(braintrust.ACLNewParamsBodyCreateUserPermissionACLPermissionCreate),
-		},
+		ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		ObjectType:         braintrust.F(braintrust.ACLNewParamsObjectTypeOrganization),
+		GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		Permission:         braintrust.F[braintrust.ACLNewParamsPermissionUnion](braintrust.ACLNewParamsPermissionString(braintrust.ACLNewParamsPermissionStringCreate)),
+		RestrictObjectType: braintrust.F[braintrust.ACLNewParamsRestrictObjectTypeUnion](braintrust.ACLNewParamsRestrictObjectTypeString(braintrust.ACLNewParamsRestrictObjectTypeStringOrganization)),
+		RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -128,13 +128,13 @@ func TestACLReplaceWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ACL.Replace(context.TODO(), braintrust.ACLReplaceParams{
-		Body: braintrust.ACLReplaceParamsBodyCreateUserPermissionACL{
-			ObjectType:         braintrust.F(braintrust.ACLReplaceParamsBodyCreateUserPermissionACLObjectTypeOrganization),
-			ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			RestrictObjectType: braintrust.F[braintrust.ACLReplaceParamsBodyCreateUserPermissionACLRestrictObjectTypeUnion](braintrust.ACLReplaceParamsBodyCreateUserPermissionACLRestrictObjectTypeString(braintrust.ACLReplaceParamsBodyCreateUserPermissionACLRestrictObjectTypeStringOrganization)),
-			UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			Permission:         braintrust.F(braintrust.ACLReplaceParamsBodyCreateUserPermissionACLPermissionCreate),
-		},
+		ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		ObjectType:         braintrust.F(braintrust.ACLReplaceParamsObjectTypeOrganization),
+		GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		Permission:         braintrust.F[braintrust.ACLReplaceParamsPermissionUnion](braintrust.ACLReplaceParamsPermissionString(braintrust.ACLReplaceParamsPermissionStringCreate)),
+		RestrictObjectType: braintrust.F[braintrust.ACLReplaceParamsRestrictObjectTypeUnion](braintrust.ACLReplaceParamsRestrictObjectTypeString(braintrust.ACLReplaceParamsRestrictObjectTypeStringOrganization)),
+		RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
