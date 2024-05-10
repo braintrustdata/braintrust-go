@@ -25,7 +25,6 @@ func TestRoleNewWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Role.New(context.TODO(), braintrust.RoleNewParams{
 		Name:              braintrust.F("string"),
@@ -54,7 +53,6 @@ func TestRoleGet(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Role.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
@@ -77,7 +75,6 @@ func TestRoleUpdateWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Role.Update(
 		context.TODO(),
@@ -109,7 +106,6 @@ func TestRoleListWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Role.List(context.TODO(), braintrust.RoleListParams{
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
@@ -139,7 +135,6 @@ func TestRoleDelete(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Role.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
@@ -162,7 +157,6 @@ func TestRoleReplaceWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Role.Replace(context.TODO(), braintrust.RoleReplaceParams{
 		Name:              braintrust.F("string"),

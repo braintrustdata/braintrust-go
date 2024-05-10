@@ -25,7 +25,6 @@ func TestPromptNewWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Prompt.New(context.TODO(), braintrust.PromptNewParams{
 		Name:        braintrust.F("string"),
@@ -84,7 +83,6 @@ func TestPromptGet(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Prompt.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
@@ -107,7 +105,6 @@ func TestPromptUpdateWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Prompt.Update(
 		context.TODO(),
@@ -168,7 +165,6 @@ func TestPromptListWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Prompt.List(context.TODO(), braintrust.PromptListParams{
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
@@ -201,7 +197,6 @@ func TestPromptDelete(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Prompt.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
@@ -224,7 +219,6 @@ func TestPromptFeedback(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	err := client.Prompt.Feedback(
 		context.TODO(),
@@ -274,7 +268,6 @@ func TestPromptReplaceWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Prompt.Replace(context.TODO(), braintrust.PromptReplaceParams{
 		Name:        braintrust.F("string"),

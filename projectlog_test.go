@@ -24,7 +24,6 @@ func TestProjectLogFeedback(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	err := client.Project.Logs.Feedback(
 		context.TODO(),
@@ -86,7 +85,6 @@ func TestProjectLogFetchWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Project.Logs.Fetch(
 		context.TODO(),
@@ -118,7 +116,6 @@ func TestProjectLogFetchPostWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Project.Logs.FetchPost(
 		context.TODO(),
@@ -164,7 +161,6 @@ func TestProjectLogInsert(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Project.Logs.Insert(
 		context.TODO(),
