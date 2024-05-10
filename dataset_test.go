@@ -25,7 +25,6 @@ func TestDatasetNewWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Dataset.New(context.TODO(), braintrust.DatasetNewParams{
 		Name:        braintrust.F("string"),
@@ -52,7 +51,6 @@ func TestDatasetGet(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Dataset.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
@@ -75,7 +73,6 @@ func TestDatasetUpdateWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Dataset.Update(
 		context.TODO(),
@@ -105,7 +102,6 @@ func TestDatasetListWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Dataset.List(context.TODO(), braintrust.DatasetListParams{
 		DatasetName:   braintrust.F("string"),
@@ -136,7 +132,6 @@ func TestDatasetDelete(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Dataset.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
@@ -159,7 +154,6 @@ func TestDatasetFeedback(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	err := client.Dataset.Feedback(
 		context.TODO(),
@@ -209,7 +203,6 @@ func TestDatasetFetchWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Dataset.Fetch(
 		context.TODO(),
@@ -241,7 +234,6 @@ func TestDatasetFetchPostWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Dataset.FetchPost(
 		context.TODO(),
@@ -287,7 +279,6 @@ func TestDatasetInsert(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Dataset.Insert(
 		context.TODO(),
@@ -349,7 +340,6 @@ func TestDatasetReplaceWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Dataset.Replace(context.TODO(), braintrust.DatasetReplaceParams{
 		Name:        braintrust.F("string"),
@@ -376,7 +366,6 @@ func TestDatasetSummarizeWithOptionalParams(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.Dataset.Summarize(
 		context.TODO(),
