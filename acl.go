@@ -344,8 +344,8 @@ func (r ACLUserPermissionACLRestrictObjectTypeString) IsKnown() bool {
 type ACLUserPermissionACLRestrictObjectTypeObject struct {
 	// This is just a placeholder nullable object. Only pass null, not the object
 	// itself
-	ReservedOnlyAllowNull map[string]interface{}                           `json:"__reserved_only_allow_null,required"`
-	JSON                  aclUserPermissionACLRestrictObjectTypeObjectJSON `json:"-"`
+	ReservedOnlyAllowNull ACLUserPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull `json:"__reserved_only_allow_null,required"`
+	JSON                  aclUserPermissionACLRestrictObjectTypeObjectJSON                  `json:"-"`
 }
 
 // aclUserPermissionACLRestrictObjectTypeObjectJSON contains the JSON metadata for
@@ -365,6 +365,28 @@ func (r aclUserPermissionACLRestrictObjectTypeObjectJSON) RawJSON() string {
 }
 
 func (r ACLUserPermissionACLRestrictObjectTypeObject) ImplementsACLUserPermissionACLRestrictObjectTypeUnion() {
+}
+
+// This is just a placeholder nullable object. Only pass null, not the object
+// itself
+type ACLUserPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull struct {
+	JSON aclUserPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON `json:"-"`
+}
+
+// aclUserPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON contains
+// the JSON metadata for the struct
+// [ACLUserPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull]
+type aclUserPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON struct {
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *ACLUserPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r aclUserPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON) RawJSON() string {
+	return r.raw
 }
 
 type ACLUserRoleACL struct {
@@ -485,8 +507,8 @@ func (r ACLUserRoleACLRestrictObjectTypeString) IsKnown() bool {
 type ACLUserRoleACLRestrictObjectTypeObject struct {
 	// This is just a placeholder nullable object. Only pass null, not the object
 	// itself
-	ReservedOnlyAllowNull map[string]interface{}                     `json:"__reserved_only_allow_null,required"`
-	JSON                  aclUserRoleACLRestrictObjectTypeObjectJSON `json:"-"`
+	ReservedOnlyAllowNull ACLUserRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull `json:"__reserved_only_allow_null,required"`
+	JSON                  aclUserRoleACLRestrictObjectTypeObjectJSON                  `json:"-"`
 }
 
 // aclUserRoleACLRestrictObjectTypeObjectJSON contains the JSON metadata for the
@@ -506,6 +528,28 @@ func (r aclUserRoleACLRestrictObjectTypeObjectJSON) RawJSON() string {
 }
 
 func (r ACLUserRoleACLRestrictObjectTypeObject) ImplementsACLUserRoleACLRestrictObjectTypeUnion() {}
+
+// This is just a placeholder nullable object. Only pass null, not the object
+// itself
+type ACLUserRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull struct {
+	JSON aclUserRoleACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON `json:"-"`
+}
+
+// aclUserRoleACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON contains the
+// JSON metadata for the struct
+// [ACLUserRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull]
+type aclUserRoleACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON struct {
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *ACLUserRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r aclUserRoleACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON) RawJSON() string {
+	return r.raw
+}
 
 type ACLGroupPermissionACL struct {
 	// Unique identifier for the acl
@@ -648,8 +692,8 @@ func (r ACLGroupPermissionACLRestrictObjectTypeString) IsKnown() bool {
 type ACLGroupPermissionACLRestrictObjectTypeObject struct {
 	// This is just a placeholder nullable object. Only pass null, not the object
 	// itself
-	ReservedOnlyAllowNull map[string]interface{}                            `json:"__reserved_only_allow_null,required"`
-	JSON                  aclGroupPermissionACLRestrictObjectTypeObjectJSON `json:"-"`
+	ReservedOnlyAllowNull ACLGroupPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull `json:"__reserved_only_allow_null,required"`
+	JSON                  aclGroupPermissionACLRestrictObjectTypeObjectJSON                  `json:"-"`
 }
 
 // aclGroupPermissionACLRestrictObjectTypeObjectJSON contains the JSON metadata for
@@ -669,6 +713,28 @@ func (r aclGroupPermissionACLRestrictObjectTypeObjectJSON) RawJSON() string {
 }
 
 func (r ACLGroupPermissionACLRestrictObjectTypeObject) ImplementsACLGroupPermissionACLRestrictObjectTypeUnion() {
+}
+
+// This is just a placeholder nullable object. Only pass null, not the object
+// itself
+type ACLGroupPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull struct {
+	JSON aclGroupPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON `json:"-"`
+}
+
+// aclGroupPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON contains
+// the JSON metadata for the struct
+// [ACLGroupPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull]
+type aclGroupPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON struct {
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *ACLGroupPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r aclGroupPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON) RawJSON() string {
+	return r.raw
 }
 
 type ACLGroupRoleACL struct {
@@ -789,8 +855,8 @@ func (r ACLGroupRoleACLRestrictObjectTypeString) IsKnown() bool {
 type ACLGroupRoleACLRestrictObjectTypeObject struct {
 	// This is just a placeholder nullable object. Only pass null, not the object
 	// itself
-	ReservedOnlyAllowNull map[string]interface{}                      `json:"__reserved_only_allow_null,required"`
-	JSON                  aclGroupRoleACLRestrictObjectTypeObjectJSON `json:"-"`
+	ReservedOnlyAllowNull ACLGroupRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull `json:"__reserved_only_allow_null,required"`
+	JSON                  aclGroupRoleACLRestrictObjectTypeObjectJSON                  `json:"-"`
 }
 
 // aclGroupRoleACLRestrictObjectTypeObjectJSON contains the JSON metadata for the
@@ -810,6 +876,28 @@ func (r aclGroupRoleACLRestrictObjectTypeObjectJSON) RawJSON() string {
 }
 
 func (r ACLGroupRoleACLRestrictObjectTypeObject) ImplementsACLGroupRoleACLRestrictObjectTypeUnion() {}
+
+// This is just a placeholder nullable object. Only pass null, not the object
+// itself
+type ACLGroupRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull struct {
+	JSON aclGroupRoleACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON `json:"-"`
+}
+
+// aclGroupRoleACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON contains the
+// JSON metadata for the struct
+// [ACLGroupRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull]
+type aclGroupRoleACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON struct {
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *ACLGroupRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r aclGroupRoleACLRestrictObjectTypeObjectReservedOnlyAllowNullJSON) RawJSON() string {
+	return r.raw
+}
 
 // The object type that the ACL applies to
 type ACLObjectType string
@@ -1007,7 +1095,7 @@ func (r ACLNewParamsBodyCreateUserPermissionACLRestrictObjectTypeString) IsKnown
 type ACLNewParamsBodyCreateUserPermissionACLRestrictObjectTypeObject struct {
 	// This is just a placeholder nullable object. Only pass null, not the object
 	// itself
-	ReservedOnlyAllowNull param.Field[map[string]interface{}] `json:"__reserved_only_allow_null,required"`
+	ReservedOnlyAllowNull param.Field[ACLNewParamsBodyCreateUserPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull] `json:"__reserved_only_allow_null,required"`
 }
 
 func (r ACLNewParamsBodyCreateUserPermissionACLRestrictObjectTypeObject) MarshalJSON() (data []byte, err error) {
@@ -1015,6 +1103,15 @@ func (r ACLNewParamsBodyCreateUserPermissionACLRestrictObjectTypeObject) Marshal
 }
 
 func (r ACLNewParamsBodyCreateUserPermissionACLRestrictObjectTypeObject) ImplementsACLNewParamsBodyCreateUserPermissionACLRestrictObjectTypeUnion() {
+}
+
+// This is just a placeholder nullable object. Only pass null, not the object
+// itself
+type ACLNewParamsBodyCreateUserPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull struct {
+}
+
+func (r ACLNewParamsBodyCreateUserPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }
 
 type ACLNewParamsBodyCreateUserRoleACL struct {
@@ -1108,7 +1205,7 @@ func (r ACLNewParamsBodyCreateUserRoleACLRestrictObjectTypeString) IsKnown() boo
 type ACLNewParamsBodyCreateUserRoleACLRestrictObjectTypeObject struct {
 	// This is just a placeholder nullable object. Only pass null, not the object
 	// itself
-	ReservedOnlyAllowNull param.Field[map[string]interface{}] `json:"__reserved_only_allow_null,required"`
+	ReservedOnlyAllowNull param.Field[ACLNewParamsBodyCreateUserRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull] `json:"__reserved_only_allow_null,required"`
 }
 
 func (r ACLNewParamsBodyCreateUserRoleACLRestrictObjectTypeObject) MarshalJSON() (data []byte, err error) {
@@ -1116,6 +1213,15 @@ func (r ACLNewParamsBodyCreateUserRoleACLRestrictObjectTypeObject) MarshalJSON()
 }
 
 func (r ACLNewParamsBodyCreateUserRoleACLRestrictObjectTypeObject) ImplementsACLNewParamsBodyCreateUserRoleACLRestrictObjectTypeUnion() {
+}
+
+// This is just a placeholder nullable object. Only pass null, not the object
+// itself
+type ACLNewParamsBodyCreateUserRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull struct {
+}
+
+func (r ACLNewParamsBodyCreateUserRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }
 
 type ACLNewParamsBodyCreateGroupPermissionACL struct {
@@ -1231,7 +1337,7 @@ func (r ACLNewParamsBodyCreateGroupPermissionACLRestrictObjectTypeString) IsKnow
 type ACLNewParamsBodyCreateGroupPermissionACLRestrictObjectTypeObject struct {
 	// This is just a placeholder nullable object. Only pass null, not the object
 	// itself
-	ReservedOnlyAllowNull param.Field[map[string]interface{}] `json:"__reserved_only_allow_null,required"`
+	ReservedOnlyAllowNull param.Field[ACLNewParamsBodyCreateGroupPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull] `json:"__reserved_only_allow_null,required"`
 }
 
 func (r ACLNewParamsBodyCreateGroupPermissionACLRestrictObjectTypeObject) MarshalJSON() (data []byte, err error) {
@@ -1239,6 +1345,15 @@ func (r ACLNewParamsBodyCreateGroupPermissionACLRestrictObjectTypeObject) Marsha
 }
 
 func (r ACLNewParamsBodyCreateGroupPermissionACLRestrictObjectTypeObject) ImplementsACLNewParamsBodyCreateGroupPermissionACLRestrictObjectTypeUnion() {
+}
+
+// This is just a placeholder nullable object. Only pass null, not the object
+// itself
+type ACLNewParamsBodyCreateGroupPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull struct {
+}
+
+func (r ACLNewParamsBodyCreateGroupPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }
 
 type ACLNewParamsBodyCreateGroupRoleACL struct {
@@ -1332,7 +1447,7 @@ func (r ACLNewParamsBodyCreateGroupRoleACLRestrictObjectTypeString) IsKnown() bo
 type ACLNewParamsBodyCreateGroupRoleACLRestrictObjectTypeObject struct {
 	// This is just a placeholder nullable object. Only pass null, not the object
 	// itself
-	ReservedOnlyAllowNull param.Field[map[string]interface{}] `json:"__reserved_only_allow_null,required"`
+	ReservedOnlyAllowNull param.Field[ACLNewParamsBodyCreateGroupRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull] `json:"__reserved_only_allow_null,required"`
 }
 
 func (r ACLNewParamsBodyCreateGroupRoleACLRestrictObjectTypeObject) MarshalJSON() (data []byte, err error) {
@@ -1340,6 +1455,15 @@ func (r ACLNewParamsBodyCreateGroupRoleACLRestrictObjectTypeObject) MarshalJSON(
 }
 
 func (r ACLNewParamsBodyCreateGroupRoleACLRestrictObjectTypeObject) ImplementsACLNewParamsBodyCreateGroupRoleACLRestrictObjectTypeUnion() {
+}
+
+// This is just a placeholder nullable object. Only pass null, not the object
+// itself
+type ACLNewParamsBodyCreateGroupRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull struct {
+}
+
+func (r ACLNewParamsBodyCreateGroupRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }
 
 // The object type that the ACL applies to
@@ -1593,7 +1717,7 @@ func (r ACLReplaceParamsBodyCreateUserPermissionACLRestrictObjectTypeString) IsK
 type ACLReplaceParamsBodyCreateUserPermissionACLRestrictObjectTypeObject struct {
 	// This is just a placeholder nullable object. Only pass null, not the object
 	// itself
-	ReservedOnlyAllowNull param.Field[map[string]interface{}] `json:"__reserved_only_allow_null,required"`
+	ReservedOnlyAllowNull param.Field[ACLReplaceParamsBodyCreateUserPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull] `json:"__reserved_only_allow_null,required"`
 }
 
 func (r ACLReplaceParamsBodyCreateUserPermissionACLRestrictObjectTypeObject) MarshalJSON() (data []byte, err error) {
@@ -1601,6 +1725,15 @@ func (r ACLReplaceParamsBodyCreateUserPermissionACLRestrictObjectTypeObject) Mar
 }
 
 func (r ACLReplaceParamsBodyCreateUserPermissionACLRestrictObjectTypeObject) ImplementsACLReplaceParamsBodyCreateUserPermissionACLRestrictObjectTypeUnion() {
+}
+
+// This is just a placeholder nullable object. Only pass null, not the object
+// itself
+type ACLReplaceParamsBodyCreateUserPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull struct {
+}
+
+func (r ACLReplaceParamsBodyCreateUserPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }
 
 type ACLReplaceParamsBodyCreateUserRoleACL struct {
@@ -1694,7 +1827,7 @@ func (r ACLReplaceParamsBodyCreateUserRoleACLRestrictObjectTypeString) IsKnown()
 type ACLReplaceParamsBodyCreateUserRoleACLRestrictObjectTypeObject struct {
 	// This is just a placeholder nullable object. Only pass null, not the object
 	// itself
-	ReservedOnlyAllowNull param.Field[map[string]interface{}] `json:"__reserved_only_allow_null,required"`
+	ReservedOnlyAllowNull param.Field[ACLReplaceParamsBodyCreateUserRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull] `json:"__reserved_only_allow_null,required"`
 }
 
 func (r ACLReplaceParamsBodyCreateUserRoleACLRestrictObjectTypeObject) MarshalJSON() (data []byte, err error) {
@@ -1702,6 +1835,15 @@ func (r ACLReplaceParamsBodyCreateUserRoleACLRestrictObjectTypeObject) MarshalJS
 }
 
 func (r ACLReplaceParamsBodyCreateUserRoleACLRestrictObjectTypeObject) ImplementsACLReplaceParamsBodyCreateUserRoleACLRestrictObjectTypeUnion() {
+}
+
+// This is just a placeholder nullable object. Only pass null, not the object
+// itself
+type ACLReplaceParamsBodyCreateUserRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull struct {
+}
+
+func (r ACLReplaceParamsBodyCreateUserRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }
 
 type ACLReplaceParamsBodyCreateGroupPermissionACL struct {
@@ -1818,7 +1960,7 @@ func (r ACLReplaceParamsBodyCreateGroupPermissionACLRestrictObjectTypeString) Is
 type ACLReplaceParamsBodyCreateGroupPermissionACLRestrictObjectTypeObject struct {
 	// This is just a placeholder nullable object. Only pass null, not the object
 	// itself
-	ReservedOnlyAllowNull param.Field[map[string]interface{}] `json:"__reserved_only_allow_null,required"`
+	ReservedOnlyAllowNull param.Field[ACLReplaceParamsBodyCreateGroupPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull] `json:"__reserved_only_allow_null,required"`
 }
 
 func (r ACLReplaceParamsBodyCreateGroupPermissionACLRestrictObjectTypeObject) MarshalJSON() (data []byte, err error) {
@@ -1826,6 +1968,15 @@ func (r ACLReplaceParamsBodyCreateGroupPermissionACLRestrictObjectTypeObject) Ma
 }
 
 func (r ACLReplaceParamsBodyCreateGroupPermissionACLRestrictObjectTypeObject) ImplementsACLReplaceParamsBodyCreateGroupPermissionACLRestrictObjectTypeUnion() {
+}
+
+// This is just a placeholder nullable object. Only pass null, not the object
+// itself
+type ACLReplaceParamsBodyCreateGroupPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull struct {
+}
+
+func (r ACLReplaceParamsBodyCreateGroupPermissionACLRestrictObjectTypeObjectReservedOnlyAllowNull) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }
 
 type ACLReplaceParamsBodyCreateGroupRoleACL struct {
@@ -1919,7 +2070,7 @@ func (r ACLReplaceParamsBodyCreateGroupRoleACLRestrictObjectTypeString) IsKnown(
 type ACLReplaceParamsBodyCreateGroupRoleACLRestrictObjectTypeObject struct {
 	// This is just a placeholder nullable object. Only pass null, not the object
 	// itself
-	ReservedOnlyAllowNull param.Field[map[string]interface{}] `json:"__reserved_only_allow_null,required"`
+	ReservedOnlyAllowNull param.Field[ACLReplaceParamsBodyCreateGroupRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull] `json:"__reserved_only_allow_null,required"`
 }
 
 func (r ACLReplaceParamsBodyCreateGroupRoleACLRestrictObjectTypeObject) MarshalJSON() (data []byte, err error) {
@@ -1927,6 +2078,15 @@ func (r ACLReplaceParamsBodyCreateGroupRoleACLRestrictObjectTypeObject) MarshalJ
 }
 
 func (r ACLReplaceParamsBodyCreateGroupRoleACLRestrictObjectTypeObject) ImplementsACLReplaceParamsBodyCreateGroupRoleACLRestrictObjectTypeUnion() {
+}
+
+// This is just a placeholder nullable object. Only pass null, not the object
+// itself
+type ACLReplaceParamsBodyCreateGroupRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull struct {
+}
+
+func (r ACLReplaceParamsBodyCreateGroupRoleACLRestrictObjectTypeObjectReservedOnlyAllowNull) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }
 
 // The object type that the ACL applies to
