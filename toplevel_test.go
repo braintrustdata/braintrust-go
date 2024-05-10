@@ -24,6 +24,7 @@ func TestTopLevelHelloWorld(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
+		option.WithBaseURL("My Base URL"),
 	)
 	_, err := client.TopLevel.HelloWorld(context.TODO())
 	if err != nil {

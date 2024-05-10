@@ -23,6 +23,7 @@ func TestManualPagination(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
+		option.WithBaseURL("My Base URL"),
 	)
 	page, err := client.Project.List(context.TODO(), braintrust.ProjectListParams{})
 	if err != nil {

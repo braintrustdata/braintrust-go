@@ -50,7 +50,8 @@ import (
 
 func main() {
 	client := braintrust.NewClient(
-		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("BRAINTRUST_API_KEY")
+		option.WithAPIKey("My API Key"),   // defaults to os.LookupEnv("BRAINTRUST_API_KEY")
+		option.WithBaseURL("My Base URL"), // defaults to os.LookupEnv("BRAINTRUST_APP_URL")
 	)
 	project, err := client.Project.New(context.TODO(), braintrust.ProjectNewParams{
 		Name: braintrust.F("string"),

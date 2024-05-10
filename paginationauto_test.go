@@ -23,6 +23,7 @@ func TestAutoPagination(t *testing.T) {
 	client := braintrust.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
+		option.WithBaseURL("My Base URL"),
 	)
 	iter := client.Project.ListAutoPaging(context.TODO(), braintrust.ProjectListParams{})
 	// Prism mock isn't going to give us real pagination
