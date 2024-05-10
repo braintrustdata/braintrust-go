@@ -606,25 +606,23 @@ func (r promptPromptDataOriginJSON) RawJSON() string {
 }
 
 type PromptPromptDataPrompt struct {
-	Type                  PromptPromptDataPromptType `json:"type"`
-	Content               string                     `json:"content"`
-	Messages              interface{}                `json:"messages,required"`
-	Tools                 string                     `json:"tools"`
-	ReservedOnlyAllowNull interface{}                `json:"__reserved_only_allow_null,required"`
-	JSON                  promptPromptDataPromptJSON `json:"-"`
-	union                 PromptPromptDataPromptUnion
+	Type     PromptPromptDataPromptType `json:"type"`
+	Content  string                     `json:"content"`
+	Messages interface{}                `json:"messages,required"`
+	Tools    string                     `json:"tools"`
+	JSON     promptPromptDataPromptJSON `json:"-"`
+	union    PromptPromptDataPromptUnion
 }
 
 // promptPromptDataPromptJSON contains the JSON metadata for the struct
 // [PromptPromptDataPrompt]
 type promptPromptDataPromptJSON struct {
-	Type                  apijson.Field
-	Content               apijson.Field
-	Messages              apijson.Field
-	Tools                 apijson.Field
-	ReservedOnlyAllowNull apijson.Field
-	raw                   string
-	ExtraFields           map[string]apijson.Field
+	Type        apijson.Field
+	Content     apijson.Field
+	Messages    apijson.Field
+	Tools       apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
 }
 
 func (r promptPromptDataPromptJSON) RawJSON() string {
@@ -965,11 +963,10 @@ func (r PromptNewParamsPromptDataOrigin) MarshalJSON() (data []byte, err error) 
 }
 
 type PromptNewParamsPromptDataPrompt struct {
-	Type                  param.Field[PromptNewParamsPromptDataPromptType] `json:"type"`
-	Content               param.Field[string]                              `json:"content"`
-	Messages              param.Field[interface{}]                         `json:"messages,required"`
-	Tools                 param.Field[string]                              `json:"tools"`
-	ReservedOnlyAllowNull param.Field[interface{}]                         `json:"__reserved_only_allow_null,required"`
+	Type     param.Field[PromptNewParamsPromptDataPromptType] `json:"type"`
+	Content  param.Field[string]                              `json:"content"`
+	Messages param.Field[interface{}]                         `json:"messages,required"`
+	Tools    param.Field[string]                              `json:"tools"`
 }
 
 func (r PromptNewParamsPromptDataPrompt) MarshalJSON() (data []byte, err error) {
@@ -1265,11 +1262,10 @@ func (r PromptUpdateParamsPromptDataOrigin) MarshalJSON() (data []byte, err erro
 }
 
 type PromptUpdateParamsPromptDataPrompt struct {
-	Type                  param.Field[PromptUpdateParamsPromptDataPromptType] `json:"type"`
-	Content               param.Field[string]                                 `json:"content"`
-	Messages              param.Field[interface{}]                            `json:"messages,required"`
-	Tools                 param.Field[string]                                 `json:"tools"`
-	ReservedOnlyAllowNull param.Field[interface{}]                            `json:"__reserved_only_allow_null,required"`
+	Type     param.Field[PromptUpdateParamsPromptDataPromptType] `json:"type"`
+	Content  param.Field[string]                                 `json:"content"`
+	Messages param.Field[interface{}]                            `json:"messages,required"`
+	Tools    param.Field[string]                                 `json:"tools"`
 }
 
 func (r PromptUpdateParamsPromptDataPrompt) MarshalJSON() (data []byte, err error) {
@@ -1668,11 +1664,10 @@ func (r PromptReplaceParamsPromptDataOrigin) MarshalJSON() (data []byte, err err
 }
 
 type PromptReplaceParamsPromptDataPrompt struct {
-	Type                  param.Field[PromptReplaceParamsPromptDataPromptType] `json:"type"`
-	Content               param.Field[string]                                  `json:"content"`
-	Messages              param.Field[interface{}]                             `json:"messages,required"`
-	Tools                 param.Field[string]                                  `json:"tools"`
-	ReservedOnlyAllowNull param.Field[interface{}]                             `json:"__reserved_only_allow_null,required"`
+	Type     param.Field[PromptReplaceParamsPromptDataPromptType] `json:"type"`
+	Content  param.Field[string]                                  `json:"content"`
+	Messages param.Field[interface{}]                             `json:"messages,required"`
+	Tools    param.Field[string]                                  `json:"tools"`
 }
 
 func (r PromptReplaceParamsPromptDataPrompt) MarshalJSON() (data []byte, err error) {
