@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"reflect"
 	"time"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
@@ -16,7 +15,6 @@ import (
 	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
-	"github.com/tidwall/gjson"
 )
 
 // ACLService contains methods and other services that help with interacting with
@@ -116,7 +114,7 @@ type ACL struct {
 	// The id of the object the ACL applies to
 	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType ACLObjectType `json:"object_type,required"`
+	ObjectType ACLObjectType `json:"object_type,required,nullable"`
 	// Date of acl creation
 	Created time.Time `json:"created,nullable" format:"date-time"`
 	// Id of the group the ACL applies to. Exactly one of `user_id` and `group_id` will
@@ -124,9 +122,9 @@ type ACL struct {
 	GroupID string `json:"group_id,nullable" format:"uuid"`
 	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
-	Permission ACLPermissionUnion `json:"permission"`
+	Permission ACLPermission `json:"permission,nullable"`
 	// Optionally restricts the permission grant to just the specified object type
-	RestrictObjectType ACLRestrictObjectTypeUnion `json:"restrict_object_type"`
+	RestrictObjectType ACLRestrictObjectType `json:"restrict_object_type,nullable"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
 	RoleID string `json:"role_id,nullable" format:"uuid"`
@@ -186,140 +184,50 @@ func (r ACLObjectType) IsKnown() bool {
 
 // Permission the ACL grants. Exactly one of `permission` and `role_id` will be
 // provided
-//
-// Union satisfied by [ACLPermissionString] or [ACLPermissionObject].
-type ACLPermissionUnion interface {
-	ImplementsACLPermissionUnion()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*ACLPermissionUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(ACLPermissionString("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ACLPermissionObject{}),
-		},
-	)
-}
-
-// Each permission permits a certain type of operation on an object in the system
-//
-// Permissions can be assigned to to objects on an individual basis, or grouped
-// into roles
-type ACLPermissionString string
+type ACLPermission string
 
 const (
-	ACLPermissionStringCreate     ACLPermissionString = "create"
-	ACLPermissionStringRead       ACLPermissionString = "read"
-	ACLPermissionStringUpdate     ACLPermissionString = "update"
-	ACLPermissionStringDelete     ACLPermissionString = "delete"
-	ACLPermissionStringCreateACLs ACLPermissionString = "create_acls"
-	ACLPermissionStringReadACLs   ACLPermissionString = "read_acls"
-	ACLPermissionStringUpdateACLs ACLPermissionString = "update_acls"
-	ACLPermissionStringDeleteACLs ACLPermissionString = "delete_acls"
+	ACLPermissionCreate     ACLPermission = "create"
+	ACLPermissionRead       ACLPermission = "read"
+	ACLPermissionUpdate     ACLPermission = "update"
+	ACLPermissionDelete     ACLPermission = "delete"
+	ACLPermissionCreateACLs ACLPermission = "create_acls"
+	ACLPermissionReadACLs   ACLPermission = "read_acls"
+	ACLPermissionUpdateACLs ACLPermission = "update_acls"
+	ACLPermissionDeleteACLs ACLPermission = "delete_acls"
 )
 
-func (r ACLPermissionString) IsKnown() bool {
+func (r ACLPermission) IsKnown() bool {
 	switch r {
-	case ACLPermissionStringCreate, ACLPermissionStringRead, ACLPermissionStringUpdate, ACLPermissionStringDelete, ACLPermissionStringCreateACLs, ACLPermissionStringReadACLs, ACLPermissionStringUpdateACLs, ACLPermissionStringDeleteACLs:
+	case ACLPermissionCreate, ACLPermissionRead, ACLPermissionUpdate, ACLPermissionDelete, ACLPermissionCreateACLs, ACLPermissionReadACLs, ACLPermissionUpdateACLs, ACLPermissionDeleteACLs:
 		return true
 	}
 	return false
 }
-
-type ACLPermissionObject struct {
-	JSON aclPermissionObjectJSON `json:"-"`
-}
-
-// aclPermissionObjectJSON contains the JSON metadata for the struct
-// [ACLPermissionObject]
-type aclPermissionObjectJSON struct {
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ACLPermissionObject) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r aclPermissionObjectJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r ACLPermissionObject) ImplementsACLPermissionUnion() {}
 
 // Optionally restricts the permission grant to just the specified object type
-//
-// Union satisfied by [ACLRestrictObjectTypeString] or
-// [ACLRestrictObjectTypeObject].
-type ACLRestrictObjectTypeUnion interface {
-	ImplementsACLRestrictObjectTypeUnion()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*ACLRestrictObjectTypeUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(ACLRestrictObjectTypeString("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ACLRestrictObjectTypeObject{}),
-		},
-	)
-}
-
-// The object type that the ACL applies to
-type ACLRestrictObjectTypeString string
+type ACLRestrictObjectType string
 
 const (
-	ACLRestrictObjectTypeStringOrganization  ACLRestrictObjectTypeString = "organization"
-	ACLRestrictObjectTypeStringProject       ACLRestrictObjectTypeString = "project"
-	ACLRestrictObjectTypeStringExperiment    ACLRestrictObjectTypeString = "experiment"
-	ACLRestrictObjectTypeStringDataset       ACLRestrictObjectTypeString = "dataset"
-	ACLRestrictObjectTypeStringPrompt        ACLRestrictObjectTypeString = "prompt"
-	ACLRestrictObjectTypeStringPromptSession ACLRestrictObjectTypeString = "prompt_session"
-	ACLRestrictObjectTypeStringProjectScore  ACLRestrictObjectTypeString = "project_score"
-	ACLRestrictObjectTypeStringProjectTag    ACLRestrictObjectTypeString = "project_tag"
-	ACLRestrictObjectTypeStringGroup         ACLRestrictObjectTypeString = "group"
-	ACLRestrictObjectTypeStringRole          ACLRestrictObjectTypeString = "role"
+	ACLRestrictObjectTypeOrganization  ACLRestrictObjectType = "organization"
+	ACLRestrictObjectTypeProject       ACLRestrictObjectType = "project"
+	ACLRestrictObjectTypeExperiment    ACLRestrictObjectType = "experiment"
+	ACLRestrictObjectTypeDataset       ACLRestrictObjectType = "dataset"
+	ACLRestrictObjectTypePrompt        ACLRestrictObjectType = "prompt"
+	ACLRestrictObjectTypePromptSession ACLRestrictObjectType = "prompt_session"
+	ACLRestrictObjectTypeProjectScore  ACLRestrictObjectType = "project_score"
+	ACLRestrictObjectTypeProjectTag    ACLRestrictObjectType = "project_tag"
+	ACLRestrictObjectTypeGroup         ACLRestrictObjectType = "group"
+	ACLRestrictObjectTypeRole          ACLRestrictObjectType = "role"
 )
 
-func (r ACLRestrictObjectTypeString) IsKnown() bool {
+func (r ACLRestrictObjectType) IsKnown() bool {
 	switch r {
-	case ACLRestrictObjectTypeStringOrganization, ACLRestrictObjectTypeStringProject, ACLRestrictObjectTypeStringExperiment, ACLRestrictObjectTypeStringDataset, ACLRestrictObjectTypeStringPrompt, ACLRestrictObjectTypeStringPromptSession, ACLRestrictObjectTypeStringProjectScore, ACLRestrictObjectTypeStringProjectTag, ACLRestrictObjectTypeStringGroup, ACLRestrictObjectTypeStringRole:
+	case ACLRestrictObjectTypeOrganization, ACLRestrictObjectTypeProject, ACLRestrictObjectTypeExperiment, ACLRestrictObjectTypeDataset, ACLRestrictObjectTypePrompt, ACLRestrictObjectTypePromptSession, ACLRestrictObjectTypeProjectScore, ACLRestrictObjectTypeProjectTag, ACLRestrictObjectTypeGroup, ACLRestrictObjectTypeRole:
 		return true
 	}
 	return false
 }
-
-type ACLRestrictObjectTypeObject struct {
-	JSON aclRestrictObjectTypeObjectJSON `json:"-"`
-}
-
-// aclRestrictObjectTypeObjectJSON contains the JSON metadata for the struct
-// [ACLRestrictObjectTypeObject]
-type aclRestrictObjectTypeObjectJSON struct {
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ACLRestrictObjectTypeObject) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r aclRestrictObjectTypeObjectJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r ACLRestrictObjectTypeObject) ImplementsACLRestrictObjectTypeUnion() {}
 
 type ACLNewParams struct {
 	// The id of the object the ACL applies to
@@ -331,9 +239,9 @@ type ACLNewParams struct {
 	GroupID param.Field[string] `json:"group_id" format:"uuid"`
 	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
-	Permission param.Field[ACLNewParamsPermissionUnion] `json:"permission"`
+	Permission param.Field[ACLNewParamsPermission] `json:"permission"`
 	// Optionally restricts the permission grant to just the specified object type
-	RestrictObjectType param.Field[ACLNewParamsRestrictObjectTypeUnion] `json:"restrict_object_type"`
+	RestrictObjectType param.Field[ACLNewParamsRestrictObjectType] `json:"restrict_object_type"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
 	RoleID param.Field[string] `json:"role_id" format:"uuid"`
@@ -372,86 +280,50 @@ func (r ACLNewParamsObjectType) IsKnown() bool {
 
 // Permission the ACL grants. Exactly one of `permission` and `role_id` will be
 // provided
-//
-// Satisfied by [ACLNewParamsPermissionString], [ACLNewParamsPermissionObject].
-type ACLNewParamsPermissionUnion interface {
-	ImplementsACLNewParamsPermissionUnion()
-}
-
-// Each permission permits a certain type of operation on an object in the system
-//
-// Permissions can be assigned to to objects on an individual basis, or grouped
-// into roles
-type ACLNewParamsPermissionString string
+type ACLNewParamsPermission string
 
 const (
-	ACLNewParamsPermissionStringCreate     ACLNewParamsPermissionString = "create"
-	ACLNewParamsPermissionStringRead       ACLNewParamsPermissionString = "read"
-	ACLNewParamsPermissionStringUpdate     ACLNewParamsPermissionString = "update"
-	ACLNewParamsPermissionStringDelete     ACLNewParamsPermissionString = "delete"
-	ACLNewParamsPermissionStringCreateACLs ACLNewParamsPermissionString = "create_acls"
-	ACLNewParamsPermissionStringReadACLs   ACLNewParamsPermissionString = "read_acls"
-	ACLNewParamsPermissionStringUpdateACLs ACLNewParamsPermissionString = "update_acls"
-	ACLNewParamsPermissionStringDeleteACLs ACLNewParamsPermissionString = "delete_acls"
+	ACLNewParamsPermissionCreate     ACLNewParamsPermission = "create"
+	ACLNewParamsPermissionRead       ACLNewParamsPermission = "read"
+	ACLNewParamsPermissionUpdate     ACLNewParamsPermission = "update"
+	ACLNewParamsPermissionDelete     ACLNewParamsPermission = "delete"
+	ACLNewParamsPermissionCreateACLs ACLNewParamsPermission = "create_acls"
+	ACLNewParamsPermissionReadACLs   ACLNewParamsPermission = "read_acls"
+	ACLNewParamsPermissionUpdateACLs ACLNewParamsPermission = "update_acls"
+	ACLNewParamsPermissionDeleteACLs ACLNewParamsPermission = "delete_acls"
 )
 
-func (r ACLNewParamsPermissionString) IsKnown() bool {
+func (r ACLNewParamsPermission) IsKnown() bool {
 	switch r {
-	case ACLNewParamsPermissionStringCreate, ACLNewParamsPermissionStringRead, ACLNewParamsPermissionStringUpdate, ACLNewParamsPermissionStringDelete, ACLNewParamsPermissionStringCreateACLs, ACLNewParamsPermissionStringReadACLs, ACLNewParamsPermissionStringUpdateACLs, ACLNewParamsPermissionStringDeleteACLs:
+	case ACLNewParamsPermissionCreate, ACLNewParamsPermissionRead, ACLNewParamsPermissionUpdate, ACLNewParamsPermissionDelete, ACLNewParamsPermissionCreateACLs, ACLNewParamsPermissionReadACLs, ACLNewParamsPermissionUpdateACLs, ACLNewParamsPermissionDeleteACLs:
 		return true
 	}
 	return false
 }
-
-type ACLNewParamsPermissionObject struct {
-}
-
-func (r ACLNewParamsPermissionObject) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ACLNewParamsPermissionObject) ImplementsACLNewParamsPermissionUnion() {}
 
 // Optionally restricts the permission grant to just the specified object type
-//
-// Satisfied by [ACLNewParamsRestrictObjectTypeString],
-// [ACLNewParamsRestrictObjectTypeObject].
-type ACLNewParamsRestrictObjectTypeUnion interface {
-	ImplementsACLNewParamsRestrictObjectTypeUnion()
-}
-
-// The object type that the ACL applies to
-type ACLNewParamsRestrictObjectTypeString string
+type ACLNewParamsRestrictObjectType string
 
 const (
-	ACLNewParamsRestrictObjectTypeStringOrganization  ACLNewParamsRestrictObjectTypeString = "organization"
-	ACLNewParamsRestrictObjectTypeStringProject       ACLNewParamsRestrictObjectTypeString = "project"
-	ACLNewParamsRestrictObjectTypeStringExperiment    ACLNewParamsRestrictObjectTypeString = "experiment"
-	ACLNewParamsRestrictObjectTypeStringDataset       ACLNewParamsRestrictObjectTypeString = "dataset"
-	ACLNewParamsRestrictObjectTypeStringPrompt        ACLNewParamsRestrictObjectTypeString = "prompt"
-	ACLNewParamsRestrictObjectTypeStringPromptSession ACLNewParamsRestrictObjectTypeString = "prompt_session"
-	ACLNewParamsRestrictObjectTypeStringProjectScore  ACLNewParamsRestrictObjectTypeString = "project_score"
-	ACLNewParamsRestrictObjectTypeStringProjectTag    ACLNewParamsRestrictObjectTypeString = "project_tag"
-	ACLNewParamsRestrictObjectTypeStringGroup         ACLNewParamsRestrictObjectTypeString = "group"
-	ACLNewParamsRestrictObjectTypeStringRole          ACLNewParamsRestrictObjectTypeString = "role"
+	ACLNewParamsRestrictObjectTypeOrganization  ACLNewParamsRestrictObjectType = "organization"
+	ACLNewParamsRestrictObjectTypeProject       ACLNewParamsRestrictObjectType = "project"
+	ACLNewParamsRestrictObjectTypeExperiment    ACLNewParamsRestrictObjectType = "experiment"
+	ACLNewParamsRestrictObjectTypeDataset       ACLNewParamsRestrictObjectType = "dataset"
+	ACLNewParamsRestrictObjectTypePrompt        ACLNewParamsRestrictObjectType = "prompt"
+	ACLNewParamsRestrictObjectTypePromptSession ACLNewParamsRestrictObjectType = "prompt_session"
+	ACLNewParamsRestrictObjectTypeProjectScore  ACLNewParamsRestrictObjectType = "project_score"
+	ACLNewParamsRestrictObjectTypeProjectTag    ACLNewParamsRestrictObjectType = "project_tag"
+	ACLNewParamsRestrictObjectTypeGroup         ACLNewParamsRestrictObjectType = "group"
+	ACLNewParamsRestrictObjectTypeRole          ACLNewParamsRestrictObjectType = "role"
 )
 
-func (r ACLNewParamsRestrictObjectTypeString) IsKnown() bool {
+func (r ACLNewParamsRestrictObjectType) IsKnown() bool {
 	switch r {
-	case ACLNewParamsRestrictObjectTypeStringOrganization, ACLNewParamsRestrictObjectTypeStringProject, ACLNewParamsRestrictObjectTypeStringExperiment, ACLNewParamsRestrictObjectTypeStringDataset, ACLNewParamsRestrictObjectTypeStringPrompt, ACLNewParamsRestrictObjectTypeStringPromptSession, ACLNewParamsRestrictObjectTypeStringProjectScore, ACLNewParamsRestrictObjectTypeStringProjectTag, ACLNewParamsRestrictObjectTypeStringGroup, ACLNewParamsRestrictObjectTypeStringRole:
+	case ACLNewParamsRestrictObjectTypeOrganization, ACLNewParamsRestrictObjectTypeProject, ACLNewParamsRestrictObjectTypeExperiment, ACLNewParamsRestrictObjectTypeDataset, ACLNewParamsRestrictObjectTypePrompt, ACLNewParamsRestrictObjectTypePromptSession, ACLNewParamsRestrictObjectTypeProjectScore, ACLNewParamsRestrictObjectTypeProjectTag, ACLNewParamsRestrictObjectTypeGroup, ACLNewParamsRestrictObjectTypeRole:
 		return true
 	}
 	return false
 }
-
-type ACLNewParamsRestrictObjectTypeObject struct {
-}
-
-func (r ACLNewParamsRestrictObjectTypeObject) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ACLNewParamsRestrictObjectTypeObject) ImplementsACLNewParamsRestrictObjectTypeUnion() {}
 
 type ACLListParams struct {
 	// The id of the object the ACL applies to
@@ -516,9 +388,9 @@ type ACLReplaceParams struct {
 	GroupID param.Field[string] `json:"group_id" format:"uuid"`
 	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
-	Permission param.Field[ACLReplaceParamsPermissionUnion] `json:"permission"`
+	Permission param.Field[ACLReplaceParamsPermission] `json:"permission"`
 	// Optionally restricts the permission grant to just the specified object type
-	RestrictObjectType param.Field[ACLReplaceParamsRestrictObjectTypeUnion] `json:"restrict_object_type"`
+	RestrictObjectType param.Field[ACLReplaceParamsRestrictObjectType] `json:"restrict_object_type"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
 	RoleID param.Field[string] `json:"role_id" format:"uuid"`
@@ -557,85 +429,47 @@ func (r ACLReplaceParamsObjectType) IsKnown() bool {
 
 // Permission the ACL grants. Exactly one of `permission` and `role_id` will be
 // provided
-//
-// Satisfied by [ACLReplaceParamsPermissionString],
-// [ACLReplaceParamsPermissionObject].
-type ACLReplaceParamsPermissionUnion interface {
-	ImplementsACLReplaceParamsPermissionUnion()
-}
-
-// Each permission permits a certain type of operation on an object in the system
-//
-// Permissions can be assigned to to objects on an individual basis, or grouped
-// into roles
-type ACLReplaceParamsPermissionString string
+type ACLReplaceParamsPermission string
 
 const (
-	ACLReplaceParamsPermissionStringCreate     ACLReplaceParamsPermissionString = "create"
-	ACLReplaceParamsPermissionStringRead       ACLReplaceParamsPermissionString = "read"
-	ACLReplaceParamsPermissionStringUpdate     ACLReplaceParamsPermissionString = "update"
-	ACLReplaceParamsPermissionStringDelete     ACLReplaceParamsPermissionString = "delete"
-	ACLReplaceParamsPermissionStringCreateACLs ACLReplaceParamsPermissionString = "create_acls"
-	ACLReplaceParamsPermissionStringReadACLs   ACLReplaceParamsPermissionString = "read_acls"
-	ACLReplaceParamsPermissionStringUpdateACLs ACLReplaceParamsPermissionString = "update_acls"
-	ACLReplaceParamsPermissionStringDeleteACLs ACLReplaceParamsPermissionString = "delete_acls"
+	ACLReplaceParamsPermissionCreate     ACLReplaceParamsPermission = "create"
+	ACLReplaceParamsPermissionRead       ACLReplaceParamsPermission = "read"
+	ACLReplaceParamsPermissionUpdate     ACLReplaceParamsPermission = "update"
+	ACLReplaceParamsPermissionDelete     ACLReplaceParamsPermission = "delete"
+	ACLReplaceParamsPermissionCreateACLs ACLReplaceParamsPermission = "create_acls"
+	ACLReplaceParamsPermissionReadACLs   ACLReplaceParamsPermission = "read_acls"
+	ACLReplaceParamsPermissionUpdateACLs ACLReplaceParamsPermission = "update_acls"
+	ACLReplaceParamsPermissionDeleteACLs ACLReplaceParamsPermission = "delete_acls"
 )
 
-func (r ACLReplaceParamsPermissionString) IsKnown() bool {
+func (r ACLReplaceParamsPermission) IsKnown() bool {
 	switch r {
-	case ACLReplaceParamsPermissionStringCreate, ACLReplaceParamsPermissionStringRead, ACLReplaceParamsPermissionStringUpdate, ACLReplaceParamsPermissionStringDelete, ACLReplaceParamsPermissionStringCreateACLs, ACLReplaceParamsPermissionStringReadACLs, ACLReplaceParamsPermissionStringUpdateACLs, ACLReplaceParamsPermissionStringDeleteACLs:
+	case ACLReplaceParamsPermissionCreate, ACLReplaceParamsPermissionRead, ACLReplaceParamsPermissionUpdate, ACLReplaceParamsPermissionDelete, ACLReplaceParamsPermissionCreateACLs, ACLReplaceParamsPermissionReadACLs, ACLReplaceParamsPermissionUpdateACLs, ACLReplaceParamsPermissionDeleteACLs:
 		return true
 	}
 	return false
 }
-
-type ACLReplaceParamsPermissionObject struct {
-}
-
-func (r ACLReplaceParamsPermissionObject) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ACLReplaceParamsPermissionObject) ImplementsACLReplaceParamsPermissionUnion() {}
 
 // Optionally restricts the permission grant to just the specified object type
-//
-// Satisfied by [ACLReplaceParamsRestrictObjectTypeString],
-// [ACLReplaceParamsRestrictObjectTypeObject].
-type ACLReplaceParamsRestrictObjectTypeUnion interface {
-	ImplementsACLReplaceParamsRestrictObjectTypeUnion()
-}
-
-// The object type that the ACL applies to
-type ACLReplaceParamsRestrictObjectTypeString string
+type ACLReplaceParamsRestrictObjectType string
 
 const (
-	ACLReplaceParamsRestrictObjectTypeStringOrganization  ACLReplaceParamsRestrictObjectTypeString = "organization"
-	ACLReplaceParamsRestrictObjectTypeStringProject       ACLReplaceParamsRestrictObjectTypeString = "project"
-	ACLReplaceParamsRestrictObjectTypeStringExperiment    ACLReplaceParamsRestrictObjectTypeString = "experiment"
-	ACLReplaceParamsRestrictObjectTypeStringDataset       ACLReplaceParamsRestrictObjectTypeString = "dataset"
-	ACLReplaceParamsRestrictObjectTypeStringPrompt        ACLReplaceParamsRestrictObjectTypeString = "prompt"
-	ACLReplaceParamsRestrictObjectTypeStringPromptSession ACLReplaceParamsRestrictObjectTypeString = "prompt_session"
-	ACLReplaceParamsRestrictObjectTypeStringProjectScore  ACLReplaceParamsRestrictObjectTypeString = "project_score"
-	ACLReplaceParamsRestrictObjectTypeStringProjectTag    ACLReplaceParamsRestrictObjectTypeString = "project_tag"
-	ACLReplaceParamsRestrictObjectTypeStringGroup         ACLReplaceParamsRestrictObjectTypeString = "group"
-	ACLReplaceParamsRestrictObjectTypeStringRole          ACLReplaceParamsRestrictObjectTypeString = "role"
+	ACLReplaceParamsRestrictObjectTypeOrganization  ACLReplaceParamsRestrictObjectType = "organization"
+	ACLReplaceParamsRestrictObjectTypeProject       ACLReplaceParamsRestrictObjectType = "project"
+	ACLReplaceParamsRestrictObjectTypeExperiment    ACLReplaceParamsRestrictObjectType = "experiment"
+	ACLReplaceParamsRestrictObjectTypeDataset       ACLReplaceParamsRestrictObjectType = "dataset"
+	ACLReplaceParamsRestrictObjectTypePrompt        ACLReplaceParamsRestrictObjectType = "prompt"
+	ACLReplaceParamsRestrictObjectTypePromptSession ACLReplaceParamsRestrictObjectType = "prompt_session"
+	ACLReplaceParamsRestrictObjectTypeProjectScore  ACLReplaceParamsRestrictObjectType = "project_score"
+	ACLReplaceParamsRestrictObjectTypeProjectTag    ACLReplaceParamsRestrictObjectType = "project_tag"
+	ACLReplaceParamsRestrictObjectTypeGroup         ACLReplaceParamsRestrictObjectType = "group"
+	ACLReplaceParamsRestrictObjectTypeRole          ACLReplaceParamsRestrictObjectType = "role"
 )
 
-func (r ACLReplaceParamsRestrictObjectTypeString) IsKnown() bool {
+func (r ACLReplaceParamsRestrictObjectType) IsKnown() bool {
 	switch r {
-	case ACLReplaceParamsRestrictObjectTypeStringOrganization, ACLReplaceParamsRestrictObjectTypeStringProject, ACLReplaceParamsRestrictObjectTypeStringExperiment, ACLReplaceParamsRestrictObjectTypeStringDataset, ACLReplaceParamsRestrictObjectTypeStringPrompt, ACLReplaceParamsRestrictObjectTypeStringPromptSession, ACLReplaceParamsRestrictObjectTypeStringProjectScore, ACLReplaceParamsRestrictObjectTypeStringProjectTag, ACLReplaceParamsRestrictObjectTypeStringGroup, ACLReplaceParamsRestrictObjectTypeStringRole:
+	case ACLReplaceParamsRestrictObjectTypeOrganization, ACLReplaceParamsRestrictObjectTypeProject, ACLReplaceParamsRestrictObjectTypeExperiment, ACLReplaceParamsRestrictObjectTypeDataset, ACLReplaceParamsRestrictObjectTypePrompt, ACLReplaceParamsRestrictObjectTypePromptSession, ACLReplaceParamsRestrictObjectTypeProjectScore, ACLReplaceParamsRestrictObjectTypeProjectTag, ACLReplaceParamsRestrictObjectTypeGroup, ACLReplaceParamsRestrictObjectTypeRole:
 		return true
 	}
 	return false
-}
-
-type ACLReplaceParamsRestrictObjectTypeObject struct {
-}
-
-func (r ACLReplaceParamsRestrictObjectTypeObject) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ACLReplaceParamsRestrictObjectTypeObject) ImplementsACLReplaceParamsRestrictObjectTypeUnion() {
 }
