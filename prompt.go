@@ -383,7 +383,7 @@ func (r PromptPromptDataOptionsParamsObject) implementsPromptPromptDataOptionsPa
 // [PromptPromptDataOptionsParamsObjectFunctionCallString] or
 // [PromptPromptDataOptionsParamsObjectFunctionCallObject].
 type PromptPromptDataOptionsParamsObjectFunctionCallUnion interface {
-	ImplementsPromptPromptDataOptionsParamsObjectFunctionCallUnion()
+	implementsPromptPromptDataOptionsParamsObjectFunctionCallUnion()
 }
 
 func init() {
@@ -440,7 +440,7 @@ func (r promptPromptDataOptionsParamsObjectFunctionCallObjectJSON) RawJSON() str
 	return r.raw
 }
 
-func (r PromptPromptDataOptionsParamsObjectFunctionCallObject) ImplementsPromptPromptDataOptionsParamsObjectFunctionCallUnion() {
+func (r PromptPromptDataOptionsParamsObjectFunctionCallObject) implementsPromptPromptDataOptionsParamsObjectFunctionCallUnion() {
 }
 
 type PromptPromptDataOptionsParamsObjectResponseFormat struct {
@@ -482,7 +482,7 @@ func (r PromptPromptDataOptionsParamsObjectResponseFormatType) IsKnown() bool {
 // [PromptPromptDataOptionsParamsObjectToolChoiceString] or
 // [PromptPromptDataOptionsParamsObjectToolChoiceObject].
 type PromptPromptDataOptionsParamsObjectToolChoiceUnion interface {
-	ImplementsPromptPromptDataOptionsParamsObjectToolChoiceUnion()
+	implementsPromptPromptDataOptionsParamsObjectToolChoiceUnion()
 }
 
 func init() {
@@ -541,7 +541,7 @@ func (r promptPromptDataOptionsParamsObjectToolChoiceObjectJSON) RawJSON() strin
 	return r.raw
 }
 
-func (r PromptPromptDataOptionsParamsObjectToolChoiceObject) ImplementsPromptPromptDataOptionsParamsObjectToolChoiceUnion() {
+func (r PromptPromptDataOptionsParamsObjectToolChoiceObject) implementsPromptPromptDataOptionsParamsObjectToolChoiceUnion() {
 }
 
 type PromptPromptDataOptionsParamsObjectToolChoiceObjectFunction struct {
@@ -826,7 +826,7 @@ func (r PromptNewParamsPromptDataOptionsParamsObjectFunctionCall) MarshalJSON() 
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptNewParamsPromptDataOptionsParamsObjectFunctionCall) ImplementsPromptNewParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
+func (r PromptNewParamsPromptDataOptionsParamsObjectFunctionCall) implementsPromptNewParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
 }
 
 // Satisfied by [PromptNewParamsPromptDataOptionsParamsObjectFunctionCallString],
@@ -834,7 +834,7 @@ func (r PromptNewParamsPromptDataOptionsParamsObjectFunctionCall) ImplementsProm
 // [PromptNewParamsPromptDataOptionsParamsObjectFunctionCallObject],
 // [PromptNewParamsPromptDataOptionsParamsObjectFunctionCall].
 type PromptNewParamsPromptDataOptionsParamsObjectFunctionCallUnion interface {
-	ImplementsPromptNewParamsPromptDataOptionsParamsObjectFunctionCallUnion()
+	implementsPromptNewParamsPromptDataOptionsParamsObjectFunctionCallUnion()
 }
 
 type PromptNewParamsPromptDataOptionsParamsObjectFunctionCallString string
@@ -859,7 +859,7 @@ func (r PromptNewParamsPromptDataOptionsParamsObjectFunctionCallObject) MarshalJ
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptNewParamsPromptDataOptionsParamsObjectFunctionCallObject) ImplementsPromptNewParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
+func (r PromptNewParamsPromptDataOptionsParamsObjectFunctionCallObject) implementsPromptNewParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
 }
 
 type PromptNewParamsPromptDataOptionsParamsObjectResponseFormat struct {
@@ -893,7 +893,7 @@ func (r PromptNewParamsPromptDataOptionsParamsObjectToolChoice) MarshalJSON() (d
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptNewParamsPromptDataOptionsParamsObjectToolChoice) ImplementsPromptNewParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
+func (r PromptNewParamsPromptDataOptionsParamsObjectToolChoice) implementsPromptNewParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
 }
 
 // Satisfied by [PromptNewParamsPromptDataOptionsParamsObjectToolChoiceString],
@@ -901,7 +901,7 @@ func (r PromptNewParamsPromptDataOptionsParamsObjectToolChoice) ImplementsPrompt
 // [PromptNewParamsPromptDataOptionsParamsObjectToolChoiceObject],
 // [PromptNewParamsPromptDataOptionsParamsObjectToolChoice].
 type PromptNewParamsPromptDataOptionsParamsObjectToolChoiceUnion interface {
-	ImplementsPromptNewParamsPromptDataOptionsParamsObjectToolChoiceUnion()
+	implementsPromptNewParamsPromptDataOptionsParamsObjectToolChoiceUnion()
 }
 
 type PromptNewParamsPromptDataOptionsParamsObjectToolChoiceString string
@@ -927,7 +927,7 @@ func (r PromptNewParamsPromptDataOptionsParamsObjectToolChoiceObject) MarshalJSO
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptNewParamsPromptDataOptionsParamsObjectToolChoiceObject) ImplementsPromptNewParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
+func (r PromptNewParamsPromptDataOptionsParamsObjectToolChoiceObject) implementsPromptNewParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
 }
 
 type PromptNewParamsPromptDataOptionsParamsObjectToolChoiceObjectFunction struct {
@@ -1124,7 +1124,7 @@ func (r PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCall) MarshalJSON
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCall) ImplementsPromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
+func (r PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCall) implementsPromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
 }
 
 // Satisfied by
@@ -1133,7 +1133,7 @@ func (r PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCall) ImplementsP
 // [PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallObject],
 // [PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCall].
 type PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallUnion interface {
-	ImplementsPromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallUnion()
+	implementsPromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallUnion()
 }
 
 type PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallString string
@@ -1158,7 +1158,7 @@ func (r PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallObject) Marsh
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallObject) ImplementsPromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
+func (r PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallObject) implementsPromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
 }
 
 type PromptUpdateParamsPromptDataOptionsParamsObjectResponseFormat struct {
@@ -1192,7 +1192,7 @@ func (r PromptUpdateParamsPromptDataOptionsParamsObjectToolChoice) MarshalJSON()
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptUpdateParamsPromptDataOptionsParamsObjectToolChoice) ImplementsPromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
+func (r PromptUpdateParamsPromptDataOptionsParamsObjectToolChoice) implementsPromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
 }
 
 // Satisfied by [PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceString],
@@ -1200,7 +1200,7 @@ func (r PromptUpdateParamsPromptDataOptionsParamsObjectToolChoice) ImplementsPro
 // [PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceObject],
 // [PromptUpdateParamsPromptDataOptionsParamsObjectToolChoice].
 type PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceUnion interface {
-	ImplementsPromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceUnion()
+	implementsPromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceUnion()
 }
 
 type PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceString string
@@ -1226,7 +1226,7 @@ func (r PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceObject) Marshal
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceObject) ImplementsPromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
+func (r PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceObject) implementsPromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
 }
 
 type PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceObjectFunction struct {
@@ -1526,7 +1526,7 @@ func (r PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCall) MarshalJSO
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCall) ImplementsPromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
+func (r PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCall) implementsPromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
 }
 
 // Satisfied by
@@ -1535,7 +1535,7 @@ func (r PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCall) Implements
 // [PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallObject],
 // [PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCall].
 type PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallUnion interface {
-	ImplementsPromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallUnion()
+	implementsPromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallUnion()
 }
 
 type PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallString string
@@ -1560,7 +1560,7 @@ func (r PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallObject) Mars
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallObject) ImplementsPromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
+func (r PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallObject) implementsPromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
 }
 
 type PromptReplaceParamsPromptDataOptionsParamsObjectResponseFormat struct {
@@ -1594,7 +1594,7 @@ func (r PromptReplaceParamsPromptDataOptionsParamsObjectToolChoice) MarshalJSON(
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptReplaceParamsPromptDataOptionsParamsObjectToolChoice) ImplementsPromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
+func (r PromptReplaceParamsPromptDataOptionsParamsObjectToolChoice) implementsPromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
 }
 
 // Satisfied by [PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceString],
@@ -1602,7 +1602,7 @@ func (r PromptReplaceParamsPromptDataOptionsParamsObjectToolChoice) ImplementsPr
 // [PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceObject],
 // [PromptReplaceParamsPromptDataOptionsParamsObjectToolChoice].
 type PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceUnion interface {
-	ImplementsPromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceUnion()
+	implementsPromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceUnion()
 }
 
 type PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceString string
@@ -1628,7 +1628,7 @@ func (r PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceObject) Marsha
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceObject) ImplementsPromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
+func (r PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceObject) implementsPromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
 }
 
 type PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceObjectFunction struct {
