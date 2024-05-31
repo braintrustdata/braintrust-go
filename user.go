@@ -4,6 +4,7 @@ package braintrust
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -39,6 +40,10 @@ func NewUserService(opts ...option.RequestOption) (r *UserService) {
 // Get a user object by its id
 func (r *UserService) Get(ctx context.Context, userID string, opts ...option.RequestOption) (res *User, err error) {
 	opts = append(r.Options[:], opts...)
+	if userID == "" {
+		err = errors.New("missing required user_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/user/%s", userID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return

@@ -4,6 +4,7 @@ package braintrust
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -48,6 +49,10 @@ func (r *GroupService) New(ctx context.Context, body GroupNewParams, opts ...opt
 // Get a group object by its id
 func (r *GroupService) Get(ctx context.Context, groupID string, opts ...option.RequestOption) (res *Group, err error) {
 	opts = append(r.Options[:], opts...)
+	if groupID == "" {
+		err = errors.New("missing required group_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/group/%s", groupID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
@@ -58,6 +63,10 @@ func (r *GroupService) Get(ctx context.Context, groupID string, opts ...option.R
 // do not support removing fields or setting them to null.
 func (r *GroupService) Update(ctx context.Context, groupID string, body GroupUpdateParams, opts ...option.RequestOption) (res *Group, err error) {
 	opts = append(r.Options[:], opts...)
+	if groupID == "" {
+		err = errors.New("missing required group_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/group/%s", groupID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
 	return
@@ -91,6 +100,10 @@ func (r *GroupService) ListAutoPaging(ctx context.Context, query GroupListParams
 // Delete a group object by its id
 func (r *GroupService) Delete(ctx context.Context, groupID string, opts ...option.RequestOption) (res *Group, err error) {
 	opts = append(r.Options[:], opts...)
+	if groupID == "" {
+		err = errors.New("missing required group_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/group/%s", groupID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
 	return
