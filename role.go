@@ -4,6 +4,7 @@ package braintrust
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -48,6 +49,10 @@ func (r *RoleService) New(ctx context.Context, body RoleNewParams, opts ...optio
 // Get a role object by its id
 func (r *RoleService) Get(ctx context.Context, roleID string, opts ...option.RequestOption) (res *Role, err error) {
 	opts = append(r.Options[:], opts...)
+	if roleID == "" {
+		err = errors.New("missing required role_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/role/%s", roleID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
@@ -58,6 +63,10 @@ func (r *RoleService) Get(ctx context.Context, roleID string, opts ...option.Req
 // not support removing fields or setting them to null.
 func (r *RoleService) Update(ctx context.Context, roleID string, body RoleUpdateParams, opts ...option.RequestOption) (res *Role, err error) {
 	opts = append(r.Options[:], opts...)
+	if roleID == "" {
+		err = errors.New("missing required role_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/role/%s", roleID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
 	return
@@ -91,6 +100,10 @@ func (r *RoleService) ListAutoPaging(ctx context.Context, query RoleListParams, 
 // Delete a role object by its id
 func (r *RoleService) Delete(ctx context.Context, roleID string, opts ...option.RequestOption) (res *Role, err error) {
 	opts = append(r.Options[:], opts...)
+	if roleID == "" {
+		err = errors.New("missing required role_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/role/%s", roleID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
 	return

@@ -4,6 +4,7 @@ package braintrust
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -50,6 +51,10 @@ func (r *ProjectService) New(ctx context.Context, body ProjectNewParams, opts ..
 // Get a project object by its id
 func (r *ProjectService) Get(ctx context.Context, projectID string, opts ...option.RequestOption) (res *Project, err error) {
 	opts = append(r.Options[:], opts...)
+	if projectID == "" {
+		err = errors.New("missing required project_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/project/%s", projectID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
@@ -60,6 +65,10 @@ func (r *ProjectService) Get(ctx context.Context, projectID string, opts ...opti
 // do not support removing fields or setting them to null.
 func (r *ProjectService) Update(ctx context.Context, projectID string, body ProjectUpdateParams, opts ...option.RequestOption) (res *Project, err error) {
 	opts = append(r.Options[:], opts...)
+	if projectID == "" {
+		err = errors.New("missing required project_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/project/%s", projectID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
 	return
@@ -93,6 +102,10 @@ func (r *ProjectService) ListAutoPaging(ctx context.Context, query ProjectListPa
 // Delete a project object by its id
 func (r *ProjectService) Delete(ctx context.Context, projectID string, opts ...option.RequestOption) (res *Project, err error) {
 	opts = append(r.Options[:], opts...)
+	if projectID == "" {
+		err = errors.New("missing required project_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/project/%s", projectID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
 	return

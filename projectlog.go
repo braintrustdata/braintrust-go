@@ -4,6 +4,7 @@ package braintrust
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -39,6 +40,10 @@ func NewProjectLogService(opts ...option.RequestOption) (r *ProjectLogService) {
 func (r *ProjectLogService) Feedback(ctx context.Context, projectID string, body ProjectLogFeedbackParams, opts ...option.RequestOption) (err error) {
 	opts = append(r.Options[:], opts...)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "")}, opts...)
+	if projectID == "" {
+		err = errors.New("missing required project_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/project_logs/%s/feedback", projectID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, nil, opts...)
 	return
@@ -48,6 +53,10 @@ func (r *ProjectLogService) Feedback(ctx context.Context, projectID string, body
 // path, but with the parameters in the URL query rather than in the request body
 func (r *ProjectLogService) Fetch(ctx context.Context, projectID string, query ProjectLogFetchParams, opts ...option.RequestOption) (res *ProjectLogFetchResponse, err error) {
 	opts = append(r.Options[:], opts...)
+	if projectID == "" {
+		err = errors.New("missing required project_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/project_logs/%s/fetch", projectID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
@@ -57,6 +66,10 @@ func (r *ProjectLogService) Fetch(ctx context.Context, projectID string, query P
 // but with the parameters in the request body rather than in the URL query
 func (r *ProjectLogService) FetchPost(ctx context.Context, projectID string, body ProjectLogFetchPostParams, opts ...option.RequestOption) (res *ProjectLogFetchPostResponse, err error) {
 	opts = append(r.Options[:], opts...)
+	if projectID == "" {
+		err = errors.New("missing required project_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/project_logs/%s/fetch", projectID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -65,6 +78,10 @@ func (r *ProjectLogService) FetchPost(ctx context.Context, projectID string, bod
 // Insert a set of events into the project logs
 func (r *ProjectLogService) Insert(ctx context.Context, projectID string, body ProjectLogInsertParams, opts ...option.RequestOption) (res *ProjectLogInsertResponse, err error) {
 	opts = append(r.Options[:], opts...)
+	if projectID == "" {
+		err = errors.New("missing required project_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/project_logs/%s/insert", projectID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return

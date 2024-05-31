@@ -4,6 +4,7 @@ package braintrust
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -49,6 +50,10 @@ func (r *DatasetService) New(ctx context.Context, body DatasetNewParams, opts ..
 // Get a dataset object by its id
 func (r *DatasetService) Get(ctx context.Context, datasetID string, opts ...option.RequestOption) (res *Dataset, err error) {
 	opts = append(r.Options[:], opts...)
+	if datasetID == "" {
+		err = errors.New("missing required dataset_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/dataset/%s", datasetID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
@@ -59,6 +64,10 @@ func (r *DatasetService) Get(ctx context.Context, datasetID string, opts ...opti
 // do not support removing fields or setting them to null.
 func (r *DatasetService) Update(ctx context.Context, datasetID string, body DatasetUpdateParams, opts ...option.RequestOption) (res *Dataset, err error) {
 	opts = append(r.Options[:], opts...)
+	if datasetID == "" {
+		err = errors.New("missing required dataset_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/dataset/%s", datasetID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
 	return
@@ -92,6 +101,10 @@ func (r *DatasetService) ListAutoPaging(ctx context.Context, query DatasetListPa
 // Delete a dataset object by its id
 func (r *DatasetService) Delete(ctx context.Context, datasetID string, opts ...option.RequestOption) (res *Dataset, err error) {
 	opts = append(r.Options[:], opts...)
+	if datasetID == "" {
+		err = errors.New("missing required dataset_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/dataset/%s", datasetID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
 	return
@@ -101,6 +114,10 @@ func (r *DatasetService) Delete(ctx context.Context, datasetID string, opts ...o
 func (r *DatasetService) Feedback(ctx context.Context, datasetID string, body DatasetFeedbackParams, opts ...option.RequestOption) (err error) {
 	opts = append(r.Options[:], opts...)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "")}, opts...)
+	if datasetID == "" {
+		err = errors.New("missing required dataset_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/dataset/%s/feedback", datasetID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, nil, opts...)
 	return
@@ -110,6 +127,10 @@ func (r *DatasetService) Feedback(ctx context.Context, datasetID string, body Da
 // with the parameters in the URL query rather than in the request body
 func (r *DatasetService) Fetch(ctx context.Context, datasetID string, query DatasetFetchParams, opts ...option.RequestOption) (res *DatasetFetchResponse, err error) {
 	opts = append(r.Options[:], opts...)
+	if datasetID == "" {
+		err = errors.New("missing required dataset_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/dataset/%s/fetch", datasetID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
@@ -119,6 +140,10 @@ func (r *DatasetService) Fetch(ctx context.Context, datasetID string, query Data
 // with the parameters in the request body rather than in the URL query
 func (r *DatasetService) FetchPost(ctx context.Context, datasetID string, body DatasetFetchPostParams, opts ...option.RequestOption) (res *DatasetFetchPostResponse, err error) {
 	opts = append(r.Options[:], opts...)
+	if datasetID == "" {
+		err = errors.New("missing required dataset_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/dataset/%s/fetch", datasetID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -127,6 +152,10 @@ func (r *DatasetService) FetchPost(ctx context.Context, datasetID string, body D
 // Insert a set of events into the dataset
 func (r *DatasetService) Insert(ctx context.Context, datasetID string, body DatasetInsertParams, opts ...option.RequestOption) (res *DatasetInsertResponse, err error) {
 	opts = append(r.Options[:], opts...)
+	if datasetID == "" {
+		err = errors.New("missing required dataset_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/dataset/%s/insert", datasetID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -147,6 +176,10 @@ func (r *DatasetService) Replace(ctx context.Context, body DatasetReplaceParams,
 // Summarize dataset
 func (r *DatasetService) Summarize(ctx context.Context, datasetID string, query DatasetSummarizeParams, opts ...option.RequestOption) (res *DatasetSummarizeResponse, err error) {
 	opts = append(r.Options[:], opts...)
+	if datasetID == "" {
+		err = errors.New("missing required dataset_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/dataset/%s/summarize", datasetID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return

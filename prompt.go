@@ -4,6 +4,7 @@ package braintrust
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -51,6 +52,10 @@ func (r *PromptService) New(ctx context.Context, body PromptNewParams, opts ...o
 // Get a prompt object by its id
 func (r *PromptService) Get(ctx context.Context, promptID string, opts ...option.RequestOption) (res *Prompt, err error) {
 	opts = append(r.Options[:], opts...)
+	if promptID == "" {
+		err = errors.New("missing required prompt_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/prompt/%s", promptID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
@@ -61,6 +66,10 @@ func (r *PromptService) Get(ctx context.Context, promptID string, opts ...option
 // do not support removing fields or setting them to null.
 func (r *PromptService) Update(ctx context.Context, promptID string, body PromptUpdateParams, opts ...option.RequestOption) (res *Prompt, err error) {
 	opts = append(r.Options[:], opts...)
+	if promptID == "" {
+		err = errors.New("missing required prompt_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/prompt/%s", promptID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
 	return
@@ -94,6 +103,10 @@ func (r *PromptService) ListAutoPaging(ctx context.Context, query PromptListPara
 // Delete a prompt object by its id
 func (r *PromptService) Delete(ctx context.Context, promptID string, opts ...option.RequestOption) (res *Prompt, err error) {
 	opts = append(r.Options[:], opts...)
+	if promptID == "" {
+		err = errors.New("missing required prompt_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/prompt/%s", promptID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
 	return
@@ -103,6 +116,10 @@ func (r *PromptService) Delete(ctx context.Context, promptID string, opts ...opt
 func (r *PromptService) Feedback(ctx context.Context, promptID string, body PromptFeedbackParams, opts ...option.RequestOption) (err error) {
 	opts = append(r.Options[:], opts...)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "")}, opts...)
+	if promptID == "" {
+		err = errors.New("missing required prompt_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/prompt/%s/feedback", promptID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, nil, opts...)
 	return
