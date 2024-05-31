@@ -4,6 +4,7 @@ package braintrust
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -49,6 +50,10 @@ func (r *ExperimentService) New(ctx context.Context, body ExperimentNewParams, o
 // Get an experiment object by its id
 func (r *ExperimentService) Get(ctx context.Context, experimentID string, opts ...option.RequestOption) (res *Experiment, err error) {
 	opts = append(r.Options[:], opts...)
+	if experimentID == "" {
+		err = errors.New("missing required experiment_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/experiment/%s", experimentID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
@@ -59,6 +64,10 @@ func (r *ExperimentService) Get(ctx context.Context, experimentID string, opts .
 // Currently we do not support removing fields or setting them to null.
 func (r *ExperimentService) Update(ctx context.Context, experimentID string, body ExperimentUpdateParams, opts ...option.RequestOption) (res *Experiment, err error) {
 	opts = append(r.Options[:], opts...)
+	if experimentID == "" {
+		err = errors.New("missing required experiment_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/experiment/%s", experimentID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
 	return
@@ -92,6 +101,10 @@ func (r *ExperimentService) ListAutoPaging(ctx context.Context, query Experiment
 // Delete an experiment object by its id
 func (r *ExperimentService) Delete(ctx context.Context, experimentID string, opts ...option.RequestOption) (res *Experiment, err error) {
 	opts = append(r.Options[:], opts...)
+	if experimentID == "" {
+		err = errors.New("missing required experiment_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/experiment/%s", experimentID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
 	return
@@ -101,6 +114,10 @@ func (r *ExperimentService) Delete(ctx context.Context, experimentID string, opt
 func (r *ExperimentService) Feedback(ctx context.Context, experimentID string, body ExperimentFeedbackParams, opts ...option.RequestOption) (err error) {
 	opts = append(r.Options[:], opts...)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "")}, opts...)
+	if experimentID == "" {
+		err = errors.New("missing required experiment_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/experiment/%s/feedback", experimentID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, nil, opts...)
 	return
@@ -110,6 +127,10 @@ func (r *ExperimentService) Feedback(ctx context.Context, experimentID string, b
 // but with the parameters in the URL query rather than in the request body
 func (r *ExperimentService) Fetch(ctx context.Context, experimentID string, query ExperimentFetchParams, opts ...option.RequestOption) (res *ExperimentFetchResponse, err error) {
 	opts = append(r.Options[:], opts...)
+	if experimentID == "" {
+		err = errors.New("missing required experiment_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/experiment/%s/fetch", experimentID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
@@ -119,6 +140,10 @@ func (r *ExperimentService) Fetch(ctx context.Context, experimentID string, quer
 // but with the parameters in the request body rather than in the URL query
 func (r *ExperimentService) FetchPost(ctx context.Context, experimentID string, body ExperimentFetchPostParams, opts ...option.RequestOption) (res *ExperimentFetchPostResponse, err error) {
 	opts = append(r.Options[:], opts...)
+	if experimentID == "" {
+		err = errors.New("missing required experiment_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/experiment/%s/fetch", experimentID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -127,6 +152,10 @@ func (r *ExperimentService) FetchPost(ctx context.Context, experimentID string, 
 // Insert a set of events into the experiment
 func (r *ExperimentService) Insert(ctx context.Context, experimentID string, body ExperimentInsertParams, opts ...option.RequestOption) (res *ExperimentInsertResponse, err error) {
 	opts = append(r.Options[:], opts...)
+	if experimentID == "" {
+		err = errors.New("missing required experiment_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/experiment/%s/insert", experimentID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -147,6 +176,10 @@ func (r *ExperimentService) Replace(ctx context.Context, body ExperimentReplaceP
 // Summarize experiment
 func (r *ExperimentService) Summarize(ctx context.Context, experimentID string, query ExperimentSummarizeParams, opts ...option.RequestOption) (res *ExperimentSummarizeResponse, err error) {
 	opts = append(r.Options[:], opts...)
+	if experimentID == "" {
+		err = errors.New("missing required experiment_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/experiment/%s/summarize", experimentID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return

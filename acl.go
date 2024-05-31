@@ -4,6 +4,7 @@ package braintrust
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -48,6 +49,10 @@ func (r *ACLService) New(ctx context.Context, body ACLNewParams, opts ...option.
 // Get an acl object by its id
 func (r *ACLService) Get(ctx context.Context, aclID string, opts ...option.RequestOption) (res *ACL, err error) {
 	opts = append(r.Options[:], opts...)
+	if aclID == "" {
+		err = errors.New("missing required acl_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/acl/%s", aclID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
@@ -81,6 +86,10 @@ func (r *ACLService) ListAutoPaging(ctx context.Context, query ACLListParams, op
 // Delete an acl object by its id
 func (r *ACLService) Delete(ctx context.Context, aclID string, opts ...option.RequestOption) (res *ACL, err error) {
 	opts = append(r.Options[:], opts...)
+	if aclID == "" {
+		err = errors.New("missing required acl_id parameter")
+		return
+	}
 	path := fmt.Sprintf("v1/acl/%s", aclID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
 	return
