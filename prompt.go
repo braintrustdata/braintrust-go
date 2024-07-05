@@ -79,7 +79,7 @@ func (r *PromptService) Update(ctx context.Context, promptID string, body Prompt
 // recently-created prompts coming first
 func (r *PromptService) List(ctx context.Context, query PromptListParams, opts ...option.RequestOption) (res *pagination.ListObjects[Prompt], err error) {
 	var raw *http.Response
-	opts = append(r.Options, opts...)
+	opts = append(r.Options[:], opts...)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "v1/prompt"
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -261,19 +261,27 @@ func (r promptPromptDataOptionsJSON) RawJSON() string {
 }
 
 type PromptPromptDataOptionsParams struct {
-	UseCache         bool        `json:"use_cache"`
-	Temperature      float64     `json:"temperature"`
-	TopP             float64     `json:"top_p"`
-	MaxTokens        float64     `json:"max_tokens"`
-	FrequencyPenalty float64     `json:"frequency_penalty"`
-	PresencePenalty  float64     `json:"presence_penalty"`
-	ResponseFormat   interface{} `json:"response_format,required"`
-	ToolChoice       interface{} `json:"tool_choice,required"`
-	FunctionCall     interface{} `json:"function_call,required"`
-	N                float64     `json:"n"`
-	Stop             interface{} `json:"stop,required"`
-	TopK             float64     `json:"top_k"`
-	StopSequences    interface{} `json:"stop_sequences,required"`
+	UseCache         bool    `json:"use_cache"`
+	Temperature      float64 `json:"temperature"`
+	TopP             float64 `json:"top_p"`
+	MaxTokens        float64 `json:"max_tokens"`
+	FrequencyPenalty float64 `json:"frequency_penalty"`
+	PresencePenalty  float64 `json:"presence_penalty"`
+	// This field can have the runtime type of
+	// [PromptPromptDataOptionsParamsObjectResponseFormat].
+	ResponseFormat interface{} `json:"response_format,required"`
+	// This field can have the runtime type of
+	// [PromptPromptDataOptionsParamsObjectToolChoiceUnion].
+	ToolChoice interface{} `json:"tool_choice,required"`
+	// This field can have the runtime type of
+	// [PromptPromptDataOptionsParamsObjectFunctionCallUnion].
+	FunctionCall interface{} `json:"function_call,required"`
+	N            float64     `json:"n"`
+	// This field can have the runtime type of [[]string].
+	Stop interface{} `json:"stop,required"`
+	TopK float64     `json:"top_k"`
+	// This field can have the runtime type of [[]string].
+	StopSequences interface{} `json:"stop_sequences,required"`
 	// This is a legacy parameter that should not be used.
 	MaxTokensToSample float64                           `json:"max_tokens_to_sample"`
 	MaxOutputTokens   float64                           `json:"maxOutputTokens"`
@@ -319,6 +327,12 @@ func (r *PromptPromptDataOptionsParams) UnmarshalJSON(data []byte) (err error) {
 	return apijson.Port(r.union, &r)
 }
 
+// AsUnion returns a [PromptPromptDataOptionsParamsUnion] interface which you can
+// cast to the specific types for more type safety.
+//
+// Possible runtime types of the union are [PromptPromptDataOptionsParamsObject],
+// [PromptPromptDataOptionsParamsObject], [PromptPromptDataOptionsParamsObject],
+// [PromptPromptDataOptionsParamsObject].
 func (r PromptPromptDataOptionsParams) AsUnion() PromptPromptDataOptionsParamsUnion {
 	return r.union
 }
@@ -436,6 +450,9 @@ func (r PromptPromptDataOptionsParamsObjectFunctionCallString) IsKnown() bool {
 	return false
 }
 
+func (r PromptPromptDataOptionsParamsObjectFunctionCallString) implementsPromptPromptDataOptionsParamsObjectFunctionCallUnion() {
+}
+
 type PromptPromptDataOptionsParamsObjectFunctionCallObject struct {
 	Name string                                                    `json:"name,required"`
 	JSON promptPromptDataOptionsParamsObjectFunctionCallObjectJSON `json:"-"`
@@ -535,6 +552,9 @@ func (r PromptPromptDataOptionsParamsObjectToolChoiceString) IsKnown() bool {
 	return false
 }
 
+func (r PromptPromptDataOptionsParamsObjectToolChoiceString) implementsPromptPromptDataOptionsParamsObjectToolChoiceUnion() {
+}
+
 type PromptPromptDataOptionsParamsObjectToolChoiceObject struct {
 	Function PromptPromptDataOptionsParamsObjectToolChoiceObjectFunction `json:"function,required"`
 	Type     PromptPromptDataOptionsParamsObjectToolChoiceObjectType     `json:"type,required"`
@@ -623,8 +643,9 @@ func (r promptPromptDataOriginJSON) RawJSON() string {
 }
 
 type PromptPromptDataPrompt struct {
-	Type     PromptPromptDataPromptType `json:"type"`
-	Content  string                     `json:"content"`
+	Type    PromptPromptDataPromptType `json:"type"`
+	Content string                     `json:"content"`
+	// This field can have the runtime type of [[]PromptPromptDataPromptObjectMessage].
 	Messages interface{}                `json:"messages,required"`
 	Tools    string                     `json:"tools"`
 	JSON     promptPromptDataPromptJSON `json:"-"`
@@ -654,6 +675,11 @@ func (r *PromptPromptDataPrompt) UnmarshalJSON(data []byte) (err error) {
 	return apijson.Port(r.union, &r)
 }
 
+// AsUnion returns a [PromptPromptDataPromptUnion] interface which you can cast to
+// the specific types for more type safety.
+//
+// Possible runtime types of the union are [PromptPromptDataPromptObject],
+// [PromptPromptDataPromptObject], [PromptPromptDataPromptObject].
 func (r PromptPromptDataPrompt) AsUnion() PromptPromptDataPromptUnion {
 	return r.union
 }
@@ -835,21 +861,9 @@ func (r PromptNewParamsPromptDataOptionsParamsObject) MarshalJSON() (data []byte
 func (r PromptNewParamsPromptDataOptionsParamsObject) implementsPromptNewParamsPromptDataOptionsParamsUnion() {
 }
 
-type PromptNewParamsPromptDataOptionsParamsObjectFunctionCall struct {
-	Name param.Field[string] `json:"name,required"`
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsObjectFunctionCall) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsObjectFunctionCall) implementsPromptNewParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
-}
-
 // Satisfied by [PromptNewParamsPromptDataOptionsParamsObjectFunctionCallString],
 // [PromptNewParamsPromptDataOptionsParamsObjectFunctionCallString],
-// [PromptNewParamsPromptDataOptionsParamsObjectFunctionCallObject],
-// [PromptNewParamsPromptDataOptionsParamsObjectFunctionCall].
+// [PromptNewParamsPromptDataOptionsParamsObjectFunctionCallObject].
 type PromptNewParamsPromptDataOptionsParamsObjectFunctionCallUnion interface {
 	implementsPromptNewParamsPromptDataOptionsParamsObjectFunctionCallUnion()
 }
@@ -866,6 +880,9 @@ func (r PromptNewParamsPromptDataOptionsParamsObjectFunctionCallString) IsKnown(
 		return true
 	}
 	return false
+}
+
+func (r PromptNewParamsPromptDataOptionsParamsObjectFunctionCallString) implementsPromptNewParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
 }
 
 type PromptNewParamsPromptDataOptionsParamsObjectFunctionCallObject struct {
@@ -901,22 +918,9 @@ func (r PromptNewParamsPromptDataOptionsParamsObjectResponseFormatType) IsKnown(
 	return false
 }
 
-type PromptNewParamsPromptDataOptionsParamsObjectToolChoice struct {
-	Type     param.Field[PromptNewParamsPromptDataOptionsParamsObjectToolChoiceType] `json:"type,required"`
-	Function param.Field[interface{}]                                                `json:"function"`
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsObjectToolChoice) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsObjectToolChoice) implementsPromptNewParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
-}
-
 // Satisfied by [PromptNewParamsPromptDataOptionsParamsObjectToolChoiceString],
 // [PromptNewParamsPromptDataOptionsParamsObjectToolChoiceString],
-// [PromptNewParamsPromptDataOptionsParamsObjectToolChoiceObject],
-// [PromptNewParamsPromptDataOptionsParamsObjectToolChoice].
+// [PromptNewParamsPromptDataOptionsParamsObjectToolChoiceObject].
 type PromptNewParamsPromptDataOptionsParamsObjectToolChoiceUnion interface {
 	implementsPromptNewParamsPromptDataOptionsParamsObjectToolChoiceUnion()
 }
@@ -933,6 +937,9 @@ func (r PromptNewParamsPromptDataOptionsParamsObjectToolChoiceString) IsKnown() 
 		return true
 	}
 	return false
+}
+
+func (r PromptNewParamsPromptDataOptionsParamsObjectToolChoiceString) implementsPromptNewParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
 }
 
 type PromptNewParamsPromptDataOptionsParamsObjectToolChoiceObject struct {
@@ -1133,22 +1140,10 @@ func (r PromptUpdateParamsPromptDataOptionsParamsObject) MarshalJSON() (data []b
 func (r PromptUpdateParamsPromptDataOptionsParamsObject) implementsPromptUpdateParamsPromptDataOptionsParamsUnion() {
 }
 
-type PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCall struct {
-	Name param.Field[string] `json:"name,required"`
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCall) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCall) implementsPromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
-}
-
 // Satisfied by
 // [PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallString],
 // [PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallString],
-// [PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallObject],
-// [PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCall].
+// [PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallObject].
 type PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallUnion interface {
 	implementsPromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallUnion()
 }
@@ -1165,6 +1160,9 @@ func (r PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallString) IsKno
 		return true
 	}
 	return false
+}
+
+func (r PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallString) implementsPromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
 }
 
 type PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallObject struct {
@@ -1200,22 +1198,9 @@ func (r PromptUpdateParamsPromptDataOptionsParamsObjectResponseFormatType) IsKno
 	return false
 }
 
-type PromptUpdateParamsPromptDataOptionsParamsObjectToolChoice struct {
-	Type     param.Field[PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceType] `json:"type,required"`
-	Function param.Field[interface{}]                                                   `json:"function"`
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsObjectToolChoice) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsObjectToolChoice) implementsPromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
-}
-
 // Satisfied by [PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceString],
 // [PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceString],
-// [PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceObject],
-// [PromptUpdateParamsPromptDataOptionsParamsObjectToolChoice].
+// [PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceObject].
 type PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceUnion interface {
 	implementsPromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceUnion()
 }
@@ -1232,6 +1217,9 @@ func (r PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceString) IsKnown
 		return true
 	}
 	return false
+}
+
+func (r PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceString) implementsPromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
 }
 
 type PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceObject struct {
@@ -1535,22 +1523,10 @@ func (r PromptReplaceParamsPromptDataOptionsParamsObject) MarshalJSON() (data []
 func (r PromptReplaceParamsPromptDataOptionsParamsObject) implementsPromptReplaceParamsPromptDataOptionsParamsUnion() {
 }
 
-type PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCall struct {
-	Name param.Field[string] `json:"name,required"`
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCall) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCall) implementsPromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
-}
-
 // Satisfied by
 // [PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallString],
 // [PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallString],
-// [PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallObject],
-// [PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCall].
+// [PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallObject].
 type PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallUnion interface {
 	implementsPromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallUnion()
 }
@@ -1567,6 +1543,9 @@ func (r PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallString) IsKn
 		return true
 	}
 	return false
+}
+
+func (r PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallString) implementsPromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallUnion() {
 }
 
 type PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallObject struct {
@@ -1602,22 +1581,9 @@ func (r PromptReplaceParamsPromptDataOptionsParamsObjectResponseFormatType) IsKn
 	return false
 }
 
-type PromptReplaceParamsPromptDataOptionsParamsObjectToolChoice struct {
-	Type     param.Field[PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceType] `json:"type,required"`
-	Function param.Field[interface{}]                                                    `json:"function"`
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsObjectToolChoice) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsObjectToolChoice) implementsPromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
-}
-
 // Satisfied by [PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceString],
 // [PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceString],
-// [PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceObject],
-// [PromptReplaceParamsPromptDataOptionsParamsObjectToolChoice].
+// [PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceObject].
 type PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceUnion interface {
 	implementsPromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceUnion()
 }
@@ -1634,6 +1600,9 @@ func (r PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceString) IsKnow
 		return true
 	}
 	return false
+}
+
+func (r PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceString) implementsPromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceUnion() {
 }
 
 type PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceObject struct {
