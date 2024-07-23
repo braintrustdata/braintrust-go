@@ -14,7 +14,7 @@ import (
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
-func TestGroupNewWithOptionalParams(t *testing.T) {
+func TestProjectTagNewWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -26,12 +26,11 @@ func TestGroupNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Group.New(context.TODO(), braintrust.GroupNewParams{
-		Name:         braintrust.F("string"),
-		Description:  braintrust.F("string"),
-		MemberGroups: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
-		MemberUsers:  braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
-		OrgName:      braintrust.F("string"),
+	_, err := client.ProjectTag.New(context.TODO(), braintrust.ProjectTagNewParams{
+		Name:        braintrust.F("string"),
+		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		Color:       braintrust.F("string"),
+		Description: braintrust.F("string"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -42,7 +41,7 @@ func TestGroupNewWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestGroupGet(t *testing.T) {
+func TestProjectTagGet(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -54,7 +53,7 @@ func TestGroupGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Group.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.ProjectTag.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -64,7 +63,7 @@ func TestGroupGet(t *testing.T) {
 	}
 }
 
-func TestGroupUpdateWithOptionalParams(t *testing.T) {
+func TestProjectTagUpdateWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -76,16 +75,13 @@ func TestGroupUpdateWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Group.Update(
+	_, err := client.ProjectTag.Update(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		braintrust.GroupUpdateParams{
-			AddMemberGroups:    braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
-			AddMemberUsers:     braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
-			Description:        braintrust.F("string"),
-			Name:               braintrust.F("string"),
-			RemoveMemberGroups: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
-			RemoveMemberUsers:  braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
+		braintrust.ProjectTagUpdateParams{
+			Color:       braintrust.F("string"),
+			Description: braintrust.F("string"),
+			Name:        braintrust.F("string"),
 		},
 	)
 	if err != nil {
@@ -97,7 +93,7 @@ func TestGroupUpdateWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestGroupListWithOptionalParams(t *testing.T) {
+func TestProjectTagListWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -109,13 +105,14 @@ func TestGroupListWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Group.List(context.TODO(), braintrust.GroupListParams{
-		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		GroupName:     braintrust.F("string"),
-		IDs:           braintrust.F[braintrust.GroupListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
-		Limit:         braintrust.F(int64(0)),
-		OrgName:       braintrust.F("string"),
-		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+	_, err := client.ProjectTag.List(context.TODO(), braintrust.ProjectTagListParams{
+		EndingBefore:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		IDs:            braintrust.F[braintrust.ProjectTagListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
+		Limit:          braintrust.F(int64(0)),
+		OrgName:        braintrust.F("string"),
+		ProjectName:    braintrust.F("string"),
+		ProjectTagName: braintrust.F("string"),
+		StartingAfter:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -126,7 +123,7 @@ func TestGroupListWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestGroupDelete(t *testing.T) {
+func TestProjectTagDelete(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -138,7 +135,7 @@ func TestGroupDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Group.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.ProjectTag.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -148,7 +145,7 @@ func TestGroupDelete(t *testing.T) {
 	}
 }
 
-func TestGroupReplaceWithOptionalParams(t *testing.T) {
+func TestProjectTagReplaceWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -160,12 +157,11 @@ func TestGroupReplaceWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Group.Replace(context.TODO(), braintrust.GroupReplaceParams{
-		Name:         braintrust.F("string"),
-		Description:  braintrust.F("string"),
-		MemberGroups: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
-		MemberUsers:  braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
-		OrgName:      braintrust.F("string"),
+	_, err := client.ProjectTag.Replace(context.TODO(), braintrust.ProjectTagReplaceParams{
+		Name:        braintrust.F("string"),
+		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		Color:       braintrust.F("string"),
+		Description: braintrust.F("string"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error

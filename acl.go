@@ -95,17 +95,6 @@ func (r *ACLService) Delete(ctx context.Context, aclID string, opts ...option.Re
 	return
 }
 
-// NOTE: This operation is deprecated and will be removed in a future revision of
-// the API. Create or replace a new acl. If there is an existing acl with the same
-// contents as the one specified in the request, will return the existing acl
-// unmodified, will replace the existing acl with the provided fields
-func (r *ACLService) Replace(ctx context.Context, body ACLReplaceParams, opts ...option.RequestOption) (res *ACL, err error) {
-	opts = append(r.Options[:], opts...)
-	path := "v1/acl"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
-	return
-}
-
 // An ACL grants a certain permission or role to a certain user or group on an
 // object.
 //
@@ -114,7 +103,8 @@ func (r *ACLService) Replace(ctx context.Context, body ACLReplaceParams, opts ..
 // experiment, dataset, etc. created within that project.
 //
 // To restrict a grant to a particular sub-object, you may specify
-// `restrict_object_type` in the ACL.
+// `restrict_object_type` in the ACL, as part of a direct permission grant or as
+// part of a role.
 type ACL struct {
 	// Unique identifier for the acl
 	ID string `json:"id,required" format:"uuid"`
@@ -132,7 +122,8 @@ type ACL struct {
 	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
 	Permission ACLPermission `json:"permission,nullable"`
-	// Optionally restricts the permission grant to just the specified object type
+	// When setting a permission directly, optionally restricts the permission grant to
+	// just the specified object type. Cannot be set alongside a `role_id`.
 	RestrictObjectType ACLRestrictObjectType `json:"restrict_object_type,nullable"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
@@ -177,15 +168,16 @@ const (
 	ACLObjectTypeDataset       ACLObjectType = "dataset"
 	ACLObjectTypePrompt        ACLObjectType = "prompt"
 	ACLObjectTypePromptSession ACLObjectType = "prompt_session"
-	ACLObjectTypeProjectScore  ACLObjectType = "project_score"
-	ACLObjectTypeProjectTag    ACLObjectType = "project_tag"
 	ACLObjectTypeGroup         ACLObjectType = "group"
 	ACLObjectTypeRole          ACLObjectType = "role"
+	ACLObjectTypeOrgMember     ACLObjectType = "org_member"
+	ACLObjectTypeProjectLog    ACLObjectType = "project_log"
+	ACLObjectTypeOrgProject    ACLObjectType = "org_project"
 )
 
 func (r ACLObjectType) IsKnown() bool {
 	switch r {
-	case ACLObjectTypeOrganization, ACLObjectTypeProject, ACLObjectTypeExperiment, ACLObjectTypeDataset, ACLObjectTypePrompt, ACLObjectTypePromptSession, ACLObjectTypeProjectScore, ACLObjectTypeProjectTag, ACLObjectTypeGroup, ACLObjectTypeRole:
+	case ACLObjectTypeOrganization, ACLObjectTypeProject, ACLObjectTypeExperiment, ACLObjectTypeDataset, ACLObjectTypePrompt, ACLObjectTypePromptSession, ACLObjectTypeGroup, ACLObjectTypeRole, ACLObjectTypeOrgMember, ACLObjectTypeProjectLog, ACLObjectTypeOrgProject:
 		return true
 	}
 	return false
@@ -214,7 +206,8 @@ func (r ACLPermission) IsKnown() bool {
 	return false
 }
 
-// Optionally restricts the permission grant to just the specified object type
+// When setting a permission directly, optionally restricts the permission grant to
+// just the specified object type. Cannot be set alongside a `role_id`.
 type ACLRestrictObjectType string
 
 const (
@@ -224,15 +217,16 @@ const (
 	ACLRestrictObjectTypeDataset       ACLRestrictObjectType = "dataset"
 	ACLRestrictObjectTypePrompt        ACLRestrictObjectType = "prompt"
 	ACLRestrictObjectTypePromptSession ACLRestrictObjectType = "prompt_session"
-	ACLRestrictObjectTypeProjectScore  ACLRestrictObjectType = "project_score"
-	ACLRestrictObjectTypeProjectTag    ACLRestrictObjectType = "project_tag"
 	ACLRestrictObjectTypeGroup         ACLRestrictObjectType = "group"
 	ACLRestrictObjectTypeRole          ACLRestrictObjectType = "role"
+	ACLRestrictObjectTypeOrgMember     ACLRestrictObjectType = "org_member"
+	ACLRestrictObjectTypeProjectLog    ACLRestrictObjectType = "project_log"
+	ACLRestrictObjectTypeOrgProject    ACLRestrictObjectType = "org_project"
 )
 
 func (r ACLRestrictObjectType) IsKnown() bool {
 	switch r {
-	case ACLRestrictObjectTypeOrganization, ACLRestrictObjectTypeProject, ACLRestrictObjectTypeExperiment, ACLRestrictObjectTypeDataset, ACLRestrictObjectTypePrompt, ACLRestrictObjectTypePromptSession, ACLRestrictObjectTypeProjectScore, ACLRestrictObjectTypeProjectTag, ACLRestrictObjectTypeGroup, ACLRestrictObjectTypeRole:
+	case ACLRestrictObjectTypeOrganization, ACLRestrictObjectTypeProject, ACLRestrictObjectTypeExperiment, ACLRestrictObjectTypeDataset, ACLRestrictObjectTypePrompt, ACLRestrictObjectTypePromptSession, ACLRestrictObjectTypeGroup, ACLRestrictObjectTypeRole, ACLRestrictObjectTypeOrgMember, ACLRestrictObjectTypeProjectLog, ACLRestrictObjectTypeOrgProject:
 		return true
 	}
 	return false
@@ -249,7 +243,8 @@ type ACLNewParams struct {
 	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
 	Permission param.Field[ACLNewParamsPermission] `json:"permission"`
-	// Optionally restricts the permission grant to just the specified object type
+	// When setting a permission directly, optionally restricts the permission grant to
+	// just the specified object type. Cannot be set alongside a `role_id`.
 	RestrictObjectType param.Field[ACLNewParamsRestrictObjectType] `json:"restrict_object_type"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
@@ -273,15 +268,16 @@ const (
 	ACLNewParamsObjectTypeDataset       ACLNewParamsObjectType = "dataset"
 	ACLNewParamsObjectTypePrompt        ACLNewParamsObjectType = "prompt"
 	ACLNewParamsObjectTypePromptSession ACLNewParamsObjectType = "prompt_session"
-	ACLNewParamsObjectTypeProjectScore  ACLNewParamsObjectType = "project_score"
-	ACLNewParamsObjectTypeProjectTag    ACLNewParamsObjectType = "project_tag"
 	ACLNewParamsObjectTypeGroup         ACLNewParamsObjectType = "group"
 	ACLNewParamsObjectTypeRole          ACLNewParamsObjectType = "role"
+	ACLNewParamsObjectTypeOrgMember     ACLNewParamsObjectType = "org_member"
+	ACLNewParamsObjectTypeProjectLog    ACLNewParamsObjectType = "project_log"
+	ACLNewParamsObjectTypeOrgProject    ACLNewParamsObjectType = "org_project"
 )
 
 func (r ACLNewParamsObjectType) IsKnown() bool {
 	switch r {
-	case ACLNewParamsObjectTypeOrganization, ACLNewParamsObjectTypeProject, ACLNewParamsObjectTypeExperiment, ACLNewParamsObjectTypeDataset, ACLNewParamsObjectTypePrompt, ACLNewParamsObjectTypePromptSession, ACLNewParamsObjectTypeProjectScore, ACLNewParamsObjectTypeProjectTag, ACLNewParamsObjectTypeGroup, ACLNewParamsObjectTypeRole:
+	case ACLNewParamsObjectTypeOrganization, ACLNewParamsObjectTypeProject, ACLNewParamsObjectTypeExperiment, ACLNewParamsObjectTypeDataset, ACLNewParamsObjectTypePrompt, ACLNewParamsObjectTypePromptSession, ACLNewParamsObjectTypeGroup, ACLNewParamsObjectTypeRole, ACLNewParamsObjectTypeOrgMember, ACLNewParamsObjectTypeProjectLog, ACLNewParamsObjectTypeOrgProject:
 		return true
 	}
 	return false
@@ -310,7 +306,8 @@ func (r ACLNewParamsPermission) IsKnown() bool {
 	return false
 }
 
-// Optionally restricts the permission grant to just the specified object type
+// When setting a permission directly, optionally restricts the permission grant to
+// just the specified object type. Cannot be set alongside a `role_id`.
 type ACLNewParamsRestrictObjectType string
 
 const (
@@ -320,15 +317,16 @@ const (
 	ACLNewParamsRestrictObjectTypeDataset       ACLNewParamsRestrictObjectType = "dataset"
 	ACLNewParamsRestrictObjectTypePrompt        ACLNewParamsRestrictObjectType = "prompt"
 	ACLNewParamsRestrictObjectTypePromptSession ACLNewParamsRestrictObjectType = "prompt_session"
-	ACLNewParamsRestrictObjectTypeProjectScore  ACLNewParamsRestrictObjectType = "project_score"
-	ACLNewParamsRestrictObjectTypeProjectTag    ACLNewParamsRestrictObjectType = "project_tag"
 	ACLNewParamsRestrictObjectTypeGroup         ACLNewParamsRestrictObjectType = "group"
 	ACLNewParamsRestrictObjectTypeRole          ACLNewParamsRestrictObjectType = "role"
+	ACLNewParamsRestrictObjectTypeOrgMember     ACLNewParamsRestrictObjectType = "org_member"
+	ACLNewParamsRestrictObjectTypeProjectLog    ACLNewParamsRestrictObjectType = "project_log"
+	ACLNewParamsRestrictObjectTypeOrgProject    ACLNewParamsRestrictObjectType = "org_project"
 )
 
 func (r ACLNewParamsRestrictObjectType) IsKnown() bool {
 	switch r {
-	case ACLNewParamsRestrictObjectTypeOrganization, ACLNewParamsRestrictObjectTypeProject, ACLNewParamsRestrictObjectTypeExperiment, ACLNewParamsRestrictObjectTypeDataset, ACLNewParamsRestrictObjectTypePrompt, ACLNewParamsRestrictObjectTypePromptSession, ACLNewParamsRestrictObjectTypeProjectScore, ACLNewParamsRestrictObjectTypeProjectTag, ACLNewParamsRestrictObjectTypeGroup, ACLNewParamsRestrictObjectTypeRole:
+	case ACLNewParamsRestrictObjectTypeOrganization, ACLNewParamsRestrictObjectTypeProject, ACLNewParamsRestrictObjectTypeExperiment, ACLNewParamsRestrictObjectTypeDataset, ACLNewParamsRestrictObjectTypePrompt, ACLNewParamsRestrictObjectTypePromptSession, ACLNewParamsRestrictObjectTypeGroup, ACLNewParamsRestrictObjectTypeRole, ACLNewParamsRestrictObjectTypeOrgMember, ACLNewParamsRestrictObjectTypeProjectLog, ACLNewParamsRestrictObjectTypeOrgProject:
 		return true
 	}
 	return false
@@ -345,6 +343,9 @@ type ACLListParams struct {
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
 	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs param.Field[ACLListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
 	Limit param.Field[int64] `query:"limit"`
 	// Pagination cursor id.
@@ -373,112 +374,29 @@ const (
 	ACLListParamsObjectTypeDataset       ACLListParamsObjectType = "dataset"
 	ACLListParamsObjectTypePrompt        ACLListParamsObjectType = "prompt"
 	ACLListParamsObjectTypePromptSession ACLListParamsObjectType = "prompt_session"
-	ACLListParamsObjectTypeProjectScore  ACLListParamsObjectType = "project_score"
-	ACLListParamsObjectTypeProjectTag    ACLListParamsObjectType = "project_tag"
 	ACLListParamsObjectTypeGroup         ACLListParamsObjectType = "group"
 	ACLListParamsObjectTypeRole          ACLListParamsObjectType = "role"
+	ACLListParamsObjectTypeOrgMember     ACLListParamsObjectType = "org_member"
+	ACLListParamsObjectTypeProjectLog    ACLListParamsObjectType = "project_log"
+	ACLListParamsObjectTypeOrgProject    ACLListParamsObjectType = "org_project"
 )
 
 func (r ACLListParamsObjectType) IsKnown() bool {
 	switch r {
-	case ACLListParamsObjectTypeOrganization, ACLListParamsObjectTypeProject, ACLListParamsObjectTypeExperiment, ACLListParamsObjectTypeDataset, ACLListParamsObjectTypePrompt, ACLListParamsObjectTypePromptSession, ACLListParamsObjectTypeProjectScore, ACLListParamsObjectTypeProjectTag, ACLListParamsObjectTypeGroup, ACLListParamsObjectTypeRole:
+	case ACLListParamsObjectTypeOrganization, ACLListParamsObjectTypeProject, ACLListParamsObjectTypeExperiment, ACLListParamsObjectTypeDataset, ACLListParamsObjectTypePrompt, ACLListParamsObjectTypePromptSession, ACLListParamsObjectTypeGroup, ACLListParamsObjectTypeRole, ACLListParamsObjectTypeOrgMember, ACLListParamsObjectTypeProjectLog, ACLListParamsObjectTypeOrgProject:
 		return true
 	}
 	return false
 }
 
-type ACLReplaceParams struct {
-	// The id of the object the ACL applies to
-	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
-	// The object type that the ACL applies to
-	ObjectType param.Field[ACLReplaceParamsObjectType] `json:"object_type,required"`
-	// Id of the group the ACL applies to. Exactly one of `user_id` and `group_id` will
-	// be provided
-	GroupID param.Field[string] `json:"group_id" format:"uuid"`
-	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
-	// provided
-	Permission param.Field[ACLReplaceParamsPermission] `json:"permission"`
-	// Optionally restricts the permission grant to just the specified object type
-	RestrictObjectType param.Field[ACLReplaceParamsRestrictObjectType] `json:"restrict_object_type"`
-	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
-	// provided
-	RoleID param.Field[string] `json:"role_id" format:"uuid"`
-	// Id of the user the ACL applies to. Exactly one of `user_id` and `group_id` will
-	// be provided
-	UserID param.Field[string] `json:"user_id" format:"uuid"`
+// Filter search results to a particular set of object IDs. To specify a list of
+// IDs, include the query param multiple times
+//
+// Satisfied by [shared.UnionString], [ACLListParamsIDsArray].
+type ACLListParamsIDsUnion interface {
+	ImplementsACLListParamsIDsUnion()
 }
 
-func (r ACLReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
+type ACLListParamsIDsArray []string
 
-// The object type that the ACL applies to
-type ACLReplaceParamsObjectType string
-
-const (
-	ACLReplaceParamsObjectTypeOrganization  ACLReplaceParamsObjectType = "organization"
-	ACLReplaceParamsObjectTypeProject       ACLReplaceParamsObjectType = "project"
-	ACLReplaceParamsObjectTypeExperiment    ACLReplaceParamsObjectType = "experiment"
-	ACLReplaceParamsObjectTypeDataset       ACLReplaceParamsObjectType = "dataset"
-	ACLReplaceParamsObjectTypePrompt        ACLReplaceParamsObjectType = "prompt"
-	ACLReplaceParamsObjectTypePromptSession ACLReplaceParamsObjectType = "prompt_session"
-	ACLReplaceParamsObjectTypeProjectScore  ACLReplaceParamsObjectType = "project_score"
-	ACLReplaceParamsObjectTypeProjectTag    ACLReplaceParamsObjectType = "project_tag"
-	ACLReplaceParamsObjectTypeGroup         ACLReplaceParamsObjectType = "group"
-	ACLReplaceParamsObjectTypeRole          ACLReplaceParamsObjectType = "role"
-)
-
-func (r ACLReplaceParamsObjectType) IsKnown() bool {
-	switch r {
-	case ACLReplaceParamsObjectTypeOrganization, ACLReplaceParamsObjectTypeProject, ACLReplaceParamsObjectTypeExperiment, ACLReplaceParamsObjectTypeDataset, ACLReplaceParamsObjectTypePrompt, ACLReplaceParamsObjectTypePromptSession, ACLReplaceParamsObjectTypeProjectScore, ACLReplaceParamsObjectTypeProjectTag, ACLReplaceParamsObjectTypeGroup, ACLReplaceParamsObjectTypeRole:
-		return true
-	}
-	return false
-}
-
-// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
-// provided
-type ACLReplaceParamsPermission string
-
-const (
-	ACLReplaceParamsPermissionCreate     ACLReplaceParamsPermission = "create"
-	ACLReplaceParamsPermissionRead       ACLReplaceParamsPermission = "read"
-	ACLReplaceParamsPermissionUpdate     ACLReplaceParamsPermission = "update"
-	ACLReplaceParamsPermissionDelete     ACLReplaceParamsPermission = "delete"
-	ACLReplaceParamsPermissionCreateACLs ACLReplaceParamsPermission = "create_acls"
-	ACLReplaceParamsPermissionReadACLs   ACLReplaceParamsPermission = "read_acls"
-	ACLReplaceParamsPermissionUpdateACLs ACLReplaceParamsPermission = "update_acls"
-	ACLReplaceParamsPermissionDeleteACLs ACLReplaceParamsPermission = "delete_acls"
-)
-
-func (r ACLReplaceParamsPermission) IsKnown() bool {
-	switch r {
-	case ACLReplaceParamsPermissionCreate, ACLReplaceParamsPermissionRead, ACLReplaceParamsPermissionUpdate, ACLReplaceParamsPermissionDelete, ACLReplaceParamsPermissionCreateACLs, ACLReplaceParamsPermissionReadACLs, ACLReplaceParamsPermissionUpdateACLs, ACLReplaceParamsPermissionDeleteACLs:
-		return true
-	}
-	return false
-}
-
-// Optionally restricts the permission grant to just the specified object type
-type ACLReplaceParamsRestrictObjectType string
-
-const (
-	ACLReplaceParamsRestrictObjectTypeOrganization  ACLReplaceParamsRestrictObjectType = "organization"
-	ACLReplaceParamsRestrictObjectTypeProject       ACLReplaceParamsRestrictObjectType = "project"
-	ACLReplaceParamsRestrictObjectTypeExperiment    ACLReplaceParamsRestrictObjectType = "experiment"
-	ACLReplaceParamsRestrictObjectTypeDataset       ACLReplaceParamsRestrictObjectType = "dataset"
-	ACLReplaceParamsRestrictObjectTypePrompt        ACLReplaceParamsRestrictObjectType = "prompt"
-	ACLReplaceParamsRestrictObjectTypePromptSession ACLReplaceParamsRestrictObjectType = "prompt_session"
-	ACLReplaceParamsRestrictObjectTypeProjectScore  ACLReplaceParamsRestrictObjectType = "project_score"
-	ACLReplaceParamsRestrictObjectTypeProjectTag    ACLReplaceParamsRestrictObjectType = "project_tag"
-	ACLReplaceParamsRestrictObjectTypeGroup         ACLReplaceParamsRestrictObjectType = "group"
-	ACLReplaceParamsRestrictObjectTypeRole          ACLReplaceParamsRestrictObjectType = "role"
-)
-
-func (r ACLReplaceParamsRestrictObjectType) IsKnown() bool {
-	switch r {
-	case ACLReplaceParamsRestrictObjectTypeOrganization, ACLReplaceParamsRestrictObjectTypeProject, ACLReplaceParamsRestrictObjectTypeExperiment, ACLReplaceParamsRestrictObjectTypeDataset, ACLReplaceParamsRestrictObjectTypePrompt, ACLReplaceParamsRestrictObjectTypePromptSession, ACLReplaceParamsRestrictObjectTypeProjectScore, ACLReplaceParamsRestrictObjectTypeProjectTag, ACLReplaceParamsRestrictObjectTypeGroup, ACLReplaceParamsRestrictObjectTypeRole:
-		return true
-	}
-	return false
-}
+func (r ACLListParamsIDsArray) ImplementsACLListParamsIDsUnion() {}
