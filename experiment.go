@@ -161,18 +161,6 @@ func (r *ExperimentService) Insert(ctx context.Context, experimentID string, bod
 	return
 }
 
-// NOTE: This operation is deprecated and will be removed in a future revision of
-// the API. Create or replace a new experiment. If there is an existing experiment
-// in the project with the same name as the one specified in the request, will
-// return the existing experiment unmodified, will replace the existing experiment
-// with the provided fields
-func (r *ExperimentService) Replace(ctx context.Context, body ExperimentReplaceParams, opts ...option.RequestOption) (res *Experiment, err error) {
-	opts = append(r.Options[:], opts...)
-	path := "v1/experiment"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
-	return
-}
-
 // Summarize experiment
 func (r *ExperimentService) Summarize(ctx context.Context, experimentID string, query ExperimentSummarizeParams, opts ...option.RequestOption) (res *ExperimentSummarizeResponse, err error) {
 	opts = append(r.Options[:], opts...)
@@ -340,12 +328,12 @@ type ExperimentFetchResponseEvent struct {
 	// Unique identifier for the project that the experiment belongs under
 	ProjectID string `json:"project_id,required" format:"uuid"`
 	// The `span_id` of the root of the trace this experiment event belongs to
-	RootSpanID string `json:"root_span_id,required"`
+	RootSpanID string `json:"root_span_id,required" format:"uuid"`
 	// A unique identifier used to link different experiment events together as part of
 	// a full trace. See the
-	// [tracing guide](https://www.braintrustdata.com/docs/guides/tracing) for full
-	// details on tracing
-	SpanID string `json:"span_id,required"`
+	// [tracing guide](https://www.braintrust.dev/docs/guides/tracing) for full details
+	// on tracing
+	SpanID string `json:"span_id,required" format:"uuid"`
 	// Context is additional information about the code that produced the experiment
 	// event. It is essentially the textual counterpart to `metrics`. Use the
 	// `caller_*` attributes to track the location in code which produced the
@@ -603,12 +591,12 @@ type ExperimentFetchPostResponseEvent struct {
 	// Unique identifier for the project that the experiment belongs under
 	ProjectID string `json:"project_id,required" format:"uuid"`
 	// The `span_id` of the root of the trace this experiment event belongs to
-	RootSpanID string `json:"root_span_id,required"`
+	RootSpanID string `json:"root_span_id,required" format:"uuid"`
 	// A unique identifier used to link different experiment events together as part of
 	// a full trace. See the
-	// [tracing guide](https://www.braintrustdata.com/docs/guides/tracing) for full
-	// details on tracing
-	SpanID string `json:"span_id,required"`
+	// [tracing guide](https://www.braintrust.dev/docs/guides/tracing) for full details
+	// on tracing
+	SpanID string `json:"span_id,required" format:"uuid"`
 	// Context is additional information about the code that produced the experiment
 	// event. It is essentially the textual counterpart to `metrics`. Use the
 	// `caller_*` attributes to track the location in code which produced the
@@ -1344,6 +1332,8 @@ type ExperimentInsertParamsEvent struct {
 	// If the experiment is associated to a dataset, this is the event-level dataset id
 	// this experiment event is tied to
 	DatasetRecordID param.Field[string] `json:"dataset_record_id"`
+	// The timestamp the experiment event was created
+	Created param.Field[time.Time] `json:"created" format:"date-time"`
 	// Pass `_object_delete=true` to mark the experiment event deleted. Deleted events
 	// will not show up in subsequent fetches for this experiment
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
@@ -1362,7 +1352,7 @@ type ExperimentInsertParamsEvent struct {
 	// Use the `_parent_id` field to create this row as a subspan of an existing row.
 	// It cannot be specified alongside `_is_merge=true`. Tracking hierarchical
 	// relationships are important for tracing (see the
-	// [guide](https://www.braintrustdata.com/docs/guides/tracing) for full details).
+	// [guide](https://www.braintrust.dev/docs/guides/tracing) for full details).
 	//
 	// For example, say we have logged a row
 	// `{"id": "abc", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
@@ -1412,7 +1402,7 @@ type ExperimentInsertParamsEventsInsertExperimentEventReplace struct {
 	// Use the `_parent_id` field to create this row as a subspan of an existing row.
 	// It cannot be specified alongside `_is_merge=true`. Tracking hierarchical
 	// relationships are important for tracing (see the
-	// [guide](https://www.braintrustdata.com/docs/guides/tracing) for full details).
+	// [guide](https://www.braintrust.dev/docs/guides/tracing) for full details).
 	//
 	// For example, say we have logged a row
 	// `{"id": "abc", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
@@ -1427,6 +1417,8 @@ type ExperimentInsertParamsEventsInsertExperimentEventReplace struct {
 	// `caller_*` attributes to track the location in code which produced the
 	// experiment event
 	Context param.Field[ExperimentInsertParamsEventsInsertExperimentEventReplaceContext] `json:"context"`
+	// The timestamp the experiment event was created
+	Created param.Field[time.Time] `json:"created" format:"date-time"`
 	// If the experiment is associated to a dataset, this is the event-level dataset id
 	// this experiment event is tied to
 	DatasetRecordID param.Field[string] `json:"dataset_record_id"`
@@ -1596,6 +1588,8 @@ type ExperimentInsertParamsEventsInsertExperimentEventMerge struct {
 	// `caller_*` attributes to track the location in code which produced the
 	// experiment event
 	Context param.Field[ExperimentInsertParamsEventsInsertExperimentEventMergeContext] `json:"context"`
+	// The timestamp the experiment event was created
+	Created param.Field[time.Time] `json:"created" format:"date-time"`
 	// If the experiment is associated to a dataset, this is the event-level dataset id
 	// this experiment event is tied to
 	DatasetRecordID param.Field[string] `json:"dataset_record_id"`
@@ -1725,66 +1719,6 @@ func (r ExperimentInsertParamsEventsInsertExperimentEventMergeSpanAttributesType
 		return true
 	}
 	return false
-}
-
-type ExperimentReplaceParams struct {
-	// Unique identifier for the project that the experiment belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
-	// Id of default base experiment to compare against when viewing this experiment
-	BaseExpID param.Field[string] `json:"base_exp_id" format:"uuid"`
-	// Identifier of the linked dataset, or null if the experiment is not linked to a
-	// dataset
-	DatasetID param.Field[string] `json:"dataset_id" format:"uuid"`
-	// Version number of the linked dataset the experiment was run against. This can be
-	// used to reproduce the experiment after the dataset has been modified.
-	DatasetVersion param.Field[string] `json:"dataset_version"`
-	// Textual description of the experiment
-	Description param.Field[string] `json:"description"`
-	// Normally, creating an experiment with the same name as an existing experiment
-	// will return the existing one un-modified. But if `ensure_new` is true,
-	// registration will generate a new experiment with a unique name in case of a
-	// conflict.
-	EnsureNew param.Field[bool] `json:"ensure_new"`
-	// User-controlled metadata about the experiment
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
-	// Name of the experiment. Within a project, experiment names are unique
-	Name param.Field[string] `json:"name"`
-	// Whether or not the experiment is public. Public experiments can be viewed by
-	// anybody inside or outside the organization
-	Public param.Field[bool] `json:"public"`
-	// Metadata about the state of the repo when the experiment was created
-	RepoInfo param.Field[ExperimentReplaceParamsRepoInfo] `json:"repo_info"`
-}
-
-func (r ExperimentReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// Metadata about the state of the repo when the experiment was created
-type ExperimentReplaceParamsRepoInfo struct {
-	// Email of the author of the most recent commit
-	AuthorEmail param.Field[string] `json:"author_email"`
-	// Name of the author of the most recent commit
-	AuthorName param.Field[string] `json:"author_name"`
-	// Name of the branch the most recent commit belongs to
-	Branch param.Field[string] `json:"branch"`
-	// SHA of most recent commit
-	Commit param.Field[string] `json:"commit"`
-	// Most recent commit message
-	CommitMessage param.Field[string] `json:"commit_message"`
-	// Time of the most recent commit
-	CommitTime param.Field[string] `json:"commit_time"`
-	// Whether or not the repo had uncommitted changes when snapshotted
-	Dirty param.Field[bool] `json:"dirty"`
-	// If the repo was dirty when run, this includes the diff between the current state
-	// of the repo and the most recent commit.
-	GitDiff param.Field[string] `json:"git_diff"`
-	// Name of the tag on the most recent commit
-	Tag param.Field[string] `json:"tag"`
-}
-
-func (r ExperimentReplaceParamsRepoInfo) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
 }
 
 type ExperimentSummarizeParams struct {

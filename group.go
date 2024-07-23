@@ -109,10 +109,9 @@ func (r *GroupService) Delete(ctx context.Context, groupID string, opts ...optio
 	return
 }
 
-// NOTE: This operation is deprecated and will be removed in a future revision of
-// the API. Create or replace a new group. If there is an existing group with the
-// same name as the one specified in the request, will return the existing group
-// unmodified, will replace the existing group with the provided fields
+// Create or replace group. If there is an existing group with the same name as the
+// one specified in the request, will replace the existing group with the provided
+// fields
 func (r *GroupService) Replace(ctx context.Context, body GroupReplaceParams, opts ...option.RequestOption) (res *Group, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/group"
@@ -197,17 +196,18 @@ func (r GroupNewParams) MarshalJSON() (data []byte, err error) {
 }
 
 type GroupUpdateParams struct {
+	// A list of group IDs to add to the group's inheriting-from set
+	AddMemberGroups param.Field[[]string] `json:"add_member_groups" format:"uuid"`
+	// A list of user IDs to add to the group
+	AddMemberUsers param.Field[[]string] `json:"add_member_users" format:"uuid"`
 	// Textual description of the group
 	Description param.Field[string] `json:"description"`
-	// Ids of the groups this group inherits from
-	//
-	// An inheriting group has all the users contained in its member groups, as well as
-	// all of their inherited users
-	MemberGroups param.Field[[]string] `json:"member_groups" format:"uuid"`
-	// Ids of users which belong to this group
-	MemberUsers param.Field[[]string] `json:"member_users" format:"uuid"`
 	// Name of the group
 	Name param.Field[string] `json:"name"`
+	// A list of group IDs to remove from the group's inheriting-from set
+	RemoveMemberGroups param.Field[[]string] `json:"remove_member_groups" format:"uuid"`
+	// A list of user IDs to remove from the group
+	RemoveMemberUsers param.Field[[]string] `json:"remove_member_users" format:"uuid"`
 }
 
 func (r GroupUpdateParams) MarshalJSON() (data []byte, err error) {
