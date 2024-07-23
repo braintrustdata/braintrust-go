@@ -24,7 +24,7 @@ func TestUsage(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	project, err := client.Project.New(context.TODO(), braintrust.ProjectNewParams{
+	project, err := client.Projects.New(context.TODO(), braintrust.ProjectNewParams{
 		Name: braintrust.F("name"),
 	})
 	if err != nil {

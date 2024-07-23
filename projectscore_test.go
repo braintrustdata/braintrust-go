@@ -26,7 +26,7 @@ func TestProjectScoreNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.ProjectScore.New(context.TODO(), braintrust.ProjectScoreNewParams{
+	_, err := client.ProjectScores.New(context.TODO(), braintrust.ProjectScoreNewParams{
 		Name:      braintrust.F("name"),
 		ProjectID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ScoreType: braintrust.F(braintrust.ProjectScoreNewParamsScoreTypeSlider),
@@ -63,7 +63,7 @@ func TestProjectScoreGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.ProjectScore.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.ProjectScores.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -85,7 +85,7 @@ func TestProjectScoreUpdateWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.ProjectScore.Update(
+	_, err := client.ProjectScores.Update(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectScoreUpdateParams{
@@ -125,7 +125,7 @@ func TestProjectScoreListWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.ProjectScore.List(context.TODO(), braintrust.ProjectScoreListParams{
+	_, err := client.ProjectScores.List(context.TODO(), braintrust.ProjectScoreListParams{
 		EndingBefore:     braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		IDs:              braintrust.F[braintrust.ProjectScoreListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:            braintrust.F(int64(0)),
@@ -155,7 +155,7 @@ func TestProjectScoreDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.ProjectScore.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.ProjectScores.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -177,7 +177,7 @@ func TestProjectScoreReplaceWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.ProjectScore.Replace(context.TODO(), braintrust.ProjectScoreReplaceParams{
+	_, err := client.ProjectScores.Replace(context.TODO(), braintrust.ProjectScoreReplaceParams{
 		Name:      braintrust.F("name"),
 		ProjectID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ScoreType: braintrust.F(braintrust.ProjectScoreReplaceParamsScoreTypeSlider),
