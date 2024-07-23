@@ -28,7 +28,7 @@ func TestViewNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.View.New(context.TODO(), braintrust.ViewNewParams{
-		Name:       braintrust.F("string"),
+		Name:       braintrust.F("name"),
 		ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ObjectType: braintrust.F(braintrust.ViewNewParamsObjectTypeOrganization),
 		ViewType:   braintrust.F(braintrust.ViewNewParamsViewTypeProjects),
@@ -108,7 +108,7 @@ func TestViewUpdateWithOptionalParams(t *testing.T) {
 		braintrust.ViewUpdateParams{
 			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 			ObjectType: braintrust.F(braintrust.ViewUpdateParamsObjectTypeOrganization),
-			Name:       braintrust.F("string"),
+			Name:       braintrust.F("name"),
 			Options: braintrust.F(braintrust.ViewUpdateParamsOptions{
 				ColumnVisibility: braintrust.F(map[string]bool{
 					"foo": true,
@@ -157,9 +157,9 @@ func TestViewListWithOptionalParams(t *testing.T) {
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		IDs:           braintrust.F[braintrust.ViewListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
-		ProjectName:   braintrust.F("string"),
+		ProjectName:   braintrust.F("project_name"),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ViewName:      braintrust.F("string"),
+		ViewName:      braintrust.F("view_name"),
 		ViewType:      braintrust.F(braintrust.ViewListParamsViewTypeProjects),
 	})
 	if err != nil {
@@ -213,7 +213,7 @@ func TestViewReplaceWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.View.Replace(context.TODO(), braintrust.ViewReplaceParams{
-		Name:       braintrust.F("string"),
+		Name:       braintrust.F("name"),
 		ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ObjectType: braintrust.F(braintrust.ViewReplaceParamsObjectTypeOrganization),
 		ViewType:   braintrust.F(braintrust.ViewReplaceParamsViewTypeProjects),

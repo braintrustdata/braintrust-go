@@ -27,17 +27,17 @@ func TestPromptNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Prompt.New(context.TODO(), braintrust.PromptNewParams{
-		Name:        braintrust.F("string"),
+		Name:        braintrust.F("name"),
 		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Slug:        braintrust.F("string"),
-		Description: braintrust.F("string"),
+		Slug:        braintrust.F("slug"),
+		Description: braintrust.F("description"),
 		PromptData: braintrust.F(braintrust.PromptNewParamsPromptData{
 			Prompt: braintrust.F[braintrust.PromptNewParamsPromptDataPromptUnion](braintrust.PromptNewParamsPromptDataPromptObject{
 				Type:    braintrust.F(braintrust.PromptNewParamsPromptDataPromptObjectTypeCompletion),
-				Content: braintrust.F("string"),
+				Content: braintrust.F("content"),
 			}),
 			Options: braintrust.F(braintrust.PromptNewParamsPromptDataOptions{
-				Model: braintrust.F("string"),
+				Model: braintrust.F("model"),
 				Params: braintrust.F[braintrust.PromptNewParamsPromptDataOptionsParamsUnion](braintrust.PromptNewParamsPromptDataOptionsParamsObject{
 					UseCache:         braintrust.F(true),
 					Temperature:      braintrust.F(0.000000),
@@ -53,12 +53,12 @@ func TestPromptNewWithOptionalParams(t *testing.T) {
 					N:            braintrust.F(0.000000),
 					Stop:         braintrust.F([]string{"string", "string", "string"}),
 				}),
-				Position: braintrust.F("string"),
+				Position: braintrust.F("position"),
 			}),
 			Origin: braintrust.F(braintrust.PromptNewParamsPromptDataOrigin{
-				PromptID:      braintrust.F("string"),
-				ProjectID:     braintrust.F("string"),
-				PromptVersion: braintrust.F("string"),
+				PromptID:      braintrust.F("prompt_id"),
+				ProjectID:     braintrust.F("project_id"),
+				PromptVersion: braintrust.F("prompt_version"),
 			}),
 		}),
 		Tags: braintrust.F([]string{"string", "string", "string"}),
@@ -110,15 +110,15 @@ func TestPromptUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.PromptUpdateParams{
-			Description: braintrust.F("string"),
-			Name:        braintrust.F("string"),
+			Description: braintrust.F("description"),
+			Name:        braintrust.F("name"),
 			PromptData: braintrust.F(braintrust.PromptUpdateParamsPromptData{
 				Prompt: braintrust.F[braintrust.PromptUpdateParamsPromptDataPromptUnion](braintrust.PromptUpdateParamsPromptDataPromptObject{
 					Type:    braintrust.F(braintrust.PromptUpdateParamsPromptDataPromptObjectTypeCompletion),
-					Content: braintrust.F("string"),
+					Content: braintrust.F("content"),
 				}),
 				Options: braintrust.F(braintrust.PromptUpdateParamsPromptDataOptions{
-					Model: braintrust.F("string"),
+					Model: braintrust.F("model"),
 					Params: braintrust.F[braintrust.PromptUpdateParamsPromptDataOptionsParamsUnion](braintrust.PromptUpdateParamsPromptDataOptionsParamsObject{
 						UseCache:         braintrust.F(true),
 						Temperature:      braintrust.F(0.000000),
@@ -134,12 +134,12 @@ func TestPromptUpdateWithOptionalParams(t *testing.T) {
 						N:            braintrust.F(0.000000),
 						Stop:         braintrust.F([]string{"string", "string", "string"}),
 					}),
-					Position: braintrust.F("string"),
+					Position: braintrust.F("position"),
 				}),
 				Origin: braintrust.F(braintrust.PromptUpdateParamsPromptDataOrigin{
-					PromptID:      braintrust.F("string"),
-					ProjectID:     braintrust.F("string"),
-					PromptVersion: braintrust.F("string"),
+					PromptID:      braintrust.F("prompt_id"),
+					ProjectID:     braintrust.F("project_id"),
+					PromptVersion: braintrust.F("prompt_version"),
 				}),
 			}),
 			Tags: braintrust.F([]string{"string", "string", "string"}),
@@ -170,12 +170,12 @@ func TestPromptListWithOptionalParams(t *testing.T) {
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		IDs:           braintrust.F[braintrust.PromptListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
-		OrgName:       braintrust.F("string"),
-		ProjectName:   braintrust.F("string"),
-		PromptName:    braintrust.F("string"),
-		Slug:          braintrust.F("string"),
+		OrgName:       braintrust.F("org_name"),
+		ProjectName:   braintrust.F("project_name"),
+		PromptName:    braintrust.F("prompt_name"),
+		Slug:          braintrust.F("slug"),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Version:       braintrust.F("string"),
+		Version:       braintrust.F("version"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -225,22 +225,22 @@ func TestPromptFeedback(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.PromptFeedbackParams{
 			Feedback: braintrust.F([]braintrust.PromptFeedbackParamsFeedback{{
-				ID:      braintrust.F("string"),
-				Comment: braintrust.F("string"),
+				ID:      braintrust.F("id"),
+				Comment: braintrust.F("comment"),
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
 				Source: braintrust.F(braintrust.PromptFeedbackParamsFeedbackSourceApp),
 			}, {
-				ID:      braintrust.F("string"),
-				Comment: braintrust.F("string"),
+				ID:      braintrust.F("id"),
+				Comment: braintrust.F("comment"),
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
 				Source: braintrust.F(braintrust.PromptFeedbackParamsFeedbackSourceApp),
 			}, {
-				ID:      braintrust.F("string"),
-				Comment: braintrust.F("string"),
+				ID:      braintrust.F("id"),
+				Comment: braintrust.F("comment"),
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
@@ -270,17 +270,17 @@ func TestPromptReplaceWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Prompt.Replace(context.TODO(), braintrust.PromptReplaceParams{
-		Name:        braintrust.F("string"),
+		Name:        braintrust.F("name"),
 		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Slug:        braintrust.F("string"),
-		Description: braintrust.F("string"),
+		Slug:        braintrust.F("slug"),
+		Description: braintrust.F("description"),
 		PromptData: braintrust.F(braintrust.PromptReplaceParamsPromptData{
 			Prompt: braintrust.F[braintrust.PromptReplaceParamsPromptDataPromptUnion](braintrust.PromptReplaceParamsPromptDataPromptObject{
 				Type:    braintrust.F(braintrust.PromptReplaceParamsPromptDataPromptObjectTypeCompletion),
-				Content: braintrust.F("string"),
+				Content: braintrust.F("content"),
 			}),
 			Options: braintrust.F(braintrust.PromptReplaceParamsPromptDataOptions{
-				Model: braintrust.F("string"),
+				Model: braintrust.F("model"),
 				Params: braintrust.F[braintrust.PromptReplaceParamsPromptDataOptionsParamsUnion](braintrust.PromptReplaceParamsPromptDataOptionsParamsObject{
 					UseCache:         braintrust.F(true),
 					Temperature:      braintrust.F(0.000000),
@@ -296,12 +296,12 @@ func TestPromptReplaceWithOptionalParams(t *testing.T) {
 					N:            braintrust.F(0.000000),
 					Stop:         braintrust.F([]string{"string", "string", "string"}),
 				}),
-				Position: braintrust.F("string"),
+				Position: braintrust.F("position"),
 			}),
 			Origin: braintrust.F(braintrust.PromptReplaceParamsPromptDataOrigin{
-				PromptID:      braintrust.F("string"),
-				ProjectID:     braintrust.F("string"),
-				PromptVersion: braintrust.F("string"),
+				PromptID:      braintrust.F("prompt_id"),
+				ProjectID:     braintrust.F("project_id"),
+				PromptVersion: braintrust.F("prompt_version"),
 			}),
 		}),
 		Tags: braintrust.F([]string{"string", "string", "string"}),
