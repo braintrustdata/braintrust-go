@@ -125,11 +125,9 @@ func (r *PromptService) Feedback(ctx context.Context, promptID string, body Prom
 	return
 }
 
-// NOTE: This operation is deprecated and will be removed in a future revision of
-// the API. Create or replace a new prompt. If there is an existing prompt in the
-// project with the same slug as the one specified in the request, will return the
-// existing prompt unmodified, will replace the existing prompt with the provided
-// fields
+// Create or replace prompt. If there is an existing prompt in the project with the
+// same slug as the one specified in the request, will replace the existing prompt
+// with the provided fields
 func (r *PromptService) Replace(ctx context.Context, body PromptReplaceParams, opts ...option.RequestOption) (res *Prompt, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/prompt"
@@ -332,14 +330,14 @@ func (r *PromptPromptDataOptionsParams) UnmarshalJSON(data []byte) (err error) {
 //
 // Possible runtime types of the union are [PromptPromptDataOptionsParamsObject],
 // [PromptPromptDataOptionsParamsObject], [PromptPromptDataOptionsParamsObject],
-// [PromptPromptDataOptionsParamsObject].
+// [PromptPromptDataOptionsParamsObject], [PromptPromptDataOptionsParamsObject].
 func (r PromptPromptDataOptionsParams) AsUnion() PromptPromptDataOptionsParamsUnion {
 	return r.union
 }
 
 // Union satisfied by [PromptPromptDataOptionsParamsObject],
-// [PromptPromptDataOptionsParamsObject], [PromptPromptDataOptionsParamsObject] or
-// [PromptPromptDataOptionsParamsObject].
+// [PromptPromptDataOptionsParamsObject], [PromptPromptDataOptionsParamsObject],
+// [PromptPromptDataOptionsParamsObject] or [PromptPromptDataOptionsParamsObject].
 type PromptPromptDataOptionsParamsUnion interface {
 	implementsPromptPromptDataOptionsParams()
 }
@@ -348,6 +346,10 @@ func init() {
 	apijson.RegisterUnion(
 		reflect.TypeOf((*PromptPromptDataOptionsParamsUnion)(nil)).Elem(),
 		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptPromptDataOptionsParamsObject{}),
+		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
 			Type:       reflect.TypeOf(PromptPromptDataOptionsParamsObject{}),
@@ -835,6 +837,7 @@ func (r PromptNewParamsPromptDataOptionsParams) implementsPromptNewParamsPromptD
 // [PromptNewParamsPromptDataOptionsParamsObject],
 // [PromptNewParamsPromptDataOptionsParamsObject],
 // [PromptNewParamsPromptDataOptionsParamsObject],
+// [PromptNewParamsPromptDataOptionsParamsObject],
 // [PromptNewParamsPromptDataOptionsParams].
 type PromptNewParamsPromptDataOptionsParamsUnion interface {
 	implementsPromptNewParamsPromptDataOptionsParamsUnion()
@@ -1114,6 +1117,7 @@ func (r PromptUpdateParamsPromptDataOptionsParams) implementsPromptUpdateParamsP
 // [PromptUpdateParamsPromptDataOptionsParamsObject],
 // [PromptUpdateParamsPromptDataOptionsParamsObject],
 // [PromptUpdateParamsPromptDataOptionsParamsObject],
+// [PromptUpdateParamsPromptDataOptionsParamsObject],
 // [PromptUpdateParamsPromptDataOptionsParams].
 type PromptUpdateParamsPromptDataOptionsParamsUnion interface {
 	implementsPromptUpdateParamsPromptDataOptionsParamsUnion()
@@ -1354,11 +1358,10 @@ type PromptListParams struct {
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
 	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
-	// Retrieve a snapshot of events from a past time
+	// Retrieve prompt at a specific version.
 	//
-	// The version id is essentially a filter on the latest event transaction id. You
-	// can use the `max_xact_id` returned by a past fetch as the version to reproduce
-	// that exact fetch.
+	// The version id can either be a transaction id (e.g. '1000192656880881099') or a
+	// version identifier (e.g. '81cd05ee665fdfb3').
 	Version param.Field[string] `query:"version"`
 }
 
@@ -1494,6 +1497,7 @@ func (r PromptReplaceParamsPromptDataOptionsParams) implementsPromptReplaceParam
 }
 
 // Satisfied by [PromptReplaceParamsPromptDataOptionsParamsObject],
+// [PromptReplaceParamsPromptDataOptionsParamsObject],
 // [PromptReplaceParamsPromptDataOptionsParamsObject],
 // [PromptReplaceParamsPromptDataOptionsParamsObject],
 // [PromptReplaceParamsPromptDataOptionsParamsObject],

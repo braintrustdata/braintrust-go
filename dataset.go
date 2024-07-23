@@ -161,18 +161,6 @@ func (r *DatasetService) Insert(ctx context.Context, datasetID string, body Data
 	return
 }
 
-// NOTE: This operation is deprecated and will be removed in a future revision of
-// the API. Create or replace a new dataset. If there is an existing dataset in the
-// project with the same name as the one specified in the request, will return the
-// existing dataset unmodified, will replace the existing dataset with the provided
-// fields
-func (r *DatasetService) Replace(ctx context.Context, body DatasetReplaceParams, opts ...option.RequestOption) (res *Dataset, err error) {
-	opts = append(r.Options[:], opts...)
-	path := "v1/dataset"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
-	return
-}
-
 // Summarize dataset
 func (r *DatasetService) Summarize(ctx context.Context, datasetID string, query DatasetSummarizeParams, opts ...option.RequestOption) (res *DatasetSummarizeResponse, err error) {
 	opts = append(r.Options[:], opts...)
@@ -196,6 +184,8 @@ type Dataset struct {
 	DeletedAt time.Time `json:"deleted_at,nullable" format:"date-time"`
 	// Textual description of the dataset
 	Description string `json:"description,nullable"`
+	// User-controlled metadata about the dataset
+	Metadata map[string]interface{} `json:"metadata,nullable"`
 	// Unique identifier for the project that the dataset belongs under
 	ProjectID string `json:"project_id,nullable" format:"uuid"`
 	// Identifies the user who created the dataset
@@ -210,6 +200,7 @@ type datasetJSON struct {
 	Created     apijson.Field
 	DeletedAt   apijson.Field
 	Description apijson.Field
+	Metadata    apijson.Field
 	ProjectID   apijson.Field
 	UserID      apijson.Field
 	raw         string
@@ -266,12 +257,12 @@ type DatasetFetchResponseEvent struct {
 	// Unique identifier for the dataset
 	DatasetID string `json:"dataset_id,required" format:"uuid"`
 	// The `span_id` of the root of the trace this dataset event belongs to
-	RootSpanID string `json:"root_span_id,required"`
+	RootSpanID string `json:"root_span_id,required" format:"uuid"`
 	// A unique identifier used to link different dataset events together as part of a
 	// full trace. See the
-	// [tracing guide](https://www.braintrustdata.com/docs/guides/tracing) for full
-	// details on tracing
-	SpanID string `json:"span_id,required"`
+	// [tracing guide](https://www.braintrust.dev/docs/guides/tracing) for full details
+	// on tracing
+	SpanID string `json:"span_id,required" format:"uuid"`
 	// The output of your application, including post-processing (an arbitrary, JSON
 	// serializable object)
 	Expected interface{} `json:"expected"`
@@ -359,12 +350,12 @@ type DatasetFetchPostResponseEvent struct {
 	// Unique identifier for the dataset
 	DatasetID string `json:"dataset_id,required" format:"uuid"`
 	// The `span_id` of the root of the trace this dataset event belongs to
-	RootSpanID string `json:"root_span_id,required"`
+	RootSpanID string `json:"root_span_id,required" format:"uuid"`
 	// A unique identifier used to link different dataset events together as part of a
 	// full trace. See the
-	// [tracing guide](https://www.braintrustdata.com/docs/guides/tracing) for full
-	// details on tracing
-	SpanID string `json:"span_id,required"`
+	// [tracing guide](https://www.braintrust.dev/docs/guides/tracing) for full details
+	// on tracing
+	SpanID string `json:"span_id,required" format:"uuid"`
 	// The output of your application, including post-processing (an arbitrary, JSON
 	// serializable object)
 	Expected interface{} `json:"expected"`
@@ -507,6 +498,8 @@ func (r DatasetNewParams) MarshalJSON() (data []byte, err error) {
 type DatasetUpdateParams struct {
 	// Textual description of the dataset
 	Description param.Field[string] `json:"description"`
+	// User-controlled metadata about the dataset
+	Metadata param.Field[map[string]interface{}] `json:"metadata"`
 	// Name of the dataset. Within a project, dataset names are unique
 	Name param.Field[string] `json:"name"`
 }
@@ -773,6 +766,8 @@ type DatasetInsertParamsEvent struct {
 	// A unique identifier for the dataset event. If you don't provide one, BrainTrust
 	// will generate one for you
 	ID param.Field[string] `json:"id"`
+	// The timestamp the dataset event was created
+	Created param.Field[time.Time] `json:"created" format:"date-time"`
 	// Pass `_object_delete=true` to mark the dataset event deleted. Deleted events
 	// will not show up in subsequent fetches for this dataset
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
@@ -791,7 +786,7 @@ type DatasetInsertParamsEvent struct {
 	// Use the `_parent_id` field to create this row as a subspan of an existing row.
 	// It cannot be specified alongside `_is_merge=true`. Tracking hierarchical
 	// relationships are important for tracing (see the
-	// [guide](https://www.braintrustdata.com/docs/guides/tracing) for full details).
+	// [guide](https://www.braintrust.dev/docs/guides/tracing) for full details).
 	//
 	// For example, say we have logged a row
 	// `{"id": "abc", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
@@ -840,7 +835,7 @@ type DatasetInsertParamsEventsInsertDatasetEventReplace struct {
 	// Use the `_parent_id` field to create this row as a subspan of an existing row.
 	// It cannot be specified alongside `_is_merge=true`. Tracking hierarchical
 	// relationships are important for tracing (see the
-	// [guide](https://www.braintrustdata.com/docs/guides/tracing) for full details).
+	// [guide](https://www.braintrust.dev/docs/guides/tracing) for full details).
 	//
 	// For example, say we have logged a row
 	// `{"id": "abc", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
@@ -850,6 +845,8 @@ type DatasetInsertParamsEventsInsertDatasetEventReplace struct {
 	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
 	// clicking on the "abc" row.
 	ParentID param.Field[string] `json:"_parent_id"`
+	// The timestamp the dataset event was created
+	Created param.Field[time.Time] `json:"created" format:"date-time"`
 	// The output of your application, including post-processing (an arbitrary, JSON
 	// serializable object)
 	Expected param.Field[interface{}] `json:"expected"`
@@ -906,6 +903,8 @@ type DatasetInsertParamsEventsInsertDatasetEventMerge struct {
 	// Pass `_object_delete=true` to mark the dataset event deleted. Deleted events
 	// will not show up in subsequent fetches for this dataset
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
+	// The timestamp the dataset event was created
+	Created param.Field[time.Time] `json:"created" format:"date-time"`
 	// The output of your application, including post-processing (an arbitrary, JSON
 	// serializable object)
 	Expected param.Field[interface{}] `json:"expected"`
@@ -927,19 +926,6 @@ func (r DatasetInsertParamsEventsInsertDatasetEventMerge) MarshalJSON() (data []
 }
 
 func (r DatasetInsertParamsEventsInsertDatasetEventMerge) implementsDatasetInsertParamsEventUnion() {}
-
-type DatasetReplaceParams struct {
-	// Name of the dataset. Within a project, dataset names are unique
-	Name param.Field[string] `json:"name,required"`
-	// Textual description of the dataset
-	Description param.Field[string] `json:"description"`
-	// Unique identifier for the project that the dataset belongs under
-	ProjectID param.Field[string] `json:"project_id" format:"uuid"`
-}
-
-func (r DatasetReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
 
 type DatasetSummarizeParams struct {
 	// Whether to summarize the data. If false (or omitted), only the metadata will be
