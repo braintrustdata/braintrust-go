@@ -133,12 +133,12 @@ type ProjectLogFetchResponseEvent struct {
 	// Unique identifier for the project
 	ProjectID string `json:"project_id,required" format:"uuid"`
 	// The `span_id` of the root of the trace this project logs event belongs to
-	RootSpanID string `json:"root_span_id,required"`
+	RootSpanID string `json:"root_span_id,required" format:"uuid"`
 	// A unique identifier used to link different project logs events together as part
 	// of a full trace. See the
-	// [tracing guide](https://www.braintrustdata.com/docs/guides/tracing) for full
-	// details on tracing
-	SpanID string `json:"span_id,required"`
+	// [tracing guide](https://www.braintrust.dev/docs/guides/tracing) for full details
+	// on tracing
+	SpanID string `json:"span_id,required" format:"uuid"`
 	// Context is additional information about the code that produced the project logs
 	// event. It is essentially the textual counterpart to `metrics`. Use the
 	// `caller_*` attributes to track the location in code which produced the project
@@ -406,12 +406,12 @@ type ProjectLogFetchPostResponseEvent struct {
 	// Unique identifier for the project
 	ProjectID string `json:"project_id,required" format:"uuid"`
 	// The `span_id` of the root of the trace this project logs event belongs to
-	RootSpanID string `json:"root_span_id,required"`
+	RootSpanID string `json:"root_span_id,required" format:"uuid"`
 	// A unique identifier used to link different project logs events together as part
 	// of a full trace. See the
-	// [tracing guide](https://www.braintrustdata.com/docs/guides/tracing) for full
-	// details on tracing
-	SpanID string `json:"span_id,required"`
+	// [tracing guide](https://www.braintrust.dev/docs/guides/tracing) for full details
+	// on tracing
+	SpanID string `json:"span_id,required" format:"uuid"`
 	// Context is additional information about the code that produced the project logs
 	// event. It is essentially the textual counterpart to `metrics`. Use the
 	// `caller_*` attributes to track the location in code which produced the project
@@ -879,6 +879,8 @@ type ProjectLogInsertParamsEvent struct {
 	// A unique identifier for the project logs event. If you don't provide one,
 	// BrainTrust will generate one for you
 	ID param.Field[string] `json:"id"`
+	// The timestamp the project logs event was created
+	Created param.Field[time.Time] `json:"created" format:"date-time"`
 	// Pass `_object_delete=true` to mark the project logs event deleted. Deleted
 	// events will not show up in subsequent fetches for this project logs
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
@@ -897,7 +899,7 @@ type ProjectLogInsertParamsEvent struct {
 	// Use the `_parent_id` field to create this row as a subspan of an existing row.
 	// It cannot be specified alongside `_is_merge=true`. Tracking hierarchical
 	// relationships are important for tracing (see the
-	// [guide](https://www.braintrustdata.com/docs/guides/tracing) for full details).
+	// [guide](https://www.braintrust.dev/docs/guides/tracing) for full details).
 	//
 	// For example, say we have logged a row
 	// `{"id": "abc", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
@@ -947,7 +949,7 @@ type ProjectLogInsertParamsEventsInsertProjectLogsEventReplace struct {
 	// Use the `_parent_id` field to create this row as a subspan of an existing row.
 	// It cannot be specified alongside `_is_merge=true`. Tracking hierarchical
 	// relationships are important for tracing (see the
-	// [guide](https://www.braintrustdata.com/docs/guides/tracing) for full details).
+	// [guide](https://www.braintrust.dev/docs/guides/tracing) for full details).
 	//
 	// For example, say we have logged a row
 	// `{"id": "abc", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
@@ -962,6 +964,8 @@ type ProjectLogInsertParamsEventsInsertProjectLogsEventReplace struct {
 	// `caller_*` attributes to track the location in code which produced the project
 	// logs event
 	Context param.Field[ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceContext] `json:"context"`
+	// The timestamp the project logs event was created
+	Created param.Field[time.Time] `json:"created" format:"date-time"`
 	// The ground truth value (an arbitrary, JSON serializable object) that you'd
 	// compare to `output` to determine if your `output` value is correct or not.
 	// Braintrust currently does not compare `output` to `expected` for you, since
@@ -1124,6 +1128,8 @@ type ProjectLogInsertParamsEventsInsertProjectLogsEventMerge struct {
 	// `caller_*` attributes to track the location in code which produced the project
 	// logs event
 	Context param.Field[ProjectLogInsertParamsEventsInsertProjectLogsEventMergeContext] `json:"context"`
+	// The timestamp the project logs event was created
+	Created param.Field[time.Time] `json:"created" format:"date-time"`
 	// The ground truth value (an arbitrary, JSON serializable object) that you'd
 	// compare to `output` to determine if your `output` value is correct or not.
 	// Braintrust currently does not compare `output` to `expected` for you, since

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/braintrustdata/braintrust-go"
 	"github.com/braintrustdata/braintrust-go/internal/testutil"
@@ -362,6 +363,7 @@ func TestExperimentInsert(t *testing.T) {
 				}),
 				ID:              braintrust.F("string"),
 				DatasetRecordID: braintrust.F("string"),
+				Created:         braintrust.F(time.Now()),
 				ObjectDelete:    braintrust.F(true),
 				IsMerge:         braintrust.F(true),
 				ParentID:        braintrust.F("string"),
@@ -394,6 +396,7 @@ func TestExperimentInsert(t *testing.T) {
 				}),
 				ID:              braintrust.F("string"),
 				DatasetRecordID: braintrust.F("string"),
+				Created:         braintrust.F(time.Now()),
 				ObjectDelete:    braintrust.F(true),
 				IsMerge:         braintrust.F(true),
 				ParentID:        braintrust.F("string"),
@@ -426,57 +429,13 @@ func TestExperimentInsert(t *testing.T) {
 				}),
 				ID:              braintrust.F("string"),
 				DatasetRecordID: braintrust.F("string"),
+				Created:         braintrust.F(time.Now()),
 				ObjectDelete:    braintrust.F(true),
 				IsMerge:         braintrust.F(true),
 				ParentID:        braintrust.F("string"),
 			}}),
 		},
 	)
-	if err != nil {
-		var apierr *braintrust.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestExperimentReplaceWithOptionalParams(t *testing.T) {
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := braintrust.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-	)
-	_, err := client.Experiment.Replace(context.TODO(), braintrust.ExperimentReplaceParams{
-		ProjectID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		BaseExpID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		DatasetID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		DatasetVersion: braintrust.F("string"),
-		Description:    braintrust.F("string"),
-		EnsureNew:      braintrust.F(true),
-		Metadata: braintrust.F(map[string]interface{}{
-			"foo": map[string]interface{}{},
-		}),
-		Name:   braintrust.F("string"),
-		Public: braintrust.F(true),
-		RepoInfo: braintrust.F(braintrust.ExperimentReplaceParamsRepoInfo{
-			Commit:        braintrust.F("string"),
-			Branch:        braintrust.F("string"),
-			Tag:           braintrust.F("string"),
-			Dirty:         braintrust.F(true),
-			AuthorName:    braintrust.F("string"),
-			AuthorEmail:   braintrust.F("string"),
-			CommitMessage: braintrust.F("string"),
-			CommitTime:    braintrust.F("string"),
-			GitDiff:       braintrust.F("string"),
-		}),
-	})
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {

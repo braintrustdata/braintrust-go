@@ -7,6 +7,7 @@ import (
 	"errors"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/braintrustdata/braintrust-go"
 	"github.com/braintrustdata/braintrust-go/internal/testutil"
@@ -194,6 +195,7 @@ func TestProjectLogInsert(t *testing.T) {
 					Type: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeLlm),
 				}),
 				ID:           braintrust.F("string"),
+				Created:      braintrust.F(time.Now()),
 				ObjectDelete: braintrust.F(true),
 				IsMerge:      braintrust.F(true),
 				ParentID:     braintrust.F("string"),
@@ -225,6 +227,7 @@ func TestProjectLogInsert(t *testing.T) {
 					Type: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeLlm),
 				}),
 				ID:           braintrust.F("string"),
+				Created:      braintrust.F(time.Now()),
 				ObjectDelete: braintrust.F(true),
 				IsMerge:      braintrust.F(true),
 				ParentID:     braintrust.F("string"),
@@ -256,6 +259,7 @@ func TestProjectLogInsert(t *testing.T) {
 					Type: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeLlm),
 				}),
 				ID:           braintrust.F("string"),
+				Created:      braintrust.F(time.Now()),
 				ObjectDelete: braintrust.F(true),
 				IsMerge:      braintrust.F(true),
 				ParentID:     braintrust.F("string"),

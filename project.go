@@ -111,17 +111,6 @@ func (r *ProjectService) Delete(ctx context.Context, projectID string, opts ...o
 	return
 }
 
-// NOTE: This operation is deprecated and will be removed in a future revision of
-// the API. Create or replace a new project. If there is an existing project with
-// the same name as the one specified in the request, will return the existing
-// project unmodified, will replace the existing project with the provided fields
-func (r *ProjectService) Replace(ctx context.Context, body ProjectReplaceParams, opts ...option.RequestOption) (res *Project, err error) {
-	opts = append(r.Options[:], opts...)
-	path := "v1/project"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
-	return
-}
-
 type Project struct {
 	// Unique identifier for the project
 	ID string `json:"id,required" format:"uuid"`
@@ -132,7 +121,8 @@ type Project struct {
 	// Date of project creation
 	Created time.Time `json:"created,nullable" format:"date-time"`
 	// Date of project deletion, or null if the project is still active
-	DeletedAt time.Time `json:"deleted_at,nullable" format:"date-time"`
+	DeletedAt time.Time       `json:"deleted_at,nullable" format:"date-time"`
+	Settings  ProjectSettings `json:"settings,nullable"`
 	// Identifies the user who created the project
 	UserID string      `json:"user_id,nullable" format:"uuid"`
 	JSON   projectJSON `json:"-"`
@@ -145,6 +135,7 @@ type projectJSON struct {
 	OrgID       apijson.Field
 	Created     apijson.Field
 	DeletedAt   apijson.Field
+	Settings    apijson.Field
 	UserID      apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
@@ -155,6 +146,27 @@ func (r *Project) UnmarshalJSON(data []byte) (err error) {
 }
 
 func (r projectJSON) RawJSON() string {
+	return r.raw
+}
+
+type ProjectSettings struct {
+	// The key used to join two experiments (defaults to `input`).
+	ComparisonKey string              `json:"comparison_key,nullable"`
+	JSON          projectSettingsJSON `json:"-"`
+}
+
+// projectSettingsJSON contains the JSON metadata for the struct [ProjectSettings]
+type projectSettingsJSON struct {
+	ComparisonKey apijson.Field
+	raw           string
+	ExtraFields   map[string]apijson.Field
+}
+
+func (r *ProjectSettings) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r projectSettingsJSON) RawJSON() string {
 	return r.raw
 }
 
@@ -174,9 +186,23 @@ func (r ProjectNewParams) MarshalJSON() (data []byte, err error) {
 type ProjectUpdateParams struct {
 	// Name of the project
 	Name param.Field[string] `json:"name"`
+	// Project settings. Patch operations replace all settings, so make sure you
+	// include all settings you want to keep.
+	Settings param.Field[ProjectUpdateParamsSettings] `json:"settings"`
 }
 
 func (r ProjectUpdateParams) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+// Project settings. Patch operations replace all settings, so make sure you
+// include all settings you want to keep.
+type ProjectUpdateParamsSettings struct {
+	// The key used to join two experiments (defaults to `input`).
+	ComparisonKey param.Field[string] `json:"comparison_key"`
+}
+
+func (r ProjectUpdateParamsSettings) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
@@ -223,16 +249,3 @@ type ProjectListParamsIDsUnion interface {
 type ProjectListParamsIDsArray []string
 
 func (r ProjectListParamsIDsArray) ImplementsProjectListParamsIDsUnion() {}
-
-type ProjectReplaceParams struct {
-	// Name of the project
-	Name param.Field[string] `json:"name,required"`
-	// For nearly all users, this parameter should be unnecessary. But in the rare case
-	// that your API key belongs to multiple organizations, you may specify the name of
-	// the organization the project belongs in.
-	OrgName param.Field[string] `json:"org_name"`
-}
-
-func (r ProjectReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
