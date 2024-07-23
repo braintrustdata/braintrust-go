@@ -31,34 +31,34 @@ func TestProjectLogFeedback(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectLogFeedbackParams{
 			Feedback: braintrust.F([]braintrust.ProjectLogFeedbackParamsFeedback{{
-				ID: braintrust.F("string"),
+				ID: braintrust.F("id"),
 				Scores: braintrust.F(map[string]float64{
 					"foo": 0.000000,
 				}),
 				Expected: braintrust.F[any](map[string]interface{}{}),
-				Comment:  braintrust.F("string"),
+				Comment:  braintrust.F("comment"),
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
 				Source: braintrust.F(braintrust.ProjectLogFeedbackParamsFeedbackSourceApp),
 			}, {
-				ID: braintrust.F("string"),
+				ID: braintrust.F("id"),
 				Scores: braintrust.F(map[string]float64{
 					"foo": 0.000000,
 				}),
 				Expected: braintrust.F[any](map[string]interface{}{}),
-				Comment:  braintrust.F("string"),
+				Comment:  braintrust.F("comment"),
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
 				Source: braintrust.F(braintrust.ProjectLogFeedbackParamsFeedbackSourceApp),
 			}, {
-				ID: braintrust.F("string"),
+				ID: braintrust.F("id"),
 				Scores: braintrust.F(map[string]float64{
 					"foo": 0.000000,
 				}),
 				Expected: braintrust.F[any](map[string]interface{}{}),
-				Comment:  braintrust.F("string"),
+				Comment:  braintrust.F("comment"),
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
@@ -92,9 +92,9 @@ func TestProjectLogFetchWithOptionalParams(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectLogFetchParams{
 			Limit:         braintrust.F(int64(0)),
-			MaxRootSpanID: braintrust.F("string"),
-			MaxXactID:     braintrust.F("string"),
-			Version:       braintrust.F("string"),
+			MaxRootSpanID: braintrust.F("max_root_span_id"),
+			MaxXactID:     braintrust.F("max_xact_id"),
+			Version:       braintrust.F("version"),
 		},
 	)
 	if err != nil {
@@ -122,7 +122,7 @@ func TestProjectLogFetchPostWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectLogFetchPostParams{
-			Cursor: braintrust.F("string"),
+			Cursor: braintrust.F("cursor"),
 			Filters: braintrust.F([]braintrust.ProjectLogFetchPostParamsFilter{{
 				Type:  braintrust.F(braintrust.ProjectLogFetchPostParamsFiltersTypePathLookup),
 				Path:  braintrust.F([]string{"string", "string", "string"}),
@@ -137,9 +137,9 @@ func TestProjectLogFetchPostWithOptionalParams(t *testing.T) {
 				Value: braintrust.F[any](map[string]interface{}{}),
 			}}),
 			Limit:         braintrust.F(int64(0)),
-			MaxRootSpanID: braintrust.F("string"),
-			MaxXactID:     braintrust.F("string"),
-			Version:       braintrust.F("string"),
+			MaxRootSpanID: braintrust.F("max_root_span_id"),
+			MaxXactID:     braintrust.F("max_xact_id"),
+			Version:       braintrust.F("version"),
 		},
 	)
 	if err != nil {
@@ -186,19 +186,19 @@ func TestProjectLogInsert(t *testing.T) {
 					Tokens:           braintrust.F(int64(0)),
 				}),
 				Context: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceContext{
-					CallerFunctionname: braintrust.F("string"),
-					CallerFilename:     braintrust.F("string"),
+					CallerFunctionname: braintrust.F("caller_functionname"),
+					CallerFilename:     braintrust.F("caller_filename"),
 					CallerLineno:       braintrust.F(int64(0)),
 				}),
 				SpanAttributes: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributes{
-					Name: braintrust.F("string"),
+					Name: braintrust.F("name"),
 					Type: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeLlm),
 				}),
-				ID:           braintrust.F("string"),
+				ID:           braintrust.F("id"),
 				Created:      braintrust.F(time.Now()),
 				ObjectDelete: braintrust.F(true),
 				IsMerge:      braintrust.F(true),
-				ParentID:     braintrust.F("string"),
+				ParentID:     braintrust.F("_parent_id"),
 			}, braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
 				Output:   braintrust.F[any](map[string]interface{}{}),
@@ -218,19 +218,19 @@ func TestProjectLogInsert(t *testing.T) {
 					Tokens:           braintrust.F(int64(0)),
 				}),
 				Context: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceContext{
-					CallerFunctionname: braintrust.F("string"),
-					CallerFilename:     braintrust.F("string"),
+					CallerFunctionname: braintrust.F("caller_functionname"),
+					CallerFilename:     braintrust.F("caller_filename"),
 					CallerLineno:       braintrust.F(int64(0)),
 				}),
 				SpanAttributes: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributes{
-					Name: braintrust.F("string"),
+					Name: braintrust.F("name"),
 					Type: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeLlm),
 				}),
-				ID:           braintrust.F("string"),
+				ID:           braintrust.F("id"),
 				Created:      braintrust.F(time.Now()),
 				ObjectDelete: braintrust.F(true),
 				IsMerge:      braintrust.F(true),
-				ParentID:     braintrust.F("string"),
+				ParentID:     braintrust.F("_parent_id"),
 			}, braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
 				Output:   braintrust.F[any](map[string]interface{}{}),
@@ -250,19 +250,19 @@ func TestProjectLogInsert(t *testing.T) {
 					Tokens:           braintrust.F(int64(0)),
 				}),
 				Context: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceContext{
-					CallerFunctionname: braintrust.F("string"),
-					CallerFilename:     braintrust.F("string"),
+					CallerFunctionname: braintrust.F("caller_functionname"),
+					CallerFilename:     braintrust.F("caller_filename"),
 					CallerLineno:       braintrust.F(int64(0)),
 				}),
 				SpanAttributes: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributes{
-					Name: braintrust.F("string"),
+					Name: braintrust.F("name"),
 					Type: braintrust.F(braintrust.ProjectLogInsertParamsEventsInsertProjectLogsEventReplaceSpanAttributesTypeLlm),
 				}),
-				ID:           braintrust.F("string"),
+				ID:           braintrust.F("id"),
 				Created:      braintrust.F(time.Now()),
 				ObjectDelete: braintrust.F(true),
 				IsMerge:      braintrust.F(true),
-				ParentID:     braintrust.F("string"),
+				ParentID:     braintrust.F("_parent_id"),
 			}}),
 		},
 	)

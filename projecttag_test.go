@@ -27,10 +27,10 @@ func TestProjectTagNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ProjectTag.New(context.TODO(), braintrust.ProjectTagNewParams{
-		Name:        braintrust.F("string"),
+		Name:        braintrust.F("name"),
 		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Color:       braintrust.F("string"),
-		Description: braintrust.F("string"),
+		Color:       braintrust.F("color"),
+		Description: braintrust.F("description"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -79,9 +79,9 @@ func TestProjectTagUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectTagUpdateParams{
-			Color:       braintrust.F("string"),
-			Description: braintrust.F("string"),
-			Name:        braintrust.F("string"),
+			Color:       braintrust.F("color"),
+			Description: braintrust.F("description"),
+			Name:        braintrust.F("name"),
 		},
 	)
 	if err != nil {
@@ -109,9 +109,9 @@ func TestProjectTagListWithOptionalParams(t *testing.T) {
 		EndingBefore:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		IDs:            braintrust.F[braintrust.ProjectTagListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:          braintrust.F(int64(0)),
-		OrgName:        braintrust.F("string"),
-		ProjectName:    braintrust.F("string"),
-		ProjectTagName: braintrust.F("string"),
+		OrgName:        braintrust.F("org_name"),
+		ProjectName:    braintrust.F("project_name"),
+		ProjectTagName: braintrust.F("project_tag_name"),
 		StartingAfter:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
@@ -158,10 +158,10 @@ func TestProjectTagReplaceWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ProjectTag.Replace(context.TODO(), braintrust.ProjectTagReplaceParams{
-		Name:        braintrust.F("string"),
+		Name:        braintrust.F("name"),
 		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Color:       braintrust.F("string"),
-		Description: braintrust.F("string"),
+		Color:       braintrust.F("color"),
+		Description: braintrust.F("description"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
