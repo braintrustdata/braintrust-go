@@ -27,8 +27,8 @@ func TestProjectNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Project.New(context.TODO(), braintrust.ProjectNewParams{
-		Name:    braintrust.F("string"),
-		OrgName: braintrust.F("string"),
+		Name:    braintrust.F("name"),
+		OrgName: braintrust.F("org_name"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -77,9 +77,9 @@ func TestProjectUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectUpdateParams{
-			Name: braintrust.F("string"),
+			Name: braintrust.F("name"),
 			Settings: braintrust.F(braintrust.ProjectUpdateParamsSettings{
-				ComparisonKey: braintrust.F("string"),
+				ComparisonKey: braintrust.F("comparison_key"),
 			}),
 		},
 	)
@@ -108,8 +108,8 @@ func TestProjectListWithOptionalParams(t *testing.T) {
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		IDs:           braintrust.F[braintrust.ProjectListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
-		OrgName:       braintrust.F("string"),
-		ProjectName:   braintrust.F("string"),
+		OrgName:       braintrust.F("org_name"),
+		ProjectName:   braintrust.F("project_name"),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {

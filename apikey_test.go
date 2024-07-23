@@ -27,8 +27,8 @@ func TestAPIKeyNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.APIKey.New(context.TODO(), braintrust.APIKeyNewParams{
-		Name:    braintrust.F("string"),
-		OrgName: braintrust.F("string"),
+		Name:    braintrust.F("name"),
+		OrgName: braintrust.F("org_name"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -74,11 +74,11 @@ func TestAPIKeyListWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.APIKey.List(context.TODO(), braintrust.APIKeyListParams{
-		APIKeyName:    braintrust.F("string"),
+		APIKeyName:    braintrust.F("api_key_name"),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		IDs:           braintrust.F[braintrust.APIKeyListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
-		OrgName:       braintrust.F("string"),
+		OrgName:       braintrust.F("org_name"),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {

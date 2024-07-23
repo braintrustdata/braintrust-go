@@ -52,10 +52,10 @@ func TestOrganizationUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.OrganizationUpdateParams{
-			APIURL:      braintrust.F("string"),
-			Name:        braintrust.F("string"),
-			ProxyURL:    braintrust.F("string"),
-			RealtimeURL: braintrust.F("string"),
+			APIURL:      braintrust.F("api_url"),
+			Name:        braintrust.F("name"),
+			ProxyURL:    braintrust.F("proxy_url"),
+			RealtimeURL: braintrust.F("realtime_url"),
 		},
 	)
 	if err != nil {
@@ -83,8 +83,8 @@ func TestOrganizationListWithOptionalParams(t *testing.T) {
 		EndingBefore:     braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		IDs:              braintrust.F[braintrust.OrganizationListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:            braintrust.F(int64(0)),
-		OrgName:          braintrust.F("string"),
-		OrganizationName: braintrust.F("string"),
+		OrgName:          braintrust.F("org_name"),
+		OrganizationName: braintrust.F("organization_name"),
 		StartingAfter:    braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {

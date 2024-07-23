@@ -49,13 +49,13 @@ func TestUserListWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.User.List(context.TODO(), braintrust.UserListParams{
-		Email:         braintrust.F("string"),
+		Email:         braintrust.F("email"),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		FamilyName:    braintrust.F("string"),
-		GivenName:     braintrust.F("string"),
+		FamilyName:    braintrust.F("family_name"),
+		GivenName:     braintrust.F("given_name"),
 		IDs:           braintrust.F[braintrust.UserListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
-		OrgName:       braintrust.F("string"),
+		OrgName:       braintrust.F("org_name"),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {

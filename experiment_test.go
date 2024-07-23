@@ -31,24 +31,24 @@ func TestExperimentNewWithOptionalParams(t *testing.T) {
 		ProjectID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		BaseExpID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		DatasetID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		DatasetVersion: braintrust.F("string"),
-		Description:    braintrust.F("string"),
+		DatasetVersion: braintrust.F("dataset_version"),
+		Description:    braintrust.F("description"),
 		EnsureNew:      braintrust.F(true),
 		Metadata: braintrust.F(map[string]interface{}{
 			"foo": map[string]interface{}{},
 		}),
-		Name:   braintrust.F("string"),
+		Name:   braintrust.F("name"),
 		Public: braintrust.F(true),
 		RepoInfo: braintrust.F(braintrust.ExperimentNewParamsRepoInfo{
-			Commit:        braintrust.F("string"),
-			Branch:        braintrust.F("string"),
-			Tag:           braintrust.F("string"),
+			Commit:        braintrust.F("commit"),
+			Branch:        braintrust.F("branch"),
+			Tag:           braintrust.F("tag"),
 			Dirty:         braintrust.F(true),
-			AuthorName:    braintrust.F("string"),
-			AuthorEmail:   braintrust.F("string"),
-			CommitMessage: braintrust.F("string"),
-			CommitTime:    braintrust.F("string"),
-			GitDiff:       braintrust.F("string"),
+			AuthorName:    braintrust.F("author_name"),
+			AuthorEmail:   braintrust.F("author_email"),
+			CommitMessage: braintrust.F("commit_message"),
+			CommitTime:    braintrust.F("commit_time"),
+			GitDiff:       braintrust.F("git_diff"),
 		}),
 	})
 	if err != nil {
@@ -100,23 +100,23 @@ func TestExperimentUpdateWithOptionalParams(t *testing.T) {
 		braintrust.ExperimentUpdateParams{
 			BaseExpID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 			DatasetID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			DatasetVersion: braintrust.F("string"),
-			Description:    braintrust.F("string"),
+			DatasetVersion: braintrust.F("dataset_version"),
+			Description:    braintrust.F("description"),
 			Metadata: braintrust.F(map[string]interface{}{
 				"foo": map[string]interface{}{},
 			}),
-			Name:   braintrust.F("string"),
+			Name:   braintrust.F("name"),
 			Public: braintrust.F(true),
 			RepoInfo: braintrust.F(braintrust.ExperimentUpdateParamsRepoInfo{
-				Commit:        braintrust.F("string"),
-				Branch:        braintrust.F("string"),
-				Tag:           braintrust.F("string"),
+				Commit:        braintrust.F("commit"),
+				Branch:        braintrust.F("branch"),
+				Tag:           braintrust.F("tag"),
 				Dirty:         braintrust.F(true),
-				AuthorName:    braintrust.F("string"),
-				AuthorEmail:   braintrust.F("string"),
-				CommitMessage: braintrust.F("string"),
-				CommitTime:    braintrust.F("string"),
-				GitDiff:       braintrust.F("string"),
+				AuthorName:    braintrust.F("author_name"),
+				AuthorEmail:   braintrust.F("author_email"),
+				CommitMessage: braintrust.F("commit_message"),
+				CommitTime:    braintrust.F("commit_time"),
+				GitDiff:       braintrust.F("git_diff"),
 			}),
 		},
 	)
@@ -143,11 +143,11 @@ func TestExperimentListWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.Experiment.List(context.TODO(), braintrust.ExperimentListParams{
 		EndingBefore:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ExperimentName: braintrust.F("string"),
+		ExperimentName: braintrust.F("experiment_name"),
 		IDs:            braintrust.F[braintrust.ExperimentListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:          braintrust.F(int64(0)),
-		OrgName:        braintrust.F("string"),
-		ProjectName:    braintrust.F("string"),
+		OrgName:        braintrust.F("org_name"),
+		ProjectName:    braintrust.F("project_name"),
 		StartingAfter:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
@@ -198,34 +198,34 @@ func TestExperimentFeedback(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ExperimentFeedbackParams{
 			Feedback: braintrust.F([]braintrust.ExperimentFeedbackParamsFeedback{{
-				ID: braintrust.F("string"),
+				ID: braintrust.F("id"),
 				Scores: braintrust.F(map[string]float64{
 					"foo": 0.000000,
 				}),
 				Expected: braintrust.F[any](map[string]interface{}{}),
-				Comment:  braintrust.F("string"),
+				Comment:  braintrust.F("comment"),
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
 				Source: braintrust.F(braintrust.ExperimentFeedbackParamsFeedbackSourceApp),
 			}, {
-				ID: braintrust.F("string"),
+				ID: braintrust.F("id"),
 				Scores: braintrust.F(map[string]float64{
 					"foo": 0.000000,
 				}),
 				Expected: braintrust.F[any](map[string]interface{}{}),
-				Comment:  braintrust.F("string"),
+				Comment:  braintrust.F("comment"),
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
 				Source: braintrust.F(braintrust.ExperimentFeedbackParamsFeedbackSourceApp),
 			}, {
-				ID: braintrust.F("string"),
+				ID: braintrust.F("id"),
 				Scores: braintrust.F(map[string]float64{
 					"foo": 0.000000,
 				}),
 				Expected: braintrust.F[any](map[string]interface{}{}),
-				Comment:  braintrust.F("string"),
+				Comment:  braintrust.F("comment"),
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": map[string]interface{}{},
 				}),
@@ -259,9 +259,9 @@ func TestExperimentFetchWithOptionalParams(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ExperimentFetchParams{
 			Limit:         braintrust.F(int64(0)),
-			MaxRootSpanID: braintrust.F("string"),
-			MaxXactID:     braintrust.F("string"),
-			Version:       braintrust.F("string"),
+			MaxRootSpanID: braintrust.F("max_root_span_id"),
+			MaxXactID:     braintrust.F("max_xact_id"),
+			Version:       braintrust.F("version"),
 		},
 	)
 	if err != nil {
@@ -289,7 +289,7 @@ func TestExperimentFetchPostWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ExperimentFetchPostParams{
-			Cursor: braintrust.F("string"),
+			Cursor: braintrust.F("cursor"),
 			Filters: braintrust.F([]braintrust.ExperimentFetchPostParamsFilter{{
 				Type:  braintrust.F(braintrust.ExperimentFetchPostParamsFiltersTypePathLookup),
 				Path:  braintrust.F([]string{"string", "string", "string"}),
@@ -304,9 +304,9 @@ func TestExperimentFetchPostWithOptionalParams(t *testing.T) {
 				Value: braintrust.F[any](map[string]interface{}{}),
 			}}),
 			Limit:         braintrust.F(int64(0)),
-			MaxRootSpanID: braintrust.F("string"),
-			MaxXactID:     braintrust.F("string"),
-			Version:       braintrust.F("string"),
+			MaxRootSpanID: braintrust.F("max_root_span_id"),
+			MaxXactID:     braintrust.F("max_xact_id"),
+			Version:       braintrust.F("version"),
 		},
 	)
 	if err != nil {
@@ -353,20 +353,20 @@ func TestExperimentInsert(t *testing.T) {
 					Tokens:           braintrust.F(int64(0)),
 				}),
 				Context: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceContext{
-					CallerFunctionname: braintrust.F("string"),
-					CallerFilename:     braintrust.F("string"),
+					CallerFunctionname: braintrust.F("caller_functionname"),
+					CallerFilename:     braintrust.F("caller_filename"),
 					CallerLineno:       braintrust.F(int64(0)),
 				}),
 				SpanAttributes: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributes{
-					Name: braintrust.F("string"),
+					Name: braintrust.F("name"),
 					Type: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesTypeLlm),
 				}),
-				ID:              braintrust.F("string"),
-				DatasetRecordID: braintrust.F("string"),
+				ID:              braintrust.F("id"),
+				DatasetRecordID: braintrust.F("dataset_record_id"),
 				Created:         braintrust.F(time.Now()),
 				ObjectDelete:    braintrust.F(true),
 				IsMerge:         braintrust.F(true),
-				ParentID:        braintrust.F("string"),
+				ParentID:        braintrust.F("_parent_id"),
 			}, braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
 				Output:   braintrust.F[any](map[string]interface{}{}),
@@ -386,20 +386,20 @@ func TestExperimentInsert(t *testing.T) {
 					Tokens:           braintrust.F(int64(0)),
 				}),
 				Context: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceContext{
-					CallerFunctionname: braintrust.F("string"),
-					CallerFilename:     braintrust.F("string"),
+					CallerFunctionname: braintrust.F("caller_functionname"),
+					CallerFilename:     braintrust.F("caller_filename"),
 					CallerLineno:       braintrust.F(int64(0)),
 				}),
 				SpanAttributes: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributes{
-					Name: braintrust.F("string"),
+					Name: braintrust.F("name"),
 					Type: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesTypeLlm),
 				}),
-				ID:              braintrust.F("string"),
-				DatasetRecordID: braintrust.F("string"),
+				ID:              braintrust.F("id"),
+				DatasetRecordID: braintrust.F("dataset_record_id"),
 				Created:         braintrust.F(time.Now()),
 				ObjectDelete:    braintrust.F(true),
 				IsMerge:         braintrust.F(true),
-				ParentID:        braintrust.F("string"),
+				ParentID:        braintrust.F("_parent_id"),
 			}, braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplace{
 				Input:    braintrust.F[any](map[string]interface{}{}),
 				Output:   braintrust.F[any](map[string]interface{}{}),
@@ -419,20 +419,20 @@ func TestExperimentInsert(t *testing.T) {
 					Tokens:           braintrust.F(int64(0)),
 				}),
 				Context: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceContext{
-					CallerFunctionname: braintrust.F("string"),
-					CallerFilename:     braintrust.F("string"),
+					CallerFunctionname: braintrust.F("caller_functionname"),
+					CallerFilename:     braintrust.F("caller_filename"),
 					CallerLineno:       braintrust.F(int64(0)),
 				}),
 				SpanAttributes: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributes{
-					Name: braintrust.F("string"),
+					Name: braintrust.F("name"),
 					Type: braintrust.F(braintrust.ExperimentInsertParamsEventsInsertExperimentEventReplaceSpanAttributesTypeLlm),
 				}),
-				ID:              braintrust.F("string"),
-				DatasetRecordID: braintrust.F("string"),
+				ID:              braintrust.F("id"),
+				DatasetRecordID: braintrust.F("dataset_record_id"),
 				Created:         braintrust.F(time.Now()),
 				ObjectDelete:    braintrust.F(true),
 				IsMerge:         braintrust.F(true),
-				ParentID:        braintrust.F("string"),
+				ParentID:        braintrust.F("_parent_id"),
 			}}),
 		},
 	)
