@@ -27,7 +27,7 @@ func TestViewNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.View.New(context.TODO(), braintrust.ViewNewParams{
+	_, err := client.Views.New(context.TODO(), braintrust.ViewNewParams{
 		Name:       braintrust.F("name"),
 		ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ObjectType: braintrust.F(braintrust.ViewNewParamsObjectTypeOrganization),
@@ -73,7 +73,7 @@ func TestViewGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.View.Get(
+	_, err := client.Views.Get(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ViewGetParams{
@@ -102,7 +102,7 @@ func TestViewUpdateWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.View.Update(
+	_, err := client.Views.Update(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ViewUpdateParams{
@@ -151,7 +151,7 @@ func TestViewListWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.View.List(context.TODO(), braintrust.ViewListParams{
+	_, err := client.Views.List(context.TODO(), braintrust.ViewListParams{
 		ObjectID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ObjectType:    braintrust.F(braintrust.ViewListParamsObjectTypeOrganization),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
@@ -183,7 +183,7 @@ func TestViewDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.View.Delete(
+	_, err := client.Views.Delete(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ViewDeleteParams{
@@ -212,7 +212,7 @@ func TestViewReplaceWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.View.Replace(context.TODO(), braintrust.ViewReplaceParams{
+	_, err := client.Views.Replace(context.TODO(), braintrust.ViewReplaceParams{
 		Name:       braintrust.F("name"),
 		ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ObjectType: braintrust.F(braintrust.ViewReplaceParamsObjectTypeOrganization),

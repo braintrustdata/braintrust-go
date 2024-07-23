@@ -26,7 +26,7 @@ func TestFunctionNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Function.New(context.TODO(), braintrust.FunctionNewParams{
+	_, err := client.Functions.New(context.TODO(), braintrust.FunctionNewParams{
 		FunctionData: braintrust.F[braintrust.FunctionNewParamsFunctionDataUnion](braintrust.FunctionNewParamsFunctionDataObject{
 			Type: braintrust.F(braintrust.FunctionNewParamsFunctionDataObjectTypePrompt),
 		}),
@@ -87,7 +87,7 @@ func TestFunctionGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Function.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.Functions.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -109,7 +109,7 @@ func TestFunctionUpdateWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Function.Update(
+	_, err := client.Functions.Update(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.FunctionUpdateParams{
@@ -172,7 +172,7 @@ func TestFunctionListWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Function.List(context.TODO(), braintrust.FunctionListParams{
+	_, err := client.Functions.List(context.TODO(), braintrust.FunctionListParams{
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		FunctionName:  braintrust.F("function_name"),
 		IDs:           braintrust.F[braintrust.FunctionListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
@@ -204,7 +204,7 @@ func TestFunctionDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Function.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.Functions.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -226,7 +226,7 @@ func TestFunctionFeedback(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	err := client.Function.Feedback(
+	err := client.Functions.Feedback(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.FunctionFeedbackParams{
@@ -275,7 +275,7 @@ func TestFunctionReplaceWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Function.Replace(context.TODO(), braintrust.FunctionReplaceParams{
+	_, err := client.Functions.Replace(context.TODO(), braintrust.FunctionReplaceParams{
 		FunctionData: braintrust.F[braintrust.FunctionReplaceParamsFunctionDataUnion](braintrust.FunctionReplaceParamsFunctionDataObject{
 			Type: braintrust.F(braintrust.FunctionReplaceParamsFunctionDataObjectTypePrompt),
 		}),
