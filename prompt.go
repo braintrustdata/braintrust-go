@@ -318,6 +318,7 @@ func (r promptPromptDataOptionsParamsJSON) RawJSON() string {
 }
 
 func (r *PromptPromptDataOptionsParams) UnmarshalJSON(data []byte) (err error) {
+	*r = PromptPromptDataOptionsParams{}
 	err = apijson.UnmarshalRoot(data, &r.union)
 	if err != nil {
 		return err
@@ -670,6 +671,7 @@ func (r promptPromptDataPromptJSON) RawJSON() string {
 }
 
 func (r *PromptPromptDataPrompt) UnmarshalJSON(data []byte) (err error) {
+	*r = PromptPromptDataPrompt{}
 	err = apijson.UnmarshalRoot(data, &r.union)
 	if err != nil {
 		return err
