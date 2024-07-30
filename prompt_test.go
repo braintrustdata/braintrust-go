@@ -38,18 +38,18 @@ func TestPromptNewWithOptionalParams(t *testing.T) {
 			}),
 			Options: braintrust.F(braintrust.PromptNewParamsPromptDataOptions{
 				Model: braintrust.F("model"),
-				Params: braintrust.F[braintrust.PromptNewParamsPromptDataOptionsParamsUnion](braintrust.PromptNewParamsPromptDataOptionsParamsObject{
+				Params: braintrust.F[braintrust.PromptNewParamsPromptDataOptionsParamsUnion](braintrust.PromptNewParamsPromptDataOptionsParamsOpenAIModelParams{
 					UseCache:         braintrust.F(true),
 					Temperature:      braintrust.F(0.000000),
 					TopP:             braintrust.F(0.000000),
 					MaxTokens:        braintrust.F(0.000000),
 					FrequencyPenalty: braintrust.F(0.000000),
 					PresencePenalty:  braintrust.F(0.000000),
-					ResponseFormat: braintrust.F(braintrust.PromptNewParamsPromptDataOptionsParamsObjectResponseFormat{
-						Type: braintrust.F(braintrust.PromptNewParamsPromptDataOptionsParamsObjectResponseFormatTypeJsonObject),
+					ResponseFormat: braintrust.F(braintrust.PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormat{
+						Type: braintrust.F(braintrust.PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject),
 					}),
-					ToolChoice:   braintrust.F[braintrust.PromptNewParamsPromptDataOptionsParamsObjectToolChoiceUnion](braintrust.PromptNewParamsPromptDataOptionsParamsObjectToolChoiceString(braintrust.PromptNewParamsPromptDataOptionsParamsObjectToolChoiceStringAuto)),
-					FunctionCall: braintrust.F[braintrust.PromptNewParamsPromptDataOptionsParamsObjectFunctionCallUnion](braintrust.PromptNewParamsPromptDataOptionsParamsObjectFunctionCallString(braintrust.PromptNewParamsPromptDataOptionsParamsObjectFunctionCallStringAuto)),
+					ToolChoice:   braintrust.F[braintrust.PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion](braintrust.PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceString(braintrust.PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceStringAuto)),
+					FunctionCall: braintrust.F[braintrust.PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion](braintrust.PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallString(braintrust.PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallStringAuto)),
 					N:            braintrust.F(0.000000),
 					Stop:         braintrust.F([]string{"string", "string", "string"}),
 				}),
@@ -119,18 +119,18 @@ func TestPromptUpdateWithOptionalParams(t *testing.T) {
 				}),
 				Options: braintrust.F(braintrust.PromptUpdateParamsPromptDataOptions{
 					Model: braintrust.F("model"),
-					Params: braintrust.F[braintrust.PromptUpdateParamsPromptDataOptionsParamsUnion](braintrust.PromptUpdateParamsPromptDataOptionsParamsObject{
+					Params: braintrust.F[braintrust.PromptUpdateParamsPromptDataOptionsParamsUnion](braintrust.PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParams{
 						UseCache:         braintrust.F(true),
 						Temperature:      braintrust.F(0.000000),
 						TopP:             braintrust.F(0.000000),
 						MaxTokens:        braintrust.F(0.000000),
 						FrequencyPenalty: braintrust.F(0.000000),
 						PresencePenalty:  braintrust.F(0.000000),
-						ResponseFormat: braintrust.F(braintrust.PromptUpdateParamsPromptDataOptionsParamsObjectResponseFormat{
-							Type: braintrust.F(braintrust.PromptUpdateParamsPromptDataOptionsParamsObjectResponseFormatTypeJsonObject),
+						ResponseFormat: braintrust.F(braintrust.PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormat{
+							Type: braintrust.F(braintrust.PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject),
 						}),
-						ToolChoice:   braintrust.F[braintrust.PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceUnion](braintrust.PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceString(braintrust.PromptUpdateParamsPromptDataOptionsParamsObjectToolChoiceStringAuto)),
-						FunctionCall: braintrust.F[braintrust.PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallUnion](braintrust.PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallString(braintrust.PromptUpdateParamsPromptDataOptionsParamsObjectFunctionCallStringAuto)),
+						ToolChoice:   braintrust.F[braintrust.PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion](braintrust.PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceString(braintrust.PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceStringAuto)),
+						FunctionCall: braintrust.F[braintrust.PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion](braintrust.PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallString(braintrust.PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallStringAuto)),
 						N:            braintrust.F(0.000000),
 						Stop:         braintrust.F([]string{"string", "string", "string"}),
 					}),
@@ -208,55 +208,6 @@ func TestPromptDelete(t *testing.T) {
 	}
 }
 
-func TestPromptFeedback(t *testing.T) {
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := braintrust.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-	)
-	err := client.Prompts.Feedback(
-		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		braintrust.PromptFeedbackParams{
-			Feedback: braintrust.F([]braintrust.PromptFeedbackParamsFeedback{{
-				ID:      braintrust.F("id"),
-				Comment: braintrust.F("comment"),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": map[string]interface{}{},
-				}),
-				Source: braintrust.F(braintrust.PromptFeedbackParamsFeedbackSourceApp),
-			}, {
-				ID:      braintrust.F("id"),
-				Comment: braintrust.F("comment"),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": map[string]interface{}{},
-				}),
-				Source: braintrust.F(braintrust.PromptFeedbackParamsFeedbackSourceApp),
-			}, {
-				ID:      braintrust.F("id"),
-				Comment: braintrust.F("comment"),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": map[string]interface{}{},
-				}),
-				Source: braintrust.F(braintrust.PromptFeedbackParamsFeedbackSourceApp),
-			}}),
-		},
-	)
-	if err != nil {
-		var apierr *braintrust.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
 func TestPromptReplaceWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -281,18 +232,18 @@ func TestPromptReplaceWithOptionalParams(t *testing.T) {
 			}),
 			Options: braintrust.F(braintrust.PromptReplaceParamsPromptDataOptions{
 				Model: braintrust.F("model"),
-				Params: braintrust.F[braintrust.PromptReplaceParamsPromptDataOptionsParamsUnion](braintrust.PromptReplaceParamsPromptDataOptionsParamsObject{
+				Params: braintrust.F[braintrust.PromptReplaceParamsPromptDataOptionsParamsUnion](braintrust.PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParams{
 					UseCache:         braintrust.F(true),
 					Temperature:      braintrust.F(0.000000),
 					TopP:             braintrust.F(0.000000),
 					MaxTokens:        braintrust.F(0.000000),
 					FrequencyPenalty: braintrust.F(0.000000),
 					PresencePenalty:  braintrust.F(0.000000),
-					ResponseFormat: braintrust.F(braintrust.PromptReplaceParamsPromptDataOptionsParamsObjectResponseFormat{
-						Type: braintrust.F(braintrust.PromptReplaceParamsPromptDataOptionsParamsObjectResponseFormatTypeJsonObject),
+					ResponseFormat: braintrust.F(braintrust.PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormat{
+						Type: braintrust.F(braintrust.PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject),
 					}),
-					ToolChoice:   braintrust.F[braintrust.PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceUnion](braintrust.PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceString(braintrust.PromptReplaceParamsPromptDataOptionsParamsObjectToolChoiceStringAuto)),
-					FunctionCall: braintrust.F[braintrust.PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallUnion](braintrust.PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallString(braintrust.PromptReplaceParamsPromptDataOptionsParamsObjectFunctionCallStringAuto)),
+					ToolChoice:   braintrust.F[braintrust.PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion](braintrust.PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceString(braintrust.PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceStringAuto)),
+					FunctionCall: braintrust.F[braintrust.PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion](braintrust.PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallString(braintrust.PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallStringAuto)),
 					N:            braintrust.F(0.000000),
 					Stop:         braintrust.F([]string{"string", "string", "string"}),
 				}),

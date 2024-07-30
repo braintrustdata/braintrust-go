@@ -26,6 +26,7 @@ import (
 // the [NewOrganizationService] method instead.
 type OrganizationService struct {
 	Options []option.RequestOption
+	Members *OrganizationMemberService
 }
 
 // NewOrganizationService generates a new service that applies the given options to
@@ -34,6 +35,7 @@ type OrganizationService struct {
 func NewOrganizationService(opts ...option.RequestOption) (r *OrganizationService) {
 	r = &OrganizationService{}
 	r.Options = opts
+	r.Members = NewOrganizationMemberService(opts...)
 	return
 }
 
@@ -107,22 +109,24 @@ type Organization struct {
 	Name   string `json:"name,required"`
 	APIURL string `json:"api_url,nullable"`
 	// Date of organization creation
-	Created     time.Time        `json:"created,nullable" format:"date-time"`
-	ProxyURL    string           `json:"proxy_url,nullable"`
-	RealtimeURL string           `json:"realtime_url,nullable"`
-	JSON        organizationJSON `json:"-"`
+	Created        time.Time        `json:"created,nullable" format:"date-time"`
+	IsUniversalAPI bool             `json:"is_universal_api,nullable"`
+	ProxyURL       string           `json:"proxy_url,nullable"`
+	RealtimeURL    string           `json:"realtime_url,nullable"`
+	JSON           organizationJSON `json:"-"`
 }
 
 // organizationJSON contains the JSON metadata for the struct [Organization]
 type organizationJSON struct {
-	ID          apijson.Field
-	Name        apijson.Field
-	APIURL      apijson.Field
-	Created     apijson.Field
-	ProxyURL    apijson.Field
-	RealtimeURL apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
+	ID             apijson.Field
+	Name           apijson.Field
+	APIURL         apijson.Field
+	Created        apijson.Field
+	IsUniversalAPI apijson.Field
+	ProxyURL       apijson.Field
+	RealtimeURL    apijson.Field
+	raw            string
+	ExtraFields    map[string]apijson.Field
 }
 
 func (r *Organization) UnmarshalJSON(data []byte) (err error) {
@@ -134,7 +138,8 @@ func (r organizationJSON) RawJSON() string {
 }
 
 type OrganizationUpdateParams struct {
-	APIURL param.Field[string] `json:"api_url"`
+	APIURL         param.Field[string] `json:"api_url"`
+	IsUniversalAPI param.Field[bool]   `json:"is_universal_api"`
 	// Name of the organization
 	Name        param.Field[string] `json:"name"`
 	ProxyURL    param.Field[string] `json:"proxy_url"`
