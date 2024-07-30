@@ -192,8 +192,7 @@ func (r ProjectScoreScoreType) IsKnown() bool {
 // For categorical-type project scores, the list of all categories
 //
 // Union satisfied by [ProjectScoreCategoriesCategorical],
-// [ProjectScoreCategoriesWeighted], [ProjectScoreCategoriesMinimum] or
-// [ProjectScoreCategoriesNullableVariant].
+// [ProjectScoreCategoriesMinimum] or [ProjectScoreCategoriesNullableVariant].
 type ProjectScoreCategoriesUnion interface {
 	implementsProjectScoreCategoriesUnion()
 }
@@ -246,10 +245,6 @@ func (r *ProjectScoreCategoriesCategoricalItem) UnmarshalJSON(data []byte) (err 
 func (r projectScoreCategoriesCategoricalItemJSON) RawJSON() string {
 	return r.raw
 }
-
-type ProjectScoreCategoriesWeighted map[string]float64
-
-func (r ProjectScoreCategoriesWeighted) implementsProjectScoreCategoriesUnion() {}
 
 type ProjectScoreCategoriesMinimum []string
 
