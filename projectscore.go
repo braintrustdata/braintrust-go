@@ -389,7 +389,6 @@ func (r ProjectScoreUpdateParams) MarshalJSON() (data []byte, err error) {
 // For categorical-type project scores, the list of all categories
 //
 // Satisfied by [ProjectScoreUpdateParamsCategoriesCategorical],
-// [ProjectScoreUpdateParamsCategoriesWeighted],
 // [ProjectScoreUpdateParamsCategoriesMinimum],
 // [ProjectScoreUpdateParamsCategoriesNullableVariant].
 type ProjectScoreUpdateParamsCategoriesUnion interface {
@@ -399,11 +398,6 @@ type ProjectScoreUpdateParamsCategoriesUnion interface {
 type ProjectScoreUpdateParamsCategoriesCategorical []ProjectScoreUpdateParamsCategoriesCategorical
 
 func (r ProjectScoreUpdateParamsCategoriesCategorical) implementsProjectScoreUpdateParamsCategoriesUnion() {
-}
-
-type ProjectScoreUpdateParamsCategoriesWeighted map[string]float64
-
-func (r ProjectScoreUpdateParamsCategoriesWeighted) implementsProjectScoreUpdateParamsCategoriesUnion() {
 }
 
 type ProjectScoreUpdateParamsCategoriesMinimum []string
