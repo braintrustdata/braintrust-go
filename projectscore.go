@@ -351,7 +351,6 @@ func (r ProjectScoreNewParamsScoreType) IsKnown() bool {
 // For categorical-type project scores, the list of all categories
 //
 // Satisfied by [ProjectScoreNewParamsCategoriesCategorical],
-// [ProjectScoreNewParamsCategoriesWeighted],
 // [ProjectScoreNewParamsCategoriesMinimum],
 // [ProjectScoreNewParamsCategoriesNullableVariant].
 type ProjectScoreNewParamsCategoriesUnion interface {
@@ -362,10 +361,6 @@ type ProjectScoreNewParamsCategoriesCategorical []ProjectScoreNewParamsCategorie
 
 func (r ProjectScoreNewParamsCategoriesCategorical) implementsProjectScoreNewParamsCategoriesUnion() {
 }
-
-type ProjectScoreNewParamsCategoriesWeighted map[string]float64
-
-func (r ProjectScoreNewParamsCategoriesWeighted) implementsProjectScoreNewParamsCategoriesUnion() {}
 
 type ProjectScoreNewParamsCategoriesMinimum []string
 
@@ -533,7 +528,6 @@ func (r ProjectScoreReplaceParamsScoreType) IsKnown() bool {
 // For categorical-type project scores, the list of all categories
 //
 // Satisfied by [ProjectScoreReplaceParamsCategoriesCategorical],
-// [ProjectScoreReplaceParamsCategoriesWeighted],
 // [ProjectScoreReplaceParamsCategoriesMinimum],
 // [ProjectScoreReplaceParamsCategoriesNullableVariant].
 type ProjectScoreReplaceParamsCategoriesUnion interface {
@@ -543,11 +537,6 @@ type ProjectScoreReplaceParamsCategoriesUnion interface {
 type ProjectScoreReplaceParamsCategoriesCategorical []ProjectScoreReplaceParamsCategoriesCategorical
 
 func (r ProjectScoreReplaceParamsCategoriesCategorical) implementsProjectScoreReplaceParamsCategoriesUnion() {
-}
-
-type ProjectScoreReplaceParamsCategoriesWeighted map[string]float64
-
-func (r ProjectScoreReplaceParamsCategoriesWeighted) implementsProjectScoreReplaceParamsCategoriesUnion() {
 }
 
 type ProjectScoreReplaceParamsCategoriesMinimum []string
