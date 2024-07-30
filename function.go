@@ -808,13 +808,13 @@ func (r *FunctionPromptDataPrompt) UnmarshalJSON(data []byte) (err error) {
 // to the specific types for more type safety.
 //
 // Possible runtime types of the union are [FunctionPromptDataPromptCompletion],
-// [FunctionPromptDataPromptChat], [FunctionPromptDataPromptObject].
+// [FunctionPromptDataPromptChat], [FunctionPromptDataPromptNullVariant].
 func (r FunctionPromptDataPrompt) AsUnion() FunctionPromptDataPromptUnion {
 	return r.union
 }
 
 // Union satisfied by [FunctionPromptDataPromptCompletion],
-// [FunctionPromptDataPromptChat] or [FunctionPromptDataPromptObject].
+// [FunctionPromptDataPromptChat] or [FunctionPromptDataPromptNullVariant].
 type FunctionPromptDataPromptUnion interface {
 	implementsFunctionPromptDataPrompt()
 }
@@ -833,7 +833,7 @@ func init() {
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(FunctionPromptDataPromptObject{}),
+			Type:       reflect.TypeOf(FunctionPromptDataPromptNullVariant{}),
 		},
 	)
 }
@@ -1076,26 +1076,26 @@ func (r FunctionPromptDataPromptChatType) IsKnown() bool {
 	return false
 }
 
-type FunctionPromptDataPromptObject struct {
-	JSON functionPromptDataPromptObjectJSON `json:"-"`
+type FunctionPromptDataPromptNullVariant struct {
+	JSON functionPromptDataPromptNullVariantJSON `json:"-"`
 }
 
-// functionPromptDataPromptObjectJSON contains the JSON metadata for the struct
-// [FunctionPromptDataPromptObject]
-type functionPromptDataPromptObjectJSON struct {
+// functionPromptDataPromptNullVariantJSON contains the JSON metadata for the
+// struct [FunctionPromptDataPromptNullVariant]
+type functionPromptDataPromptNullVariantJSON struct {
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *FunctionPromptDataPromptObject) UnmarshalJSON(data []byte) (err error) {
+func (r *FunctionPromptDataPromptNullVariant) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r functionPromptDataPromptObjectJSON) RawJSON() string {
+func (r functionPromptDataPromptNullVariantJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r FunctionPromptDataPromptObject) implementsFunctionPromptDataPrompt() {}
+func (r FunctionPromptDataPromptNullVariant) implementsFunctionPromptDataPrompt() {}
 
 type FunctionPromptDataPromptType string
 
@@ -1411,7 +1411,8 @@ func (r FunctionNewParamsPromptDataPrompt) implementsFunctionNewParamsPromptData
 
 // Satisfied by [FunctionNewParamsPromptDataPromptCompletion],
 // [FunctionNewParamsPromptDataPromptChat],
-// [FunctionNewParamsPromptDataPromptObject], [FunctionNewParamsPromptDataPrompt].
+// [FunctionNewParamsPromptDataPromptNullVariant],
+// [FunctionNewParamsPromptDataPrompt].
 type FunctionNewParamsPromptDataPromptUnion interface {
 	implementsFunctionNewParamsPromptDataPromptUnion()
 }
@@ -1541,14 +1542,15 @@ func (r FunctionNewParamsPromptDataPromptChatType) IsKnown() bool {
 	return false
 }
 
-type FunctionNewParamsPromptDataPromptObject struct {
+type FunctionNewParamsPromptDataPromptNullVariant struct {
 }
 
-func (r FunctionNewParamsPromptDataPromptObject) MarshalJSON() (data []byte, err error) {
+func (r FunctionNewParamsPromptDataPromptNullVariant) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r FunctionNewParamsPromptDataPromptObject) implementsFunctionNewParamsPromptDataPromptUnion() {}
+func (r FunctionNewParamsPromptDataPromptNullVariant) implementsFunctionNewParamsPromptDataPromptUnion() {
+}
 
 type FunctionNewParamsPromptDataPromptType string
 
@@ -1863,7 +1865,7 @@ func (r FunctionUpdateParamsPromptDataPrompt) implementsFunctionUpdateParamsProm
 
 // Satisfied by [FunctionUpdateParamsPromptDataPromptCompletion],
 // [FunctionUpdateParamsPromptDataPromptChat],
-// [FunctionUpdateParamsPromptDataPromptObject],
+// [FunctionUpdateParamsPromptDataPromptNullVariant],
 // [FunctionUpdateParamsPromptDataPrompt].
 type FunctionUpdateParamsPromptDataPromptUnion interface {
 	implementsFunctionUpdateParamsPromptDataPromptUnion()
@@ -1995,14 +1997,14 @@ func (r FunctionUpdateParamsPromptDataPromptChatType) IsKnown() bool {
 	return false
 }
 
-type FunctionUpdateParamsPromptDataPromptObject struct {
+type FunctionUpdateParamsPromptDataPromptNullVariant struct {
 }
 
-func (r FunctionUpdateParamsPromptDataPromptObject) MarshalJSON() (data []byte, err error) {
+func (r FunctionUpdateParamsPromptDataPromptNullVariant) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r FunctionUpdateParamsPromptDataPromptObject) implementsFunctionUpdateParamsPromptDataPromptUnion() {
+func (r FunctionUpdateParamsPromptDataPromptNullVariant) implementsFunctionUpdateParamsPromptDataPromptUnion() {
 }
 
 type FunctionUpdateParamsPromptDataPromptType string
@@ -2418,7 +2420,7 @@ func (r FunctionReplaceParamsPromptDataPrompt) implementsFunctionReplaceParamsPr
 
 // Satisfied by [FunctionReplaceParamsPromptDataPromptCompletion],
 // [FunctionReplaceParamsPromptDataPromptChat],
-// [FunctionReplaceParamsPromptDataPromptObject],
+// [FunctionReplaceParamsPromptDataPromptNullVariant],
 // [FunctionReplaceParamsPromptDataPrompt].
 type FunctionReplaceParamsPromptDataPromptUnion interface {
 	implementsFunctionReplaceParamsPromptDataPromptUnion()
@@ -2550,14 +2552,14 @@ func (r FunctionReplaceParamsPromptDataPromptChatType) IsKnown() bool {
 	return false
 }
 
-type FunctionReplaceParamsPromptDataPromptObject struct {
+type FunctionReplaceParamsPromptDataPromptNullVariant struct {
 }
 
-func (r FunctionReplaceParamsPromptDataPromptObject) MarshalJSON() (data []byte, err error) {
+func (r FunctionReplaceParamsPromptDataPromptNullVariant) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r FunctionReplaceParamsPromptDataPromptObject) implementsFunctionReplaceParamsPromptDataPromptUnion() {
+func (r FunctionReplaceParamsPromptDataPromptNullVariant) implementsFunctionReplaceParamsPromptDataPromptUnion() {
 }
 
 type FunctionReplaceParamsPromptDataPromptType string
