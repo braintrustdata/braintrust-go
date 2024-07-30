@@ -150,9 +150,14 @@ Methods:
 
 # ProjectScores
 
+Params Types:
+
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ProjectScoreCategoryParam">ProjectScoreCategoryParam</a>
+
 Response Types:
 
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ProjectScore">ProjectScore</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ProjectScoreCategory">ProjectScoreCategory</a>
 
 Methods:
 
