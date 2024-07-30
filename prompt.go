@@ -682,13 +682,13 @@ func (r *PromptPromptDataPrompt) UnmarshalJSON(data []byte) (err error) {
 // AsUnion returns a [PromptPromptDataPromptUnion] interface which you can cast to
 // the specific types for more type safety.
 //
-// Possible runtime types of the union are [PromptPromptDataPromptObject],
+// Possible runtime types of the union are [PromptPromptDataPromptCompletion],
 // [PromptPromptDataPromptObject], [PromptPromptDataPromptObject].
 func (r PromptPromptDataPrompt) AsUnion() PromptPromptDataPromptUnion {
 	return r.union
 }
 
-// Union satisfied by [PromptPromptDataPromptObject],
+// Union satisfied by [PromptPromptDataPromptCompletion],
 // [PromptPromptDataPromptObject] or [PromptPromptDataPromptObject].
 type PromptPromptDataPromptUnion interface {
 	implementsPromptPromptDataPrompt()
@@ -700,7 +700,7 @@ func init() {
 		"",
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataPromptObject{}),
+			Type:       reflect.TypeOf(PromptPromptDataPromptCompletion{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
@@ -713,17 +713,58 @@ func init() {
 	)
 }
 
+type PromptPromptDataPromptCompletion struct {
+	Content string                               `json:"content,required"`
+	Type    PromptPromptDataPromptCompletionType `json:"type,required"`
+	JSON    promptPromptDataPromptCompletionJSON `json:"-"`
+}
+
+// promptPromptDataPromptCompletionJSON contains the JSON metadata for the struct
+// [PromptPromptDataPromptCompletion]
+type promptPromptDataPromptCompletionJSON struct {
+	Content     apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptPromptDataPromptCompletion) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptPromptDataPromptCompletionJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptPromptDataPromptCompletion) implementsPromptPromptDataPrompt() {}
+
+type PromptPromptDataPromptCompletionType string
+
+const (
+	PromptPromptDataPromptCompletionTypeCompletion PromptPromptDataPromptCompletionType = "completion"
+)
+
+func (r PromptPromptDataPromptCompletionType) IsKnown() bool {
+	switch r {
+	case PromptPromptDataPromptCompletionTypeCompletion:
+		return true
+	}
+	return false
+}
+
 type PromptPromptDataPromptObject struct {
-	Content string                           `json:"content,required"`
-	Type    PromptPromptDataPromptObjectType `json:"type,required"`
-	JSON    promptPromptDataPromptObjectJSON `json:"-"`
+	Messages []PromptPromptDataPromptObjectMessage `json:"messages,required"`
+	Type     PromptPromptDataPromptObjectType      `json:"type,required"`
+	Tools    string                                `json:"tools"`
+	JSON     promptPromptDataPromptObjectJSON      `json:"-"`
 }
 
 // promptPromptDataPromptObjectJSON contains the JSON metadata for the struct
 // [PromptPromptDataPromptObject]
 type promptPromptDataPromptObjectJSON struct {
-	Content     apijson.Field
+	Messages    apijson.Field
 	Type        apijson.Field
+	Tools       apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
@@ -738,15 +779,173 @@ func (r promptPromptDataPromptObjectJSON) RawJSON() string {
 
 func (r PromptPromptDataPromptObject) implementsPromptPromptDataPrompt() {}
 
+type PromptPromptDataPromptObjectMessage struct {
+	// This field can have the runtime type of [string],
+	// [PromptPromptDataPromptObjectMessagesObjectContentUnion].
+	Content interface{}                              `json:"content,required"`
+	Role    PromptPromptDataPromptObjectMessagesRole `json:"role,required"`
+	Name    string                                   `json:"name"`
+	// This field can have the runtime type of
+	// [PromptPromptDataPromptObjectMessagesObjectFunctionCall].
+	FunctionCall interface{} `json:"function_call,required"`
+	// This field can have the runtime type of
+	// [[]PromptPromptDataPromptObjectMessagesObjectToolCall].
+	ToolCalls  interface{}                             `json:"tool_calls,required"`
+	ToolCallID string                                  `json:"tool_call_id"`
+	JSON       promptPromptDataPromptObjectMessageJSON `json:"-"`
+	union      PromptPromptDataPromptObjectMessagesUnion
+}
+
+// promptPromptDataPromptObjectMessageJSON contains the JSON metadata for the
+// struct [PromptPromptDataPromptObjectMessage]
+type promptPromptDataPromptObjectMessageJSON struct {
+	Content      apijson.Field
+	Role         apijson.Field
+	Name         apijson.Field
+	FunctionCall apijson.Field
+	ToolCalls    apijson.Field
+	ToolCallID   apijson.Field
+	raw          string
+	ExtraFields  map[string]apijson.Field
+}
+
+func (r promptPromptDataPromptObjectMessageJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r *PromptPromptDataPromptObjectMessage) UnmarshalJSON(data []byte) (err error) {
+	*r = PromptPromptDataPromptObjectMessage{}
+	err = apijson.UnmarshalRoot(data, &r.union)
+	if err != nil {
+		return err
+	}
+	return apijson.Port(r.union, &r)
+}
+
+// AsUnion returns a [PromptPromptDataPromptObjectMessagesUnion] interface which
+// you can cast to the specific types for more type safety.
+//
+// Possible runtime types of the union are
+// [PromptPromptDataPromptObjectMessagesObject],
+// [PromptPromptDataPromptObjectMessagesObject],
+// [PromptPromptDataPromptObjectMessagesObject],
+// [PromptPromptDataPromptObjectMessagesObject],
+// [PromptPromptDataPromptObjectMessagesObject],
+// [PromptPromptDataPromptObjectMessagesObject].
+func (r PromptPromptDataPromptObjectMessage) AsUnion() PromptPromptDataPromptObjectMessagesUnion {
+	return r.union
+}
+
+// Union satisfied by [PromptPromptDataPromptObjectMessagesObject],
+// [PromptPromptDataPromptObjectMessagesObject],
+// [PromptPromptDataPromptObjectMessagesObject],
+// [PromptPromptDataPromptObjectMessagesObject],
+// [PromptPromptDataPromptObjectMessagesObject] or
+// [PromptPromptDataPromptObjectMessagesObject].
+type PromptPromptDataPromptObjectMessagesUnion interface {
+	implementsPromptPromptDataPromptObjectMessage()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*PromptPromptDataPromptObjectMessagesUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptPromptDataPromptObjectMessagesObject{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptPromptDataPromptObjectMessagesObject{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptPromptDataPromptObjectMessagesObject{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptPromptDataPromptObjectMessagesObject{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptPromptDataPromptObjectMessagesObject{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptPromptDataPromptObjectMessagesObject{}),
+		},
+	)
+}
+
+type PromptPromptDataPromptObjectMessagesObject struct {
+	Role    PromptPromptDataPromptObjectMessagesObjectRole `json:"role,required"`
+	Content string                                         `json:"content"`
+	Name    string                                         `json:"name"`
+	JSON    promptPromptDataPromptObjectMessagesObjectJSON `json:"-"`
+}
+
+// promptPromptDataPromptObjectMessagesObjectJSON contains the JSON metadata for
+// the struct [PromptPromptDataPromptObjectMessagesObject]
+type promptPromptDataPromptObjectMessagesObjectJSON struct {
+	Role        apijson.Field
+	Content     apijson.Field
+	Name        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptPromptDataPromptObjectMessagesObject) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptPromptDataPromptObjectMessagesObjectJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptPromptDataPromptObjectMessagesObject) implementsPromptPromptDataPromptObjectMessage() {}
+
+type PromptPromptDataPromptObjectMessagesObjectRole string
+
+const (
+	PromptPromptDataPromptObjectMessagesObjectRoleSystem PromptPromptDataPromptObjectMessagesObjectRole = "system"
+)
+
+func (r PromptPromptDataPromptObjectMessagesObjectRole) IsKnown() bool {
+	switch r {
+	case PromptPromptDataPromptObjectMessagesObjectRoleSystem:
+		return true
+	}
+	return false
+}
+
+type PromptPromptDataPromptObjectMessagesRole string
+
+const (
+	PromptPromptDataPromptObjectMessagesRoleSystem    PromptPromptDataPromptObjectMessagesRole = "system"
+	PromptPromptDataPromptObjectMessagesRoleUser      PromptPromptDataPromptObjectMessagesRole = "user"
+	PromptPromptDataPromptObjectMessagesRoleAssistant PromptPromptDataPromptObjectMessagesRole = "assistant"
+	PromptPromptDataPromptObjectMessagesRoleTool      PromptPromptDataPromptObjectMessagesRole = "tool"
+	PromptPromptDataPromptObjectMessagesRoleFunction  PromptPromptDataPromptObjectMessagesRole = "function"
+	PromptPromptDataPromptObjectMessagesRoleModel     PromptPromptDataPromptObjectMessagesRole = "model"
+)
+
+func (r PromptPromptDataPromptObjectMessagesRole) IsKnown() bool {
+	switch r {
+	case PromptPromptDataPromptObjectMessagesRoleSystem, PromptPromptDataPromptObjectMessagesRoleUser, PromptPromptDataPromptObjectMessagesRoleAssistant, PromptPromptDataPromptObjectMessagesRoleTool, PromptPromptDataPromptObjectMessagesRoleFunction, PromptPromptDataPromptObjectMessagesRoleModel:
+		return true
+	}
+	return false
+}
+
 type PromptPromptDataPromptObjectType string
 
 const (
-	PromptPromptDataPromptObjectTypeCompletion PromptPromptDataPromptObjectType = "completion"
+	PromptPromptDataPromptObjectTypeChat PromptPromptDataPromptObjectType = "chat"
 )
 
 func (r PromptPromptDataPromptObjectType) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptObjectTypeCompletion:
+	case PromptPromptDataPromptObjectTypeChat:
 		return true
 	}
 	return false
@@ -1004,16 +1203,42 @@ func (r PromptNewParamsPromptDataPrompt) MarshalJSON() (data []byte, err error) 
 
 func (r PromptNewParamsPromptDataPrompt) implementsPromptNewParamsPromptDataPromptUnion() {}
 
-// Satisfied by [PromptNewParamsPromptDataPromptObject],
+// Satisfied by [PromptNewParamsPromptDataPromptCompletion],
 // [PromptNewParamsPromptDataPromptObject],
 // [PromptNewParamsPromptDataPromptObject], [PromptNewParamsPromptDataPrompt].
 type PromptNewParamsPromptDataPromptUnion interface {
 	implementsPromptNewParamsPromptDataPromptUnion()
 }
 
+type PromptNewParamsPromptDataPromptCompletion struct {
+	Content param.Field[string]                                        `json:"content,required"`
+	Type    param.Field[PromptNewParamsPromptDataPromptCompletionType] `json:"type,required"`
+}
+
+func (r PromptNewParamsPromptDataPromptCompletion) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptNewParamsPromptDataPromptCompletion) implementsPromptNewParamsPromptDataPromptUnion() {}
+
+type PromptNewParamsPromptDataPromptCompletionType string
+
+const (
+	PromptNewParamsPromptDataPromptCompletionTypeCompletion PromptNewParamsPromptDataPromptCompletionType = "completion"
+)
+
+func (r PromptNewParamsPromptDataPromptCompletionType) IsKnown() bool {
+	switch r {
+	case PromptNewParamsPromptDataPromptCompletionTypeCompletion:
+		return true
+	}
+	return false
+}
+
 type PromptNewParamsPromptDataPromptObject struct {
-	Content param.Field[string]                                    `json:"content,required"`
-	Type    param.Field[PromptNewParamsPromptDataPromptObjectType] `json:"type,required"`
+	Messages param.Field[[]PromptNewParamsPromptDataPromptObjectMessageUnion] `json:"messages,required"`
+	Type     param.Field[PromptNewParamsPromptDataPromptObjectType]           `json:"type,required"`
+	Tools    param.Field[string]                                              `json:"tools"`
 }
 
 func (r PromptNewParamsPromptDataPromptObject) MarshalJSON() (data []byte, err error) {
@@ -1022,15 +1247,88 @@ func (r PromptNewParamsPromptDataPromptObject) MarshalJSON() (data []byte, err e
 
 func (r PromptNewParamsPromptDataPromptObject) implementsPromptNewParamsPromptDataPromptUnion() {}
 
+type PromptNewParamsPromptDataPromptObjectMessage struct {
+	Content      param.Field[interface{}]                                       `json:"content,required"`
+	Role         param.Field[PromptNewParamsPromptDataPromptObjectMessagesRole] `json:"role,required"`
+	Name         param.Field[string]                                            `json:"name"`
+	FunctionCall param.Field[interface{}]                                       `json:"function_call,required"`
+	ToolCalls    param.Field[interface{}]                                       `json:"tool_calls,required"`
+	ToolCallID   param.Field[string]                                            `json:"tool_call_id"`
+}
+
+func (r PromptNewParamsPromptDataPromptObjectMessage) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptNewParamsPromptDataPromptObjectMessage) implementsPromptNewParamsPromptDataPromptObjectMessageUnion() {
+}
+
+// Satisfied by [PromptNewParamsPromptDataPromptObjectMessagesObject],
+// [PromptNewParamsPromptDataPromptObjectMessagesObject],
+// [PromptNewParamsPromptDataPromptObjectMessagesObject],
+// [PromptNewParamsPromptDataPromptObjectMessagesObject],
+// [PromptNewParamsPromptDataPromptObjectMessagesObject],
+// [PromptNewParamsPromptDataPromptObjectMessagesObject],
+// [PromptNewParamsPromptDataPromptObjectMessage].
+type PromptNewParamsPromptDataPromptObjectMessageUnion interface {
+	implementsPromptNewParamsPromptDataPromptObjectMessageUnion()
+}
+
+type PromptNewParamsPromptDataPromptObjectMessagesObject struct {
+	Role    param.Field[PromptNewParamsPromptDataPromptObjectMessagesObjectRole] `json:"role,required"`
+	Content param.Field[string]                                                  `json:"content"`
+	Name    param.Field[string]                                                  `json:"name"`
+}
+
+func (r PromptNewParamsPromptDataPromptObjectMessagesObject) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptNewParamsPromptDataPromptObjectMessagesObject) implementsPromptNewParamsPromptDataPromptObjectMessageUnion() {
+}
+
+type PromptNewParamsPromptDataPromptObjectMessagesObjectRole string
+
+const (
+	PromptNewParamsPromptDataPromptObjectMessagesObjectRoleSystem PromptNewParamsPromptDataPromptObjectMessagesObjectRole = "system"
+)
+
+func (r PromptNewParamsPromptDataPromptObjectMessagesObjectRole) IsKnown() bool {
+	switch r {
+	case PromptNewParamsPromptDataPromptObjectMessagesObjectRoleSystem:
+		return true
+	}
+	return false
+}
+
+type PromptNewParamsPromptDataPromptObjectMessagesRole string
+
+const (
+	PromptNewParamsPromptDataPromptObjectMessagesRoleSystem    PromptNewParamsPromptDataPromptObjectMessagesRole = "system"
+	PromptNewParamsPromptDataPromptObjectMessagesRoleUser      PromptNewParamsPromptDataPromptObjectMessagesRole = "user"
+	PromptNewParamsPromptDataPromptObjectMessagesRoleAssistant PromptNewParamsPromptDataPromptObjectMessagesRole = "assistant"
+	PromptNewParamsPromptDataPromptObjectMessagesRoleTool      PromptNewParamsPromptDataPromptObjectMessagesRole = "tool"
+	PromptNewParamsPromptDataPromptObjectMessagesRoleFunction  PromptNewParamsPromptDataPromptObjectMessagesRole = "function"
+	PromptNewParamsPromptDataPromptObjectMessagesRoleModel     PromptNewParamsPromptDataPromptObjectMessagesRole = "model"
+)
+
+func (r PromptNewParamsPromptDataPromptObjectMessagesRole) IsKnown() bool {
+	switch r {
+	case PromptNewParamsPromptDataPromptObjectMessagesRoleSystem, PromptNewParamsPromptDataPromptObjectMessagesRoleUser, PromptNewParamsPromptDataPromptObjectMessagesRoleAssistant, PromptNewParamsPromptDataPromptObjectMessagesRoleTool, PromptNewParamsPromptDataPromptObjectMessagesRoleFunction, PromptNewParamsPromptDataPromptObjectMessagesRoleModel:
+		return true
+	}
+	return false
+}
+
 type PromptNewParamsPromptDataPromptObjectType string
 
 const (
-	PromptNewParamsPromptDataPromptObjectTypeCompletion PromptNewParamsPromptDataPromptObjectType = "completion"
+	PromptNewParamsPromptDataPromptObjectTypeChat PromptNewParamsPromptDataPromptObjectType = "chat"
 )
 
 func (r PromptNewParamsPromptDataPromptObjectType) IsKnown() bool {
 	switch r {
-	case PromptNewParamsPromptDataPromptObjectTypeCompletion:
+	case PromptNewParamsPromptDataPromptObjectTypeChat:
 		return true
 	}
 	return false
@@ -1285,7 +1583,7 @@ func (r PromptUpdateParamsPromptDataPrompt) MarshalJSON() (data []byte, err erro
 
 func (r PromptUpdateParamsPromptDataPrompt) implementsPromptUpdateParamsPromptDataPromptUnion() {}
 
-// Satisfied by [PromptUpdateParamsPromptDataPromptObject],
+// Satisfied by [PromptUpdateParamsPromptDataPromptCompletion],
 // [PromptUpdateParamsPromptDataPromptObject],
 // [PromptUpdateParamsPromptDataPromptObject],
 // [PromptUpdateParamsPromptDataPrompt].
@@ -1293,9 +1591,36 @@ type PromptUpdateParamsPromptDataPromptUnion interface {
 	implementsPromptUpdateParamsPromptDataPromptUnion()
 }
 
+type PromptUpdateParamsPromptDataPromptCompletion struct {
+	Content param.Field[string]                                           `json:"content,required"`
+	Type    param.Field[PromptUpdateParamsPromptDataPromptCompletionType] `json:"type,required"`
+}
+
+func (r PromptUpdateParamsPromptDataPromptCompletion) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptUpdateParamsPromptDataPromptCompletion) implementsPromptUpdateParamsPromptDataPromptUnion() {
+}
+
+type PromptUpdateParamsPromptDataPromptCompletionType string
+
+const (
+	PromptUpdateParamsPromptDataPromptCompletionTypeCompletion PromptUpdateParamsPromptDataPromptCompletionType = "completion"
+)
+
+func (r PromptUpdateParamsPromptDataPromptCompletionType) IsKnown() bool {
+	switch r {
+	case PromptUpdateParamsPromptDataPromptCompletionTypeCompletion:
+		return true
+	}
+	return false
+}
+
 type PromptUpdateParamsPromptDataPromptObject struct {
-	Content param.Field[string]                                       `json:"content,required"`
-	Type    param.Field[PromptUpdateParamsPromptDataPromptObjectType] `json:"type,required"`
+	Messages param.Field[[]PromptUpdateParamsPromptDataPromptObjectMessageUnion] `json:"messages,required"`
+	Type     param.Field[PromptUpdateParamsPromptDataPromptObjectType]           `json:"type,required"`
+	Tools    param.Field[string]                                                 `json:"tools"`
 }
 
 func (r PromptUpdateParamsPromptDataPromptObject) MarshalJSON() (data []byte, err error) {
@@ -1305,15 +1630,88 @@ func (r PromptUpdateParamsPromptDataPromptObject) MarshalJSON() (data []byte, er
 func (r PromptUpdateParamsPromptDataPromptObject) implementsPromptUpdateParamsPromptDataPromptUnion() {
 }
 
+type PromptUpdateParamsPromptDataPromptObjectMessage struct {
+	Content      param.Field[interface{}]                                          `json:"content,required"`
+	Role         param.Field[PromptUpdateParamsPromptDataPromptObjectMessagesRole] `json:"role,required"`
+	Name         param.Field[string]                                               `json:"name"`
+	FunctionCall param.Field[interface{}]                                          `json:"function_call,required"`
+	ToolCalls    param.Field[interface{}]                                          `json:"tool_calls,required"`
+	ToolCallID   param.Field[string]                                               `json:"tool_call_id"`
+}
+
+func (r PromptUpdateParamsPromptDataPromptObjectMessage) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptUpdateParamsPromptDataPromptObjectMessage) implementsPromptUpdateParamsPromptDataPromptObjectMessageUnion() {
+}
+
+// Satisfied by [PromptUpdateParamsPromptDataPromptObjectMessagesObject],
+// [PromptUpdateParamsPromptDataPromptObjectMessagesObject],
+// [PromptUpdateParamsPromptDataPromptObjectMessagesObject],
+// [PromptUpdateParamsPromptDataPromptObjectMessagesObject],
+// [PromptUpdateParamsPromptDataPromptObjectMessagesObject],
+// [PromptUpdateParamsPromptDataPromptObjectMessagesObject],
+// [PromptUpdateParamsPromptDataPromptObjectMessage].
+type PromptUpdateParamsPromptDataPromptObjectMessageUnion interface {
+	implementsPromptUpdateParamsPromptDataPromptObjectMessageUnion()
+}
+
+type PromptUpdateParamsPromptDataPromptObjectMessagesObject struct {
+	Role    param.Field[PromptUpdateParamsPromptDataPromptObjectMessagesObjectRole] `json:"role,required"`
+	Content param.Field[string]                                                     `json:"content"`
+	Name    param.Field[string]                                                     `json:"name"`
+}
+
+func (r PromptUpdateParamsPromptDataPromptObjectMessagesObject) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptUpdateParamsPromptDataPromptObjectMessagesObject) implementsPromptUpdateParamsPromptDataPromptObjectMessageUnion() {
+}
+
+type PromptUpdateParamsPromptDataPromptObjectMessagesObjectRole string
+
+const (
+	PromptUpdateParamsPromptDataPromptObjectMessagesObjectRoleSystem PromptUpdateParamsPromptDataPromptObjectMessagesObjectRole = "system"
+)
+
+func (r PromptUpdateParamsPromptDataPromptObjectMessagesObjectRole) IsKnown() bool {
+	switch r {
+	case PromptUpdateParamsPromptDataPromptObjectMessagesObjectRoleSystem:
+		return true
+	}
+	return false
+}
+
+type PromptUpdateParamsPromptDataPromptObjectMessagesRole string
+
+const (
+	PromptUpdateParamsPromptDataPromptObjectMessagesRoleSystem    PromptUpdateParamsPromptDataPromptObjectMessagesRole = "system"
+	PromptUpdateParamsPromptDataPromptObjectMessagesRoleUser      PromptUpdateParamsPromptDataPromptObjectMessagesRole = "user"
+	PromptUpdateParamsPromptDataPromptObjectMessagesRoleAssistant PromptUpdateParamsPromptDataPromptObjectMessagesRole = "assistant"
+	PromptUpdateParamsPromptDataPromptObjectMessagesRoleTool      PromptUpdateParamsPromptDataPromptObjectMessagesRole = "tool"
+	PromptUpdateParamsPromptDataPromptObjectMessagesRoleFunction  PromptUpdateParamsPromptDataPromptObjectMessagesRole = "function"
+	PromptUpdateParamsPromptDataPromptObjectMessagesRoleModel     PromptUpdateParamsPromptDataPromptObjectMessagesRole = "model"
+)
+
+func (r PromptUpdateParamsPromptDataPromptObjectMessagesRole) IsKnown() bool {
+	switch r {
+	case PromptUpdateParamsPromptDataPromptObjectMessagesRoleSystem, PromptUpdateParamsPromptDataPromptObjectMessagesRoleUser, PromptUpdateParamsPromptDataPromptObjectMessagesRoleAssistant, PromptUpdateParamsPromptDataPromptObjectMessagesRoleTool, PromptUpdateParamsPromptDataPromptObjectMessagesRoleFunction, PromptUpdateParamsPromptDataPromptObjectMessagesRoleModel:
+		return true
+	}
+	return false
+}
+
 type PromptUpdateParamsPromptDataPromptObjectType string
 
 const (
-	PromptUpdateParamsPromptDataPromptObjectTypeCompletion PromptUpdateParamsPromptDataPromptObjectType = "completion"
+	PromptUpdateParamsPromptDataPromptObjectTypeChat PromptUpdateParamsPromptDataPromptObjectType = "chat"
 )
 
 func (r PromptUpdateParamsPromptDataPromptObjectType) IsKnown() bool {
 	switch r {
-	case PromptUpdateParamsPromptDataPromptObjectTypeCompletion:
+	case PromptUpdateParamsPromptDataPromptObjectTypeChat:
 		return true
 	}
 	return false
@@ -1668,7 +2066,7 @@ func (r PromptReplaceParamsPromptDataPrompt) MarshalJSON() (data []byte, err err
 
 func (r PromptReplaceParamsPromptDataPrompt) implementsPromptReplaceParamsPromptDataPromptUnion() {}
 
-// Satisfied by [PromptReplaceParamsPromptDataPromptObject],
+// Satisfied by [PromptReplaceParamsPromptDataPromptCompletion],
 // [PromptReplaceParamsPromptDataPromptObject],
 // [PromptReplaceParamsPromptDataPromptObject],
 // [PromptReplaceParamsPromptDataPrompt].
@@ -1676,9 +2074,36 @@ type PromptReplaceParamsPromptDataPromptUnion interface {
 	implementsPromptReplaceParamsPromptDataPromptUnion()
 }
 
+type PromptReplaceParamsPromptDataPromptCompletion struct {
+	Content param.Field[string]                                            `json:"content,required"`
+	Type    param.Field[PromptReplaceParamsPromptDataPromptCompletionType] `json:"type,required"`
+}
+
+func (r PromptReplaceParamsPromptDataPromptCompletion) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptReplaceParamsPromptDataPromptCompletion) implementsPromptReplaceParamsPromptDataPromptUnion() {
+}
+
+type PromptReplaceParamsPromptDataPromptCompletionType string
+
+const (
+	PromptReplaceParamsPromptDataPromptCompletionTypeCompletion PromptReplaceParamsPromptDataPromptCompletionType = "completion"
+)
+
+func (r PromptReplaceParamsPromptDataPromptCompletionType) IsKnown() bool {
+	switch r {
+	case PromptReplaceParamsPromptDataPromptCompletionTypeCompletion:
+		return true
+	}
+	return false
+}
+
 type PromptReplaceParamsPromptDataPromptObject struct {
-	Content param.Field[string]                                        `json:"content,required"`
-	Type    param.Field[PromptReplaceParamsPromptDataPromptObjectType] `json:"type,required"`
+	Messages param.Field[[]PromptReplaceParamsPromptDataPromptObjectMessageUnion] `json:"messages,required"`
+	Type     param.Field[PromptReplaceParamsPromptDataPromptObjectType]           `json:"type,required"`
+	Tools    param.Field[string]                                                  `json:"tools"`
 }
 
 func (r PromptReplaceParamsPromptDataPromptObject) MarshalJSON() (data []byte, err error) {
@@ -1688,15 +2113,88 @@ func (r PromptReplaceParamsPromptDataPromptObject) MarshalJSON() (data []byte, e
 func (r PromptReplaceParamsPromptDataPromptObject) implementsPromptReplaceParamsPromptDataPromptUnion() {
 }
 
+type PromptReplaceParamsPromptDataPromptObjectMessage struct {
+	Content      param.Field[interface{}]                                           `json:"content,required"`
+	Role         param.Field[PromptReplaceParamsPromptDataPromptObjectMessagesRole] `json:"role,required"`
+	Name         param.Field[string]                                                `json:"name"`
+	FunctionCall param.Field[interface{}]                                           `json:"function_call,required"`
+	ToolCalls    param.Field[interface{}]                                           `json:"tool_calls,required"`
+	ToolCallID   param.Field[string]                                                `json:"tool_call_id"`
+}
+
+func (r PromptReplaceParamsPromptDataPromptObjectMessage) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptReplaceParamsPromptDataPromptObjectMessage) implementsPromptReplaceParamsPromptDataPromptObjectMessageUnion() {
+}
+
+// Satisfied by [PromptReplaceParamsPromptDataPromptObjectMessagesObject],
+// [PromptReplaceParamsPromptDataPromptObjectMessagesObject],
+// [PromptReplaceParamsPromptDataPromptObjectMessagesObject],
+// [PromptReplaceParamsPromptDataPromptObjectMessagesObject],
+// [PromptReplaceParamsPromptDataPromptObjectMessagesObject],
+// [PromptReplaceParamsPromptDataPromptObjectMessagesObject],
+// [PromptReplaceParamsPromptDataPromptObjectMessage].
+type PromptReplaceParamsPromptDataPromptObjectMessageUnion interface {
+	implementsPromptReplaceParamsPromptDataPromptObjectMessageUnion()
+}
+
+type PromptReplaceParamsPromptDataPromptObjectMessagesObject struct {
+	Role    param.Field[PromptReplaceParamsPromptDataPromptObjectMessagesObjectRole] `json:"role,required"`
+	Content param.Field[string]                                                      `json:"content"`
+	Name    param.Field[string]                                                      `json:"name"`
+}
+
+func (r PromptReplaceParamsPromptDataPromptObjectMessagesObject) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptReplaceParamsPromptDataPromptObjectMessagesObject) implementsPromptReplaceParamsPromptDataPromptObjectMessageUnion() {
+}
+
+type PromptReplaceParamsPromptDataPromptObjectMessagesObjectRole string
+
+const (
+	PromptReplaceParamsPromptDataPromptObjectMessagesObjectRoleSystem PromptReplaceParamsPromptDataPromptObjectMessagesObjectRole = "system"
+)
+
+func (r PromptReplaceParamsPromptDataPromptObjectMessagesObjectRole) IsKnown() bool {
+	switch r {
+	case PromptReplaceParamsPromptDataPromptObjectMessagesObjectRoleSystem:
+		return true
+	}
+	return false
+}
+
+type PromptReplaceParamsPromptDataPromptObjectMessagesRole string
+
+const (
+	PromptReplaceParamsPromptDataPromptObjectMessagesRoleSystem    PromptReplaceParamsPromptDataPromptObjectMessagesRole = "system"
+	PromptReplaceParamsPromptDataPromptObjectMessagesRoleUser      PromptReplaceParamsPromptDataPromptObjectMessagesRole = "user"
+	PromptReplaceParamsPromptDataPromptObjectMessagesRoleAssistant PromptReplaceParamsPromptDataPromptObjectMessagesRole = "assistant"
+	PromptReplaceParamsPromptDataPromptObjectMessagesRoleTool      PromptReplaceParamsPromptDataPromptObjectMessagesRole = "tool"
+	PromptReplaceParamsPromptDataPromptObjectMessagesRoleFunction  PromptReplaceParamsPromptDataPromptObjectMessagesRole = "function"
+	PromptReplaceParamsPromptDataPromptObjectMessagesRoleModel     PromptReplaceParamsPromptDataPromptObjectMessagesRole = "model"
+)
+
+func (r PromptReplaceParamsPromptDataPromptObjectMessagesRole) IsKnown() bool {
+	switch r {
+	case PromptReplaceParamsPromptDataPromptObjectMessagesRoleSystem, PromptReplaceParamsPromptDataPromptObjectMessagesRoleUser, PromptReplaceParamsPromptDataPromptObjectMessagesRoleAssistant, PromptReplaceParamsPromptDataPromptObjectMessagesRoleTool, PromptReplaceParamsPromptDataPromptObjectMessagesRoleFunction, PromptReplaceParamsPromptDataPromptObjectMessagesRoleModel:
+		return true
+	}
+	return false
+}
+
 type PromptReplaceParamsPromptDataPromptObjectType string
 
 const (
-	PromptReplaceParamsPromptDataPromptObjectTypeCompletion PromptReplaceParamsPromptDataPromptObjectType = "completion"
+	PromptReplaceParamsPromptDataPromptObjectTypeChat PromptReplaceParamsPromptDataPromptObjectType = "chat"
 )
 
 func (r PromptReplaceParamsPromptDataPromptObjectType) IsKnown() bool {
 	switch r {
-	case PromptReplaceParamsPromptDataPromptObjectTypeCompletion:
+	case PromptReplaceParamsPromptDataPromptObjectTypeChat:
 		return true
 	}
 	return false
