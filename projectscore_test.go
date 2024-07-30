@@ -30,7 +30,7 @@ func TestProjectScoreNewWithOptionalParams(t *testing.T) {
 		Name:      braintrust.F("name"),
 		ProjectID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ScoreType: braintrust.F(braintrust.ProjectScoreNewParamsScoreTypeSlider),
-		Categories: braintrust.F[braintrust.ProjectScoreNewParamsCategoriesUnion](braintrust.ProjectScoreNewParamsCategoriesArray([]braintrust.ProjectScoreNewParamsCategoriesArray{{
+		Categories: braintrust.F[braintrust.ProjectScoreNewParamsCategoriesUnion](braintrust.ProjectScoreNewParamsCategoriesCategorical([]braintrust.ProjectScoreNewParamsCategoriesCategorical{{
 			Name:  braintrust.F("name"),
 			Value: braintrust.F(0.000000),
 		}, {
@@ -89,7 +89,7 @@ func TestProjectScoreUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectScoreUpdateParams{
-			Categories: braintrust.F[braintrust.ProjectScoreUpdateParamsCategoriesUnion](braintrust.ProjectScoreUpdateParamsCategoriesArray([]braintrust.ProjectScoreUpdateParamsCategoriesArray{{
+			Categories: braintrust.F[braintrust.ProjectScoreUpdateParamsCategoriesUnion](braintrust.ProjectScoreUpdateParamsCategoriesCategorical([]braintrust.ProjectScoreUpdateParamsCategoriesCategorical{{
 				Name:  braintrust.F("name"),
 				Value: braintrust.F(0.000000),
 			}, {
@@ -181,7 +181,7 @@ func TestProjectScoreReplaceWithOptionalParams(t *testing.T) {
 		Name:      braintrust.F("name"),
 		ProjectID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ScoreType: braintrust.F(braintrust.ProjectScoreReplaceParamsScoreTypeSlider),
-		Categories: braintrust.F[braintrust.ProjectScoreReplaceParamsCategoriesUnion](braintrust.ProjectScoreReplaceParamsCategoriesArray([]braintrust.ProjectScoreReplaceParamsCategoriesArray{{
+		Categories: braintrust.F[braintrust.ProjectScoreReplaceParamsCategoriesUnion](braintrust.ProjectScoreReplaceParamsCategoriesCategorical([]braintrust.ProjectScoreReplaceParamsCategoriesCategorical{{
 			Name:  braintrust.F("name"),
 			Value: braintrust.F(0.000000),
 		}, {
