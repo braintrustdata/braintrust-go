@@ -32,8 +32,8 @@ func TestPromptNewWithOptionalParams(t *testing.T) {
 		Slug:        braintrust.F("slug"),
 		Description: braintrust.F("description"),
 		PromptData: braintrust.F(braintrust.PromptNewParamsPromptData{
-			Prompt: braintrust.F[braintrust.PromptNewParamsPromptDataPromptUnion](braintrust.PromptNewParamsPromptDataPromptObject{
-				Type:    braintrust.F(braintrust.PromptNewParamsPromptDataPromptObjectTypeCompletion),
+			Prompt: braintrust.F[braintrust.PromptNewParamsPromptDataPromptUnion](braintrust.PromptNewParamsPromptDataPromptCompletion{
+				Type:    braintrust.F(braintrust.PromptNewParamsPromptDataPromptCompletionTypeCompletion),
 				Content: braintrust.F("content"),
 			}),
 			Options: braintrust.F(braintrust.PromptNewParamsPromptDataOptions{
@@ -113,8 +113,8 @@ func TestPromptUpdateWithOptionalParams(t *testing.T) {
 			Description: braintrust.F("description"),
 			Name:        braintrust.F("name"),
 			PromptData: braintrust.F(braintrust.PromptUpdateParamsPromptData{
-				Prompt: braintrust.F[braintrust.PromptUpdateParamsPromptDataPromptUnion](braintrust.PromptUpdateParamsPromptDataPromptObject{
-					Type:    braintrust.F(braintrust.PromptUpdateParamsPromptDataPromptObjectTypeCompletion),
+				Prompt: braintrust.F[braintrust.PromptUpdateParamsPromptDataPromptUnion](braintrust.PromptUpdateParamsPromptDataPromptCompletion{
+					Type:    braintrust.F(braintrust.PromptUpdateParamsPromptDataPromptCompletionTypeCompletion),
 					Content: braintrust.F("content"),
 				}),
 				Options: braintrust.F(braintrust.PromptUpdateParamsPromptDataOptions{
@@ -275,8 +275,8 @@ func TestPromptReplaceWithOptionalParams(t *testing.T) {
 		Slug:        braintrust.F("slug"),
 		Description: braintrust.F("description"),
 		PromptData: braintrust.F(braintrust.PromptReplaceParamsPromptData{
-			Prompt: braintrust.F[braintrust.PromptReplaceParamsPromptDataPromptUnion](braintrust.PromptReplaceParamsPromptDataPromptObject{
-				Type:    braintrust.F(braintrust.PromptReplaceParamsPromptDataPromptObjectTypeCompletion),
+			Prompt: braintrust.F[braintrust.PromptReplaceParamsPromptDataPromptUnion](braintrust.PromptReplaceParamsPromptDataPromptCompletion{
+				Type:    braintrust.F(braintrust.PromptReplaceParamsPromptDataPromptCompletionTypeCompletion),
 				Content: braintrust.F("content"),
 			}),
 			Options: braintrust.F(braintrust.PromptReplaceParamsPromptDataOptions{
