@@ -192,7 +192,7 @@ func (r ProjectScoreScoreType) IsKnown() bool {
 // For categorical-type project scores, the list of all categories
 //
 // Union satisfied by [ProjectScoreCategoriesArray], [ProjectScoreCategoriesMap],
-// [ProjectScoreCategoriesArray] or [ProjectScoreCategoriesObject].
+// [ProjectScoreCategoriesArray] or [ProjectScoreCategoriesNullableVariant].
 type ProjectScoreCategoriesUnion interface {
 	implementsProjectScoreCategoriesUnion()
 }
@@ -211,7 +211,7 @@ func init() {
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ProjectScoreCategoriesObject{}),
+			Type:       reflect.TypeOf(ProjectScoreCategoriesNullableVariant{}),
 		},
 	)
 }
@@ -250,26 +250,26 @@ type ProjectScoreCategoriesMap map[string]float64
 
 func (r ProjectScoreCategoriesMap) implementsProjectScoreCategoriesUnion() {}
 
-type ProjectScoreCategoriesObject struct {
-	JSON projectScoreCategoriesObjectJSON `json:"-"`
+type ProjectScoreCategoriesNullableVariant struct {
+	JSON projectScoreCategoriesNullableVariantJSON `json:"-"`
 }
 
-// projectScoreCategoriesObjectJSON contains the JSON metadata for the struct
-// [ProjectScoreCategoriesObject]
-type projectScoreCategoriesObjectJSON struct {
+// projectScoreCategoriesNullableVariantJSON contains the JSON metadata for the
+// struct [ProjectScoreCategoriesNullableVariant]
+type projectScoreCategoriesNullableVariantJSON struct {
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *ProjectScoreCategoriesObject) UnmarshalJSON(data []byte) (err error) {
+func (r *ProjectScoreCategoriesNullableVariant) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r projectScoreCategoriesObjectJSON) RawJSON() string {
+func (r projectScoreCategoriesNullableVariantJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r ProjectScoreCategoriesObject) implementsProjectScoreCategoriesUnion() {}
+func (r ProjectScoreCategoriesNullableVariant) implementsProjectScoreCategoriesUnion() {}
 
 type ProjectScoreConfig struct {
 	Destination ProjectScoreConfigDestination `json:"destination,nullable"`
@@ -347,7 +347,7 @@ func (r ProjectScoreNewParamsScoreType) IsKnown() bool {
 //
 // Satisfied by [ProjectScoreNewParamsCategoriesArray],
 // [ProjectScoreNewParamsCategoriesMap], [ProjectScoreNewParamsCategoriesArray],
-// [ProjectScoreNewParamsCategoriesObject].
+// [ProjectScoreNewParamsCategoriesNullableVariant].
 type ProjectScoreNewParamsCategoriesUnion interface {
 	implementsProjectScoreNewParamsCategoriesUnion()
 }
@@ -360,14 +360,15 @@ type ProjectScoreNewParamsCategoriesMap map[string]float64
 
 func (r ProjectScoreNewParamsCategoriesMap) implementsProjectScoreNewParamsCategoriesUnion() {}
 
-type ProjectScoreNewParamsCategoriesObject struct {
+type ProjectScoreNewParamsCategoriesNullableVariant struct {
 }
 
-func (r ProjectScoreNewParamsCategoriesObject) MarshalJSON() (data []byte, err error) {
+func (r ProjectScoreNewParamsCategoriesNullableVariant) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r ProjectScoreNewParamsCategoriesObject) implementsProjectScoreNewParamsCategoriesUnion() {}
+func (r ProjectScoreNewParamsCategoriesNullableVariant) implementsProjectScoreNewParamsCategoriesUnion() {
+}
 
 type ProjectScoreUpdateParams struct {
 	// For categorical-type project scores, the list of all categories
@@ -389,7 +390,7 @@ func (r ProjectScoreUpdateParams) MarshalJSON() (data []byte, err error) {
 // Satisfied by [ProjectScoreUpdateParamsCategoriesArray],
 // [ProjectScoreUpdateParamsCategoriesMap],
 // [ProjectScoreUpdateParamsCategoriesArray],
-// [ProjectScoreUpdateParamsCategoriesObject].
+// [ProjectScoreUpdateParamsCategoriesNullableVariant].
 type ProjectScoreUpdateParamsCategoriesUnion interface {
 	implementsProjectScoreUpdateParamsCategoriesUnion()
 }
@@ -403,14 +404,14 @@ type ProjectScoreUpdateParamsCategoriesMap map[string]float64
 
 func (r ProjectScoreUpdateParamsCategoriesMap) implementsProjectScoreUpdateParamsCategoriesUnion() {}
 
-type ProjectScoreUpdateParamsCategoriesObject struct {
+type ProjectScoreUpdateParamsCategoriesNullableVariant struct {
 }
 
-func (r ProjectScoreUpdateParamsCategoriesObject) MarshalJSON() (data []byte, err error) {
+func (r ProjectScoreUpdateParamsCategoriesNullableVariant) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r ProjectScoreUpdateParamsCategoriesObject) implementsProjectScoreUpdateParamsCategoriesUnion() {
+func (r ProjectScoreUpdateParamsCategoriesNullableVariant) implementsProjectScoreUpdateParamsCategoriesUnion() {
 }
 
 // The type of the configured score
@@ -517,7 +518,7 @@ func (r ProjectScoreReplaceParamsScoreType) IsKnown() bool {
 // Satisfied by [ProjectScoreReplaceParamsCategoriesArray],
 // [ProjectScoreReplaceParamsCategoriesMap],
 // [ProjectScoreReplaceParamsCategoriesArray],
-// [ProjectScoreReplaceParamsCategoriesObject].
+// [ProjectScoreReplaceParamsCategoriesNullableVariant].
 type ProjectScoreReplaceParamsCategoriesUnion interface {
 	implementsProjectScoreReplaceParamsCategoriesUnion()
 }
@@ -532,12 +533,12 @@ type ProjectScoreReplaceParamsCategoriesMap map[string]float64
 func (r ProjectScoreReplaceParamsCategoriesMap) implementsProjectScoreReplaceParamsCategoriesUnion() {
 }
 
-type ProjectScoreReplaceParamsCategoriesObject struct {
+type ProjectScoreReplaceParamsCategoriesNullableVariant struct {
 }
 
-func (r ProjectScoreReplaceParamsCategoriesObject) MarshalJSON() (data []byte, err error) {
+func (r ProjectScoreReplaceParamsCategoriesNullableVariant) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r ProjectScoreReplaceParamsCategoriesObject) implementsProjectScoreReplaceParamsCategoriesUnion() {
+func (r ProjectScoreReplaceParamsCategoriesNullableVariant) implementsProjectScoreReplaceParamsCategoriesUnion() {
 }
