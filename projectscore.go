@@ -192,7 +192,8 @@ func (r ProjectScoreScoreType) IsKnown() bool {
 // For categorical-type project scores, the list of all categories
 //
 // Union satisfied by [ProjectScoreCategoriesCategorical],
-// [ProjectScoreCategoriesMinimum] or [ProjectScoreCategoriesNullableVariant].
+// [ProjectScoreCategoriesWeighted], [ProjectScoreCategoriesMinimum] or
+// [ProjectScoreCategoriesNullableVariant].
 type ProjectScoreCategoriesUnion interface {
 	implementsProjectScoreCategoriesUnion()
 }
@@ -245,6 +246,10 @@ func (r *ProjectScoreCategoriesCategoricalItem) UnmarshalJSON(data []byte) (err 
 func (r projectScoreCategoriesCategoricalItemJSON) RawJSON() string {
 	return r.raw
 }
+
+type ProjectScoreCategoriesWeighted map[string]float64
+
+func (r ProjectScoreCategoriesWeighted) implementsProjectScoreCategoriesUnion() {}
 
 type ProjectScoreCategoriesMinimum []string
 
@@ -346,6 +351,7 @@ func (r ProjectScoreNewParamsScoreType) IsKnown() bool {
 // For categorical-type project scores, the list of all categories
 //
 // Satisfied by [ProjectScoreNewParamsCategoriesCategorical],
+// [ProjectScoreNewParamsCategoriesWeighted],
 // [ProjectScoreNewParamsCategoriesMinimum],
 // [ProjectScoreNewParamsCategoriesNullableVariant].
 type ProjectScoreNewParamsCategoriesUnion interface {
@@ -356,6 +362,10 @@ type ProjectScoreNewParamsCategoriesCategorical []ProjectScoreNewParamsCategorie
 
 func (r ProjectScoreNewParamsCategoriesCategorical) implementsProjectScoreNewParamsCategoriesUnion() {
 }
+
+type ProjectScoreNewParamsCategoriesWeighted map[string]float64
+
+func (r ProjectScoreNewParamsCategoriesWeighted) implementsProjectScoreNewParamsCategoriesUnion() {}
 
 type ProjectScoreNewParamsCategoriesMinimum []string
 
@@ -389,6 +399,7 @@ func (r ProjectScoreUpdateParams) MarshalJSON() (data []byte, err error) {
 // For categorical-type project scores, the list of all categories
 //
 // Satisfied by [ProjectScoreUpdateParamsCategoriesCategorical],
+// [ProjectScoreUpdateParamsCategoriesWeighted],
 // [ProjectScoreUpdateParamsCategoriesMinimum],
 // [ProjectScoreUpdateParamsCategoriesNullableVariant].
 type ProjectScoreUpdateParamsCategoriesUnion interface {
@@ -398,6 +409,11 @@ type ProjectScoreUpdateParamsCategoriesUnion interface {
 type ProjectScoreUpdateParamsCategoriesCategorical []ProjectScoreUpdateParamsCategoriesCategorical
 
 func (r ProjectScoreUpdateParamsCategoriesCategorical) implementsProjectScoreUpdateParamsCategoriesUnion() {
+}
+
+type ProjectScoreUpdateParamsCategoriesWeighted map[string]float64
+
+func (r ProjectScoreUpdateParamsCategoriesWeighted) implementsProjectScoreUpdateParamsCategoriesUnion() {
 }
 
 type ProjectScoreUpdateParamsCategoriesMinimum []string
@@ -517,6 +533,7 @@ func (r ProjectScoreReplaceParamsScoreType) IsKnown() bool {
 // For categorical-type project scores, the list of all categories
 //
 // Satisfied by [ProjectScoreReplaceParamsCategoriesCategorical],
+// [ProjectScoreReplaceParamsCategoriesWeighted],
 // [ProjectScoreReplaceParamsCategoriesMinimum],
 // [ProjectScoreReplaceParamsCategoriesNullableVariant].
 type ProjectScoreReplaceParamsCategoriesUnion interface {
@@ -526,6 +543,11 @@ type ProjectScoreReplaceParamsCategoriesUnion interface {
 type ProjectScoreReplaceParamsCategoriesCategorical []ProjectScoreReplaceParamsCategoriesCategorical
 
 func (r ProjectScoreReplaceParamsCategoriesCategorical) implementsProjectScoreReplaceParamsCategoriesUnion() {
+}
+
+type ProjectScoreReplaceParamsCategoriesWeighted map[string]float64
+
+func (r ProjectScoreReplaceParamsCategoriesWeighted) implementsProjectScoreReplaceParamsCategoriesUnion() {
 }
 
 type ProjectScoreReplaceParamsCategoriesMinimum []string
