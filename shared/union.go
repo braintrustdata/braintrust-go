@@ -7,14 +7,14 @@ type UnionString string
 func (UnionString) ImplementsProjectListParamsIDsUnion()    {}
 func (UnionString) ImplementsExperimentListParamsIDsUnion() {}
 func (UnionString) ImplementsDatasetListParamsIDsUnion()    {}
-func (UnionString) ImplementsPromptPromptDataPromptPromptDataPrompt1MessagesPromptDataPromptMessage1ContentUnion() {
+func (UnionString) ImplementsPromptPromptDataPromptChatMessagesPromptDataPromptMessage1ContentUnion() {
 }
-func (UnionString) ImplementsPromptNewParamsPromptDataPromptPromptDataPrompt1MessagesPromptDataPromptMessage1ContentUnion() {
+func (UnionString) ImplementsPromptNewParamsPromptDataPromptChatMessagesPromptDataPromptMessage1ContentUnion() {
 }
-func (UnionString) ImplementsPromptUpdateParamsPromptDataPromptPromptDataPrompt1MessagesPromptDataPromptMessage1ContentUnion() {
+func (UnionString) ImplementsPromptUpdateParamsPromptDataPromptChatMessagesPromptDataPromptMessage1ContentUnion() {
 }
 func (UnionString) ImplementsPromptListParamsIDsUnion() {}
-func (UnionString) ImplementsPromptReplaceParamsPromptDataPromptPromptDataPrompt1MessagesPromptDataPromptMessage1ContentUnion() {
+func (UnionString) ImplementsPromptReplaceParamsPromptDataPromptChatMessagesPromptDataPromptMessage1ContentUnion() {
 }
 func (UnionString) ImplementsRoleListParamsIDsUnion()         {}
 func (UnionString) ImplementsGroupListParamsIDsUnion()        {}
@@ -25,14 +25,14 @@ func (UnionString) ImplementsUserListParamsGivenNameUnion()   {}
 func (UnionString) ImplementsUserListParamsIDsUnion()         {}
 func (UnionString) ImplementsProjectScoreListParamsIDsUnion() {}
 func (UnionString) ImplementsProjectTagListParamsIDsUnion()   {}
-func (UnionString) ImplementsFunctionPromptDataPromptPromptDataPrompt1MessagesPromptDataPromptMessage1ContentUnion() {
+func (UnionString) ImplementsFunctionPromptDataPromptChatMessagesPromptDataPromptMessage1ContentUnion() {
 }
-func (UnionString) ImplementsFunctionNewParamsPromptDataPromptPromptDataPrompt1MessagesPromptDataPromptMessage1ContentUnion() {
+func (UnionString) ImplementsFunctionNewParamsPromptDataPromptChatMessagesPromptDataPromptMessage1ContentUnion() {
 }
-func (UnionString) ImplementsFunctionUpdateParamsPromptDataPromptPromptDataPrompt1MessagesPromptDataPromptMessage1ContentUnion() {
+func (UnionString) ImplementsFunctionUpdateParamsPromptDataPromptChatMessagesPromptDataPromptMessage1ContentUnion() {
 }
 func (UnionString) ImplementsFunctionListParamsIDsUnion() {}
-func (UnionString) ImplementsFunctionReplaceParamsPromptDataPromptPromptDataPrompt1MessagesPromptDataPromptMessage1ContentUnion() {
+func (UnionString) ImplementsFunctionReplaceParamsPromptDataPromptChatMessagesPromptDataPromptMessage1ContentUnion() {
 }
 func (UnionString) ImplementsViewListParamsIDsUnion()         {}
 func (UnionString) ImplementsOrganizationListParamsIDsUnion() {}
