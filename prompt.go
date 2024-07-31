@@ -148,7 +148,7 @@ type Prompt struct {
 	// User-controlled metadata about the prompt
 	Metadata map[string]interface{} `json:"metadata,nullable"`
 	// The prompt, model, and its parameters
-	PromptData PromptPromptData `json:"prompt_data,nullable"`
+	PromptData PromptData `json:"prompt_data,nullable"`
 	// A list of tags for the prompt
 	Tags []string   `json:"tags,nullable"`
 	JSON promptJSON `json:"-"`
@@ -196,16 +196,15 @@ func (r PromptLogID) IsKnown() bool {
 }
 
 // The prompt, model, and its parameters
-type PromptPromptData struct {
-	Options PromptPromptDataOptions `json:"options,nullable"`
-	Origin  PromptPromptDataOrigin  `json:"origin,nullable"`
-	Prompt  PromptPromptDataPrompt  `json:"prompt"`
-	JSON    promptPromptDataJSON    `json:"-"`
+type PromptData struct {
+	Options PromptDataOptions `json:"options,nullable"`
+	Origin  PromptDataOrigin  `json:"origin,nullable"`
+	Prompt  PromptDataPrompt  `json:"prompt"`
+	JSON    promptDataJSON    `json:"-"`
 }
 
-// promptPromptDataJSON contains the JSON metadata for the struct
-// [PromptPromptData]
-type promptPromptDataJSON struct {
+// promptDataJSON contains the JSON metadata for the struct [PromptData]
+type promptDataJSON struct {
 	Options     apijson.Field
 	Origin      apijson.Field
 	Prompt      apijson.Field
@@ -213,24 +212,24 @@ type promptPromptDataJSON struct {
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptData) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptData) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataJSON) RawJSON() string {
+func (r promptDataJSON) RawJSON() string {
 	return r.raw
 }
 
-type PromptPromptDataOptions struct {
-	Model    string                        `json:"model"`
-	Params   PromptPromptDataOptionsParams `json:"params"`
-	Position string                        `json:"position"`
-	JSON     promptPromptDataOptionsJSON   `json:"-"`
+type PromptDataOptions struct {
+	Model    string                       `json:"model"`
+	Params   PromptDataOptionsParamsUnion `json:"params"`
+	Position string                       `json:"position"`
+	JSON     promptDataOptionsJSON        `json:"-"`
 }
 
-// promptPromptDataOptionsJSON contains the JSON metadata for the struct
-// [PromptPromptDataOptions]
-type promptPromptDataOptionsJSON struct {
+// promptDataOptionsJSON contains the JSON metadata for the struct
+// [PromptDataOptions]
+type promptDataOptionsJSON struct {
 	Model       apijson.Field
 	Params      apijson.Field
 	Position    apijson.Field
@@ -238,149 +237,68 @@ type promptPromptDataOptionsJSON struct {
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataOptions) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataOptions) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataOptionsJSON) RawJSON() string {
+func (r promptDataOptionsJSON) RawJSON() string {
 	return r.raw
 }
 
-type PromptPromptDataOptionsParams struct {
-	UseCache         bool    `json:"use_cache"`
-	Temperature      float64 `json:"temperature"`
-	TopP             float64 `json:"top_p"`
-	MaxTokens        float64 `json:"max_tokens"`
-	FrequencyPenalty float64 `json:"frequency_penalty"`
-	PresencePenalty  float64 `json:"presence_penalty"`
-	// This field can have the runtime type of
-	// [PromptPromptDataOptionsParamsOpenAIModelParamsResponseFormat].
-	ResponseFormat interface{} `json:"response_format,required"`
-	// This field can have the runtime type of
-	// [PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion].
-	ToolChoice interface{} `json:"tool_choice,required"`
-	// This field can have the runtime type of
-	// [PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion].
-	FunctionCall interface{} `json:"function_call,required"`
-	N            float64     `json:"n"`
-	// This field can have the runtime type of [[]string].
-	Stop interface{} `json:"stop,required"`
-	TopK float64     `json:"top_k"`
-	// This field can have the runtime type of [[]string].
-	StopSequences interface{} `json:"stop_sequences,required"`
-	// This is a legacy parameter that should not be used.
-	MaxTokensToSample float64                           `json:"max_tokens_to_sample"`
-	MaxOutputTokens   float64                           `json:"maxOutputTokens"`
-	TopP              float64                           `json:"topP"`
-	TopK              float64                           `json:"topK"`
-	JSON              promptPromptDataOptionsParamsJSON `json:"-"`
-	union             PromptPromptDataOptionsParamsUnion
-}
-
-// promptPromptDataOptionsParamsJSON contains the JSON metadata for the struct
-// [PromptPromptDataOptionsParams]
-type promptPromptDataOptionsParamsJSON struct {
-	UseCache          apijson.Field
-	Temperature       apijson.Field
-	TopP              apijson.Field
-	MaxTokens         apijson.Field
-	FrequencyPenalty  apijson.Field
-	PresencePenalty   apijson.Field
-	ResponseFormat    apijson.Field
-	ToolChoice        apijson.Field
-	FunctionCall      apijson.Field
-	N                 apijson.Field
-	Stop              apijson.Field
-	TopK              apijson.Field
-	StopSequences     apijson.Field
-	MaxTokensToSample apijson.Field
-	MaxOutputTokens   apijson.Field
-	TopP              apijson.Field
-	TopK              apijson.Field
-	raw               string
-	ExtraFields       map[string]apijson.Field
-}
-
-func (r promptPromptDataOptionsParamsJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *PromptPromptDataOptionsParams) UnmarshalJSON(data []byte) (err error) {
-	*r = PromptPromptDataOptionsParams{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [PromptPromptDataOptionsParamsUnion] interface which you can
-// cast to the specific types for more type safety.
-//
-// Possible runtime types of the union are
-// [PromptPromptDataOptionsParamsOpenAIModelParams],
-// [PromptPromptDataOptionsParamsAnthropicModelParams],
-// [PromptPromptDataOptionsParamsGoogleModelParams],
-// [PromptPromptDataOptionsParamsWindowAIModelParams],
-// [PromptPromptDataOptionsParamsJsCompletionParams].
-func (r PromptPromptDataOptionsParams) AsUnion() PromptPromptDataOptionsParamsUnion {
-	return r.union
-}
-
-// Union satisfied by [PromptPromptDataOptionsParamsOpenAIModelParams],
-// [PromptPromptDataOptionsParamsAnthropicModelParams],
-// [PromptPromptDataOptionsParamsGoogleModelParams],
-// [PromptPromptDataOptionsParamsWindowAIModelParams] or
-// [PromptPromptDataOptionsParamsJsCompletionParams].
-type PromptPromptDataOptionsParamsUnion interface {
-	implementsPromptPromptDataOptionsParams()
+// Union satisfied by [PromptDataOptionsParamsOpenAIModelParams],
+// [PromptDataOptionsParamsAnthropicModelParams],
+// [PromptDataOptionsParamsGoogleModelParams],
+// [PromptDataOptionsParamsWindowAIModelParams] or
+// [PromptDataOptionsParamsJsCompletionParams].
+type PromptDataOptionsParamsUnion interface {
+	implementsPromptDataOptionsParamsUnion()
 }
 
 func init() {
 	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptPromptDataOptionsParamsUnion)(nil)).Elem(),
+		reflect.TypeOf((*PromptDataOptionsParamsUnion)(nil)).Elem(),
 		"",
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataOptionsParamsOpenAIModelParams{}),
+			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParams{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataOptionsParamsAnthropicModelParams{}),
+			Type:       reflect.TypeOf(PromptDataOptionsParamsAnthropicModelParams{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataOptionsParamsGoogleModelParams{}),
+			Type:       reflect.TypeOf(PromptDataOptionsParamsGoogleModelParams{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataOptionsParamsWindowAIModelParams{}),
+			Type:       reflect.TypeOf(PromptDataOptionsParamsWindowAIModelParams{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataOptionsParamsJsCompletionParams{}),
+			Type:       reflect.TypeOf(PromptDataOptionsParamsJsCompletionParams{}),
 		},
 	)
 }
 
-type PromptPromptDataOptionsParamsOpenAIModelParams struct {
-	FrequencyPenalty float64                                                         `json:"frequency_penalty"`
-	FunctionCall     PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion `json:"function_call"`
-	MaxTokens        float64                                                         `json:"max_tokens"`
-	N                float64                                                         `json:"n"`
-	PresencePenalty  float64                                                         `json:"presence_penalty"`
-	ResponseFormat   PromptPromptDataOptionsParamsOpenAIModelParamsResponseFormat    `json:"response_format,nullable"`
-	Stop             []string                                                        `json:"stop"`
-	Temperature      float64                                                         `json:"temperature"`
-	ToolChoice       PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion   `json:"tool_choice"`
-	TopP             float64                                                         `json:"top_p"`
-	UseCache         bool                                                            `json:"use_cache"`
-	JSON             promptPromptDataOptionsParamsOpenAIModelParamsJSON              `json:"-"`
+type PromptDataOptionsParamsOpenAIModelParams struct {
+	FrequencyPenalty float64                                                   `json:"frequency_penalty"`
+	FunctionCall     PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion `json:"function_call"`
+	MaxTokens        float64                                                   `json:"max_tokens"`
+	N                float64                                                   `json:"n"`
+	PresencePenalty  float64                                                   `json:"presence_penalty"`
+	ResponseFormat   PromptDataOptionsParamsOpenAIModelParamsResponseFormat    `json:"response_format,nullable"`
+	Stop             []string                                                  `json:"stop"`
+	Temperature      float64                                                   `json:"temperature"`
+	ToolChoice       PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion   `json:"tool_choice"`
+	TopP             float64                                                   `json:"top_p"`
+	UseCache         bool                                                      `json:"use_cache"`
+	JSON             promptDataOptionsParamsOpenAIModelParamsJSON              `json:"-"`
 }
 
-// promptPromptDataOptionsParamsOpenAIModelParamsJSON contains the JSON metadata
-// for the struct [PromptPromptDataOptionsParamsOpenAIModelParams]
-type promptPromptDataOptionsParamsOpenAIModelParamsJSON struct {
+// promptDataOptionsParamsOpenAIModelParamsJSON contains the JSON metadata for the
+// struct [PromptDataOptionsParamsOpenAIModelParams]
+type promptDataOptionsParamsOpenAIModelParamsJSON struct {
 	FrequencyPenalty apijson.Field
 	FunctionCall     apijson.Field
 	MaxTokens        apijson.Field
@@ -396,277 +314,286 @@ type promptPromptDataOptionsParamsOpenAIModelParamsJSON struct {
 	ExtraFields      map[string]apijson.Field
 }
 
-func (r *PromptPromptDataOptionsParamsOpenAIModelParams) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataOptionsParamsOpenAIModelParams) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataOptionsParamsOpenAIModelParamsJSON) RawJSON() string {
+func (r promptDataOptionsParamsOpenAIModelParamsJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataOptionsParamsOpenAIModelParams) implementsPromptPromptDataOptionsParams() {}
+func (r PromptDataOptionsParamsOpenAIModelParams) implementsPromptDataOptionsParamsUnion() {}
 
-// Union satisfied by
-// [PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto],
-// [PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone] or
-// [PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction].
-type PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion interface {
-	implementsPromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion()
+// Union satisfied by [PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto],
+// [PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone] or
+// [PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction].
+type PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion interface {
+	implementsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion()
 }
 
 func init() {
 	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion)(nil)).Elem(),
+		reflect.TypeOf((*PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion)(nil)).Elem(),
 		"",
 		apijson.UnionVariant{
 			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto("")),
+			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto("")),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone("")),
+			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone("")),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction{}),
+			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction{}),
 		},
 	)
 }
 
-type PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto string
+type PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto string
 
 const (
-	PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto = "auto"
+	PromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto = "auto"
 )
 
-func (r PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto) IsKnown() bool {
+func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto) IsKnown() bool {
 	switch r {
-	case PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto:
+	case PromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto:
 		return true
 	}
 	return false
 }
 
-func (r PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto) implementsPromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
+func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto) implementsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
 }
 
-type PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone string
+func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto) implementsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
+}
+
+type PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone string
 
 const (
-	PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallNoneNone PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone = "none"
+	PromptDataOptionsParamsOpenAIModelParamsFunctionCallNoneNone PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone = "none"
 )
 
-func (r PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone) IsKnown() bool {
+func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone) IsKnown() bool {
 	switch r {
-	case PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallNoneNone:
+	case PromptDataOptionsParamsOpenAIModelParamsFunctionCallNoneNone:
 		return true
 	}
 	return false
 }
 
-func (r PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone) implementsPromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
+func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone) implementsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
 }
 
-type PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction struct {
-	Name string                                                                 `json:"name,required"`
-	JSON promptPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON `json:"-"`
+func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone) implementsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
 }
 
-// promptPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON contains
-// the JSON metadata for the struct
-// [PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction]
-type promptPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON struct {
+type PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction struct {
+	Name string                                                           `json:"name,required"`
+	JSON promptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON `json:"-"`
+}
+
+// promptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON contains the
+// JSON metadata for the struct
+// [PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction]
+type promptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON struct {
 	Name        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON) RawJSON() string {
+func (r promptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction) implementsPromptPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
+func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction) implementsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
 }
 
-type PromptPromptDataOptionsParamsOpenAIModelParamsResponseFormat struct {
-	Type PromptPromptDataOptionsParamsOpenAIModelParamsResponseFormatType `json:"type,required"`
-	JSON promptPromptDataOptionsParamsOpenAIModelParamsResponseFormatJSON `json:"-"`
+type PromptDataOptionsParamsOpenAIModelParamsResponseFormat struct {
+	Type PromptDataOptionsParamsOpenAIModelParamsResponseFormatType `json:"type,required"`
+	JSON promptDataOptionsParamsOpenAIModelParamsResponseFormatJSON `json:"-"`
 }
 
-// promptPromptDataOptionsParamsOpenAIModelParamsResponseFormatJSON contains the
-// JSON metadata for the struct
-// [PromptPromptDataOptionsParamsOpenAIModelParamsResponseFormat]
-type promptPromptDataOptionsParamsOpenAIModelParamsResponseFormatJSON struct {
+// promptDataOptionsParamsOpenAIModelParamsResponseFormatJSON contains the JSON
+// metadata for the struct [PromptDataOptionsParamsOpenAIModelParamsResponseFormat]
+type promptDataOptionsParamsOpenAIModelParamsResponseFormatJSON struct {
 	Type        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataOptionsParamsOpenAIModelParamsResponseFormat) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataOptionsParamsOpenAIModelParamsResponseFormat) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataOptionsParamsOpenAIModelParamsResponseFormatJSON) RawJSON() string {
+func (r promptDataOptionsParamsOpenAIModelParamsResponseFormatJSON) RawJSON() string {
 	return r.raw
 }
 
-type PromptPromptDataOptionsParamsOpenAIModelParamsResponseFormatType string
+type PromptDataOptionsParamsOpenAIModelParamsResponseFormatType string
 
 const (
-	PromptPromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject PromptPromptDataOptionsParamsOpenAIModelParamsResponseFormatType = "json_object"
+	PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject PromptDataOptionsParamsOpenAIModelParamsResponseFormatType = "json_object"
 )
 
-func (r PromptPromptDataOptionsParamsOpenAIModelParamsResponseFormatType) IsKnown() bool {
+func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatType) IsKnown() bool {
 	switch r {
-	case PromptPromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject:
+	case PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject:
 		return true
 	}
 	return false
 }
 
-// Union satisfied by
-// [PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto],
-// [PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone] or
-// [PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction].
-type PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion interface {
-	implementsPromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion()
+// Union satisfied by [PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto],
+// [PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone] or
+// [PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction].
+type PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion interface {
+	implementsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion()
 }
 
 func init() {
 	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion)(nil)).Elem(),
+		reflect.TypeOf((*PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion)(nil)).Elem(),
 		"",
 		apijson.UnionVariant{
 			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto("")),
+			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto("")),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone("")),
+			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone("")),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction{}),
+			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction{}),
 		},
 	)
 }
 
-type PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto string
+type PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto string
 
 const (
-	PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto = "auto"
+	PromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto = "auto"
 )
 
-func (r PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) IsKnown() bool {
+func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) IsKnown() bool {
 	switch r {
-	case PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto:
+	case PromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto:
 		return true
 	}
 	return false
 }
 
-func (r PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) implementsPromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
+func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) implementsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
 }
 
-type PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone string
+func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) implementsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
+}
+
+type PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone string
 
 const (
-	PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone = "none"
+	PromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone = "none"
 )
 
-func (r PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) IsKnown() bool {
+func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) IsKnown() bool {
 	switch r {
-	case PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone:
+	case PromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone:
 		return true
 	}
 	return false
 }
 
-func (r PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) implementsPromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
+func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) implementsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
 }
 
-type PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction struct {
-	Function PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction `json:"function,required"`
-	Type     PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType     `json:"type,required"`
-	JSON     promptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON     `json:"-"`
+func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) implementsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
 }
 
-// promptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON contains
-// the JSON metadata for the struct
-// [PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction]
-type promptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON struct {
+type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction struct {
+	Function PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction `json:"function,required"`
+	Type     PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType     `json:"type,required"`
+	JSON     promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON     `json:"-"`
+}
+
+// promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON contains the JSON
+// metadata for the struct
+// [PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction]
+type promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON struct {
 	Function    apijson.Field
 	Type        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON) RawJSON() string {
+func (r promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction) implementsPromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
+func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction) implementsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
 }
 
-type PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction struct {
-	Name string                                                                       `json:"name,required"`
-	JSON promptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON `json:"-"`
+type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction struct {
+	Name string                                                                 `json:"name,required"`
+	JSON promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON `json:"-"`
 }
 
-// promptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON
-// contains the JSON metadata for the struct
-// [PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction]
-type promptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON struct {
+// promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON contains
+// the JSON metadata for the struct
+// [PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction]
+type promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON struct {
 	Name        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON) RawJSON() string {
+func (r promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON) RawJSON() string {
 	return r.raw
 }
 
-type PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType string
+type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType string
 
 const (
-	PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType = "function"
+	PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType = "function"
 )
 
-func (r PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType) IsKnown() bool {
+func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType) IsKnown() bool {
 	switch r {
-	case PromptPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction:
+	case PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction:
 		return true
 	}
 	return false
 }
 
-type PromptPromptDataOptionsParamsAnthropicModelParams struct {
+type PromptDataOptionsParamsAnthropicModelParams struct {
 	MaxTokens   float64 `json:"max_tokens,required"`
 	Temperature float64 `json:"temperature,required"`
 	// This is a legacy parameter that should not be used.
-	MaxTokensToSample float64                                               `json:"max_tokens_to_sample"`
-	StopSequences     []string                                              `json:"stop_sequences"`
-	TopK              float64                                               `json:"top_k"`
-	TopP              float64                                               `json:"top_p"`
-	UseCache          bool                                                  `json:"use_cache"`
-	JSON              promptPromptDataOptionsParamsAnthropicModelParamsJSON `json:"-"`
+	MaxTokensToSample float64                                         `json:"max_tokens_to_sample"`
+	StopSequences     []string                                        `json:"stop_sequences"`
+	TopK              float64                                         `json:"top_k"`
+	TopP              float64                                         `json:"top_p"`
+	UseCache          bool                                            `json:"use_cache"`
+	JSON              promptDataOptionsParamsAnthropicModelParamsJSON `json:"-"`
 }
 
-// promptPromptDataOptionsParamsAnthropicModelParamsJSON contains the JSON metadata
-// for the struct [PromptPromptDataOptionsParamsAnthropicModelParams]
-type promptPromptDataOptionsParamsAnthropicModelParamsJSON struct {
+// promptDataOptionsParamsAnthropicModelParamsJSON contains the JSON metadata for
+// the struct [PromptDataOptionsParamsAnthropicModelParams]
+type promptDataOptionsParamsAnthropicModelParamsJSON struct {
 	MaxTokens         apijson.Field
 	Temperature       apijson.Field
 	MaxTokensToSample apijson.Field
@@ -678,29 +605,28 @@ type promptPromptDataOptionsParamsAnthropicModelParamsJSON struct {
 	ExtraFields       map[string]apijson.Field
 }
 
-func (r *PromptPromptDataOptionsParamsAnthropicModelParams) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataOptionsParamsAnthropicModelParams) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataOptionsParamsAnthropicModelParamsJSON) RawJSON() string {
+func (r promptDataOptionsParamsAnthropicModelParamsJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataOptionsParamsAnthropicModelParams) implementsPromptPromptDataOptionsParams() {
+func (r PromptDataOptionsParamsAnthropicModelParams) implementsPromptDataOptionsParamsUnion() {}
+
+type PromptDataOptionsParamsGoogleModelParams struct {
+	MaxOutputTokens float64                                      `json:"maxOutputTokens"`
+	Temperature     float64                                      `json:"temperature"`
+	TopK            float64                                      `json:"topK"`
+	TopP            float64                                      `json:"topP"`
+	UseCache        bool                                         `json:"use_cache"`
+	JSON            promptDataOptionsParamsGoogleModelParamsJSON `json:"-"`
 }
 
-type PromptPromptDataOptionsParamsGoogleModelParams struct {
-	MaxOutputTokens float64                                            `json:"maxOutputTokens"`
-	Temperature     float64                                            `json:"temperature"`
-	TopK            float64                                            `json:"topK"`
-	TopP            float64                                            `json:"topP"`
-	UseCache        bool                                               `json:"use_cache"`
-	JSON            promptPromptDataOptionsParamsGoogleModelParamsJSON `json:"-"`
-}
-
-// promptPromptDataOptionsParamsGoogleModelParamsJSON contains the JSON metadata
-// for the struct [PromptPromptDataOptionsParamsGoogleModelParams]
-type promptPromptDataOptionsParamsGoogleModelParamsJSON struct {
+// promptDataOptionsParamsGoogleModelParamsJSON contains the JSON metadata for the
+// struct [PromptDataOptionsParamsGoogleModelParams]
+type promptDataOptionsParamsGoogleModelParamsJSON struct {
 	MaxOutputTokens apijson.Field
 	Temperature     apijson.Field
 	TopK            apijson.Field
@@ -710,26 +636,26 @@ type promptPromptDataOptionsParamsGoogleModelParamsJSON struct {
 	ExtraFields     map[string]apijson.Field
 }
 
-func (r *PromptPromptDataOptionsParamsGoogleModelParams) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataOptionsParamsGoogleModelParams) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataOptionsParamsGoogleModelParamsJSON) RawJSON() string {
+func (r promptDataOptionsParamsGoogleModelParamsJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataOptionsParamsGoogleModelParams) implementsPromptPromptDataOptionsParams() {}
+func (r PromptDataOptionsParamsGoogleModelParams) implementsPromptDataOptionsParamsUnion() {}
 
-type PromptPromptDataOptionsParamsWindowAIModelParams struct {
-	Temperature float64                                              `json:"temperature"`
-	TopK        float64                                              `json:"topK"`
-	UseCache    bool                                                 `json:"use_cache"`
-	JSON        promptPromptDataOptionsParamsWindowAIModelParamsJSON `json:"-"`
+type PromptDataOptionsParamsWindowAIModelParams struct {
+	Temperature float64                                        `json:"temperature"`
+	TopK        float64                                        `json:"topK"`
+	UseCache    bool                                           `json:"use_cache"`
+	JSON        promptDataOptionsParamsWindowAIModelParamsJSON `json:"-"`
 }
 
-// promptPromptDataOptionsParamsWindowAIModelParamsJSON contains the JSON metadata
-// for the struct [PromptPromptDataOptionsParamsWindowAIModelParams]
-type promptPromptDataOptionsParamsWindowAIModelParamsJSON struct {
+// promptDataOptionsParamsWindowAIModelParamsJSON contains the JSON metadata for
+// the struct [PromptDataOptionsParamsWindowAIModelParams]
+type promptDataOptionsParamsWindowAIModelParamsJSON struct {
 	Temperature apijson.Field
 	TopK        apijson.Field
 	UseCache    apijson.Field
@@ -737,49 +663,49 @@ type promptPromptDataOptionsParamsWindowAIModelParamsJSON struct {
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataOptionsParamsWindowAIModelParams) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataOptionsParamsWindowAIModelParams) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataOptionsParamsWindowAIModelParamsJSON) RawJSON() string {
+func (r promptDataOptionsParamsWindowAIModelParamsJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataOptionsParamsWindowAIModelParams) implementsPromptPromptDataOptionsParams() {}
+func (r PromptDataOptionsParamsWindowAIModelParams) implementsPromptDataOptionsParamsUnion() {}
 
-type PromptPromptDataOptionsParamsJsCompletionParams struct {
-	UseCache bool                                                `json:"use_cache"`
-	JSON     promptPromptDataOptionsParamsJsCompletionParamsJSON `json:"-"`
+type PromptDataOptionsParamsJsCompletionParams struct {
+	UseCache bool                                          `json:"use_cache"`
+	JSON     promptDataOptionsParamsJsCompletionParamsJSON `json:"-"`
 }
 
-// promptPromptDataOptionsParamsJsCompletionParamsJSON contains the JSON metadata
-// for the struct [PromptPromptDataOptionsParamsJsCompletionParams]
-type promptPromptDataOptionsParamsJsCompletionParamsJSON struct {
+// promptDataOptionsParamsJsCompletionParamsJSON contains the JSON metadata for the
+// struct [PromptDataOptionsParamsJsCompletionParams]
+type promptDataOptionsParamsJsCompletionParamsJSON struct {
 	UseCache    apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataOptionsParamsJsCompletionParams) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataOptionsParamsJsCompletionParams) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataOptionsParamsJsCompletionParamsJSON) RawJSON() string {
+func (r promptDataOptionsParamsJsCompletionParamsJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataOptionsParamsJsCompletionParams) implementsPromptPromptDataOptionsParams() {}
+func (r PromptDataOptionsParamsJsCompletionParams) implementsPromptDataOptionsParamsUnion() {}
 
-type PromptPromptDataOrigin struct {
-	ProjectID     string                     `json:"project_id"`
-	PromptID      string                     `json:"prompt_id"`
-	PromptVersion string                     `json:"prompt_version"`
-	JSON          promptPromptDataOriginJSON `json:"-"`
+type PromptDataOrigin struct {
+	ProjectID     string               `json:"project_id"`
+	PromptID      string               `json:"prompt_id"`
+	PromptVersion string               `json:"prompt_version"`
+	JSON          promptDataOriginJSON `json:"-"`
 }
 
-// promptPromptDataOriginJSON contains the JSON metadata for the struct
-// [PromptPromptDataOrigin]
-type promptPromptDataOriginJSON struct {
+// promptDataOriginJSON contains the JSON metadata for the struct
+// [PromptDataOrigin]
+type promptDataOriginJSON struct {
 	ProjectID     apijson.Field
 	PromptID      apijson.Field
 	PromptVersion apijson.Field
@@ -787,27 +713,27 @@ type promptPromptDataOriginJSON struct {
 	ExtraFields   map[string]apijson.Field
 }
 
-func (r *PromptPromptDataOrigin) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataOrigin) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataOriginJSON) RawJSON() string {
+func (r promptDataOriginJSON) RawJSON() string {
 	return r.raw
 }
 
-type PromptPromptDataPrompt struct {
-	Type    PromptPromptDataPromptType `json:"type"`
-	Content string                     `json:"content"`
-	// This field can have the runtime type of [[]PromptPromptDataPromptChatMessage].
-	Messages interface{}                `json:"messages,required"`
-	Tools    string                     `json:"tools"`
-	JSON     promptPromptDataPromptJSON `json:"-"`
-	union    PromptPromptDataPromptUnion
+type PromptDataPrompt struct {
+	Type    PromptDataPromptType `json:"type"`
+	Content string               `json:"content"`
+	// This field can have the runtime type of [[]PromptDataPromptChatMessage].
+	Messages interface{}          `json:"messages,required"`
+	Tools    string               `json:"tools"`
+	JSON     promptDataPromptJSON `json:"-"`
+	union    PromptDataPromptUnion
 }
 
-// promptPromptDataPromptJSON contains the JSON metadata for the struct
-// [PromptPromptDataPrompt]
-type promptPromptDataPromptJSON struct {
+// promptDataPromptJSON contains the JSON metadata for the struct
+// [PromptDataPrompt]
+type promptDataPromptJSON struct {
 	Type        apijson.Field
 	Content     apijson.Field
 	Messages    apijson.Field
@@ -816,12 +742,12 @@ type promptPromptDataPromptJSON struct {
 	ExtraFields map[string]apijson.Field
 }
 
-func (r promptPromptDataPromptJSON) RawJSON() string {
+func (r promptDataPromptJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r *PromptPromptDataPrompt) UnmarshalJSON(data []byte) (err error) {
-	*r = PromptPromptDataPrompt{}
+func (r *PromptDataPrompt) UnmarshalJSON(data []byte) (err error) {
+	*r = PromptDataPrompt{}
 	err = apijson.UnmarshalRoot(data, &r.union)
 	if err != nil {
 		return err
@@ -829,89 +755,89 @@ func (r *PromptPromptDataPrompt) UnmarshalJSON(data []byte) (err error) {
 	return apijson.Port(r.union, &r)
 }
 
-// AsUnion returns a [PromptPromptDataPromptUnion] interface which you can cast to
-// the specific types for more type safety.
+// AsUnion returns a [PromptDataPromptUnion] interface which you can cast to the
+// specific types for more type safety.
 //
-// Possible runtime types of the union are [PromptPromptDataPromptCompletion],
-// [PromptPromptDataPromptChat], [PromptPromptDataPromptNullableVariant].
-func (r PromptPromptDataPrompt) AsUnion() PromptPromptDataPromptUnion {
+// Possible runtime types of the union are [PromptDataPromptCompletion],
+// [PromptDataPromptChat], [PromptDataPromptNullableVariant].
+func (r PromptDataPrompt) AsUnion() PromptDataPromptUnion {
 	return r.union
 }
 
-// Union satisfied by [PromptPromptDataPromptCompletion],
-// [PromptPromptDataPromptChat] or [PromptPromptDataPromptNullableVariant].
-type PromptPromptDataPromptUnion interface {
-	implementsPromptPromptDataPrompt()
+// Union satisfied by [PromptDataPromptCompletion], [PromptDataPromptChat] or
+// [PromptDataPromptNullableVariant].
+type PromptDataPromptUnion interface {
+	implementsPromptDataPrompt()
 }
 
 func init() {
 	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptPromptDataPromptUnion)(nil)).Elem(),
+		reflect.TypeOf((*PromptDataPromptUnion)(nil)).Elem(),
 		"",
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataPromptCompletion{}),
+			Type:       reflect.TypeOf(PromptDataPromptCompletion{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataPromptChat{}),
+			Type:       reflect.TypeOf(PromptDataPromptChat{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataPromptNullableVariant{}),
+			Type:       reflect.TypeOf(PromptDataPromptNullableVariant{}),
 		},
 	)
 }
 
-type PromptPromptDataPromptCompletion struct {
-	Content string                               `json:"content,required"`
-	Type    PromptPromptDataPromptCompletionType `json:"type,required"`
-	JSON    promptPromptDataPromptCompletionJSON `json:"-"`
+type PromptDataPromptCompletion struct {
+	Content string                         `json:"content,required"`
+	Type    PromptDataPromptCompletionType `json:"type,required"`
+	JSON    promptDataPromptCompletionJSON `json:"-"`
 }
 
-// promptPromptDataPromptCompletionJSON contains the JSON metadata for the struct
-// [PromptPromptDataPromptCompletion]
-type promptPromptDataPromptCompletionJSON struct {
+// promptDataPromptCompletionJSON contains the JSON metadata for the struct
+// [PromptDataPromptCompletion]
+type promptDataPromptCompletionJSON struct {
 	Content     apijson.Field
 	Type        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataPromptCompletion) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptCompletion) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataPromptCompletionJSON) RawJSON() string {
+func (r promptDataPromptCompletionJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataPromptCompletion) implementsPromptPromptDataPrompt() {}
+func (r PromptDataPromptCompletion) implementsPromptDataPrompt() {}
 
-type PromptPromptDataPromptCompletionType string
+type PromptDataPromptCompletionType string
 
 const (
-	PromptPromptDataPromptCompletionTypeCompletion PromptPromptDataPromptCompletionType = "completion"
+	PromptDataPromptCompletionTypeCompletion PromptDataPromptCompletionType = "completion"
 )
 
-func (r PromptPromptDataPromptCompletionType) IsKnown() bool {
+func (r PromptDataPromptCompletionType) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptCompletionTypeCompletion:
+	case PromptDataPromptCompletionTypeCompletion:
 		return true
 	}
 	return false
 }
 
-type PromptPromptDataPromptChat struct {
-	Messages []PromptPromptDataPromptChatMessage `json:"messages,required"`
-	Type     PromptPromptDataPromptChatType      `json:"type,required"`
-	Tools    string                              `json:"tools"`
-	JSON     promptPromptDataPromptChatJSON      `json:"-"`
+type PromptDataPromptChat struct {
+	Messages []PromptDataPromptChatMessage `json:"messages,required"`
+	Type     PromptDataPromptChatType      `json:"type,required"`
+	Tools    string                        `json:"tools"`
+	JSON     promptDataPromptChatJSON      `json:"-"`
 }
 
-// promptPromptDataPromptChatJSON contains the JSON metadata for the struct
-// [PromptPromptDataPromptChat]
-type promptPromptDataPromptChatJSON struct {
+// promptDataPromptChatJSON contains the JSON metadata for the struct
+// [PromptDataPromptChat]
+type promptDataPromptChatJSON struct {
 	Messages    apijson.Field
 	Type        apijson.Field
 	Tools       apijson.Field
@@ -919,36 +845,36 @@ type promptPromptDataPromptChatJSON struct {
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataPromptChat) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptChat) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataPromptChatJSON) RawJSON() string {
+func (r promptDataPromptChatJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataPromptChat) implementsPromptPromptDataPrompt() {}
+func (r PromptDataPromptChat) implementsPromptDataPrompt() {}
 
-type PromptPromptDataPromptChatMessage struct {
+type PromptDataPromptChatMessage struct {
 	// This field can have the runtime type of [string],
-	// [PromptPromptDataPromptChatMessagesUserContentUnion].
-	Content interface{}                            `json:"content,required"`
-	Role    PromptPromptDataPromptChatMessagesRole `json:"role,required"`
-	Name    string                                 `json:"name"`
+	// [PromptDataPromptChatMessagesUserContentUnion].
+	Content interface{}                      `json:"content,required"`
+	Role    PromptDataPromptChatMessagesRole `json:"role,required"`
+	Name    string                           `json:"name"`
 	// This field can have the runtime type of
-	// [PromptPromptDataPromptChatMessagesAssistantFunctionCall].
+	// [PromptDataPromptChatMessagesAssistantFunctionCall].
 	FunctionCall interface{} `json:"function_call,required"`
 	// This field can have the runtime type of
-	// [[]PromptPromptDataPromptChatMessagesAssistantToolCall].
-	ToolCalls  interface{}                           `json:"tool_calls,required"`
-	ToolCallID string                                `json:"tool_call_id"`
-	JSON       promptPromptDataPromptChatMessageJSON `json:"-"`
-	union      PromptPromptDataPromptChatMessagesUnion
+	// [[]PromptDataPromptChatMessagesAssistantToolCall].
+	ToolCalls  interface{}                     `json:"tool_calls,required"`
+	ToolCallID string                          `json:"tool_call_id"`
+	JSON       promptDataPromptChatMessageJSON `json:"-"`
+	union      PromptDataPromptChatMessagesUnion
 }
 
-// promptPromptDataPromptChatMessageJSON contains the JSON metadata for the struct
-// [PromptPromptDataPromptChatMessage]
-type promptPromptDataPromptChatMessageJSON struct {
+// promptDataPromptChatMessageJSON contains the JSON metadata for the struct
+// [PromptDataPromptChatMessage]
+type promptDataPromptChatMessageJSON struct {
 	Content      apijson.Field
 	Role         apijson.Field
 	Name         apijson.Field
@@ -959,12 +885,12 @@ type promptPromptDataPromptChatMessageJSON struct {
 	ExtraFields  map[string]apijson.Field
 }
 
-func (r promptPromptDataPromptChatMessageJSON) RawJSON() string {
+func (r promptDataPromptChatMessageJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r *PromptPromptDataPromptChatMessage) UnmarshalJSON(data []byte) (err error) {
-	*r = PromptPromptDataPromptChatMessage{}
+func (r *PromptDataPromptChatMessage) UnmarshalJSON(data []byte) (err error) {
+	*r = PromptDataPromptChatMessage{}
 	err = apijson.UnmarshalRoot(data, &r.union)
 	if err != nil {
 		return err
@@ -972,71 +898,66 @@ func (r *PromptPromptDataPromptChatMessage) UnmarshalJSON(data []byte) (err erro
 	return apijson.Port(r.union, &r)
 }
 
-// AsUnion returns a [PromptPromptDataPromptChatMessagesUnion] interface which you
-// can cast to the specific types for more type safety.
+// AsUnion returns a [PromptDataPromptChatMessagesUnion] interface which you can
+// cast to the specific types for more type safety.
 //
-// Possible runtime types of the union are
-// [PromptPromptDataPromptChatMessagesSystem],
-// [PromptPromptDataPromptChatMessagesUser],
-// [PromptPromptDataPromptChatMessagesAssistant],
-// [PromptPromptDataPromptChatMessagesTool],
-// [PromptPromptDataPromptChatMessagesFunction],
-// [PromptPromptDataPromptChatMessagesFallback].
-func (r PromptPromptDataPromptChatMessage) AsUnion() PromptPromptDataPromptChatMessagesUnion {
+// Possible runtime types of the union are [PromptDataPromptChatMessagesSystem],
+// [PromptDataPromptChatMessagesUser], [PromptDataPromptChatMessagesAssistant],
+// [PromptDataPromptChatMessagesTool], [PromptDataPromptChatMessagesFunction],
+// [PromptDataPromptChatMessagesFallback].
+func (r PromptDataPromptChatMessage) AsUnion() PromptDataPromptChatMessagesUnion {
 	return r.union
 }
 
-// Union satisfied by [PromptPromptDataPromptChatMessagesSystem],
-// [PromptPromptDataPromptChatMessagesUser],
-// [PromptPromptDataPromptChatMessagesAssistant],
-// [PromptPromptDataPromptChatMessagesTool],
-// [PromptPromptDataPromptChatMessagesFunction] or
-// [PromptPromptDataPromptChatMessagesFallback].
-type PromptPromptDataPromptChatMessagesUnion interface {
-	implementsPromptPromptDataPromptChatMessage()
+// Union satisfied by [PromptDataPromptChatMessagesSystem],
+// [PromptDataPromptChatMessagesUser], [PromptDataPromptChatMessagesAssistant],
+// [PromptDataPromptChatMessagesTool], [PromptDataPromptChatMessagesFunction] or
+// [PromptDataPromptChatMessagesFallback].
+type PromptDataPromptChatMessagesUnion interface {
+	implementsPromptDataPromptChatMessage()
 }
 
 func init() {
 	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptPromptDataPromptChatMessagesUnion)(nil)).Elem(),
+		reflect.TypeOf((*PromptDataPromptChatMessagesUnion)(nil)).Elem(),
 		"",
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataPromptChatMessagesSystem{}),
+			Type:       reflect.TypeOf(PromptDataPromptChatMessagesSystem{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataPromptChatMessagesUser{}),
+			Type:       reflect.TypeOf(PromptDataPromptChatMessagesUser{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataPromptChatMessagesAssistant{}),
+			Type:       reflect.TypeOf(PromptDataPromptChatMessagesAssistant{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataPromptChatMessagesTool{}),
+			Type:       reflect.TypeOf(PromptDataPromptChatMessagesTool{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataPromptChatMessagesFunction{}),
+			Type:       reflect.TypeOf(PromptDataPromptChatMessagesFunction{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataPromptChatMessagesFallback{}),
+			Type:       reflect.TypeOf(PromptDataPromptChatMessagesFallback{}),
 		},
 	)
 }
 
-type PromptPromptDataPromptChatMessagesSystem struct {
-	Role    PromptPromptDataPromptChatMessagesSystemRole `json:"role,required"`
-	Content string                                       `json:"content"`
-	Name    string                                       `json:"name"`
-	JSON    promptPromptDataPromptChatMessagesSystemJSON `json:"-"`
+type PromptDataPromptChatMessagesSystem struct {
+	Role    PromptDataPromptChatMessagesSystemRole `json:"role,required"`
+	Content string                                 `json:"content"`
+	Name    string                                 `json:"name"`
+	JSON    promptDataPromptChatMessagesSystemJSON `json:"-"`
 }
 
-// promptPromptDataPromptChatMessagesSystemJSON contains the JSON metadata for the
-// struct [PromptPromptDataPromptChatMessagesSystem]
-type promptPromptDataPromptChatMessagesSystemJSON struct {
+// promptDataPromptChatMessagesSystemJSON contains the JSON metadata for the struct
+// [PromptDataPromptChatMessagesSystem]
+type promptDataPromptChatMessagesSystemJSON struct {
 	Role        apijson.Field
 	Content     apijson.Field
 	Name        apijson.Field
@@ -1044,40 +965,40 @@ type promptPromptDataPromptChatMessagesSystemJSON struct {
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataPromptChatMessagesSystem) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptChatMessagesSystem) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataPromptChatMessagesSystemJSON) RawJSON() string {
+func (r promptDataPromptChatMessagesSystemJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataPromptChatMessagesSystem) implementsPromptPromptDataPromptChatMessage() {}
+func (r PromptDataPromptChatMessagesSystem) implementsPromptDataPromptChatMessage() {}
 
-type PromptPromptDataPromptChatMessagesSystemRole string
+type PromptDataPromptChatMessagesSystemRole string
 
 const (
-	PromptPromptDataPromptChatMessagesSystemRoleSystem PromptPromptDataPromptChatMessagesSystemRole = "system"
+	PromptDataPromptChatMessagesSystemRoleSystem PromptDataPromptChatMessagesSystemRole = "system"
 )
 
-func (r PromptPromptDataPromptChatMessagesSystemRole) IsKnown() bool {
+func (r PromptDataPromptChatMessagesSystemRole) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptChatMessagesSystemRoleSystem:
+	case PromptDataPromptChatMessagesSystemRoleSystem:
 		return true
 	}
 	return false
 }
 
-type PromptPromptDataPromptChatMessagesUser struct {
-	Role    PromptPromptDataPromptChatMessagesUserRole         `json:"role,required"`
-	Content PromptPromptDataPromptChatMessagesUserContentUnion `json:"content"`
-	Name    string                                             `json:"name"`
-	JSON    promptPromptDataPromptChatMessagesUserJSON         `json:"-"`
+type PromptDataPromptChatMessagesUser struct {
+	Role    PromptDataPromptChatMessagesUserRole         `json:"role,required"`
+	Content PromptDataPromptChatMessagesUserContentUnion `json:"content"`
+	Name    string                                       `json:"name"`
+	JSON    promptDataPromptChatMessagesUserJSON         `json:"-"`
 }
 
-// promptPromptDataPromptChatMessagesUserJSON contains the JSON metadata for the
-// struct [PromptPromptDataPromptChatMessagesUser]
-type promptPromptDataPromptChatMessagesUserJSON struct {
+// promptDataPromptChatMessagesUserJSON contains the JSON metadata for the struct
+// [PromptDataPromptChatMessagesUser]
+type promptDataPromptChatMessagesUserJSON struct {
 	Role        apijson.Field
 	Content     apijson.Field
 	Name        apijson.Field
@@ -1085,39 +1006,39 @@ type promptPromptDataPromptChatMessagesUserJSON struct {
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataPromptChatMessagesUser) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptChatMessagesUser) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataPromptChatMessagesUserJSON) RawJSON() string {
+func (r promptDataPromptChatMessagesUserJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataPromptChatMessagesUser) implementsPromptPromptDataPromptChatMessage() {}
+func (r PromptDataPromptChatMessagesUser) implementsPromptDataPromptChatMessage() {}
 
-type PromptPromptDataPromptChatMessagesUserRole string
+type PromptDataPromptChatMessagesUserRole string
 
 const (
-	PromptPromptDataPromptChatMessagesUserRoleUser PromptPromptDataPromptChatMessagesUserRole = "user"
+	PromptDataPromptChatMessagesUserRoleUser PromptDataPromptChatMessagesUserRole = "user"
 )
 
-func (r PromptPromptDataPromptChatMessagesUserRole) IsKnown() bool {
+func (r PromptDataPromptChatMessagesUserRole) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptChatMessagesUserRoleUser:
+	case PromptDataPromptChatMessagesUserRoleUser:
 		return true
 	}
 	return false
 }
 
 // Union satisfied by [shared.UnionString] or
-// [PromptPromptDataPromptChatMessagesUserContentArray].
-type PromptPromptDataPromptChatMessagesUserContentUnion interface {
-	ImplementsPromptPromptDataPromptChatMessagesUserContentUnion()
+// [PromptDataPromptChatMessagesUserContentArray].
+type PromptDataPromptChatMessagesUserContentUnion interface {
+	ImplementsPromptDataPromptChatMessagesUserContentUnion()
 }
 
 func init() {
 	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptPromptDataPromptChatMessagesUserContentUnion)(nil)).Elem(),
+		reflect.TypeOf((*PromptDataPromptChatMessagesUserContentUnion)(nil)).Elem(),
 		"",
 		apijson.UnionVariant{
 			TypeFilter: gjson.String,
@@ -1125,29 +1046,29 @@ func init() {
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataPromptChatMessagesUserContentArray{}),
+			Type:       reflect.TypeOf(PromptDataPromptChatMessagesUserContentArray{}),
 		},
 	)
 }
 
-type PromptPromptDataPromptChatMessagesUserContentArray []PromptPromptDataPromptChatMessagesUserContentArrayItem
+type PromptDataPromptChatMessagesUserContentArray []PromptDataPromptChatMessagesUserContentArrayItem
 
-func (r PromptPromptDataPromptChatMessagesUserContentArray) ImplementsPromptPromptDataPromptChatMessagesUserContentUnion() {
+func (r PromptDataPromptChatMessagesUserContentArray) ImplementsPromptDataPromptChatMessagesUserContentUnion() {
 }
 
-type PromptPromptDataPromptChatMessagesUserContentArrayItem struct {
-	Text string                                                 `json:"text"`
-	Type PromptPromptDataPromptChatMessagesUserContentArrayType `json:"type,required"`
+type PromptDataPromptChatMessagesUserContentArrayItem struct {
+	Text string                                           `json:"text"`
+	Type PromptDataPromptChatMessagesUserContentArrayType `json:"type,required"`
 	// This field can have the runtime type of
-	// [PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURL].
-	ImageURL interface{}                                                `json:"image_url,required"`
-	JSON     promptPromptDataPromptChatMessagesUserContentArrayItemJSON `json:"-"`
-	union    PromptPromptDataPromptChatMessagesUserContentArrayUnionItem
+	// [PromptDataPromptChatMessagesUserContentArrayImageURLImageURL].
+	ImageURL interface{}                                          `json:"image_url,required"`
+	JSON     promptDataPromptChatMessagesUserContentArrayItemJSON `json:"-"`
+	union    PromptDataPromptChatMessagesUserContentArrayUnionItem
 }
 
-// promptPromptDataPromptChatMessagesUserContentArrayItemJSON contains the JSON
-// metadata for the struct [PromptPromptDataPromptChatMessagesUserContentArrayItem]
-type promptPromptDataPromptChatMessagesUserContentArrayItemJSON struct {
+// promptDataPromptChatMessagesUserContentArrayItemJSON contains the JSON metadata
+// for the struct [PromptDataPromptChatMessagesUserContentArrayItem]
+type promptDataPromptChatMessagesUserContentArrayItemJSON struct {
 	Text        apijson.Field
 	Type        apijson.Field
 	ImageURL    apijson.Field
@@ -1155,12 +1076,12 @@ type promptPromptDataPromptChatMessagesUserContentArrayItemJSON struct {
 	ExtraFields map[string]apijson.Field
 }
 
-func (r promptPromptDataPromptChatMessagesUserContentArrayItemJSON) RawJSON() string {
+func (r promptDataPromptChatMessagesUserContentArrayItemJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r *PromptPromptDataPromptChatMessagesUserContentArrayItem) UnmarshalJSON(data []byte) (err error) {
-	*r = PromptPromptDataPromptChatMessagesUserContentArrayItem{}
+func (r *PromptDataPromptChatMessagesUserContentArrayItem) UnmarshalJSON(data []byte) (err error) {
+	*r = PromptDataPromptChatMessagesUserContentArrayItem{}
 	err = apijson.UnmarshalRoot(data, &r.union)
 	if err != nil {
 		return err
@@ -1168,185 +1089,184 @@ func (r *PromptPromptDataPromptChatMessagesUserContentArrayItem) UnmarshalJSON(d
 	return apijson.Port(r.union, &r)
 }
 
-// AsUnion returns a [PromptPromptDataPromptChatMessagesUserContentArrayUnionItem]
+// AsUnion returns a [PromptDataPromptChatMessagesUserContentArrayUnionItem]
 // interface which you can cast to the specific types for more type safety.
 //
 // Possible runtime types of the union are
-// [PromptPromptDataPromptChatMessagesUserContentArrayText],
-// [PromptPromptDataPromptChatMessagesUserContentArrayImageURL].
-func (r PromptPromptDataPromptChatMessagesUserContentArrayItem) AsUnion() PromptPromptDataPromptChatMessagesUserContentArrayUnionItem {
+// [PromptDataPromptChatMessagesUserContentArrayText],
+// [PromptDataPromptChatMessagesUserContentArrayImageURL].
+func (r PromptDataPromptChatMessagesUserContentArrayItem) AsUnion() PromptDataPromptChatMessagesUserContentArrayUnionItem {
 	return r.union
 }
 
-// Union satisfied by [PromptPromptDataPromptChatMessagesUserContentArrayText] or
-// [PromptPromptDataPromptChatMessagesUserContentArrayImageURL].
-type PromptPromptDataPromptChatMessagesUserContentArrayUnionItem interface {
-	implementsPromptPromptDataPromptChatMessagesUserContentArrayItem()
+// Union satisfied by [PromptDataPromptChatMessagesUserContentArrayText] or
+// [PromptDataPromptChatMessagesUserContentArrayImageURL].
+type PromptDataPromptChatMessagesUserContentArrayUnionItem interface {
+	implementsPromptDataPromptChatMessagesUserContentArrayItem()
 }
 
 func init() {
 	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptPromptDataPromptChatMessagesUserContentArrayUnionItem)(nil)).Elem(),
+		reflect.TypeOf((*PromptDataPromptChatMessagesUserContentArrayUnionItem)(nil)).Elem(),
 		"",
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataPromptChatMessagesUserContentArrayText{}),
+			Type:       reflect.TypeOf(PromptDataPromptChatMessagesUserContentArrayText{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptPromptDataPromptChatMessagesUserContentArrayImageURL{}),
+			Type:       reflect.TypeOf(PromptDataPromptChatMessagesUserContentArrayImageURL{}),
 		},
 	)
 }
 
-type PromptPromptDataPromptChatMessagesUserContentArrayText struct {
-	Type PromptPromptDataPromptChatMessagesUserContentArrayTextType `json:"type,required"`
-	Text string                                                     `json:"text"`
-	JSON promptPromptDataPromptChatMessagesUserContentArrayTextJSON `json:"-"`
+type PromptDataPromptChatMessagesUserContentArrayText struct {
+	Type PromptDataPromptChatMessagesUserContentArrayTextType `json:"type,required"`
+	Text string                                               `json:"text"`
+	JSON promptDataPromptChatMessagesUserContentArrayTextJSON `json:"-"`
 }
 
-// promptPromptDataPromptChatMessagesUserContentArrayTextJSON contains the JSON
-// metadata for the struct [PromptPromptDataPromptChatMessagesUserContentArrayText]
-type promptPromptDataPromptChatMessagesUserContentArrayTextJSON struct {
+// promptDataPromptChatMessagesUserContentArrayTextJSON contains the JSON metadata
+// for the struct [PromptDataPromptChatMessagesUserContentArrayText]
+type promptDataPromptChatMessagesUserContentArrayTextJSON struct {
 	Type        apijson.Field
 	Text        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataPromptChatMessagesUserContentArrayText) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptChatMessagesUserContentArrayText) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataPromptChatMessagesUserContentArrayTextJSON) RawJSON() string {
+func (r promptDataPromptChatMessagesUserContentArrayTextJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataPromptChatMessagesUserContentArrayText) implementsPromptPromptDataPromptChatMessagesUserContentArrayItem() {
+func (r PromptDataPromptChatMessagesUserContentArrayText) implementsPromptDataPromptChatMessagesUserContentArrayItem() {
 }
 
-type PromptPromptDataPromptChatMessagesUserContentArrayTextType string
+type PromptDataPromptChatMessagesUserContentArrayTextType string
 
 const (
-	PromptPromptDataPromptChatMessagesUserContentArrayTextTypeText PromptPromptDataPromptChatMessagesUserContentArrayTextType = "text"
+	PromptDataPromptChatMessagesUserContentArrayTextTypeText PromptDataPromptChatMessagesUserContentArrayTextType = "text"
 )
 
-func (r PromptPromptDataPromptChatMessagesUserContentArrayTextType) IsKnown() bool {
+func (r PromptDataPromptChatMessagesUserContentArrayTextType) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptChatMessagesUserContentArrayTextTypeText:
+	case PromptDataPromptChatMessagesUserContentArrayTextTypeText:
 		return true
 	}
 	return false
 }
 
-type PromptPromptDataPromptChatMessagesUserContentArrayImageURL struct {
-	ImageURL PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURL `json:"image_url,required"`
-	Type     PromptPromptDataPromptChatMessagesUserContentArrayImageURLType     `json:"type,required"`
-	JSON     promptPromptDataPromptChatMessagesUserContentArrayImageURLJSON     `json:"-"`
+type PromptDataPromptChatMessagesUserContentArrayImageURL struct {
+	ImageURL PromptDataPromptChatMessagesUserContentArrayImageURLImageURL `json:"image_url,required"`
+	Type     PromptDataPromptChatMessagesUserContentArrayImageURLType     `json:"type,required"`
+	JSON     promptDataPromptChatMessagesUserContentArrayImageURLJSON     `json:"-"`
 }
 
-// promptPromptDataPromptChatMessagesUserContentArrayImageURLJSON contains the JSON
-// metadata for the struct
-// [PromptPromptDataPromptChatMessagesUserContentArrayImageURL]
-type promptPromptDataPromptChatMessagesUserContentArrayImageURLJSON struct {
+// promptDataPromptChatMessagesUserContentArrayImageURLJSON contains the JSON
+// metadata for the struct [PromptDataPromptChatMessagesUserContentArrayImageURL]
+type promptDataPromptChatMessagesUserContentArrayImageURLJSON struct {
 	ImageURL    apijson.Field
 	Type        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataPromptChatMessagesUserContentArrayImageURL) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptChatMessagesUserContentArrayImageURL) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataPromptChatMessagesUserContentArrayImageURLJSON) RawJSON() string {
+func (r promptDataPromptChatMessagesUserContentArrayImageURLJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataPromptChatMessagesUserContentArrayImageURL) implementsPromptPromptDataPromptChatMessagesUserContentArrayItem() {
+func (r PromptDataPromptChatMessagesUserContentArrayImageURL) implementsPromptDataPromptChatMessagesUserContentArrayItem() {
 }
 
-type PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURL struct {
-	URL    string                                                                   `json:"url,required"`
-	Detail PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail `json:"detail"`
-	JSON   promptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLJSON   `json:"-"`
+type PromptDataPromptChatMessagesUserContentArrayImageURLImageURL struct {
+	URL    string                                                             `json:"url,required"`
+	Detail PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail `json:"detail"`
+	JSON   promptDataPromptChatMessagesUserContentArrayImageURLImageURLJSON   `json:"-"`
 }
 
-// promptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLJSON contains
-// the JSON metadata for the struct
-// [PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURL]
-type promptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLJSON struct {
+// promptDataPromptChatMessagesUserContentArrayImageURLImageURLJSON contains the
+// JSON metadata for the struct
+// [PromptDataPromptChatMessagesUserContentArrayImageURLImageURL]
+type promptDataPromptChatMessagesUserContentArrayImageURLImageURLJSON struct {
 	URL         apijson.Field
 	Detail      apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURL) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptChatMessagesUserContentArrayImageURLImageURL) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLJSON) RawJSON() string {
+func (r promptDataPromptChatMessagesUserContentArrayImageURLImageURLJSON) RawJSON() string {
 	return r.raw
 }
 
-type PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail string
+type PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail string
 
 const (
-	PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailAuto PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "auto"
-	PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailLow  PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "low"
-	PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailHigh PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "high"
+	PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailAuto PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "auto"
+	PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailLow  PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "low"
+	PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailHigh PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "high"
 )
 
-func (r PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail) IsKnown() bool {
+func (r PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailAuto, PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailLow, PromptPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailHigh:
+	case PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailAuto, PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailLow, PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailHigh:
 		return true
 	}
 	return false
 }
 
-type PromptPromptDataPromptChatMessagesUserContentArrayImageURLType string
+type PromptDataPromptChatMessagesUserContentArrayImageURLType string
 
 const (
-	PromptPromptDataPromptChatMessagesUserContentArrayImageURLTypeImageURL PromptPromptDataPromptChatMessagesUserContentArrayImageURLType = "image_url"
+	PromptDataPromptChatMessagesUserContentArrayImageURLTypeImageURL PromptDataPromptChatMessagesUserContentArrayImageURLType = "image_url"
 )
 
-func (r PromptPromptDataPromptChatMessagesUserContentArrayImageURLType) IsKnown() bool {
+func (r PromptDataPromptChatMessagesUserContentArrayImageURLType) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptChatMessagesUserContentArrayImageURLTypeImageURL:
+	case PromptDataPromptChatMessagesUserContentArrayImageURLTypeImageURL:
 		return true
 	}
 	return false
 }
 
-type PromptPromptDataPromptChatMessagesUserContentArrayType string
+type PromptDataPromptChatMessagesUserContentArrayType string
 
 const (
-	PromptPromptDataPromptChatMessagesUserContentArrayTypeText     PromptPromptDataPromptChatMessagesUserContentArrayType = "text"
-	PromptPromptDataPromptChatMessagesUserContentArrayTypeImageURL PromptPromptDataPromptChatMessagesUserContentArrayType = "image_url"
+	PromptDataPromptChatMessagesUserContentArrayTypeText     PromptDataPromptChatMessagesUserContentArrayType = "text"
+	PromptDataPromptChatMessagesUserContentArrayTypeImageURL PromptDataPromptChatMessagesUserContentArrayType = "image_url"
 )
 
-func (r PromptPromptDataPromptChatMessagesUserContentArrayType) IsKnown() bool {
+func (r PromptDataPromptChatMessagesUserContentArrayType) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptChatMessagesUserContentArrayTypeText, PromptPromptDataPromptChatMessagesUserContentArrayTypeImageURL:
+	case PromptDataPromptChatMessagesUserContentArrayTypeText, PromptDataPromptChatMessagesUserContentArrayTypeImageURL:
 		return true
 	}
 	return false
 }
 
-type PromptPromptDataPromptChatMessagesAssistant struct {
-	Role         PromptPromptDataPromptChatMessagesAssistantRole         `json:"role,required"`
-	Content      string                                                  `json:"content,nullable"`
-	FunctionCall PromptPromptDataPromptChatMessagesAssistantFunctionCall `json:"function_call"`
-	Name         string                                                  `json:"name"`
-	ToolCalls    []PromptPromptDataPromptChatMessagesAssistantToolCall   `json:"tool_calls"`
-	JSON         promptPromptDataPromptChatMessagesAssistantJSON         `json:"-"`
+type PromptDataPromptChatMessagesAssistant struct {
+	Role         PromptDataPromptChatMessagesAssistantRole         `json:"role,required"`
+	Content      string                                            `json:"content,nullable"`
+	FunctionCall PromptDataPromptChatMessagesAssistantFunctionCall `json:"function_call"`
+	Name         string                                            `json:"name"`
+	ToolCalls    []PromptDataPromptChatMessagesAssistantToolCall   `json:"tool_calls"`
+	JSON         promptDataPromptChatMessagesAssistantJSON         `json:"-"`
 }
 
-// promptPromptDataPromptChatMessagesAssistantJSON contains the JSON metadata for
-// the struct [PromptPromptDataPromptChatMessagesAssistant]
-type promptPromptDataPromptChatMessagesAssistantJSON struct {
+// promptDataPromptChatMessagesAssistantJSON contains the JSON metadata for the
+// struct [PromptDataPromptChatMessagesAssistant]
+type promptDataPromptChatMessagesAssistantJSON struct {
 	Role         apijson.Field
 	Content      apijson.Field
 	FunctionCall apijson.Field
@@ -1356,64 +1276,63 @@ type promptPromptDataPromptChatMessagesAssistantJSON struct {
 	ExtraFields  map[string]apijson.Field
 }
 
-func (r *PromptPromptDataPromptChatMessagesAssistant) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptChatMessagesAssistant) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataPromptChatMessagesAssistantJSON) RawJSON() string {
+func (r promptDataPromptChatMessagesAssistantJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataPromptChatMessagesAssistant) implementsPromptPromptDataPromptChatMessage() {}
+func (r PromptDataPromptChatMessagesAssistant) implementsPromptDataPromptChatMessage() {}
 
-type PromptPromptDataPromptChatMessagesAssistantRole string
+type PromptDataPromptChatMessagesAssistantRole string
 
 const (
-	PromptPromptDataPromptChatMessagesAssistantRoleAssistant PromptPromptDataPromptChatMessagesAssistantRole = "assistant"
+	PromptDataPromptChatMessagesAssistantRoleAssistant PromptDataPromptChatMessagesAssistantRole = "assistant"
 )
 
-func (r PromptPromptDataPromptChatMessagesAssistantRole) IsKnown() bool {
+func (r PromptDataPromptChatMessagesAssistantRole) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptChatMessagesAssistantRoleAssistant:
+	case PromptDataPromptChatMessagesAssistantRoleAssistant:
 		return true
 	}
 	return false
 }
 
-type PromptPromptDataPromptChatMessagesAssistantFunctionCall struct {
-	Arguments string                                                      `json:"arguments,required"`
-	Name      string                                                      `json:"name,required"`
-	JSON      promptPromptDataPromptChatMessagesAssistantFunctionCallJSON `json:"-"`
+type PromptDataPromptChatMessagesAssistantFunctionCall struct {
+	Arguments string                                                `json:"arguments,required"`
+	Name      string                                                `json:"name,required"`
+	JSON      promptDataPromptChatMessagesAssistantFunctionCallJSON `json:"-"`
 }
 
-// promptPromptDataPromptChatMessagesAssistantFunctionCallJSON contains the JSON
-// metadata for the struct
-// [PromptPromptDataPromptChatMessagesAssistantFunctionCall]
-type promptPromptDataPromptChatMessagesAssistantFunctionCallJSON struct {
+// promptDataPromptChatMessagesAssistantFunctionCallJSON contains the JSON metadata
+// for the struct [PromptDataPromptChatMessagesAssistantFunctionCall]
+type promptDataPromptChatMessagesAssistantFunctionCallJSON struct {
 	Arguments   apijson.Field
 	Name        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataPromptChatMessagesAssistantFunctionCall) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptChatMessagesAssistantFunctionCall) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataPromptChatMessagesAssistantFunctionCallJSON) RawJSON() string {
+func (r promptDataPromptChatMessagesAssistantFunctionCallJSON) RawJSON() string {
 	return r.raw
 }
 
-type PromptPromptDataPromptChatMessagesAssistantToolCall struct {
-	ID       string                                                       `json:"id,required"`
-	Function PromptPromptDataPromptChatMessagesAssistantToolCallsFunction `json:"function,required"`
-	Type     PromptPromptDataPromptChatMessagesAssistantToolCallsType     `json:"type,required"`
-	JSON     promptPromptDataPromptChatMessagesAssistantToolCallJSON      `json:"-"`
+type PromptDataPromptChatMessagesAssistantToolCall struct {
+	ID       string                                                 `json:"id,required"`
+	Function PromptDataPromptChatMessagesAssistantToolCallsFunction `json:"function,required"`
+	Type     PromptDataPromptChatMessagesAssistantToolCallsType     `json:"type,required"`
+	JSON     promptDataPromptChatMessagesAssistantToolCallJSON      `json:"-"`
 }
 
-// promptPromptDataPromptChatMessagesAssistantToolCallJSON contains the JSON
-// metadata for the struct [PromptPromptDataPromptChatMessagesAssistantToolCall]
-type promptPromptDataPromptChatMessagesAssistantToolCallJSON struct {
+// promptDataPromptChatMessagesAssistantToolCallJSON contains the JSON metadata for
+// the struct [PromptDataPromptChatMessagesAssistantToolCall]
+type promptDataPromptChatMessagesAssistantToolCallJSON struct {
 	ID          apijson.Field
 	Function    apijson.Field
 	Type        apijson.Field
@@ -1421,62 +1340,61 @@ type promptPromptDataPromptChatMessagesAssistantToolCallJSON struct {
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataPromptChatMessagesAssistantToolCall) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptChatMessagesAssistantToolCall) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataPromptChatMessagesAssistantToolCallJSON) RawJSON() string {
+func (r promptDataPromptChatMessagesAssistantToolCallJSON) RawJSON() string {
 	return r.raw
 }
 
-type PromptPromptDataPromptChatMessagesAssistantToolCallsFunction struct {
-	Arguments string                                                           `json:"arguments,required"`
-	Name      string                                                           `json:"name,required"`
-	JSON      promptPromptDataPromptChatMessagesAssistantToolCallsFunctionJSON `json:"-"`
+type PromptDataPromptChatMessagesAssistantToolCallsFunction struct {
+	Arguments string                                                     `json:"arguments,required"`
+	Name      string                                                     `json:"name,required"`
+	JSON      promptDataPromptChatMessagesAssistantToolCallsFunctionJSON `json:"-"`
 }
 
-// promptPromptDataPromptChatMessagesAssistantToolCallsFunctionJSON contains the
-// JSON metadata for the struct
-// [PromptPromptDataPromptChatMessagesAssistantToolCallsFunction]
-type promptPromptDataPromptChatMessagesAssistantToolCallsFunctionJSON struct {
+// promptDataPromptChatMessagesAssistantToolCallsFunctionJSON contains the JSON
+// metadata for the struct [PromptDataPromptChatMessagesAssistantToolCallsFunction]
+type promptDataPromptChatMessagesAssistantToolCallsFunctionJSON struct {
 	Arguments   apijson.Field
 	Name        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataPromptChatMessagesAssistantToolCallsFunction) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptChatMessagesAssistantToolCallsFunction) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataPromptChatMessagesAssistantToolCallsFunctionJSON) RawJSON() string {
+func (r promptDataPromptChatMessagesAssistantToolCallsFunctionJSON) RawJSON() string {
 	return r.raw
 }
 
-type PromptPromptDataPromptChatMessagesAssistantToolCallsType string
+type PromptDataPromptChatMessagesAssistantToolCallsType string
 
 const (
-	PromptPromptDataPromptChatMessagesAssistantToolCallsTypeFunction PromptPromptDataPromptChatMessagesAssistantToolCallsType = "function"
+	PromptDataPromptChatMessagesAssistantToolCallsTypeFunction PromptDataPromptChatMessagesAssistantToolCallsType = "function"
 )
 
-func (r PromptPromptDataPromptChatMessagesAssistantToolCallsType) IsKnown() bool {
+func (r PromptDataPromptChatMessagesAssistantToolCallsType) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptChatMessagesAssistantToolCallsTypeFunction:
+	case PromptDataPromptChatMessagesAssistantToolCallsTypeFunction:
 		return true
 	}
 	return false
 }
 
-type PromptPromptDataPromptChatMessagesTool struct {
-	Role       PromptPromptDataPromptChatMessagesToolRole `json:"role,required"`
-	Content    string                                     `json:"content"`
-	ToolCallID string                                     `json:"tool_call_id"`
-	JSON       promptPromptDataPromptChatMessagesToolJSON `json:"-"`
+type PromptDataPromptChatMessagesTool struct {
+	Role       PromptDataPromptChatMessagesToolRole `json:"role,required"`
+	Content    string                               `json:"content"`
+	ToolCallID string                               `json:"tool_call_id"`
+	JSON       promptDataPromptChatMessagesToolJSON `json:"-"`
 }
 
-// promptPromptDataPromptChatMessagesToolJSON contains the JSON metadata for the
-// struct [PromptPromptDataPromptChatMessagesTool]
-type promptPromptDataPromptChatMessagesToolJSON struct {
+// promptDataPromptChatMessagesToolJSON contains the JSON metadata for the struct
+// [PromptDataPromptChatMessagesTool]
+type promptDataPromptChatMessagesToolJSON struct {
 	Role        apijson.Field
 	Content     apijson.Field
 	ToolCallID  apijson.Field
@@ -1484,40 +1402,40 @@ type promptPromptDataPromptChatMessagesToolJSON struct {
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataPromptChatMessagesTool) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptChatMessagesTool) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataPromptChatMessagesToolJSON) RawJSON() string {
+func (r promptDataPromptChatMessagesToolJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataPromptChatMessagesTool) implementsPromptPromptDataPromptChatMessage() {}
+func (r PromptDataPromptChatMessagesTool) implementsPromptDataPromptChatMessage() {}
 
-type PromptPromptDataPromptChatMessagesToolRole string
+type PromptDataPromptChatMessagesToolRole string
 
 const (
-	PromptPromptDataPromptChatMessagesToolRoleTool PromptPromptDataPromptChatMessagesToolRole = "tool"
+	PromptDataPromptChatMessagesToolRoleTool PromptDataPromptChatMessagesToolRole = "tool"
 )
 
-func (r PromptPromptDataPromptChatMessagesToolRole) IsKnown() bool {
+func (r PromptDataPromptChatMessagesToolRole) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptChatMessagesToolRoleTool:
+	case PromptDataPromptChatMessagesToolRoleTool:
 		return true
 	}
 	return false
 }
 
-type PromptPromptDataPromptChatMessagesFunction struct {
-	Name    string                                         `json:"name,required"`
-	Role    PromptPromptDataPromptChatMessagesFunctionRole `json:"role,required"`
-	Content string                                         `json:"content"`
-	JSON    promptPromptDataPromptChatMessagesFunctionJSON `json:"-"`
+type PromptDataPromptChatMessagesFunction struct {
+	Name    string                                   `json:"name,required"`
+	Role    PromptDataPromptChatMessagesFunctionRole `json:"role,required"`
+	Content string                                   `json:"content"`
+	JSON    promptDataPromptChatMessagesFunctionJSON `json:"-"`
 }
 
-// promptPromptDataPromptChatMessagesFunctionJSON contains the JSON metadata for
-// the struct [PromptPromptDataPromptChatMessagesFunction]
-type promptPromptDataPromptChatMessagesFunctionJSON struct {
+// promptDataPromptChatMessagesFunctionJSON contains the JSON metadata for the
+// struct [PromptDataPromptChatMessagesFunction]
+type promptDataPromptChatMessagesFunctionJSON struct {
 	Name        apijson.Field
 	Role        apijson.Field
 	Content     apijson.Field
@@ -1525,137 +1443,580 @@ type promptPromptDataPromptChatMessagesFunctionJSON struct {
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataPromptChatMessagesFunction) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptChatMessagesFunction) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataPromptChatMessagesFunctionJSON) RawJSON() string {
+func (r promptDataPromptChatMessagesFunctionJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataPromptChatMessagesFunction) implementsPromptPromptDataPromptChatMessage() {}
+func (r PromptDataPromptChatMessagesFunction) implementsPromptDataPromptChatMessage() {}
 
-type PromptPromptDataPromptChatMessagesFunctionRole string
+type PromptDataPromptChatMessagesFunctionRole string
 
 const (
-	PromptPromptDataPromptChatMessagesFunctionRoleFunction PromptPromptDataPromptChatMessagesFunctionRole = "function"
+	PromptDataPromptChatMessagesFunctionRoleFunction PromptDataPromptChatMessagesFunctionRole = "function"
 )
 
-func (r PromptPromptDataPromptChatMessagesFunctionRole) IsKnown() bool {
+func (r PromptDataPromptChatMessagesFunctionRole) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptChatMessagesFunctionRoleFunction:
+	case PromptDataPromptChatMessagesFunctionRoleFunction:
 		return true
 	}
 	return false
 }
 
-type PromptPromptDataPromptChatMessagesFallback struct {
-	Role    PromptPromptDataPromptChatMessagesFallbackRole `json:"role,required"`
-	Content string                                         `json:"content,nullable"`
-	JSON    promptPromptDataPromptChatMessagesFallbackJSON `json:"-"`
+type PromptDataPromptChatMessagesFallback struct {
+	Role    PromptDataPromptChatMessagesFallbackRole `json:"role,required"`
+	Content string                                   `json:"content,nullable"`
+	JSON    promptDataPromptChatMessagesFallbackJSON `json:"-"`
 }
 
-// promptPromptDataPromptChatMessagesFallbackJSON contains the JSON metadata for
-// the struct [PromptPromptDataPromptChatMessagesFallback]
-type promptPromptDataPromptChatMessagesFallbackJSON struct {
+// promptDataPromptChatMessagesFallbackJSON contains the JSON metadata for the
+// struct [PromptDataPromptChatMessagesFallback]
+type promptDataPromptChatMessagesFallbackJSON struct {
 	Role        apijson.Field
 	Content     apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataPromptChatMessagesFallback) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptChatMessagesFallback) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataPromptChatMessagesFallbackJSON) RawJSON() string {
+func (r promptDataPromptChatMessagesFallbackJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataPromptChatMessagesFallback) implementsPromptPromptDataPromptChatMessage() {}
+func (r PromptDataPromptChatMessagesFallback) implementsPromptDataPromptChatMessage() {}
 
-type PromptPromptDataPromptChatMessagesFallbackRole string
+type PromptDataPromptChatMessagesFallbackRole string
 
 const (
-	PromptPromptDataPromptChatMessagesFallbackRoleModel PromptPromptDataPromptChatMessagesFallbackRole = "model"
+	PromptDataPromptChatMessagesFallbackRoleModel PromptDataPromptChatMessagesFallbackRole = "model"
 )
 
-func (r PromptPromptDataPromptChatMessagesFallbackRole) IsKnown() bool {
+func (r PromptDataPromptChatMessagesFallbackRole) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptChatMessagesFallbackRoleModel:
+	case PromptDataPromptChatMessagesFallbackRoleModel:
 		return true
 	}
 	return false
 }
 
-type PromptPromptDataPromptChatMessagesRole string
+type PromptDataPromptChatMessagesRole string
 
 const (
-	PromptPromptDataPromptChatMessagesRoleSystem    PromptPromptDataPromptChatMessagesRole = "system"
-	PromptPromptDataPromptChatMessagesRoleUser      PromptPromptDataPromptChatMessagesRole = "user"
-	PromptPromptDataPromptChatMessagesRoleAssistant PromptPromptDataPromptChatMessagesRole = "assistant"
-	PromptPromptDataPromptChatMessagesRoleTool      PromptPromptDataPromptChatMessagesRole = "tool"
-	PromptPromptDataPromptChatMessagesRoleFunction  PromptPromptDataPromptChatMessagesRole = "function"
-	PromptPromptDataPromptChatMessagesRoleModel     PromptPromptDataPromptChatMessagesRole = "model"
+	PromptDataPromptChatMessagesRoleSystem    PromptDataPromptChatMessagesRole = "system"
+	PromptDataPromptChatMessagesRoleUser      PromptDataPromptChatMessagesRole = "user"
+	PromptDataPromptChatMessagesRoleAssistant PromptDataPromptChatMessagesRole = "assistant"
+	PromptDataPromptChatMessagesRoleTool      PromptDataPromptChatMessagesRole = "tool"
+	PromptDataPromptChatMessagesRoleFunction  PromptDataPromptChatMessagesRole = "function"
+	PromptDataPromptChatMessagesRoleModel     PromptDataPromptChatMessagesRole = "model"
 )
 
-func (r PromptPromptDataPromptChatMessagesRole) IsKnown() bool {
+func (r PromptDataPromptChatMessagesRole) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptChatMessagesRoleSystem, PromptPromptDataPromptChatMessagesRoleUser, PromptPromptDataPromptChatMessagesRoleAssistant, PromptPromptDataPromptChatMessagesRoleTool, PromptPromptDataPromptChatMessagesRoleFunction, PromptPromptDataPromptChatMessagesRoleModel:
+	case PromptDataPromptChatMessagesRoleSystem, PromptDataPromptChatMessagesRoleUser, PromptDataPromptChatMessagesRoleAssistant, PromptDataPromptChatMessagesRoleTool, PromptDataPromptChatMessagesRoleFunction, PromptDataPromptChatMessagesRoleModel:
 		return true
 	}
 	return false
 }
 
-type PromptPromptDataPromptChatType string
+type PromptDataPromptChatType string
 
 const (
-	PromptPromptDataPromptChatTypeChat PromptPromptDataPromptChatType = "chat"
+	PromptDataPromptChatTypeChat PromptDataPromptChatType = "chat"
 )
 
-func (r PromptPromptDataPromptChatType) IsKnown() bool {
+func (r PromptDataPromptChatType) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptChatTypeChat:
+	case PromptDataPromptChatTypeChat:
 		return true
 	}
 	return false
 }
 
-type PromptPromptDataPromptNullableVariant struct {
-	JSON promptPromptDataPromptNullableVariantJSON `json:"-"`
+type PromptDataPromptNullableVariant struct {
+	JSON promptDataPromptNullableVariantJSON `json:"-"`
 }
 
-// promptPromptDataPromptNullableVariantJSON contains the JSON metadata for the
-// struct [PromptPromptDataPromptNullableVariant]
-type promptPromptDataPromptNullableVariantJSON struct {
+// promptDataPromptNullableVariantJSON contains the JSON metadata for the struct
+// [PromptDataPromptNullableVariant]
+type promptDataPromptNullableVariantJSON struct {
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *PromptPromptDataPromptNullableVariant) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptNullableVariant) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptPromptDataPromptNullableVariantJSON) RawJSON() string {
+func (r promptDataPromptNullableVariantJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptPromptDataPromptNullableVariant) implementsPromptPromptDataPrompt() {}
+func (r PromptDataPromptNullableVariant) implementsPromptDataPrompt() {}
 
-type PromptPromptDataPromptType string
+type PromptDataPromptType string
 
 const (
-	PromptPromptDataPromptTypeCompletion PromptPromptDataPromptType = "completion"
-	PromptPromptDataPromptTypeChat       PromptPromptDataPromptType = "chat"
+	PromptDataPromptTypeCompletion PromptDataPromptType = "completion"
+	PromptDataPromptTypeChat       PromptDataPromptType = "chat"
 )
 
-func (r PromptPromptDataPromptType) IsKnown() bool {
+func (r PromptDataPromptType) IsKnown() bool {
 	switch r {
-	case PromptPromptDataPromptTypeCompletion, PromptPromptDataPromptTypeChat:
+	case PromptDataPromptTypeCompletion, PromptDataPromptTypeChat:
 		return true
 	}
 	return false
 }
+
+// The prompt, model, and its parameters
+type PromptDataParam struct {
+	Options param.Field[PromptDataOptionsParam]     `json:"options"`
+	Origin  param.Field[PromptDataOriginParam]      `json:"origin"`
+	Prompt  param.Field[PromptDataPromptUnionParam] `json:"prompt"`
+}
+
+func (r PromptDataParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type PromptDataOptionsParam struct {
+	Model    param.Field[string]                            `json:"model"`
+	Params   param.Field[PromptDataOptionsParamsUnionParam] `json:"params"`
+	Position param.Field[string]                            `json:"position"`
+}
+
+func (r PromptDataOptionsParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type PromptDataOptionsParamsParam struct {
+	UseCache         param.Field[bool]        `json:"use_cache"`
+	Temperature      param.Field[float64]     `json:"temperature"`
+	TopP             param.Field[float64]     `json:"top_p"`
+	MaxTokens        param.Field[float64]     `json:"max_tokens"`
+	FrequencyPenalty param.Field[float64]     `json:"frequency_penalty"`
+	PresencePenalty  param.Field[float64]     `json:"presence_penalty"`
+	ResponseFormat   param.Field[interface{}] `json:"response_format,required"`
+	ToolChoice       param.Field[interface{}] `json:"tool_choice,required"`
+	FunctionCall     param.Field[interface{}] `json:"function_call,required"`
+	N                param.Field[float64]     `json:"n"`
+	Stop             param.Field[interface{}] `json:"stop,required"`
+	TopK             param.Field[float64]     `json:"top_k"`
+	StopSequences    param.Field[interface{}] `json:"stop_sequences,required"`
+	// This is a legacy parameter that should not be used.
+	MaxTokensToSample param.Field[float64] `json:"max_tokens_to_sample"`
+	MaxOutputTokens   param.Field[float64] `json:"maxOutputTokens"`
+	TopP              param.Field[float64] `json:"topP"`
+	TopK              param.Field[float64] `json:"topK"`
+}
+
+func (r PromptDataOptionsParamsParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataOptionsParamsParam) implementsPromptDataOptionsParamsUnionParam() {}
+
+// Satisfied by [PromptDataOptionsParamsOpenAIModelParamsParam],
+// [PromptDataOptionsParamsAnthropicModelParamsParam],
+// [PromptDataOptionsParamsGoogleModelParamsParam],
+// [PromptDataOptionsParamsWindowAIModelParamsParam],
+// [PromptDataOptionsParamsJsCompletionParamsParam],
+// [PromptDataOptionsParamsParam].
+type PromptDataOptionsParamsUnionParam interface {
+	implementsPromptDataOptionsParamsUnionParam()
+}
+
+type PromptDataOptionsParamsOpenAIModelParamsParam struct {
+	FrequencyPenalty param.Field[float64]                                                        `json:"frequency_penalty"`
+	FunctionCall     param.Field[PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam] `json:"function_call"`
+	MaxTokens        param.Field[float64]                                                        `json:"max_tokens"`
+	N                param.Field[float64]                                                        `json:"n"`
+	PresencePenalty  param.Field[float64]                                                        `json:"presence_penalty"`
+	ResponseFormat   param.Field[PromptDataOptionsParamsOpenAIModelParamsResponseFormatParam]    `json:"response_format"`
+	Stop             param.Field[[]string]                                                       `json:"stop"`
+	Temperature      param.Field[float64]                                                        `json:"temperature"`
+	ToolChoice       param.Field[PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam]   `json:"tool_choice"`
+	TopP             param.Field[float64]                                                        `json:"top_p"`
+	UseCache         param.Field[bool]                                                           `json:"use_cache"`
+}
+
+func (r PromptDataOptionsParamsOpenAIModelParamsParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataOptionsParamsOpenAIModelParamsParam) implementsPromptDataOptionsParamsUnionParam() {
+}
+
+// Satisfied by [PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto],
+// [PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone],
+// [PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionParam].
+type PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam interface {
+	implementsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam()
+}
+
+type PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionParam struct {
+	Name param.Field[string] `json:"name,required"`
+}
+
+func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) implementsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
+}
+
+type PromptDataOptionsParamsOpenAIModelParamsResponseFormatParam struct {
+	Type param.Field[PromptDataOptionsParamsOpenAIModelParamsResponseFormatType] `json:"type,required"`
+}
+
+func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+// Satisfied by [PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto],
+// [PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone],
+// [PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam].
+type PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam interface {
+	implementsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam()
+}
+
+type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam struct {
+	Function param.Field[PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam] `json:"function,required"`
+	Type     param.Field[PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType]          `json:"type,required"`
+}
+
+func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) implementsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
+}
+
+type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam struct {
+	Name param.Field[string] `json:"name,required"`
+}
+
+func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type PromptDataOptionsParamsAnthropicModelParamsParam struct {
+	MaxTokens   param.Field[float64] `json:"max_tokens,required"`
+	Temperature param.Field[float64] `json:"temperature,required"`
+	// This is a legacy parameter that should not be used.
+	MaxTokensToSample param.Field[float64]  `json:"max_tokens_to_sample"`
+	StopSequences     param.Field[[]string] `json:"stop_sequences"`
+	TopK              param.Field[float64]  `json:"top_k"`
+	TopP              param.Field[float64]  `json:"top_p"`
+	UseCache          param.Field[bool]     `json:"use_cache"`
+}
+
+func (r PromptDataOptionsParamsAnthropicModelParamsParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataOptionsParamsAnthropicModelParamsParam) implementsPromptDataOptionsParamsUnionParam() {
+}
+
+type PromptDataOptionsParamsGoogleModelParamsParam struct {
+	MaxOutputTokens param.Field[float64] `json:"maxOutputTokens"`
+	Temperature     param.Field[float64] `json:"temperature"`
+	TopK            param.Field[float64] `json:"topK"`
+	TopP            param.Field[float64] `json:"topP"`
+	UseCache        param.Field[bool]    `json:"use_cache"`
+}
+
+func (r PromptDataOptionsParamsGoogleModelParamsParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataOptionsParamsGoogleModelParamsParam) implementsPromptDataOptionsParamsUnionParam() {
+}
+
+type PromptDataOptionsParamsWindowAIModelParamsParam struct {
+	Temperature param.Field[float64] `json:"temperature"`
+	TopK        param.Field[float64] `json:"topK"`
+	UseCache    param.Field[bool]    `json:"use_cache"`
+}
+
+func (r PromptDataOptionsParamsWindowAIModelParamsParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataOptionsParamsWindowAIModelParamsParam) implementsPromptDataOptionsParamsUnionParam() {
+}
+
+type PromptDataOptionsParamsJsCompletionParamsParam struct {
+	UseCache param.Field[bool] `json:"use_cache"`
+}
+
+func (r PromptDataOptionsParamsJsCompletionParamsParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataOptionsParamsJsCompletionParamsParam) implementsPromptDataOptionsParamsUnionParam() {
+}
+
+type PromptDataOriginParam struct {
+	ProjectID     param.Field[string] `json:"project_id"`
+	PromptID      param.Field[string] `json:"prompt_id"`
+	PromptVersion param.Field[string] `json:"prompt_version"`
+}
+
+func (r PromptDataOriginParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type PromptDataPromptParam struct {
+	Type     param.Field[PromptDataPromptType] `json:"type"`
+	Content  param.Field[string]               `json:"content"`
+	Messages param.Field[interface{}]          `json:"messages,required"`
+	Tools    param.Field[string]               `json:"tools"`
+}
+
+func (r PromptDataPromptParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptParam) implementsPromptDataPromptUnionParam() {}
+
+// Satisfied by [PromptDataPromptCompletionParam], [PromptDataPromptChatParam],
+// [PromptDataPromptNullableVariantParam], [PromptDataPromptParam].
+type PromptDataPromptUnionParam interface {
+	implementsPromptDataPromptUnionParam()
+}
+
+type PromptDataPromptCompletionParam struct {
+	Content param.Field[string]                         `json:"content,required"`
+	Type    param.Field[PromptDataPromptCompletionType] `json:"type,required"`
+}
+
+func (r PromptDataPromptCompletionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptCompletionParam) implementsPromptDataPromptUnionParam() {}
+
+type PromptDataPromptChatParam struct {
+	Messages param.Field[[]PromptDataPromptChatMessagesUnionParam] `json:"messages,required"`
+	Type     param.Field[PromptDataPromptChatType]                 `json:"type,required"`
+	Tools    param.Field[string]                                   `json:"tools"`
+}
+
+func (r PromptDataPromptChatParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatParam) implementsPromptDataPromptUnionParam() {}
+
+type PromptDataPromptChatMessageParam struct {
+	Content      param.Field[interface{}]                      `json:"content,required"`
+	Role         param.Field[PromptDataPromptChatMessagesRole] `json:"role,required"`
+	Name         param.Field[string]                           `json:"name"`
+	FunctionCall param.Field[interface{}]                      `json:"function_call,required"`
+	ToolCalls    param.Field[interface{}]                      `json:"tool_calls,required"`
+	ToolCallID   param.Field[string]                           `json:"tool_call_id"`
+}
+
+func (r PromptDataPromptChatMessageParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessageParam) implementsPromptDataPromptChatMessagesUnionParam() {}
+
+// Satisfied by [PromptDataPromptChatMessagesSystemParam],
+// [PromptDataPromptChatMessagesUserParam],
+// [PromptDataPromptChatMessagesAssistantParam],
+// [PromptDataPromptChatMessagesToolParam],
+// [PromptDataPromptChatMessagesFunctionParam],
+// [PromptDataPromptChatMessagesFallbackParam], [PromptDataPromptChatMessageParam].
+type PromptDataPromptChatMessagesUnionParam interface {
+	implementsPromptDataPromptChatMessagesUnionParam()
+}
+
+type PromptDataPromptChatMessagesSystemParam struct {
+	Role    param.Field[PromptDataPromptChatMessagesSystemRole] `json:"role,required"`
+	Content param.Field[string]                                 `json:"content"`
+	Name    param.Field[string]                                 `json:"name"`
+}
+
+func (r PromptDataPromptChatMessagesSystemParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesSystemParam) implementsPromptDataPromptChatMessagesUnionParam() {}
+
+type PromptDataPromptChatMessagesUserParam struct {
+	Role    param.Field[PromptDataPromptChatMessagesUserRole]              `json:"role,required"`
+	Content param.Field[PromptDataPromptChatMessagesUserContentUnionParam] `json:"content"`
+	Name    param.Field[string]                                            `json:"name"`
+}
+
+func (r PromptDataPromptChatMessagesUserParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesUserParam) implementsPromptDataPromptChatMessagesUnionParam() {}
+
+// Satisfied by [shared.UnionString],
+// [PromptDataPromptChatMessagesUserContentArrayParam].
+type PromptDataPromptChatMessagesUserContentUnionParam interface {
+	ImplementsPromptDataPromptChatMessagesUserContentUnionParam()
+}
+
+type PromptDataPromptChatMessagesUserContentArrayParam []PromptDataPromptChatMessagesUserContentArrayUnionItemParam
+
+func (r PromptDataPromptChatMessagesUserContentArrayParam) ImplementsPromptDataPromptChatMessagesUserContentUnionParam() {
+}
+
+type PromptDataPromptChatMessagesUserContentArrayItemParam struct {
+	Text     param.Field[string]                                           `json:"text"`
+	Type     param.Field[PromptDataPromptChatMessagesUserContentArrayType] `json:"type,required"`
+	ImageURL param.Field[interface{}]                                      `json:"image_url,required"`
+}
+
+func (r PromptDataPromptChatMessagesUserContentArrayItemParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesUserContentArrayItemParam) implementsPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
+}
+
+// Satisfied by [PromptDataPromptChatMessagesUserContentArrayTextParam],
+// [PromptDataPromptChatMessagesUserContentArrayImageURLParam],
+// [PromptDataPromptChatMessagesUserContentArrayItemParam].
+type PromptDataPromptChatMessagesUserContentArrayUnionItemParam interface {
+	implementsPromptDataPromptChatMessagesUserContentArrayUnionItemParam()
+}
+
+type PromptDataPromptChatMessagesUserContentArrayTextParam struct {
+	Type param.Field[PromptDataPromptChatMessagesUserContentArrayTextType] `json:"type,required"`
+	Text param.Field[string]                                               `json:"text"`
+}
+
+func (r PromptDataPromptChatMessagesUserContentArrayTextParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesUserContentArrayTextParam) implementsPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
+}
+
+type PromptDataPromptChatMessagesUserContentArrayImageURLParam struct {
+	ImageURL param.Field[PromptDataPromptChatMessagesUserContentArrayImageURLImageURLParam] `json:"image_url,required"`
+	Type     param.Field[PromptDataPromptChatMessagesUserContentArrayImageURLType]          `json:"type,required"`
+}
+
+func (r PromptDataPromptChatMessagesUserContentArrayImageURLParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesUserContentArrayImageURLParam) implementsPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
+}
+
+type PromptDataPromptChatMessagesUserContentArrayImageURLImageURLParam struct {
+	URL    param.Field[string]                                                             `json:"url,required"`
+	Detail param.Field[PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail] `json:"detail"`
+}
+
+func (r PromptDataPromptChatMessagesUserContentArrayImageURLImageURLParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type PromptDataPromptChatMessagesAssistantParam struct {
+	Role         param.Field[PromptDataPromptChatMessagesAssistantRole]              `json:"role,required"`
+	Content      param.Field[string]                                                 `json:"content"`
+	FunctionCall param.Field[PromptDataPromptChatMessagesAssistantFunctionCallParam] `json:"function_call"`
+	Name         param.Field[string]                                                 `json:"name"`
+	ToolCalls    param.Field[[]PromptDataPromptChatMessagesAssistantToolCallParam]   `json:"tool_calls"`
+}
+
+func (r PromptDataPromptChatMessagesAssistantParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesAssistantParam) implementsPromptDataPromptChatMessagesUnionParam() {
+}
+
+type PromptDataPromptChatMessagesAssistantFunctionCallParam struct {
+	Arguments param.Field[string] `json:"arguments,required"`
+	Name      param.Field[string] `json:"name,required"`
+}
+
+func (r PromptDataPromptChatMessagesAssistantFunctionCallParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type PromptDataPromptChatMessagesAssistantToolCallParam struct {
+	ID       param.Field[string]                                                      `json:"id,required"`
+	Function param.Field[PromptDataPromptChatMessagesAssistantToolCallsFunctionParam] `json:"function,required"`
+	Type     param.Field[PromptDataPromptChatMessagesAssistantToolCallsType]          `json:"type,required"`
+}
+
+func (r PromptDataPromptChatMessagesAssistantToolCallParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type PromptDataPromptChatMessagesAssistantToolCallsFunctionParam struct {
+	Arguments param.Field[string] `json:"arguments,required"`
+	Name      param.Field[string] `json:"name,required"`
+}
+
+func (r PromptDataPromptChatMessagesAssistantToolCallsFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type PromptDataPromptChatMessagesToolParam struct {
+	Role       param.Field[PromptDataPromptChatMessagesToolRole] `json:"role,required"`
+	Content    param.Field[string]                               `json:"content"`
+	ToolCallID param.Field[string]                               `json:"tool_call_id"`
+}
+
+func (r PromptDataPromptChatMessagesToolParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesToolParam) implementsPromptDataPromptChatMessagesUnionParam() {}
+
+type PromptDataPromptChatMessagesFunctionParam struct {
+	Name    param.Field[string]                                   `json:"name,required"`
+	Role    param.Field[PromptDataPromptChatMessagesFunctionRole] `json:"role,required"`
+	Content param.Field[string]                                   `json:"content"`
+}
+
+func (r PromptDataPromptChatMessagesFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesFunctionParam) implementsPromptDataPromptChatMessagesUnionParam() {
+}
+
+type PromptDataPromptChatMessagesFallbackParam struct {
+	Role    param.Field[PromptDataPromptChatMessagesFallbackRole] `json:"role,required"`
+	Content param.Field[string]                                   `json:"content"`
+}
+
+func (r PromptDataPromptChatMessagesFallbackParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesFallbackParam) implementsPromptDataPromptChatMessagesUnionParam() {
+}
+
+type PromptDataPromptNullableVariantParam struct {
+}
+
+func (r PromptDataPromptNullableVariantParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptNullableVariantParam) implementsPromptDataPromptUnionParam() {}
 
 type PromptNewParams struct {
 	// Name of the prompt
@@ -1667,7 +2028,7 @@ type PromptNewParams struct {
 	// Textual description of the prompt
 	Description param.Field[string] `json:"description"`
 	// The prompt, model, and its parameters
-	PromptData param.Field[PromptNewParamsPromptData] `json:"prompt_data"`
+	PromptData param.Field[PromptDataParam] `json:"prompt_data"`
 	// A list of tags for the prompt
 	Tags param.Field[[]string] `json:"tags"`
 }
@@ -1676,1559 +2037,19 @@ func (r PromptNewParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-// The prompt, model, and its parameters
-type PromptNewParamsPromptData struct {
-	Options param.Field[PromptNewParamsPromptDataOptions]     `json:"options"`
-	Origin  param.Field[PromptNewParamsPromptDataOrigin]      `json:"origin"`
-	Prompt  param.Field[PromptNewParamsPromptDataPromptUnion] `json:"prompt"`
-}
-
-func (r PromptNewParamsPromptData) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptNewParamsPromptDataOptions struct {
-	Model    param.Field[string]                                      `json:"model"`
-	Params   param.Field[PromptNewParamsPromptDataOptionsParamsUnion] `json:"params"`
-	Position param.Field[string]                                      `json:"position"`
-}
-
-func (r PromptNewParamsPromptDataOptions) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptNewParamsPromptDataOptionsParams struct {
-	UseCache         param.Field[bool]        `json:"use_cache"`
-	Temperature      param.Field[float64]     `json:"temperature"`
-	TopP             param.Field[float64]     `json:"top_p"`
-	MaxTokens        param.Field[float64]     `json:"max_tokens"`
-	FrequencyPenalty param.Field[float64]     `json:"frequency_penalty"`
-	PresencePenalty  param.Field[float64]     `json:"presence_penalty"`
-	ResponseFormat   param.Field[interface{}] `json:"response_format,required"`
-	ToolChoice       param.Field[interface{}] `json:"tool_choice,required"`
-	FunctionCall     param.Field[interface{}] `json:"function_call,required"`
-	N                param.Field[float64]     `json:"n"`
-	Stop             param.Field[interface{}] `json:"stop,required"`
-	TopK             param.Field[float64]     `json:"top_k"`
-	StopSequences    param.Field[interface{}] `json:"stop_sequences,required"`
-	// This is a legacy parameter that should not be used.
-	MaxTokensToSample param.Field[float64] `json:"max_tokens_to_sample"`
-	MaxOutputTokens   param.Field[float64] `json:"maxOutputTokens"`
-	TopP              param.Field[float64] `json:"topP"`
-	TopK              param.Field[float64] `json:"topK"`
-}
-
-func (r PromptNewParamsPromptDataOptionsParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataOptionsParams) implementsPromptNewParamsPromptDataOptionsParamsUnion() {
-}
-
-// Satisfied by [PromptNewParamsPromptDataOptionsParamsOpenAIModelParams],
-// [PromptNewParamsPromptDataOptionsParamsAnthropicModelParams],
-// [PromptNewParamsPromptDataOptionsParamsGoogleModelParams],
-// [PromptNewParamsPromptDataOptionsParamsWindowAIModelParams],
-// [PromptNewParamsPromptDataOptionsParamsJsCompletionParams],
-// [PromptNewParamsPromptDataOptionsParams].
-type PromptNewParamsPromptDataOptionsParamsUnion interface {
-	implementsPromptNewParamsPromptDataOptionsParamsUnion()
-}
-
-type PromptNewParamsPromptDataOptionsParamsOpenAIModelParams struct {
-	FrequencyPenalty param.Field[float64]                                                                  `json:"frequency_penalty"`
-	FunctionCall     param.Field[PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion] `json:"function_call"`
-	MaxTokens        param.Field[float64]                                                                  `json:"max_tokens"`
-	N                param.Field[float64]                                                                  `json:"n"`
-	PresencePenalty  param.Field[float64]                                                                  `json:"presence_penalty"`
-	ResponseFormat   param.Field[PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormat]    `json:"response_format"`
-	Stop             param.Field[[]string]                                                                 `json:"stop"`
-	Temperature      param.Field[float64]                                                                  `json:"temperature"`
-	ToolChoice       param.Field[PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion]   `json:"tool_choice"`
-	TopP             param.Field[float64]                                                                  `json:"top_p"`
-	UseCache         param.Field[bool]                                                                     `json:"use_cache"`
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParams) implementsPromptNewParamsPromptDataOptionsParamsUnion() {
-}
-
-// Satisfied by
-// [PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto],
-// [PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone],
-// [PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction].
-type PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion interface {
-	implementsPromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion()
-}
-
-type PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto string
-
-const (
-	PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto = "auto"
-)
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto:
-		return true
-	}
-	return false
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto) implementsPromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
-}
-
-type PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone string
-
-const (
-	PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNoneNone PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone = "none"
-)
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNoneNone:
-		return true
-	}
-	return false
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone) implementsPromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
-}
-
-type PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction struct {
-	Name param.Field[string] `json:"name,required"`
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction) implementsPromptNewParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
-}
-
-type PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormat struct {
-	Type param.Field[PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatType] `json:"type,required"`
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormat) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatType string
-
-const (
-	PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatType = "json_object"
-)
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatType) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject:
-		return true
-	}
-	return false
-}
-
-// Satisfied by
-// [PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto],
-// [PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone],
-// [PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction].
-type PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion interface {
-	implementsPromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion()
-}
-
-type PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto string
-
-const (
-	PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto = "auto"
-)
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto:
-		return true
-	}
-	return false
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) implementsPromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-type PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone string
-
-const (
-	PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone = "none"
-)
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone:
-		return true
-	}
-	return false
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) implementsPromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-type PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction struct {
-	Function param.Field[PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction] `json:"function,required"`
-	Type     param.Field[PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType]     `json:"type,required"`
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction) implementsPromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-type PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction struct {
-	Name param.Field[string] `json:"name,required"`
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType string
-
-const (
-	PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType = "function"
-)
-
-func (r PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction:
-		return true
-	}
-	return false
-}
-
-type PromptNewParamsPromptDataOptionsParamsAnthropicModelParams struct {
-	MaxTokens   param.Field[float64] `json:"max_tokens,required"`
-	Temperature param.Field[float64] `json:"temperature,required"`
-	// This is a legacy parameter that should not be used.
-	MaxTokensToSample param.Field[float64]  `json:"max_tokens_to_sample"`
-	StopSequences     param.Field[[]string] `json:"stop_sequences"`
-	TopK              param.Field[float64]  `json:"top_k"`
-	TopP              param.Field[float64]  `json:"top_p"`
-	UseCache          param.Field[bool]     `json:"use_cache"`
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsAnthropicModelParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsAnthropicModelParams) implementsPromptNewParamsPromptDataOptionsParamsUnion() {
-}
-
-type PromptNewParamsPromptDataOptionsParamsGoogleModelParams struct {
-	MaxOutputTokens param.Field[float64] `json:"maxOutputTokens"`
-	Temperature     param.Field[float64] `json:"temperature"`
-	TopK            param.Field[float64] `json:"topK"`
-	TopP            param.Field[float64] `json:"topP"`
-	UseCache        param.Field[bool]    `json:"use_cache"`
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsGoogleModelParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsGoogleModelParams) implementsPromptNewParamsPromptDataOptionsParamsUnion() {
-}
-
-type PromptNewParamsPromptDataOptionsParamsWindowAIModelParams struct {
-	Temperature param.Field[float64] `json:"temperature"`
-	TopK        param.Field[float64] `json:"topK"`
-	UseCache    param.Field[bool]    `json:"use_cache"`
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsWindowAIModelParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsWindowAIModelParams) implementsPromptNewParamsPromptDataOptionsParamsUnion() {
-}
-
-type PromptNewParamsPromptDataOptionsParamsJsCompletionParams struct {
-	UseCache param.Field[bool] `json:"use_cache"`
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsJsCompletionParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataOptionsParamsJsCompletionParams) implementsPromptNewParamsPromptDataOptionsParamsUnion() {
-}
-
-type PromptNewParamsPromptDataOrigin struct {
-	ProjectID     param.Field[string] `json:"project_id"`
-	PromptID      param.Field[string] `json:"prompt_id"`
-	PromptVersion param.Field[string] `json:"prompt_version"`
-}
-
-func (r PromptNewParamsPromptDataOrigin) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptNewParamsPromptDataPrompt struct {
-	Type     param.Field[PromptNewParamsPromptDataPromptType] `json:"type"`
-	Content  param.Field[string]                              `json:"content"`
-	Messages param.Field[interface{}]                         `json:"messages,required"`
-	Tools    param.Field[string]                              `json:"tools"`
-}
-
-func (r PromptNewParamsPromptDataPrompt) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataPrompt) implementsPromptNewParamsPromptDataPromptUnion() {}
-
-// Satisfied by [PromptNewParamsPromptDataPromptCompletion],
-// [PromptNewParamsPromptDataPromptChat],
-// [PromptNewParamsPromptDataPromptNullableVariant],
-// [PromptNewParamsPromptDataPrompt].
-type PromptNewParamsPromptDataPromptUnion interface {
-	implementsPromptNewParamsPromptDataPromptUnion()
-}
-
-type PromptNewParamsPromptDataPromptCompletion struct {
-	Content param.Field[string]                                        `json:"content,required"`
-	Type    param.Field[PromptNewParamsPromptDataPromptCompletionType] `json:"type,required"`
-}
-
-func (r PromptNewParamsPromptDataPromptCompletion) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataPromptCompletion) implementsPromptNewParamsPromptDataPromptUnion() {}
-
-type PromptNewParamsPromptDataPromptCompletionType string
-
-const (
-	PromptNewParamsPromptDataPromptCompletionTypeCompletion PromptNewParamsPromptDataPromptCompletionType = "completion"
-)
-
-func (r PromptNewParamsPromptDataPromptCompletionType) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataPromptCompletionTypeCompletion:
-		return true
-	}
-	return false
-}
-
-type PromptNewParamsPromptDataPromptChat struct {
-	Messages param.Field[[]PromptNewParamsPromptDataPromptChatMessageUnion] `json:"messages,required"`
-	Type     param.Field[PromptNewParamsPromptDataPromptChatType]           `json:"type,required"`
-	Tools    param.Field[string]                                            `json:"tools"`
-}
-
-func (r PromptNewParamsPromptDataPromptChat) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataPromptChat) implementsPromptNewParamsPromptDataPromptUnion() {}
-
-type PromptNewParamsPromptDataPromptChatMessage struct {
-	Content      param.Field[interface{}]                                     `json:"content,required"`
-	Role         param.Field[PromptNewParamsPromptDataPromptChatMessagesRole] `json:"role,required"`
-	Name         param.Field[string]                                          `json:"name"`
-	FunctionCall param.Field[interface{}]                                     `json:"function_call,required"`
-	ToolCalls    param.Field[interface{}]                                     `json:"tool_calls,required"`
-	ToolCallID   param.Field[string]                                          `json:"tool_call_id"`
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessage) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessage) implementsPromptNewParamsPromptDataPromptChatMessageUnion() {
-}
-
-// Satisfied by [PromptNewParamsPromptDataPromptChatMessagesSystem],
-// [PromptNewParamsPromptDataPromptChatMessagesUser],
-// [PromptNewParamsPromptDataPromptChatMessagesAssistant],
-// [PromptNewParamsPromptDataPromptChatMessagesTool],
-// [PromptNewParamsPromptDataPromptChatMessagesFunction],
-// [PromptNewParamsPromptDataPromptChatMessagesFallback],
-// [PromptNewParamsPromptDataPromptChatMessage].
-type PromptNewParamsPromptDataPromptChatMessageUnion interface {
-	implementsPromptNewParamsPromptDataPromptChatMessageUnion()
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesSystem struct {
-	Role    param.Field[PromptNewParamsPromptDataPromptChatMessagesSystemRole] `json:"role,required"`
-	Content param.Field[string]                                                `json:"content"`
-	Name    param.Field[string]                                                `json:"name"`
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesSystem) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesSystem) implementsPromptNewParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesSystemRole string
-
-const (
-	PromptNewParamsPromptDataPromptChatMessagesSystemRoleSystem PromptNewParamsPromptDataPromptChatMessagesSystemRole = "system"
-)
-
-func (r PromptNewParamsPromptDataPromptChatMessagesSystemRole) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataPromptChatMessagesSystemRoleSystem:
-		return true
-	}
-	return false
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesUser struct {
-	Role    param.Field[PromptNewParamsPromptDataPromptChatMessagesUserRole]         `json:"role,required"`
-	Content param.Field[PromptNewParamsPromptDataPromptChatMessagesUserContentUnion] `json:"content"`
-	Name    param.Field[string]                                                      `json:"name"`
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesUser) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesUser) implementsPromptNewParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesUserRole string
-
-const (
-	PromptNewParamsPromptDataPromptChatMessagesUserRoleUser PromptNewParamsPromptDataPromptChatMessagesUserRole = "user"
-)
-
-func (r PromptNewParamsPromptDataPromptChatMessagesUserRole) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataPromptChatMessagesUserRoleUser:
-		return true
-	}
-	return false
-}
-
-// Satisfied by [shared.UnionString],
-// [PromptNewParamsPromptDataPromptChatMessagesUserContentArray].
-type PromptNewParamsPromptDataPromptChatMessagesUserContentUnion interface {
-	ImplementsPromptNewParamsPromptDataPromptChatMessagesUserContentUnion()
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesUserContentArray []PromptNewParamsPromptDataPromptChatMessagesUserContentArrayUnion
-
-func (r PromptNewParamsPromptDataPromptChatMessagesUserContentArray) ImplementsPromptNewParamsPromptDataPromptChatMessagesUserContentUnion() {
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesUserContentArray struct {
-	Text     param.Field[string]                                                          `json:"text"`
-	Type     param.Field[PromptNewParamsPromptDataPromptChatMessagesUserContentArrayType] `json:"type,required"`
-	ImageURL param.Field[interface{}]                                                     `json:"image_url,required"`
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesUserContentArray) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesUserContentArray) implementsPromptNewParamsPromptDataPromptChatMessagesUserContentArrayUnion() {
-}
-
-// Satisfied by [PromptNewParamsPromptDataPromptChatMessagesUserContentArrayText],
-// [PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURL],
-// [PromptNewParamsPromptDataPromptChatMessagesUserContentArray].
-type PromptNewParamsPromptDataPromptChatMessagesUserContentArrayUnion interface {
-	implementsPromptNewParamsPromptDataPromptChatMessagesUserContentArrayUnion()
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesUserContentArrayText struct {
-	Type param.Field[PromptNewParamsPromptDataPromptChatMessagesUserContentArrayTextType] `json:"type,required"`
-	Text param.Field[string]                                                              `json:"text"`
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesUserContentArrayText) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesUserContentArrayText) implementsPromptNewParamsPromptDataPromptChatMessagesUserContentArrayUnion() {
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesUserContentArrayTextType string
-
-const (
-	PromptNewParamsPromptDataPromptChatMessagesUserContentArrayTextTypeText PromptNewParamsPromptDataPromptChatMessagesUserContentArrayTextType = "text"
-)
-
-func (r PromptNewParamsPromptDataPromptChatMessagesUserContentArrayTextType) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataPromptChatMessagesUserContentArrayTextTypeText:
-		return true
-	}
-	return false
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURL struct {
-	ImageURL param.Field[PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURL] `json:"image_url,required"`
-	Type     param.Field[PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLType]     `json:"type,required"`
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURL) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURL) implementsPromptNewParamsPromptDataPromptChatMessagesUserContentArrayUnion() {
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURL struct {
-	URL    param.Field[string]                                                                            `json:"url,required"`
-	Detail param.Field[PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail] `json:"detail"`
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURL) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail string
-
-const (
-	PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailAuto PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "auto"
-	PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailLow  PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "low"
-	PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailHigh PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "high"
-)
-
-func (r PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailAuto, PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailLow, PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailHigh:
-		return true
-	}
-	return false
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLType string
-
-const (
-	PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLTypeImageURL PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLType = "image_url"
-)
-
-func (r PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLType) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataPromptChatMessagesUserContentArrayImageURLTypeImageURL:
-		return true
-	}
-	return false
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesUserContentArrayType string
-
-const (
-	PromptNewParamsPromptDataPromptChatMessagesUserContentArrayTypeText     PromptNewParamsPromptDataPromptChatMessagesUserContentArrayType = "text"
-	PromptNewParamsPromptDataPromptChatMessagesUserContentArrayTypeImageURL PromptNewParamsPromptDataPromptChatMessagesUserContentArrayType = "image_url"
-)
-
-func (r PromptNewParamsPromptDataPromptChatMessagesUserContentArrayType) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataPromptChatMessagesUserContentArrayTypeText, PromptNewParamsPromptDataPromptChatMessagesUserContentArrayTypeImageURL:
-		return true
-	}
-	return false
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesAssistant struct {
-	Role         param.Field[PromptNewParamsPromptDataPromptChatMessagesAssistantRole]         `json:"role,required"`
-	Content      param.Field[string]                                                           `json:"content"`
-	FunctionCall param.Field[PromptNewParamsPromptDataPromptChatMessagesAssistantFunctionCall] `json:"function_call"`
-	Name         param.Field[string]                                                           `json:"name"`
-	ToolCalls    param.Field[[]PromptNewParamsPromptDataPromptChatMessagesAssistantToolCall]   `json:"tool_calls"`
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesAssistant) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesAssistant) implementsPromptNewParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesAssistantRole string
-
-const (
-	PromptNewParamsPromptDataPromptChatMessagesAssistantRoleAssistant PromptNewParamsPromptDataPromptChatMessagesAssistantRole = "assistant"
-)
-
-func (r PromptNewParamsPromptDataPromptChatMessagesAssistantRole) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataPromptChatMessagesAssistantRoleAssistant:
-		return true
-	}
-	return false
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesAssistantFunctionCall struct {
-	Arguments param.Field[string] `json:"arguments,required"`
-	Name      param.Field[string] `json:"name,required"`
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesAssistantFunctionCall) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesAssistantToolCall struct {
-	ID       param.Field[string]                                                                `json:"id,required"`
-	Function param.Field[PromptNewParamsPromptDataPromptChatMessagesAssistantToolCallsFunction] `json:"function,required"`
-	Type     param.Field[PromptNewParamsPromptDataPromptChatMessagesAssistantToolCallsType]     `json:"type,required"`
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesAssistantToolCall) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesAssistantToolCallsFunction struct {
-	Arguments param.Field[string] `json:"arguments,required"`
-	Name      param.Field[string] `json:"name,required"`
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesAssistantToolCallsFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesAssistantToolCallsType string
-
-const (
-	PromptNewParamsPromptDataPromptChatMessagesAssistantToolCallsTypeFunction PromptNewParamsPromptDataPromptChatMessagesAssistantToolCallsType = "function"
-)
-
-func (r PromptNewParamsPromptDataPromptChatMessagesAssistantToolCallsType) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataPromptChatMessagesAssistantToolCallsTypeFunction:
-		return true
-	}
-	return false
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesTool struct {
-	Role       param.Field[PromptNewParamsPromptDataPromptChatMessagesToolRole] `json:"role,required"`
-	Content    param.Field[string]                                              `json:"content"`
-	ToolCallID param.Field[string]                                              `json:"tool_call_id"`
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesTool) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesTool) implementsPromptNewParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesToolRole string
-
-const (
-	PromptNewParamsPromptDataPromptChatMessagesToolRoleTool PromptNewParamsPromptDataPromptChatMessagesToolRole = "tool"
-)
-
-func (r PromptNewParamsPromptDataPromptChatMessagesToolRole) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataPromptChatMessagesToolRoleTool:
-		return true
-	}
-	return false
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesFunction struct {
-	Name    param.Field[string]                                                  `json:"name,required"`
-	Role    param.Field[PromptNewParamsPromptDataPromptChatMessagesFunctionRole] `json:"role,required"`
-	Content param.Field[string]                                                  `json:"content"`
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesFunction) implementsPromptNewParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesFunctionRole string
-
-const (
-	PromptNewParamsPromptDataPromptChatMessagesFunctionRoleFunction PromptNewParamsPromptDataPromptChatMessagesFunctionRole = "function"
-)
-
-func (r PromptNewParamsPromptDataPromptChatMessagesFunctionRole) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataPromptChatMessagesFunctionRoleFunction:
-		return true
-	}
-	return false
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesFallback struct {
-	Role    param.Field[PromptNewParamsPromptDataPromptChatMessagesFallbackRole] `json:"role,required"`
-	Content param.Field[string]                                                  `json:"content"`
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesFallback) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataPromptChatMessagesFallback) implementsPromptNewParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesFallbackRole string
-
-const (
-	PromptNewParamsPromptDataPromptChatMessagesFallbackRoleModel PromptNewParamsPromptDataPromptChatMessagesFallbackRole = "model"
-)
-
-func (r PromptNewParamsPromptDataPromptChatMessagesFallbackRole) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataPromptChatMessagesFallbackRoleModel:
-		return true
-	}
-	return false
-}
-
-type PromptNewParamsPromptDataPromptChatMessagesRole string
-
-const (
-	PromptNewParamsPromptDataPromptChatMessagesRoleSystem    PromptNewParamsPromptDataPromptChatMessagesRole = "system"
-	PromptNewParamsPromptDataPromptChatMessagesRoleUser      PromptNewParamsPromptDataPromptChatMessagesRole = "user"
-	PromptNewParamsPromptDataPromptChatMessagesRoleAssistant PromptNewParamsPromptDataPromptChatMessagesRole = "assistant"
-	PromptNewParamsPromptDataPromptChatMessagesRoleTool      PromptNewParamsPromptDataPromptChatMessagesRole = "tool"
-	PromptNewParamsPromptDataPromptChatMessagesRoleFunction  PromptNewParamsPromptDataPromptChatMessagesRole = "function"
-	PromptNewParamsPromptDataPromptChatMessagesRoleModel     PromptNewParamsPromptDataPromptChatMessagesRole = "model"
-)
-
-func (r PromptNewParamsPromptDataPromptChatMessagesRole) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataPromptChatMessagesRoleSystem, PromptNewParamsPromptDataPromptChatMessagesRoleUser, PromptNewParamsPromptDataPromptChatMessagesRoleAssistant, PromptNewParamsPromptDataPromptChatMessagesRoleTool, PromptNewParamsPromptDataPromptChatMessagesRoleFunction, PromptNewParamsPromptDataPromptChatMessagesRoleModel:
-		return true
-	}
-	return false
-}
-
-type PromptNewParamsPromptDataPromptChatType string
-
-const (
-	PromptNewParamsPromptDataPromptChatTypeChat PromptNewParamsPromptDataPromptChatType = "chat"
-)
-
-func (r PromptNewParamsPromptDataPromptChatType) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataPromptChatTypeChat:
-		return true
-	}
-	return false
-}
-
-type PromptNewParamsPromptDataPromptNullableVariant struct {
-}
-
-func (r PromptNewParamsPromptDataPromptNullableVariant) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptNewParamsPromptDataPromptNullableVariant) implementsPromptNewParamsPromptDataPromptUnion() {
-}
-
-type PromptNewParamsPromptDataPromptType string
-
-const (
-	PromptNewParamsPromptDataPromptTypeCompletion PromptNewParamsPromptDataPromptType = "completion"
-	PromptNewParamsPromptDataPromptTypeChat       PromptNewParamsPromptDataPromptType = "chat"
-)
-
-func (r PromptNewParamsPromptDataPromptType) IsKnown() bool {
-	switch r {
-	case PromptNewParamsPromptDataPromptTypeCompletion, PromptNewParamsPromptDataPromptTypeChat:
-		return true
-	}
-	return false
-}
-
 type PromptUpdateParams struct {
 	// Textual description of the prompt
 	Description param.Field[string] `json:"description"`
 	// Name of the prompt
 	Name param.Field[string] `json:"name"`
 	// The prompt, model, and its parameters
-	PromptData param.Field[PromptUpdateParamsPromptData] `json:"prompt_data"`
+	PromptData param.Field[PromptDataParam] `json:"prompt_data"`
 	// A list of tags for the prompt
 	Tags param.Field[[]string] `json:"tags"`
 }
 
 func (r PromptUpdateParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
-}
-
-// The prompt, model, and its parameters
-type PromptUpdateParamsPromptData struct {
-	Options param.Field[PromptUpdateParamsPromptDataOptions]     `json:"options"`
-	Origin  param.Field[PromptUpdateParamsPromptDataOrigin]      `json:"origin"`
-	Prompt  param.Field[PromptUpdateParamsPromptDataPromptUnion] `json:"prompt"`
-}
-
-func (r PromptUpdateParamsPromptData) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptUpdateParamsPromptDataOptions struct {
-	Model    param.Field[string]                                         `json:"model"`
-	Params   param.Field[PromptUpdateParamsPromptDataOptionsParamsUnion] `json:"params"`
-	Position param.Field[string]                                         `json:"position"`
-}
-
-func (r PromptUpdateParamsPromptDataOptions) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptUpdateParamsPromptDataOptionsParams struct {
-	UseCache         param.Field[bool]        `json:"use_cache"`
-	Temperature      param.Field[float64]     `json:"temperature"`
-	TopP             param.Field[float64]     `json:"top_p"`
-	MaxTokens        param.Field[float64]     `json:"max_tokens"`
-	FrequencyPenalty param.Field[float64]     `json:"frequency_penalty"`
-	PresencePenalty  param.Field[float64]     `json:"presence_penalty"`
-	ResponseFormat   param.Field[interface{}] `json:"response_format,required"`
-	ToolChoice       param.Field[interface{}] `json:"tool_choice,required"`
-	FunctionCall     param.Field[interface{}] `json:"function_call,required"`
-	N                param.Field[float64]     `json:"n"`
-	Stop             param.Field[interface{}] `json:"stop,required"`
-	TopK             param.Field[float64]     `json:"top_k"`
-	StopSequences    param.Field[interface{}] `json:"stop_sequences,required"`
-	// This is a legacy parameter that should not be used.
-	MaxTokensToSample param.Field[float64] `json:"max_tokens_to_sample"`
-	MaxOutputTokens   param.Field[float64] `json:"maxOutputTokens"`
-	TopP              param.Field[float64] `json:"topP"`
-	TopK              param.Field[float64] `json:"topK"`
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParams) implementsPromptUpdateParamsPromptDataOptionsParamsUnion() {
-}
-
-// Satisfied by [PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParams],
-// [PromptUpdateParamsPromptDataOptionsParamsAnthropicModelParams],
-// [PromptUpdateParamsPromptDataOptionsParamsGoogleModelParams],
-// [PromptUpdateParamsPromptDataOptionsParamsWindowAIModelParams],
-// [PromptUpdateParamsPromptDataOptionsParamsJsCompletionParams],
-// [PromptUpdateParamsPromptDataOptionsParams].
-type PromptUpdateParamsPromptDataOptionsParamsUnion interface {
-	implementsPromptUpdateParamsPromptDataOptionsParamsUnion()
-}
-
-type PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParams struct {
-	FrequencyPenalty param.Field[float64]                                                                     `json:"frequency_penalty"`
-	FunctionCall     param.Field[PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion] `json:"function_call"`
-	MaxTokens        param.Field[float64]                                                                     `json:"max_tokens"`
-	N                param.Field[float64]                                                                     `json:"n"`
-	PresencePenalty  param.Field[float64]                                                                     `json:"presence_penalty"`
-	ResponseFormat   param.Field[PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormat]    `json:"response_format"`
-	Stop             param.Field[[]string]                                                                    `json:"stop"`
-	Temperature      param.Field[float64]                                                                     `json:"temperature"`
-	ToolChoice       param.Field[PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion]   `json:"tool_choice"`
-	TopP             param.Field[float64]                                                                     `json:"top_p"`
-	UseCache         param.Field[bool]                                                                        `json:"use_cache"`
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParams) implementsPromptUpdateParamsPromptDataOptionsParamsUnion() {
-}
-
-// Satisfied by
-// [PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto],
-// [PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone],
-// [PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction].
-type PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion interface {
-	implementsPromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion()
-}
-
-type PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto string
-
-const (
-	PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto = "auto"
-)
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto:
-		return true
-	}
-	return false
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto) implementsPromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
-}
-
-type PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone string
-
-const (
-	PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNoneNone PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone = "none"
-)
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNoneNone:
-		return true
-	}
-	return false
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone) implementsPromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
-}
-
-type PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction struct {
-	Name param.Field[string] `json:"name,required"`
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction) implementsPromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
-}
-
-type PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormat struct {
-	Type param.Field[PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatType] `json:"type,required"`
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormat) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatType string
-
-const (
-	PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatType = "json_object"
-)
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatType) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject:
-		return true
-	}
-	return false
-}
-
-// Satisfied by
-// [PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto],
-// [PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone],
-// [PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction].
-type PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion interface {
-	implementsPromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion()
-}
-
-type PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto string
-
-const (
-	PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto = "auto"
-)
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto:
-		return true
-	}
-	return false
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) implementsPromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-type PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone string
-
-const (
-	PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone = "none"
-)
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone:
-		return true
-	}
-	return false
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) implementsPromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-type PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction struct {
-	Function param.Field[PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction] `json:"function,required"`
-	Type     param.Field[PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType]     `json:"type,required"`
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction) implementsPromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-type PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction struct {
-	Name param.Field[string] `json:"name,required"`
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType string
-
-const (
-	PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType = "function"
-)
-
-func (r PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction:
-		return true
-	}
-	return false
-}
-
-type PromptUpdateParamsPromptDataOptionsParamsAnthropicModelParams struct {
-	MaxTokens   param.Field[float64] `json:"max_tokens,required"`
-	Temperature param.Field[float64] `json:"temperature,required"`
-	// This is a legacy parameter that should not be used.
-	MaxTokensToSample param.Field[float64]  `json:"max_tokens_to_sample"`
-	StopSequences     param.Field[[]string] `json:"stop_sequences"`
-	TopK              param.Field[float64]  `json:"top_k"`
-	TopP              param.Field[float64]  `json:"top_p"`
-	UseCache          param.Field[bool]     `json:"use_cache"`
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsAnthropicModelParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsAnthropicModelParams) implementsPromptUpdateParamsPromptDataOptionsParamsUnion() {
-}
-
-type PromptUpdateParamsPromptDataOptionsParamsGoogleModelParams struct {
-	MaxOutputTokens param.Field[float64] `json:"maxOutputTokens"`
-	Temperature     param.Field[float64] `json:"temperature"`
-	TopK            param.Field[float64] `json:"topK"`
-	TopP            param.Field[float64] `json:"topP"`
-	UseCache        param.Field[bool]    `json:"use_cache"`
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsGoogleModelParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsGoogleModelParams) implementsPromptUpdateParamsPromptDataOptionsParamsUnion() {
-}
-
-type PromptUpdateParamsPromptDataOptionsParamsWindowAIModelParams struct {
-	Temperature param.Field[float64] `json:"temperature"`
-	TopK        param.Field[float64] `json:"topK"`
-	UseCache    param.Field[bool]    `json:"use_cache"`
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsWindowAIModelParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsWindowAIModelParams) implementsPromptUpdateParamsPromptDataOptionsParamsUnion() {
-}
-
-type PromptUpdateParamsPromptDataOptionsParamsJsCompletionParams struct {
-	UseCache param.Field[bool] `json:"use_cache"`
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsJsCompletionParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataOptionsParamsJsCompletionParams) implementsPromptUpdateParamsPromptDataOptionsParamsUnion() {
-}
-
-type PromptUpdateParamsPromptDataOrigin struct {
-	ProjectID     param.Field[string] `json:"project_id"`
-	PromptID      param.Field[string] `json:"prompt_id"`
-	PromptVersion param.Field[string] `json:"prompt_version"`
-}
-
-func (r PromptUpdateParamsPromptDataOrigin) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptUpdateParamsPromptDataPrompt struct {
-	Type     param.Field[PromptUpdateParamsPromptDataPromptType] `json:"type"`
-	Content  param.Field[string]                                 `json:"content"`
-	Messages param.Field[interface{}]                            `json:"messages,required"`
-	Tools    param.Field[string]                                 `json:"tools"`
-}
-
-func (r PromptUpdateParamsPromptDataPrompt) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataPrompt) implementsPromptUpdateParamsPromptDataPromptUnion() {}
-
-// Satisfied by [PromptUpdateParamsPromptDataPromptCompletion],
-// [PromptUpdateParamsPromptDataPromptChat],
-// [PromptUpdateParamsPromptDataPromptNullableVariant],
-// [PromptUpdateParamsPromptDataPrompt].
-type PromptUpdateParamsPromptDataPromptUnion interface {
-	implementsPromptUpdateParamsPromptDataPromptUnion()
-}
-
-type PromptUpdateParamsPromptDataPromptCompletion struct {
-	Content param.Field[string]                                           `json:"content,required"`
-	Type    param.Field[PromptUpdateParamsPromptDataPromptCompletionType] `json:"type,required"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptCompletion) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataPromptCompletion) implementsPromptUpdateParamsPromptDataPromptUnion() {
-}
-
-type PromptUpdateParamsPromptDataPromptCompletionType string
-
-const (
-	PromptUpdateParamsPromptDataPromptCompletionTypeCompletion PromptUpdateParamsPromptDataPromptCompletionType = "completion"
-)
-
-func (r PromptUpdateParamsPromptDataPromptCompletionType) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataPromptCompletionTypeCompletion:
-		return true
-	}
-	return false
-}
-
-type PromptUpdateParamsPromptDataPromptChat struct {
-	Messages param.Field[[]PromptUpdateParamsPromptDataPromptChatMessageUnion] `json:"messages,required"`
-	Type     param.Field[PromptUpdateParamsPromptDataPromptChatType]           `json:"type,required"`
-	Tools    param.Field[string]                                               `json:"tools"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptChat) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataPromptChat) implementsPromptUpdateParamsPromptDataPromptUnion() {}
-
-type PromptUpdateParamsPromptDataPromptChatMessage struct {
-	Content      param.Field[interface{}]                                        `json:"content,required"`
-	Role         param.Field[PromptUpdateParamsPromptDataPromptChatMessagesRole] `json:"role,required"`
-	Name         param.Field[string]                                             `json:"name"`
-	FunctionCall param.Field[interface{}]                                        `json:"function_call,required"`
-	ToolCalls    param.Field[interface{}]                                        `json:"tool_calls,required"`
-	ToolCallID   param.Field[string]                                             `json:"tool_call_id"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessage) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessage) implementsPromptUpdateParamsPromptDataPromptChatMessageUnion() {
-}
-
-// Satisfied by [PromptUpdateParamsPromptDataPromptChatMessagesSystem],
-// [PromptUpdateParamsPromptDataPromptChatMessagesUser],
-// [PromptUpdateParamsPromptDataPromptChatMessagesAssistant],
-// [PromptUpdateParamsPromptDataPromptChatMessagesTool],
-// [PromptUpdateParamsPromptDataPromptChatMessagesFunction],
-// [PromptUpdateParamsPromptDataPromptChatMessagesFallback],
-// [PromptUpdateParamsPromptDataPromptChatMessage].
-type PromptUpdateParamsPromptDataPromptChatMessageUnion interface {
-	implementsPromptUpdateParamsPromptDataPromptChatMessageUnion()
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesSystem struct {
-	Role    param.Field[PromptUpdateParamsPromptDataPromptChatMessagesSystemRole] `json:"role,required"`
-	Content param.Field[string]                                                   `json:"content"`
-	Name    param.Field[string]                                                   `json:"name"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesSystem) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesSystem) implementsPromptUpdateParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesSystemRole string
-
-const (
-	PromptUpdateParamsPromptDataPromptChatMessagesSystemRoleSystem PromptUpdateParamsPromptDataPromptChatMessagesSystemRole = "system"
-)
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesSystemRole) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataPromptChatMessagesSystemRoleSystem:
-		return true
-	}
-	return false
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesUser struct {
-	Role    param.Field[PromptUpdateParamsPromptDataPromptChatMessagesUserRole]         `json:"role,required"`
-	Content param.Field[PromptUpdateParamsPromptDataPromptChatMessagesUserContentUnion] `json:"content"`
-	Name    param.Field[string]                                                         `json:"name"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesUser) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesUser) implementsPromptUpdateParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesUserRole string
-
-const (
-	PromptUpdateParamsPromptDataPromptChatMessagesUserRoleUser PromptUpdateParamsPromptDataPromptChatMessagesUserRole = "user"
-)
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesUserRole) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataPromptChatMessagesUserRoleUser:
-		return true
-	}
-	return false
-}
-
-// Satisfied by [shared.UnionString],
-// [PromptUpdateParamsPromptDataPromptChatMessagesUserContentArray].
-type PromptUpdateParamsPromptDataPromptChatMessagesUserContentUnion interface {
-	ImplementsPromptUpdateParamsPromptDataPromptChatMessagesUserContentUnion()
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesUserContentArray []PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayUnion
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesUserContentArray) ImplementsPromptUpdateParamsPromptDataPromptChatMessagesUserContentUnion() {
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesUserContentArray struct {
-	Text     param.Field[string]                                                             `json:"text"`
-	Type     param.Field[PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayType] `json:"type,required"`
-	ImageURL param.Field[interface{}]                                                        `json:"image_url,required"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesUserContentArray) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesUserContentArray) implementsPromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayUnion() {
-}
-
-// Satisfied by
-// [PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayText],
-// [PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURL],
-// [PromptUpdateParamsPromptDataPromptChatMessagesUserContentArray].
-type PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayUnion interface {
-	implementsPromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayUnion()
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayText struct {
-	Type param.Field[PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayTextType] `json:"type,required"`
-	Text param.Field[string]                                                                 `json:"text"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayText) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayText) implementsPromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayUnion() {
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayTextType string
-
-const (
-	PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayTextTypeText PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayTextType = "text"
-)
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayTextType) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayTextTypeText:
-		return true
-	}
-	return false
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURL struct {
-	ImageURL param.Field[PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURL] `json:"image_url,required"`
-	Type     param.Field[PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLType]     `json:"type,required"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURL) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURL) implementsPromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayUnion() {
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURL struct {
-	URL    param.Field[string]                                                                               `json:"url,required"`
-	Detail param.Field[PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail] `json:"detail"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURL) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail string
-
-const (
-	PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailAuto PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "auto"
-	PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailLow  PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "low"
-	PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailHigh PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "high"
-)
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailAuto, PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailLow, PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailHigh:
-		return true
-	}
-	return false
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLType string
-
-const (
-	PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLTypeImageURL PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLType = "image_url"
-)
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLType) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayImageURLTypeImageURL:
-		return true
-	}
-	return false
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayType string
-
-const (
-	PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayTypeText     PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayType = "text"
-	PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayTypeImageURL PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayType = "image_url"
-)
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayType) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayTypeText, PromptUpdateParamsPromptDataPromptChatMessagesUserContentArrayTypeImageURL:
-		return true
-	}
-	return false
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesAssistant struct {
-	Role         param.Field[PromptUpdateParamsPromptDataPromptChatMessagesAssistantRole]         `json:"role,required"`
-	Content      param.Field[string]                                                              `json:"content"`
-	FunctionCall param.Field[PromptUpdateParamsPromptDataPromptChatMessagesAssistantFunctionCall] `json:"function_call"`
-	Name         param.Field[string]                                                              `json:"name"`
-	ToolCalls    param.Field[[]PromptUpdateParamsPromptDataPromptChatMessagesAssistantToolCall]   `json:"tool_calls"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesAssistant) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesAssistant) implementsPromptUpdateParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesAssistantRole string
-
-const (
-	PromptUpdateParamsPromptDataPromptChatMessagesAssistantRoleAssistant PromptUpdateParamsPromptDataPromptChatMessagesAssistantRole = "assistant"
-)
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesAssistantRole) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataPromptChatMessagesAssistantRoleAssistant:
-		return true
-	}
-	return false
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesAssistantFunctionCall struct {
-	Arguments param.Field[string] `json:"arguments,required"`
-	Name      param.Field[string] `json:"name,required"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesAssistantFunctionCall) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesAssistantToolCall struct {
-	ID       param.Field[string]                                                                   `json:"id,required"`
-	Function param.Field[PromptUpdateParamsPromptDataPromptChatMessagesAssistantToolCallsFunction] `json:"function,required"`
-	Type     param.Field[PromptUpdateParamsPromptDataPromptChatMessagesAssistantToolCallsType]     `json:"type,required"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesAssistantToolCall) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesAssistantToolCallsFunction struct {
-	Arguments param.Field[string] `json:"arguments,required"`
-	Name      param.Field[string] `json:"name,required"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesAssistantToolCallsFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesAssistantToolCallsType string
-
-const (
-	PromptUpdateParamsPromptDataPromptChatMessagesAssistantToolCallsTypeFunction PromptUpdateParamsPromptDataPromptChatMessagesAssistantToolCallsType = "function"
-)
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesAssistantToolCallsType) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataPromptChatMessagesAssistantToolCallsTypeFunction:
-		return true
-	}
-	return false
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesTool struct {
-	Role       param.Field[PromptUpdateParamsPromptDataPromptChatMessagesToolRole] `json:"role,required"`
-	Content    param.Field[string]                                                 `json:"content"`
-	ToolCallID param.Field[string]                                                 `json:"tool_call_id"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesTool) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesTool) implementsPromptUpdateParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesToolRole string
-
-const (
-	PromptUpdateParamsPromptDataPromptChatMessagesToolRoleTool PromptUpdateParamsPromptDataPromptChatMessagesToolRole = "tool"
-)
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesToolRole) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataPromptChatMessagesToolRoleTool:
-		return true
-	}
-	return false
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesFunction struct {
-	Name    param.Field[string]                                                     `json:"name,required"`
-	Role    param.Field[PromptUpdateParamsPromptDataPromptChatMessagesFunctionRole] `json:"role,required"`
-	Content param.Field[string]                                                     `json:"content"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesFunction) implementsPromptUpdateParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesFunctionRole string
-
-const (
-	PromptUpdateParamsPromptDataPromptChatMessagesFunctionRoleFunction PromptUpdateParamsPromptDataPromptChatMessagesFunctionRole = "function"
-)
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesFunctionRole) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataPromptChatMessagesFunctionRoleFunction:
-		return true
-	}
-	return false
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesFallback struct {
-	Role    param.Field[PromptUpdateParamsPromptDataPromptChatMessagesFallbackRole] `json:"role,required"`
-	Content param.Field[string]                                                     `json:"content"`
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesFallback) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesFallback) implementsPromptUpdateParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesFallbackRole string
-
-const (
-	PromptUpdateParamsPromptDataPromptChatMessagesFallbackRoleModel PromptUpdateParamsPromptDataPromptChatMessagesFallbackRole = "model"
-)
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesFallbackRole) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataPromptChatMessagesFallbackRoleModel:
-		return true
-	}
-	return false
-}
-
-type PromptUpdateParamsPromptDataPromptChatMessagesRole string
-
-const (
-	PromptUpdateParamsPromptDataPromptChatMessagesRoleSystem    PromptUpdateParamsPromptDataPromptChatMessagesRole = "system"
-	PromptUpdateParamsPromptDataPromptChatMessagesRoleUser      PromptUpdateParamsPromptDataPromptChatMessagesRole = "user"
-	PromptUpdateParamsPromptDataPromptChatMessagesRoleAssistant PromptUpdateParamsPromptDataPromptChatMessagesRole = "assistant"
-	PromptUpdateParamsPromptDataPromptChatMessagesRoleTool      PromptUpdateParamsPromptDataPromptChatMessagesRole = "tool"
-	PromptUpdateParamsPromptDataPromptChatMessagesRoleFunction  PromptUpdateParamsPromptDataPromptChatMessagesRole = "function"
-	PromptUpdateParamsPromptDataPromptChatMessagesRoleModel     PromptUpdateParamsPromptDataPromptChatMessagesRole = "model"
-)
-
-func (r PromptUpdateParamsPromptDataPromptChatMessagesRole) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataPromptChatMessagesRoleSystem, PromptUpdateParamsPromptDataPromptChatMessagesRoleUser, PromptUpdateParamsPromptDataPromptChatMessagesRoleAssistant, PromptUpdateParamsPromptDataPromptChatMessagesRoleTool, PromptUpdateParamsPromptDataPromptChatMessagesRoleFunction, PromptUpdateParamsPromptDataPromptChatMessagesRoleModel:
-		return true
-	}
-	return false
-}
-
-type PromptUpdateParamsPromptDataPromptChatType string
-
-const (
-	PromptUpdateParamsPromptDataPromptChatTypeChat PromptUpdateParamsPromptDataPromptChatType = "chat"
-)
-
-func (r PromptUpdateParamsPromptDataPromptChatType) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataPromptChatTypeChat:
-		return true
-	}
-	return false
-}
-
-type PromptUpdateParamsPromptDataPromptNullableVariant struct {
-}
-
-func (r PromptUpdateParamsPromptDataPromptNullableVariant) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptUpdateParamsPromptDataPromptNullableVariant) implementsPromptUpdateParamsPromptDataPromptUnion() {
-}
-
-type PromptUpdateParamsPromptDataPromptType string
-
-const (
-	PromptUpdateParamsPromptDataPromptTypeCompletion PromptUpdateParamsPromptDataPromptType = "completion"
-	PromptUpdateParamsPromptDataPromptTypeChat       PromptUpdateParamsPromptDataPromptType = "chat"
-)
-
-func (r PromptUpdateParamsPromptDataPromptType) IsKnown() bool {
-	switch r {
-	case PromptUpdateParamsPromptDataPromptTypeCompletion, PromptUpdateParamsPromptDataPromptTypeChat:
-		return true
-	}
-	return false
 }
 
 type PromptListParams struct {
@@ -3294,783 +2115,11 @@ type PromptReplaceParams struct {
 	// Textual description of the prompt
 	Description param.Field[string] `json:"description"`
 	// The prompt, model, and its parameters
-	PromptData param.Field[PromptReplaceParamsPromptData] `json:"prompt_data"`
+	PromptData param.Field[PromptDataParam] `json:"prompt_data"`
 	// A list of tags for the prompt
 	Tags param.Field[[]string] `json:"tags"`
 }
 
 func (r PromptReplaceParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
-}
-
-// The prompt, model, and its parameters
-type PromptReplaceParamsPromptData struct {
-	Options param.Field[PromptReplaceParamsPromptDataOptions]     `json:"options"`
-	Origin  param.Field[PromptReplaceParamsPromptDataOrigin]      `json:"origin"`
-	Prompt  param.Field[PromptReplaceParamsPromptDataPromptUnion] `json:"prompt"`
-}
-
-func (r PromptReplaceParamsPromptData) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptReplaceParamsPromptDataOptions struct {
-	Model    param.Field[string]                                          `json:"model"`
-	Params   param.Field[PromptReplaceParamsPromptDataOptionsParamsUnion] `json:"params"`
-	Position param.Field[string]                                          `json:"position"`
-}
-
-func (r PromptReplaceParamsPromptDataOptions) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptReplaceParamsPromptDataOptionsParams struct {
-	UseCache         param.Field[bool]        `json:"use_cache"`
-	Temperature      param.Field[float64]     `json:"temperature"`
-	TopP             param.Field[float64]     `json:"top_p"`
-	MaxTokens        param.Field[float64]     `json:"max_tokens"`
-	FrequencyPenalty param.Field[float64]     `json:"frequency_penalty"`
-	PresencePenalty  param.Field[float64]     `json:"presence_penalty"`
-	ResponseFormat   param.Field[interface{}] `json:"response_format,required"`
-	ToolChoice       param.Field[interface{}] `json:"tool_choice,required"`
-	FunctionCall     param.Field[interface{}] `json:"function_call,required"`
-	N                param.Field[float64]     `json:"n"`
-	Stop             param.Field[interface{}] `json:"stop,required"`
-	TopK             param.Field[float64]     `json:"top_k"`
-	StopSequences    param.Field[interface{}] `json:"stop_sequences,required"`
-	// This is a legacy parameter that should not be used.
-	MaxTokensToSample param.Field[float64] `json:"max_tokens_to_sample"`
-	MaxOutputTokens   param.Field[float64] `json:"maxOutputTokens"`
-	TopP              param.Field[float64] `json:"topP"`
-	TopK              param.Field[float64] `json:"topK"`
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParams) implementsPromptReplaceParamsPromptDataOptionsParamsUnion() {
-}
-
-// Satisfied by [PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParams],
-// [PromptReplaceParamsPromptDataOptionsParamsAnthropicModelParams],
-// [PromptReplaceParamsPromptDataOptionsParamsGoogleModelParams],
-// [PromptReplaceParamsPromptDataOptionsParamsWindowAIModelParams],
-// [PromptReplaceParamsPromptDataOptionsParamsJsCompletionParams],
-// [PromptReplaceParamsPromptDataOptionsParams].
-type PromptReplaceParamsPromptDataOptionsParamsUnion interface {
-	implementsPromptReplaceParamsPromptDataOptionsParamsUnion()
-}
-
-type PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParams struct {
-	FrequencyPenalty param.Field[float64]                                                                      `json:"frequency_penalty"`
-	FunctionCall     param.Field[PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion] `json:"function_call"`
-	MaxTokens        param.Field[float64]                                                                      `json:"max_tokens"`
-	N                param.Field[float64]                                                                      `json:"n"`
-	PresencePenalty  param.Field[float64]                                                                      `json:"presence_penalty"`
-	ResponseFormat   param.Field[PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormat]    `json:"response_format"`
-	Stop             param.Field[[]string]                                                                     `json:"stop"`
-	Temperature      param.Field[float64]                                                                      `json:"temperature"`
-	ToolChoice       param.Field[PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion]   `json:"tool_choice"`
-	TopP             param.Field[float64]                                                                      `json:"top_p"`
-	UseCache         param.Field[bool]                                                                         `json:"use_cache"`
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParams) implementsPromptReplaceParamsPromptDataOptionsParamsUnion() {
-}
-
-// Satisfied by
-// [PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto],
-// [PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone],
-// [PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction].
-type PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion interface {
-	implementsPromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion()
-}
-
-type PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto string
-
-const (
-	PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto = "auto"
-)
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto:
-		return true
-	}
-	return false
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto) implementsPromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
-}
-
-type PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone string
-
-const (
-	PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNoneNone PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone = "none"
-)
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNoneNone:
-		return true
-	}
-	return false
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallNone) implementsPromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
-}
-
-type PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction struct {
-	Name param.Field[string] `json:"name,required"`
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction) implementsPromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
-}
-
-type PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormat struct {
-	Type param.Field[PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatType] `json:"type,required"`
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormat) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatType string
-
-const (
-	PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatType = "json_object"
-)
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatType) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject:
-		return true
-	}
-	return false
-}
-
-// Satisfied by
-// [PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto],
-// [PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone],
-// [PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction].
-type PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion interface {
-	implementsPromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion()
-}
-
-type PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto string
-
-const (
-	PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto = "auto"
-)
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto:
-		return true
-	}
-	return false
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) implementsPromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-type PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone string
-
-const (
-	PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone = "none"
-)
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone:
-		return true
-	}
-	return false
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) implementsPromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-type PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction struct {
-	Function param.Field[PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction] `json:"function,required"`
-	Type     param.Field[PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType]     `json:"type,required"`
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction) implementsPromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-type PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction struct {
-	Name param.Field[string] `json:"name,required"`
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType string
-
-const (
-	PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType = "function"
-)
-
-func (r PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction:
-		return true
-	}
-	return false
-}
-
-type PromptReplaceParamsPromptDataOptionsParamsAnthropicModelParams struct {
-	MaxTokens   param.Field[float64] `json:"max_tokens,required"`
-	Temperature param.Field[float64] `json:"temperature,required"`
-	// This is a legacy parameter that should not be used.
-	MaxTokensToSample param.Field[float64]  `json:"max_tokens_to_sample"`
-	StopSequences     param.Field[[]string] `json:"stop_sequences"`
-	TopK              param.Field[float64]  `json:"top_k"`
-	TopP              param.Field[float64]  `json:"top_p"`
-	UseCache          param.Field[bool]     `json:"use_cache"`
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsAnthropicModelParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsAnthropicModelParams) implementsPromptReplaceParamsPromptDataOptionsParamsUnion() {
-}
-
-type PromptReplaceParamsPromptDataOptionsParamsGoogleModelParams struct {
-	MaxOutputTokens param.Field[float64] `json:"maxOutputTokens"`
-	Temperature     param.Field[float64] `json:"temperature"`
-	TopK            param.Field[float64] `json:"topK"`
-	TopP            param.Field[float64] `json:"topP"`
-	UseCache        param.Field[bool]    `json:"use_cache"`
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsGoogleModelParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsGoogleModelParams) implementsPromptReplaceParamsPromptDataOptionsParamsUnion() {
-}
-
-type PromptReplaceParamsPromptDataOptionsParamsWindowAIModelParams struct {
-	Temperature param.Field[float64] `json:"temperature"`
-	TopK        param.Field[float64] `json:"topK"`
-	UseCache    param.Field[bool]    `json:"use_cache"`
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsWindowAIModelParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsWindowAIModelParams) implementsPromptReplaceParamsPromptDataOptionsParamsUnion() {
-}
-
-type PromptReplaceParamsPromptDataOptionsParamsJsCompletionParams struct {
-	UseCache param.Field[bool] `json:"use_cache"`
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsJsCompletionParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataOptionsParamsJsCompletionParams) implementsPromptReplaceParamsPromptDataOptionsParamsUnion() {
-}
-
-type PromptReplaceParamsPromptDataOrigin struct {
-	ProjectID     param.Field[string] `json:"project_id"`
-	PromptID      param.Field[string] `json:"prompt_id"`
-	PromptVersion param.Field[string] `json:"prompt_version"`
-}
-
-func (r PromptReplaceParamsPromptDataOrigin) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptReplaceParamsPromptDataPrompt struct {
-	Type     param.Field[PromptReplaceParamsPromptDataPromptType] `json:"type"`
-	Content  param.Field[string]                                  `json:"content"`
-	Messages param.Field[interface{}]                             `json:"messages,required"`
-	Tools    param.Field[string]                                  `json:"tools"`
-}
-
-func (r PromptReplaceParamsPromptDataPrompt) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataPrompt) implementsPromptReplaceParamsPromptDataPromptUnion() {}
-
-// Satisfied by [PromptReplaceParamsPromptDataPromptCompletion],
-// [PromptReplaceParamsPromptDataPromptChat],
-// [PromptReplaceParamsPromptDataPromptNullableVariant],
-// [PromptReplaceParamsPromptDataPrompt].
-type PromptReplaceParamsPromptDataPromptUnion interface {
-	implementsPromptReplaceParamsPromptDataPromptUnion()
-}
-
-type PromptReplaceParamsPromptDataPromptCompletion struct {
-	Content param.Field[string]                                            `json:"content,required"`
-	Type    param.Field[PromptReplaceParamsPromptDataPromptCompletionType] `json:"type,required"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptCompletion) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataPromptCompletion) implementsPromptReplaceParamsPromptDataPromptUnion() {
-}
-
-type PromptReplaceParamsPromptDataPromptCompletionType string
-
-const (
-	PromptReplaceParamsPromptDataPromptCompletionTypeCompletion PromptReplaceParamsPromptDataPromptCompletionType = "completion"
-)
-
-func (r PromptReplaceParamsPromptDataPromptCompletionType) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataPromptCompletionTypeCompletion:
-		return true
-	}
-	return false
-}
-
-type PromptReplaceParamsPromptDataPromptChat struct {
-	Messages param.Field[[]PromptReplaceParamsPromptDataPromptChatMessageUnion] `json:"messages,required"`
-	Type     param.Field[PromptReplaceParamsPromptDataPromptChatType]           `json:"type,required"`
-	Tools    param.Field[string]                                                `json:"tools"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptChat) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataPromptChat) implementsPromptReplaceParamsPromptDataPromptUnion() {
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessage struct {
-	Content      param.Field[interface{}]                                         `json:"content,required"`
-	Role         param.Field[PromptReplaceParamsPromptDataPromptChatMessagesRole] `json:"role,required"`
-	Name         param.Field[string]                                              `json:"name"`
-	FunctionCall param.Field[interface{}]                                         `json:"function_call,required"`
-	ToolCalls    param.Field[interface{}]                                         `json:"tool_calls,required"`
-	ToolCallID   param.Field[string]                                              `json:"tool_call_id"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessage) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessage) implementsPromptReplaceParamsPromptDataPromptChatMessageUnion() {
-}
-
-// Satisfied by [PromptReplaceParamsPromptDataPromptChatMessagesSystem],
-// [PromptReplaceParamsPromptDataPromptChatMessagesUser],
-// [PromptReplaceParamsPromptDataPromptChatMessagesAssistant],
-// [PromptReplaceParamsPromptDataPromptChatMessagesTool],
-// [PromptReplaceParamsPromptDataPromptChatMessagesFunction],
-// [PromptReplaceParamsPromptDataPromptChatMessagesFallback],
-// [PromptReplaceParamsPromptDataPromptChatMessage].
-type PromptReplaceParamsPromptDataPromptChatMessageUnion interface {
-	implementsPromptReplaceParamsPromptDataPromptChatMessageUnion()
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesSystem struct {
-	Role    param.Field[PromptReplaceParamsPromptDataPromptChatMessagesSystemRole] `json:"role,required"`
-	Content param.Field[string]                                                    `json:"content"`
-	Name    param.Field[string]                                                    `json:"name"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesSystem) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesSystem) implementsPromptReplaceParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesSystemRole string
-
-const (
-	PromptReplaceParamsPromptDataPromptChatMessagesSystemRoleSystem PromptReplaceParamsPromptDataPromptChatMessagesSystemRole = "system"
-)
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesSystemRole) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataPromptChatMessagesSystemRoleSystem:
-		return true
-	}
-	return false
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesUser struct {
-	Role    param.Field[PromptReplaceParamsPromptDataPromptChatMessagesUserRole]         `json:"role,required"`
-	Content param.Field[PromptReplaceParamsPromptDataPromptChatMessagesUserContentUnion] `json:"content"`
-	Name    param.Field[string]                                                          `json:"name"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesUser) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesUser) implementsPromptReplaceParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesUserRole string
-
-const (
-	PromptReplaceParamsPromptDataPromptChatMessagesUserRoleUser PromptReplaceParamsPromptDataPromptChatMessagesUserRole = "user"
-)
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesUserRole) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataPromptChatMessagesUserRoleUser:
-		return true
-	}
-	return false
-}
-
-// Satisfied by [shared.UnionString],
-// [PromptReplaceParamsPromptDataPromptChatMessagesUserContentArray].
-type PromptReplaceParamsPromptDataPromptChatMessagesUserContentUnion interface {
-	ImplementsPromptReplaceParamsPromptDataPromptChatMessagesUserContentUnion()
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesUserContentArray []PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayUnion
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesUserContentArray) ImplementsPromptReplaceParamsPromptDataPromptChatMessagesUserContentUnion() {
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesUserContentArray struct {
-	Text     param.Field[string]                                                              `json:"text"`
-	Type     param.Field[PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayType] `json:"type,required"`
-	ImageURL param.Field[interface{}]                                                         `json:"image_url,required"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesUserContentArray) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesUserContentArray) implementsPromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayUnion() {
-}
-
-// Satisfied by
-// [PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayText],
-// [PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURL],
-// [PromptReplaceParamsPromptDataPromptChatMessagesUserContentArray].
-type PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayUnion interface {
-	implementsPromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayUnion()
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayText struct {
-	Type param.Field[PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayTextType] `json:"type,required"`
-	Text param.Field[string]                                                                  `json:"text"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayText) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayText) implementsPromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayUnion() {
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayTextType string
-
-const (
-	PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayTextTypeText PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayTextType = "text"
-)
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayTextType) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayTextTypeText:
-		return true
-	}
-	return false
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURL struct {
-	ImageURL param.Field[PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURL] `json:"image_url,required"`
-	Type     param.Field[PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLType]     `json:"type,required"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURL) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURL) implementsPromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayUnion() {
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURL struct {
-	URL    param.Field[string]                                                                                `json:"url,required"`
-	Detail param.Field[PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail] `json:"detail"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURL) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail string
-
-const (
-	PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailAuto PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "auto"
-	PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailLow  PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "low"
-	PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailHigh PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "high"
-)
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailAuto, PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailLow, PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailHigh:
-		return true
-	}
-	return false
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLType string
-
-const (
-	PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLTypeImageURL PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLType = "image_url"
-)
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLType) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayImageURLTypeImageURL:
-		return true
-	}
-	return false
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayType string
-
-const (
-	PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayTypeText     PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayType = "text"
-	PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayTypeImageURL PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayType = "image_url"
-)
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayType) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayTypeText, PromptReplaceParamsPromptDataPromptChatMessagesUserContentArrayTypeImageURL:
-		return true
-	}
-	return false
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesAssistant struct {
-	Role         param.Field[PromptReplaceParamsPromptDataPromptChatMessagesAssistantRole]         `json:"role,required"`
-	Content      param.Field[string]                                                               `json:"content"`
-	FunctionCall param.Field[PromptReplaceParamsPromptDataPromptChatMessagesAssistantFunctionCall] `json:"function_call"`
-	Name         param.Field[string]                                                               `json:"name"`
-	ToolCalls    param.Field[[]PromptReplaceParamsPromptDataPromptChatMessagesAssistantToolCall]   `json:"tool_calls"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesAssistant) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesAssistant) implementsPromptReplaceParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesAssistantRole string
-
-const (
-	PromptReplaceParamsPromptDataPromptChatMessagesAssistantRoleAssistant PromptReplaceParamsPromptDataPromptChatMessagesAssistantRole = "assistant"
-)
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesAssistantRole) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataPromptChatMessagesAssistantRoleAssistant:
-		return true
-	}
-	return false
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesAssistantFunctionCall struct {
-	Arguments param.Field[string] `json:"arguments,required"`
-	Name      param.Field[string] `json:"name,required"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesAssistantFunctionCall) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesAssistantToolCall struct {
-	ID       param.Field[string]                                                                    `json:"id,required"`
-	Function param.Field[PromptReplaceParamsPromptDataPromptChatMessagesAssistantToolCallsFunction] `json:"function,required"`
-	Type     param.Field[PromptReplaceParamsPromptDataPromptChatMessagesAssistantToolCallsType]     `json:"type,required"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesAssistantToolCall) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesAssistantToolCallsFunction struct {
-	Arguments param.Field[string] `json:"arguments,required"`
-	Name      param.Field[string] `json:"name,required"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesAssistantToolCallsFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesAssistantToolCallsType string
-
-const (
-	PromptReplaceParamsPromptDataPromptChatMessagesAssistantToolCallsTypeFunction PromptReplaceParamsPromptDataPromptChatMessagesAssistantToolCallsType = "function"
-)
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesAssistantToolCallsType) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataPromptChatMessagesAssistantToolCallsTypeFunction:
-		return true
-	}
-	return false
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesTool struct {
-	Role       param.Field[PromptReplaceParamsPromptDataPromptChatMessagesToolRole] `json:"role,required"`
-	Content    param.Field[string]                                                  `json:"content"`
-	ToolCallID param.Field[string]                                                  `json:"tool_call_id"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesTool) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesTool) implementsPromptReplaceParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesToolRole string
-
-const (
-	PromptReplaceParamsPromptDataPromptChatMessagesToolRoleTool PromptReplaceParamsPromptDataPromptChatMessagesToolRole = "tool"
-)
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesToolRole) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataPromptChatMessagesToolRoleTool:
-		return true
-	}
-	return false
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesFunction struct {
-	Name    param.Field[string]                                                      `json:"name,required"`
-	Role    param.Field[PromptReplaceParamsPromptDataPromptChatMessagesFunctionRole] `json:"role,required"`
-	Content param.Field[string]                                                      `json:"content"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesFunction) implementsPromptReplaceParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesFunctionRole string
-
-const (
-	PromptReplaceParamsPromptDataPromptChatMessagesFunctionRoleFunction PromptReplaceParamsPromptDataPromptChatMessagesFunctionRole = "function"
-)
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesFunctionRole) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataPromptChatMessagesFunctionRoleFunction:
-		return true
-	}
-	return false
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesFallback struct {
-	Role    param.Field[PromptReplaceParamsPromptDataPromptChatMessagesFallbackRole] `json:"role,required"`
-	Content param.Field[string]                                                      `json:"content"`
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesFallback) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesFallback) implementsPromptReplaceParamsPromptDataPromptChatMessageUnion() {
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesFallbackRole string
-
-const (
-	PromptReplaceParamsPromptDataPromptChatMessagesFallbackRoleModel PromptReplaceParamsPromptDataPromptChatMessagesFallbackRole = "model"
-)
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesFallbackRole) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataPromptChatMessagesFallbackRoleModel:
-		return true
-	}
-	return false
-}
-
-type PromptReplaceParamsPromptDataPromptChatMessagesRole string
-
-const (
-	PromptReplaceParamsPromptDataPromptChatMessagesRoleSystem    PromptReplaceParamsPromptDataPromptChatMessagesRole = "system"
-	PromptReplaceParamsPromptDataPromptChatMessagesRoleUser      PromptReplaceParamsPromptDataPromptChatMessagesRole = "user"
-	PromptReplaceParamsPromptDataPromptChatMessagesRoleAssistant PromptReplaceParamsPromptDataPromptChatMessagesRole = "assistant"
-	PromptReplaceParamsPromptDataPromptChatMessagesRoleTool      PromptReplaceParamsPromptDataPromptChatMessagesRole = "tool"
-	PromptReplaceParamsPromptDataPromptChatMessagesRoleFunction  PromptReplaceParamsPromptDataPromptChatMessagesRole = "function"
-	PromptReplaceParamsPromptDataPromptChatMessagesRoleModel     PromptReplaceParamsPromptDataPromptChatMessagesRole = "model"
-)
-
-func (r PromptReplaceParamsPromptDataPromptChatMessagesRole) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataPromptChatMessagesRoleSystem, PromptReplaceParamsPromptDataPromptChatMessagesRoleUser, PromptReplaceParamsPromptDataPromptChatMessagesRoleAssistant, PromptReplaceParamsPromptDataPromptChatMessagesRoleTool, PromptReplaceParamsPromptDataPromptChatMessagesRoleFunction, PromptReplaceParamsPromptDataPromptChatMessagesRoleModel:
-		return true
-	}
-	return false
-}
-
-type PromptReplaceParamsPromptDataPromptChatType string
-
-const (
-	PromptReplaceParamsPromptDataPromptChatTypeChat PromptReplaceParamsPromptDataPromptChatType = "chat"
-)
-
-func (r PromptReplaceParamsPromptDataPromptChatType) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataPromptChatTypeChat:
-		return true
-	}
-	return false
-}
-
-type PromptReplaceParamsPromptDataPromptNullableVariant struct {
-}
-
-func (r PromptReplaceParamsPromptDataPromptNullableVariant) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptReplaceParamsPromptDataPromptNullableVariant) implementsPromptReplaceParamsPromptDataPromptUnion() {
-}
-
-type PromptReplaceParamsPromptDataPromptType string
-
-const (
-	PromptReplaceParamsPromptDataPromptTypeCompletion PromptReplaceParamsPromptDataPromptType = "completion"
-	PromptReplaceParamsPromptDataPromptTypeChat       PromptReplaceParamsPromptDataPromptType = "chat"
-)
-
-func (r PromptReplaceParamsPromptDataPromptType) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsPromptDataPromptTypeCompletion, PromptReplaceParamsPromptDataPromptTypeChat:
-		return true
-	}
-	return false
 }
