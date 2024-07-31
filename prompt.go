@@ -1596,39 +1596,11 @@ func (r PromptDataOptionsParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-type PromptDataOptionsParamsParam struct {
-	UseCache         param.Field[bool]        `json:"use_cache"`
-	Temperature      param.Field[float64]     `json:"temperature"`
-	TopP             param.Field[float64]     `json:"top_p"`
-	MaxTokens        param.Field[float64]     `json:"max_tokens"`
-	FrequencyPenalty param.Field[float64]     `json:"frequency_penalty"`
-	PresencePenalty  param.Field[float64]     `json:"presence_penalty"`
-	ResponseFormat   param.Field[interface{}] `json:"response_format,required"`
-	ToolChoice       param.Field[interface{}] `json:"tool_choice,required"`
-	FunctionCall     param.Field[interface{}] `json:"function_call,required"`
-	N                param.Field[float64]     `json:"n"`
-	Stop             param.Field[interface{}] `json:"stop,required"`
-	TopK             param.Field[float64]     `json:"top_k"`
-	StopSequences    param.Field[interface{}] `json:"stop_sequences,required"`
-	// This is a legacy parameter that should not be used.
-	MaxTokensToSample param.Field[float64] `json:"max_tokens_to_sample"`
-	MaxOutputTokens   param.Field[float64] `json:"maxOutputTokens"`
-	TopP              param.Field[float64] `json:"topP"`
-	TopK              param.Field[float64] `json:"topK"`
-}
-
-func (r PromptDataOptionsParamsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataOptionsParamsParam) implementsPromptDataOptionsParamsUnionParam() {}
-
 // Satisfied by [PromptDataOptionsParamsOpenAIModelParamsParam],
 // [PromptDataOptionsParamsAnthropicModelParamsParam],
 // [PromptDataOptionsParamsGoogleModelParamsParam],
 // [PromptDataOptionsParamsWindowAIModelParamsParam],
-// [PromptDataOptionsParamsJsCompletionParamsParam],
-// [PromptDataOptionsParamsParam].
+// [PromptDataOptionsParamsJsCompletionParamsParam].
 type PromptDataOptionsParamsUnionParam interface {
 	implementsPromptDataOptionsParamsUnionParam()
 }
