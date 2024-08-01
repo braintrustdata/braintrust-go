@@ -1,3 +1,11 @@
+# Shared Params Types
+
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#PromptDataParam">PromptDataParam</a>
+
+# Shared Response Types
+
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#PromptData">PromptData</a>
+
 # TopLevel
 
 Methods:
@@ -35,9 +43,14 @@ Methods:
 
 # Experiments
 
+Params Types:
+
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#RepoInfoParam">RepoInfoParam</a>
+
 Response Types:
 
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#Experiment">Experiment</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#RepoInfo">RepoInfo</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ExperimentFetchResponse">ExperimentFetchResponse</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ExperimentFetchPostResponse">ExperimentFetchPostResponse</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ExperimentInsertResponse">ExperimentInsertResponse</a>
@@ -195,9 +208,18 @@ Methods:
 
 # Views
 
+Params Types:
+
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ViewDataParam">ViewDataParam</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ViewDataSearchParam">ViewDataSearchParam</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ViewOptionsParam">ViewOptionsParam</a>
+
 Response Types:
 
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#View">View</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ViewData">ViewData</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ViewDataSearch">ViewDataSearch</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ViewOptions">ViewOptions</a>
 
 Methods:
 

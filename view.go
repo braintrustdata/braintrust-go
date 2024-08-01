@@ -140,8 +140,8 @@ type View struct {
 	// Identifies the user who created the view
 	UserID string `json:"user_id,nullable" format:"uuid"`
 	// The view definition
-	ViewData ViewViewData `json:"view_data,nullable"`
-	JSON     viewJSON     `json:"-"`
+	ViewData ViewData `json:"view_data,nullable"`
+	JSON     viewJSON `json:"-"`
 }
 
 // viewJSON contains the JSON metadata for the struct [View]
@@ -215,6 +215,73 @@ func (r ViewViewType) IsKnown() bool {
 	return false
 }
 
+// The view definition
+type ViewData struct {
+	Search ViewDataSearch `json:"search,nullable"`
+	JSON   viewDataJSON   `json:"-"`
+}
+
+// viewDataJSON contains the JSON metadata for the struct [ViewData]
+type viewDataJSON struct {
+	Search      apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *ViewData) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r viewDataJSON) RawJSON() string {
+	return r.raw
+}
+
+// The view definition
+type ViewDataParam struct {
+	Search param.Field[ViewDataSearchParam] `json:"search"`
+}
+
+func (r ViewDataParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type ViewDataSearch struct {
+	Filter []interface{}      `json:"filter,nullable"`
+	Match  []interface{}      `json:"match,nullable"`
+	Sort   []interface{}      `json:"sort,nullable"`
+	Tag    []interface{}      `json:"tag,nullable"`
+	JSON   viewDataSearchJSON `json:"-"`
+}
+
+// viewDataSearchJSON contains the JSON metadata for the struct [ViewDataSearch]
+type viewDataSearchJSON struct {
+	Filter      apijson.Field
+	Match       apijson.Field
+	Sort        apijson.Field
+	Tag         apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *ViewDataSearch) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r viewDataSearchJSON) RawJSON() string {
+	return r.raw
+}
+
+type ViewDataSearchParam struct {
+	Filter param.Field[[]interface{}] `json:"filter"`
+	Match  param.Field[[]interface{}] `json:"match"`
+	Sort   param.Field[[]interface{}] `json:"sort"`
+	Tag    param.Field[[]interface{}] `json:"tag"`
+}
+
+func (r ViewDataSearchParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
 // Options for the view in the app
 type ViewOptions struct {
 	ColumnOrder      []string           `json:"columnOrder,nullable"`
@@ -240,52 +307,15 @@ func (r viewOptionsJSON) RawJSON() string {
 	return r.raw
 }
 
-// The view definition
-type ViewViewData struct {
-	Search ViewViewDataSearch `json:"search,nullable"`
-	JSON   viewViewDataJSON   `json:"-"`
+// Options for the view in the app
+type ViewOptionsParam struct {
+	ColumnOrder      param.Field[[]string]           `json:"columnOrder"`
+	ColumnSizing     param.Field[map[string]float64] `json:"columnSizing"`
+	ColumnVisibility param.Field[map[string]bool]    `json:"columnVisibility"`
 }
 
-// viewViewDataJSON contains the JSON metadata for the struct [ViewViewData]
-type viewViewDataJSON struct {
-	Search      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ViewViewData) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r viewViewDataJSON) RawJSON() string {
-	return r.raw
-}
-
-type ViewViewDataSearch struct {
-	Filter []interface{}          `json:"filter,nullable"`
-	Match  []interface{}          `json:"match,nullable"`
-	Sort   []interface{}          `json:"sort,nullable"`
-	Tag    []interface{}          `json:"tag,nullable"`
-	JSON   viewViewDataSearchJSON `json:"-"`
-}
-
-// viewViewDataSearchJSON contains the JSON metadata for the struct
-// [ViewViewDataSearch]
-type viewViewDataSearchJSON struct {
-	Filter      apijson.Field
-	Match       apijson.Field
-	Sort        apijson.Field
-	Tag         apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ViewViewDataSearch) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r viewViewDataSearchJSON) RawJSON() string {
-	return r.raw
+func (r ViewOptionsParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }
 
 type ViewNewParams struct {
@@ -300,11 +330,11 @@ type ViewNewParams struct {
 	// Date of role deletion, or null if the role is still active
 	DeletedAt param.Field[time.Time] `json:"deleted_at" format:"date-time"`
 	// Options for the view in the app
-	Options param.Field[ViewNewParamsOptions] `json:"options"`
+	Options param.Field[ViewOptionsParam] `json:"options"`
 	// Identifies the user who created the view
 	UserID param.Field[string] `json:"user_id" format:"uuid"`
 	// The view definition
-	ViewData param.Field[ViewNewParamsViewData] `json:"view_data"`
+	ViewData param.Field[ViewDataParam] `json:"view_data"`
 }
 
 func (r ViewNewParams) MarshalJSON() (data []byte, err error) {
@@ -358,37 +388,6 @@ func (r ViewNewParamsViewType) IsKnown() bool {
 	return false
 }
 
-// Options for the view in the app
-type ViewNewParamsOptions struct {
-	ColumnOrder      param.Field[[]string]           `json:"columnOrder"`
-	ColumnSizing     param.Field[map[string]float64] `json:"columnSizing"`
-	ColumnVisibility param.Field[map[string]bool]    `json:"columnVisibility"`
-}
-
-func (r ViewNewParamsOptions) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// The view definition
-type ViewNewParamsViewData struct {
-	Search param.Field[ViewNewParamsViewDataSearch] `json:"search"`
-}
-
-func (r ViewNewParamsViewData) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type ViewNewParamsViewDataSearch struct {
-	Filter param.Field[[]interface{}] `json:"filter"`
-	Match  param.Field[[]interface{}] `json:"match"`
-	Sort   param.Field[[]interface{}] `json:"sort"`
-	Tag    param.Field[[]interface{}] `json:"tag"`
-}
-
-func (r ViewNewParamsViewDataSearch) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
 type ViewGetParams struct {
 	// The id of the object the ACL applies to
 	ObjectID param.Field[string] `query:"object_id,required" format:"uuid"`
@@ -437,11 +436,11 @@ type ViewUpdateParams struct {
 	// Name of the view
 	Name param.Field[string] `json:"name"`
 	// Options for the view in the app
-	Options param.Field[ViewUpdateParamsOptions] `json:"options"`
+	Options param.Field[ViewOptionsParam] `json:"options"`
 	// Identifies the user who created the view
 	UserID param.Field[string] `json:"user_id" format:"uuid"`
 	// The view definition
-	ViewData param.Field[ViewUpdateParamsViewData] `json:"view_data"`
+	ViewData param.Field[ViewDataParam] `json:"view_data"`
 	// Type of table that the view corresponds to.
 	ViewType param.Field[ViewUpdateParamsViewType] `json:"view_type"`
 }
@@ -473,37 +472,6 @@ func (r ViewUpdateParamsObjectType) IsKnown() bool {
 		return true
 	}
 	return false
-}
-
-// Options for the view in the app
-type ViewUpdateParamsOptions struct {
-	ColumnOrder      param.Field[[]string]           `json:"columnOrder"`
-	ColumnSizing     param.Field[map[string]float64] `json:"columnSizing"`
-	ColumnVisibility param.Field[map[string]bool]    `json:"columnVisibility"`
-}
-
-func (r ViewUpdateParamsOptions) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// The view definition
-type ViewUpdateParamsViewData struct {
-	Search param.Field[ViewUpdateParamsViewDataSearch] `json:"search"`
-}
-
-func (r ViewUpdateParamsViewData) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type ViewUpdateParamsViewDataSearch struct {
-	Filter param.Field[[]interface{}] `json:"filter"`
-	Match  param.Field[[]interface{}] `json:"match"`
-	Sort   param.Field[[]interface{}] `json:"sort"`
-	Tag    param.Field[[]interface{}] `json:"tag"`
-}
-
-func (r ViewUpdateParamsViewDataSearch) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
 }
 
 // Type of table that the view corresponds to.
@@ -673,11 +641,11 @@ type ViewReplaceParams struct {
 	// Date of role deletion, or null if the role is still active
 	DeletedAt param.Field[time.Time] `json:"deleted_at" format:"date-time"`
 	// Options for the view in the app
-	Options param.Field[ViewReplaceParamsOptions] `json:"options"`
+	Options param.Field[ViewOptionsParam] `json:"options"`
 	// Identifies the user who created the view
 	UserID param.Field[string] `json:"user_id" format:"uuid"`
 	// The view definition
-	ViewData param.Field[ViewReplaceParamsViewData] `json:"view_data"`
+	ViewData param.Field[ViewDataParam] `json:"view_data"`
 }
 
 func (r ViewReplaceParams) MarshalJSON() (data []byte, err error) {
@@ -729,35 +697,4 @@ func (r ViewReplaceParamsViewType) IsKnown() bool {
 		return true
 	}
 	return false
-}
-
-// Options for the view in the app
-type ViewReplaceParamsOptions struct {
-	ColumnOrder      param.Field[[]string]           `json:"columnOrder"`
-	ColumnSizing     param.Field[map[string]float64] `json:"columnSizing"`
-	ColumnVisibility param.Field[map[string]bool]    `json:"columnVisibility"`
-}
-
-func (r ViewReplaceParamsOptions) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// The view definition
-type ViewReplaceParamsViewData struct {
-	Search param.Field[ViewReplaceParamsViewDataSearch] `json:"search"`
-}
-
-func (r ViewReplaceParamsViewData) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type ViewReplaceParamsViewDataSearch struct {
-	Filter param.Field[[]interface{}] `json:"filter"`
-	Match  param.Field[[]interface{}] `json:"match"`
-	Sort   param.Field[[]interface{}] `json:"sort"`
-	Tag    param.Field[[]interface{}] `json:"tag"`
-}
-
-func (r ViewReplaceParamsViewDataSearch) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
 }
