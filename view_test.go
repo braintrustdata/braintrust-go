@@ -33,7 +33,7 @@ func TestViewNewWithOptionalParams(t *testing.T) {
 		ObjectType: braintrust.F(braintrust.ViewNewParamsObjectTypeOrganization),
 		ViewType:   braintrust.F(braintrust.ViewNewParamsViewTypeProjects),
 		DeletedAt:  braintrust.F(time.Now()),
-		Options: braintrust.F(braintrust.ViewNewParamsOptions{
+		Options: braintrust.F(braintrust.ViewOptionsParam{
 			ColumnVisibility: braintrust.F(map[string]bool{
 				"foo": true,
 			}),
@@ -43,8 +43,8 @@ func TestViewNewWithOptionalParams(t *testing.T) {
 			}),
 		}),
 		UserID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ViewData: braintrust.F(braintrust.ViewNewParamsViewData{
-			Search: braintrust.F(braintrust.ViewNewParamsViewDataSearch{
+		ViewData: braintrust.F(braintrust.ViewDataParam{
+			Search: braintrust.F(braintrust.ViewDataSearchParam{
 				Filter: braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
 				Tag:    braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
 				Match:  braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
@@ -109,7 +109,7 @@ func TestViewUpdateWithOptionalParams(t *testing.T) {
 			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 			ObjectType: braintrust.F(braintrust.ViewUpdateParamsObjectTypeOrganization),
 			Name:       braintrust.F("name"),
-			Options: braintrust.F(braintrust.ViewUpdateParamsOptions{
+			Options: braintrust.F(braintrust.ViewOptionsParam{
 				ColumnVisibility: braintrust.F(map[string]bool{
 					"foo": true,
 				}),
@@ -119,8 +119,8 @@ func TestViewUpdateWithOptionalParams(t *testing.T) {
 				}),
 			}),
 			UserID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ViewData: braintrust.F(braintrust.ViewUpdateParamsViewData{
-				Search: braintrust.F(braintrust.ViewUpdateParamsViewDataSearch{
+			ViewData: braintrust.F(braintrust.ViewDataParam{
+				Search: braintrust.F(braintrust.ViewDataSearchParam{
 					Filter: braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
 					Tag:    braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
 					Match:  braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
@@ -218,7 +218,7 @@ func TestViewReplaceWithOptionalParams(t *testing.T) {
 		ObjectType: braintrust.F(braintrust.ViewReplaceParamsObjectTypeOrganization),
 		ViewType:   braintrust.F(braintrust.ViewReplaceParamsViewTypeProjects),
 		DeletedAt:  braintrust.F(time.Now()),
-		Options: braintrust.F(braintrust.ViewReplaceParamsOptions{
+		Options: braintrust.F(braintrust.ViewOptionsParam{
 			ColumnVisibility: braintrust.F(map[string]bool{
 				"foo": true,
 			}),
@@ -228,8 +228,8 @@ func TestViewReplaceWithOptionalParams(t *testing.T) {
 			}),
 		}),
 		UserID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ViewData: braintrust.F(braintrust.ViewReplaceParamsViewData{
-			Search: braintrust.F(braintrust.ViewReplaceParamsViewDataSearch{
+		ViewData: braintrust.F(braintrust.ViewDataParam{
+			Search: braintrust.F(braintrust.ViewDataSearchParam{
 				Filter: braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
 				Tag:    braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
 				Match:  braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),

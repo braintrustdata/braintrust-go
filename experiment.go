@@ -202,7 +202,7 @@ type Experiment struct {
 	// User-controlled metadata about the experiment
 	Metadata map[string]interface{} `json:"metadata,nullable"`
 	// Metadata about the state of the repo when the experiment was created
-	RepoInfo ExperimentRepoInfo `json:"repo_info,nullable"`
+	RepoInfo RepoInfo `json:"repo_info,nullable"`
 	// Identifies the user who created the experiment
 	UserID string         `json:"user_id,nullable" format:"uuid"`
 	JSON   experimentJSON `json:"-"`
@@ -237,7 +237,7 @@ func (r experimentJSON) RawJSON() string {
 }
 
 // Metadata about the state of the repo when the experiment was created
-type ExperimentRepoInfo struct {
+type RepoInfo struct {
 	// Email of the author of the most recent commit
 	AuthorEmail string `json:"author_email,nullable"`
 	// Name of the author of the most recent commit
@@ -256,13 +256,12 @@ type ExperimentRepoInfo struct {
 	// of the repo and the most recent commit.
 	GitDiff string `json:"git_diff,nullable"`
 	// Name of the tag on the most recent commit
-	Tag  string                 `json:"tag,nullable"`
-	JSON experimentRepoInfoJSON `json:"-"`
+	Tag  string       `json:"tag,nullable"`
+	JSON repoInfoJSON `json:"-"`
 }
 
-// experimentRepoInfoJSON contains the JSON metadata for the struct
-// [ExperimentRepoInfo]
-type experimentRepoInfoJSON struct {
+// repoInfoJSON contains the JSON metadata for the struct [RepoInfo]
+type repoInfoJSON struct {
 	AuthorEmail   apijson.Field
 	AuthorName    apijson.Field
 	Branch        apijson.Field
@@ -276,12 +275,39 @@ type experimentRepoInfoJSON struct {
 	ExtraFields   map[string]apijson.Field
 }
 
-func (r *ExperimentRepoInfo) UnmarshalJSON(data []byte) (err error) {
+func (r *RepoInfo) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r experimentRepoInfoJSON) RawJSON() string {
+func (r repoInfoJSON) RawJSON() string {
 	return r.raw
+}
+
+// Metadata about the state of the repo when the experiment was created
+type RepoInfoParam struct {
+	// Email of the author of the most recent commit
+	AuthorEmail param.Field[string] `json:"author_email"`
+	// Name of the author of the most recent commit
+	AuthorName param.Field[string] `json:"author_name"`
+	// Name of the branch the most recent commit belongs to
+	Branch param.Field[string] `json:"branch"`
+	// SHA of most recent commit
+	Commit param.Field[string] `json:"commit"`
+	// Most recent commit message
+	CommitMessage param.Field[string] `json:"commit_message"`
+	// Time of the most recent commit
+	CommitTime param.Field[string] `json:"commit_time"`
+	// Whether or not the repo had uncommitted changes when snapshotted
+	Dirty param.Field[bool] `json:"dirty"`
+	// If the repo was dirty when run, this includes the diff between the current state
+	// of the repo and the most recent commit.
+	GitDiff param.Field[string] `json:"git_diff"`
+	// Name of the tag on the most recent commit
+	Tag param.Field[string] `json:"tag"`
+}
+
+func (r RepoInfoParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }
 
 type ExperimentFetchResponse struct {
@@ -973,37 +999,10 @@ type ExperimentNewParams struct {
 	// anybody inside or outside the organization
 	Public param.Field[bool] `json:"public"`
 	// Metadata about the state of the repo when the experiment was created
-	RepoInfo param.Field[ExperimentNewParamsRepoInfo] `json:"repo_info"`
+	RepoInfo param.Field[RepoInfoParam] `json:"repo_info"`
 }
 
 func (r ExperimentNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// Metadata about the state of the repo when the experiment was created
-type ExperimentNewParamsRepoInfo struct {
-	// Email of the author of the most recent commit
-	AuthorEmail param.Field[string] `json:"author_email"`
-	// Name of the author of the most recent commit
-	AuthorName param.Field[string] `json:"author_name"`
-	// Name of the branch the most recent commit belongs to
-	Branch param.Field[string] `json:"branch"`
-	// SHA of most recent commit
-	Commit param.Field[string] `json:"commit"`
-	// Most recent commit message
-	CommitMessage param.Field[string] `json:"commit_message"`
-	// Time of the most recent commit
-	CommitTime param.Field[string] `json:"commit_time"`
-	// Whether or not the repo had uncommitted changes when snapshotted
-	Dirty param.Field[bool] `json:"dirty"`
-	// If the repo was dirty when run, this includes the diff between the current state
-	// of the repo and the most recent commit.
-	GitDiff param.Field[string] `json:"git_diff"`
-	// Name of the tag on the most recent commit
-	Tag param.Field[string] `json:"tag"`
-}
-
-func (r ExperimentNewParamsRepoInfo) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
@@ -1026,37 +1025,10 @@ type ExperimentUpdateParams struct {
 	// anybody inside or outside the organization
 	Public param.Field[bool] `json:"public"`
 	// Metadata about the state of the repo when the experiment was created
-	RepoInfo param.Field[ExperimentUpdateParamsRepoInfo] `json:"repo_info"`
+	RepoInfo param.Field[RepoInfoParam] `json:"repo_info"`
 }
 
 func (r ExperimentUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// Metadata about the state of the repo when the experiment was created
-type ExperimentUpdateParamsRepoInfo struct {
-	// Email of the author of the most recent commit
-	AuthorEmail param.Field[string] `json:"author_email"`
-	// Name of the author of the most recent commit
-	AuthorName param.Field[string] `json:"author_name"`
-	// Name of the branch the most recent commit belongs to
-	Branch param.Field[string] `json:"branch"`
-	// SHA of most recent commit
-	Commit param.Field[string] `json:"commit"`
-	// Most recent commit message
-	CommitMessage param.Field[string] `json:"commit_message"`
-	// Time of the most recent commit
-	CommitTime param.Field[string] `json:"commit_time"`
-	// Whether or not the repo had uncommitted changes when snapshotted
-	Dirty param.Field[bool] `json:"dirty"`
-	// If the repo was dirty when run, this includes the diff between the current state
-	// of the repo and the most recent commit.
-	GitDiff param.Field[string] `json:"git_diff"`
-	// Name of the tag on the most recent commit
-	Tag param.Field[string] `json:"tag"`
-}
-
-func (r ExperimentUpdateParamsRepoInfo) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
