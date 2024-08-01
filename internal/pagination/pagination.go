@@ -57,6 +57,9 @@ func (r *ListObjects[T]) GetNextPage() (res *ListObjects[T], err error) {
 }
 
 func (r *ListObjects[T]) SetPageConfig(cfg *requestconfig.RequestConfig, res *http.Response) {
+	if r == nil {
+		r = &ListObjects[T]{}
+	}
 	r.cfg = cfg
 	r.res = res
 }
