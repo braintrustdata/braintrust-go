@@ -39,7 +39,7 @@ func TestExperimentNewWithOptionalParams(t *testing.T) {
 		}),
 		Name:   braintrust.F("name"),
 		Public: braintrust.F(true),
-		RepoInfo: braintrust.F(braintrust.ExperimentNewParamsRepoInfo{
+		RepoInfo: braintrust.F(braintrust.RepoInfoParam{
 			Commit:        braintrust.F("commit"),
 			Branch:        braintrust.F("branch"),
 			Tag:           braintrust.F("tag"),
@@ -107,7 +107,7 @@ func TestExperimentUpdateWithOptionalParams(t *testing.T) {
 			}),
 			Name:   braintrust.F("name"),
 			Public: braintrust.F(true),
-			RepoInfo: braintrust.F(braintrust.ExperimentUpdateParamsRepoInfo{
+			RepoInfo: braintrust.F(braintrust.RepoInfoParam{
 				Commit:        braintrust.F("commit"),
 				Branch:        braintrust.F("branch"),
 				Tag:           braintrust.F("tag"),
