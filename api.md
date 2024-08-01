@@ -81,14 +81,9 @@ Methods:
 
 # Prompts
 
-Params Types:
-
-- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#PromptDataParam">PromptDataParam</a>
-
 Response Types:
 
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#Prompt">Prompt</a>
-- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#PromptData">PromptData</a>
 
 Methods:
 
