@@ -216,35 +216,9 @@ func init() {
 	)
 }
 
-type ProjectScoreCategoriesCategorical []ProjectScoreCategoriesCategoricalItem
+type ProjectScoreCategoriesCategorical []ProjectScoreCategory
 
 func (r ProjectScoreCategoriesCategorical) implementsProjectScoreCategoriesUnion() {}
-
-// For categorical-type project scores, defines a single category
-type ProjectScoreCategoriesCategoricalItem struct {
-	// Name of the category
-	Name string `json:"name,required"`
-	// Numerical value of the category. Must be between 0 and 1, inclusive
-	Value float64                                   `json:"value,required"`
-	JSON  projectScoreCategoriesCategoricalItemJSON `json:"-"`
-}
-
-// projectScoreCategoriesCategoricalItemJSON contains the JSON metadata for the
-// struct [ProjectScoreCategoriesCategoricalItem]
-type projectScoreCategoriesCategoricalItemJSON struct {
-	Name        apijson.Field
-	Value       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ProjectScoreCategoriesCategoricalItem) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectScoreCategoriesCategoricalItemJSON) RawJSON() string {
-	return r.raw
-}
 
 type ProjectScoreCategoriesMinimum []string
 
@@ -308,6 +282,44 @@ func (r ProjectScoreConfigDestination) IsKnown() bool {
 	return false
 }
 
+// For categorical-type project scores, defines a single category
+type ProjectScoreCategory struct {
+	// Name of the category
+	Name string `json:"name,required"`
+	// Numerical value of the category. Must be between 0 and 1, inclusive
+	Value float64                  `json:"value,required"`
+	JSON  projectScoreCategoryJSON `json:"-"`
+}
+
+// projectScoreCategoryJSON contains the JSON metadata for the struct
+// [ProjectScoreCategory]
+type projectScoreCategoryJSON struct {
+	Name        apijson.Field
+	Value       apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *ProjectScoreCategory) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r projectScoreCategoryJSON) RawJSON() string {
+	return r.raw
+}
+
+// For categorical-type project scores, defines a single category
+type ProjectScoreCategoryParam struct {
+	// Name of the category
+	Name param.Field[string] `json:"name,required"`
+	// Numerical value of the category. Must be between 0 and 1, inclusive
+	Value param.Field[float64] `json:"value,required"`
+}
+
+func (r ProjectScoreCategoryParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
 type ProjectScoreNewParams struct {
 	// Name of the project score
 	Name param.Field[string] `json:"name,required"`
@@ -352,7 +364,7 @@ type ProjectScoreNewParamsCategoriesUnion interface {
 	implementsProjectScoreNewParamsCategoriesUnion()
 }
 
-type ProjectScoreNewParamsCategoriesCategorical []ProjectScoreNewParamsCategoriesCategorical
+type ProjectScoreNewParamsCategoriesCategorical []ProjectScoreCategoryParam
 
 func (r ProjectScoreNewParamsCategoriesCategorical) implementsProjectScoreNewParamsCategoriesUnion() {
 }
@@ -395,7 +407,7 @@ type ProjectScoreUpdateParamsCategoriesUnion interface {
 	implementsProjectScoreUpdateParamsCategoriesUnion()
 }
 
-type ProjectScoreUpdateParamsCategoriesCategorical []ProjectScoreUpdateParamsCategoriesCategorical
+type ProjectScoreUpdateParamsCategoriesCategorical []ProjectScoreCategoryParam
 
 func (r ProjectScoreUpdateParamsCategoriesCategorical) implementsProjectScoreUpdateParamsCategoriesUnion() {
 }
@@ -523,7 +535,7 @@ type ProjectScoreReplaceParamsCategoriesUnion interface {
 	implementsProjectScoreReplaceParamsCategoriesUnion()
 }
 
-type ProjectScoreReplaceParamsCategoriesCategorical []ProjectScoreReplaceParamsCategoriesCategorical
+type ProjectScoreReplaceParamsCategoriesCategorical []ProjectScoreCategoryParam
 
 func (r ProjectScoreReplaceParamsCategoriesCategorical) implementsProjectScoreReplaceParamsCategoriesUnion() {
 }
