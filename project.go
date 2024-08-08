@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -16,6 +15,7 @@ import (
 	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
+	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 // ProjectService contains methods and other services that help with interacting
@@ -41,7 +41,7 @@ func NewProjectService(opts ...option.RequestOption) (r *ProjectService) {
 
 // Create a new project. If there is an existing project with the same name as the
 // one specified in the request, will return the existing project unmodified
-func (r *ProjectService) New(ctx context.Context, body ProjectNewParams, opts ...option.RequestOption) (res *Project, err error) {
+func (r *ProjectService) New(ctx context.Context, body ProjectNewParams, opts ...option.RequestOption) (res *shared.Project, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/project"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
@@ -49,7 +49,7 @@ func (r *ProjectService) New(ctx context.Context, body ProjectNewParams, opts ..
 }
 
 // Get a project object by its id
-func (r *ProjectService) Get(ctx context.Context, projectID string, opts ...option.RequestOption) (res *Project, err error) {
+func (r *ProjectService) Get(ctx context.Context, projectID shared.ProjectIDParam, opts ...option.RequestOption) (res *shared.Project, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
@@ -63,7 +63,7 @@ func (r *ProjectService) Get(ctx context.Context, projectID string, opts ...opti
 // Partially update a project object. Specify the fields to update in the payload.
 // Any object-type fields will be deep-merged with existing content. Currently we
 // do not support removing fields or setting them to null.
-func (r *ProjectService) Update(ctx context.Context, projectID string, body ProjectUpdateParams, opts ...option.RequestOption) (res *Project, err error) {
+func (r *ProjectService) Update(ctx context.Context, projectID shared.ProjectIDParam, body ProjectUpdateParams, opts ...option.RequestOption) (res *shared.Project, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
@@ -76,7 +76,7 @@ func (r *ProjectService) Update(ctx context.Context, projectID string, body Proj
 
 // List out all projects. The projects are sorted by creation date, with the most
 // recently-created projects coming first
-func (r *ProjectService) List(ctx context.Context, query ProjectListParams, opts ...option.RequestOption) (res *pagination.ListObjects[Project], err error) {
+func (r *ProjectService) List(ctx context.Context, query ProjectListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.Project], err error) {
 	var raw *http.Response
 	opts = append(r.Options[:], opts...)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
@@ -95,12 +95,12 @@ func (r *ProjectService) List(ctx context.Context, query ProjectListParams, opts
 
 // List out all projects. The projects are sorted by creation date, with the most
 // recently-created projects coming first
-func (r *ProjectService) ListAutoPaging(ctx context.Context, query ProjectListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[Project] {
+func (r *ProjectService) ListAutoPaging(ctx context.Context, query ProjectListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[shared.Project] {
 	return pagination.NewListObjectsAutoPager(r.List(ctx, query, opts...))
 }
 
 // Delete a project object by its id
-func (r *ProjectService) Delete(ctx context.Context, projectID string, opts ...option.RequestOption) (res *Project, err error) {
+func (r *ProjectService) Delete(ctx context.Context, projectID shared.ProjectIDParam, opts ...option.RequestOption) (res *shared.Project, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
@@ -111,99 +111,20 @@ func (r *ProjectService) Delete(ctx context.Context, projectID string, opts ...o
 	return
 }
 
-type Project struct {
-	// Unique identifier for the project
-	ID string `json:"id,required" format:"uuid"`
-	// Name of the project
-	Name string `json:"name,required"`
-	// Unique id for the organization that the project belongs under
-	OrgID string `json:"org_id,required" format:"uuid"`
-	// Date of project creation
-	Created time.Time `json:"created,nullable" format:"date-time"`
-	// Date of project deletion, or null if the project is still active
-	DeletedAt time.Time       `json:"deleted_at,nullable" format:"date-time"`
-	Settings  ProjectSettings `json:"settings,nullable"`
-	// Identifies the user who created the project
-	UserID string      `json:"user_id,nullable" format:"uuid"`
-	JSON   projectJSON `json:"-"`
-}
-
-// projectJSON contains the JSON metadata for the struct [Project]
-type projectJSON struct {
-	ID          apijson.Field
-	Name        apijson.Field
-	OrgID       apijson.Field
-	Created     apijson.Field
-	DeletedAt   apijson.Field
-	Settings    apijson.Field
-	UserID      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *Project) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectJSON) RawJSON() string {
-	return r.raw
-}
-
-type ProjectSettings struct {
-	// The key used to join two experiments (defaults to `input`).
-	ComparisonKey string              `json:"comparison_key,nullable"`
-	JSON          projectSettingsJSON `json:"-"`
-}
-
-// projectSettingsJSON contains the JSON metadata for the struct [ProjectSettings]
-type projectSettingsJSON struct {
-	ComparisonKey apijson.Field
-	raw           string
-	ExtraFields   map[string]apijson.Field
-}
-
-func (r *ProjectSettings) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectSettingsJSON) RawJSON() string {
-	return r.raw
-}
-
 type ProjectNewParams struct {
-	// Name of the project
-	Name param.Field[string] `json:"name,required"`
-	// For nearly all users, this parameter should be unnecessary. But in the rare case
-	// that your API key belongs to multiple organizations, you may specify the name of
-	// the organization the project belongs in.
-	OrgName param.Field[string] `json:"org_name"`
+	CreateProject shared.CreateProjectParam `json:"create_project,required"`
 }
 
 func (r ProjectNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	return apijson.MarshalRoot(r.CreateProject)
 }
 
 type ProjectUpdateParams struct {
-	// Name of the project
-	Name param.Field[string] `json:"name"`
-	// Project settings. Patch operations replace all settings, so make sure you
-	// include all settings you want to keep.
-	Settings param.Field[ProjectUpdateParamsSettings] `json:"settings"`
+	PatchProject shared.PatchProjectParam `json:"patch_project,required"`
 }
 
 func (r ProjectUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// Project settings. Patch operations replace all settings, so make sure you
-// include all settings you want to keep.
-type ProjectUpdateParamsSettings struct {
-	// The key used to join two experiments (defaults to `input`).
-	ComparisonKey param.Field[string] `json:"comparison_key"`
-}
-
-func (r ProjectUpdateParamsSettings) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	return apijson.MarshalRoot(r.PatchProject)
 }
 
 type ProjectListParams struct {
@@ -212,22 +133,22 @@ type ProjectListParams struct {
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[ProjectListParamsIDsUnion] `query:"ids" format:"uuid"`
+	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	Limit param.Field[shared.AppLimitParam] `query:"limit"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Field[shared.OrgNameParam] `query:"org_name"`
 	// Name of the project to search for
-	ProjectName param.Field[string] `query:"project_name"`
+	ProjectName param.Field[shared.ProjectNameParam] `query:"project_name"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
 }
 
 // URLQuery serializes [ProjectListParams]'s query parameters as `url.Values`.
@@ -237,15 +158,3 @@ func (r ProjectListParams) URLQuery() (v url.Values) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
-
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
-//
-// Satisfied by [shared.UnionString], [ProjectListParamsIDsArray].
-type ProjectListParamsIDsUnion interface {
-	ImplementsProjectListParamsIDsUnion()
-}
-
-type ProjectListParamsIDsArray []string
-
-func (r ProjectListParamsIDsArray) ImplementsProjectListParamsIDsUnion() {}
