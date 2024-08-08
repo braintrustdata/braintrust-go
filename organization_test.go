@@ -52,11 +52,13 @@ func TestOrganizationUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.OrganizationUpdateParams{
-			APIURL:         braintrust.F("api_url"),
-			IsUniversalAPI: braintrust.F(true),
-			Name:           braintrust.F("name"),
-			ProxyURL:       braintrust.F("proxy_url"),
-			RealtimeURL:    braintrust.F("realtime_url"),
+			PatchOrganization: shared.PatchOrganizationParam{
+				Name:           braintrust.F("name"),
+				APIURL:         braintrust.F("api_url"),
+				IsUniversalAPI: braintrust.F(true),
+				ProxyURL:       braintrust.F("proxy_url"),
+				RealtimeURL:    braintrust.F("realtime_url"),
+			},
 		},
 	)
 	if err != nil {
@@ -82,7 +84,7 @@ func TestOrganizationListWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.Organizations.List(context.TODO(), braintrust.OrganizationListParams{
 		EndingBefore:     braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:              braintrust.F[braintrust.OrganizationListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
+		IDs:              braintrust.F[shared.IDsUnionParam](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:            braintrust.F(int64(0)),
 		OrgName:          braintrust.F("org_name"),
 		OrganizationName: braintrust.F("organization_name"),

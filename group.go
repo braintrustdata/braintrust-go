@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -16,6 +15,7 @@ import (
 	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
+	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 // GroupService contains methods and other services that help with interacting with
@@ -39,7 +39,7 @@ func NewGroupService(opts ...option.RequestOption) (r *GroupService) {
 
 // Create a new group. If there is an existing group with the same name as the one
 // specified in the request, will return the existing group unmodified
-func (r *GroupService) New(ctx context.Context, body GroupNewParams, opts ...option.RequestOption) (res *Group, err error) {
+func (r *GroupService) New(ctx context.Context, body GroupNewParams, opts ...option.RequestOption) (res *shared.Group, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/group"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
@@ -47,7 +47,7 @@ func (r *GroupService) New(ctx context.Context, body GroupNewParams, opts ...opt
 }
 
 // Get a group object by its id
-func (r *GroupService) Get(ctx context.Context, groupID string, opts ...option.RequestOption) (res *Group, err error) {
+func (r *GroupService) Get(ctx context.Context, groupID shared.GroupIDParam, opts ...option.RequestOption) (res *shared.Group, err error) {
 	opts = append(r.Options[:], opts...)
 	if groupID == "" {
 		err = errors.New("missing required group_id parameter")
@@ -61,7 +61,7 @@ func (r *GroupService) Get(ctx context.Context, groupID string, opts ...option.R
 // Partially update a group object. Specify the fields to update in the payload.
 // Any object-type fields will be deep-merged with existing content. Currently we
 // do not support removing fields or setting them to null.
-func (r *GroupService) Update(ctx context.Context, groupID string, body GroupUpdateParams, opts ...option.RequestOption) (res *Group, err error) {
+func (r *GroupService) Update(ctx context.Context, groupID shared.GroupIDParam, body GroupUpdateParams, opts ...option.RequestOption) (res *shared.Group, err error) {
 	opts = append(r.Options[:], opts...)
 	if groupID == "" {
 		err = errors.New("missing required group_id parameter")
@@ -74,7 +74,7 @@ func (r *GroupService) Update(ctx context.Context, groupID string, body GroupUpd
 
 // List out all groups. The groups are sorted by creation date, with the most
 // recently-created groups coming first
-func (r *GroupService) List(ctx context.Context, query GroupListParams, opts ...option.RequestOption) (res *pagination.ListObjects[Group], err error) {
+func (r *GroupService) List(ctx context.Context, query GroupListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.Group], err error) {
 	var raw *http.Response
 	opts = append(r.Options[:], opts...)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
@@ -93,12 +93,12 @@ func (r *GroupService) List(ctx context.Context, query GroupListParams, opts ...
 
 // List out all groups. The groups are sorted by creation date, with the most
 // recently-created groups coming first
-func (r *GroupService) ListAutoPaging(ctx context.Context, query GroupListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[Group] {
+func (r *GroupService) ListAutoPaging(ctx context.Context, query GroupListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[shared.Group] {
 	return pagination.NewListObjectsAutoPager(r.List(ctx, query, opts...))
 }
 
 // Delete a group object by its id
-func (r *GroupService) Delete(ctx context.Context, groupID string, opts ...option.RequestOption) (res *Group, err error) {
+func (r *GroupService) Delete(ctx context.Context, groupID shared.GroupIDParam, opts ...option.RequestOption) (res *shared.Group, err error) {
 	opts = append(r.Options[:], opts...)
 	if groupID == "" {
 		err = errors.New("missing required group_id parameter")
@@ -112,106 +112,27 @@ func (r *GroupService) Delete(ctx context.Context, groupID string, opts ...optio
 // Create or replace group. If there is an existing group with the same name as the
 // one specified in the request, will replace the existing group with the provided
 // fields
-func (r *GroupService) Replace(ctx context.Context, body GroupReplaceParams, opts ...option.RequestOption) (res *Group, err error) {
+func (r *GroupService) Replace(ctx context.Context, body GroupReplaceParams, opts ...option.RequestOption) (res *shared.Group, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/group"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
 	return
 }
 
-// A group is a collection of users which can be assigned an ACL
-//
-// Groups can consist of individual users, as well as a set of groups they inherit
-// from
-type Group struct {
-	// Unique identifier for the group
-	ID string `json:"id,required" format:"uuid"`
-	// Name of the group
-	Name string `json:"name,required"`
-	// Unique id for the organization that the group belongs under
-	//
-	// It is forbidden to change the org after creating a group
-	OrgID string `json:"org_id,required" format:"uuid"`
-	// Date of group creation
-	Created time.Time `json:"created,nullable" format:"date-time"`
-	// Date of group deletion, or null if the group is still active
-	DeletedAt time.Time `json:"deleted_at,nullable" format:"date-time"`
-	// Textual description of the group
-	Description string `json:"description,nullable"`
-	// Ids of the groups this group inherits from
-	//
-	// An inheriting group has all the users contained in its member groups, as well as
-	// all of their inherited users
-	MemberGroups []string `json:"member_groups,nullable" format:"uuid"`
-	// Ids of users which belong to this group
-	MemberUsers []string `json:"member_users,nullable" format:"uuid"`
-	// Identifies the user who created the group
-	UserID string    `json:"user_id,nullable" format:"uuid"`
-	JSON   groupJSON `json:"-"`
-}
-
-// groupJSON contains the JSON metadata for the struct [Group]
-type groupJSON struct {
-	ID           apijson.Field
-	Name         apijson.Field
-	OrgID        apijson.Field
-	Created      apijson.Field
-	DeletedAt    apijson.Field
-	Description  apijson.Field
-	MemberGroups apijson.Field
-	MemberUsers  apijson.Field
-	UserID       apijson.Field
-	raw          string
-	ExtraFields  map[string]apijson.Field
-}
-
-func (r *Group) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r groupJSON) RawJSON() string {
-	return r.raw
-}
-
 type GroupNewParams struct {
-	// Name of the group
-	Name param.Field[string] `json:"name,required"`
-	// Textual description of the group
-	Description param.Field[string] `json:"description"`
-	// Ids of the groups this group inherits from
-	//
-	// An inheriting group has all the users contained in its member groups, as well as
-	// all of their inherited users
-	MemberGroups param.Field[[]string] `json:"member_groups" format:"uuid"`
-	// Ids of users which belong to this group
-	MemberUsers param.Field[[]string] `json:"member_users" format:"uuid"`
-	// For nearly all users, this parameter should be unnecessary. But in the rare case
-	// that your API key belongs to multiple organizations, you may specify the name of
-	// the organization the group belongs in.
-	OrgName param.Field[string] `json:"org_name"`
+	CreateGroup shared.CreateGroupParam `json:"create_group,required"`
 }
 
 func (r GroupNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	return apijson.MarshalRoot(r.CreateGroup)
 }
 
 type GroupUpdateParams struct {
-	// A list of group IDs to add to the group's inheriting-from set
-	AddMemberGroups param.Field[[]string] `json:"add_member_groups" format:"uuid"`
-	// A list of user IDs to add to the group
-	AddMemberUsers param.Field[[]string] `json:"add_member_users" format:"uuid"`
-	// Textual description of the group
-	Description param.Field[string] `json:"description"`
-	// Name of the group
-	Name param.Field[string] `json:"name"`
-	// A list of group IDs to remove from the group's inheriting-from set
-	RemoveMemberGroups param.Field[[]string] `json:"remove_member_groups" format:"uuid"`
-	// A list of user IDs to remove from the group
-	RemoveMemberUsers param.Field[[]string] `json:"remove_member_users" format:"uuid"`
+	PatchGroup shared.PatchGroupParam `json:"patch_group,required"`
 }
 
 func (r GroupUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	return apijson.MarshalRoot(r.PatchGroup)
 }
 
 type GroupListParams struct {
@@ -220,22 +141,22 @@ type GroupListParams struct {
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
 	// Name of the group to search for
-	GroupName param.Field[string] `query:"group_name"`
+	GroupName param.Field[shared.GroupNameParam] `query:"group_name"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[GroupListParamsIDsUnion] `query:"ids" format:"uuid"`
+	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	Limit param.Field[shared.AppLimitParam] `query:"limit"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Field[shared.OrgNameParam] `query:"org_name"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
 }
 
 // URLQuery serializes [GroupListParams]'s query parameters as `url.Values`.
@@ -246,36 +167,10 @@ func (r GroupListParams) URLQuery() (v url.Values) {
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
-//
-// Satisfied by [shared.UnionString], [GroupListParamsIDsArray].
-type GroupListParamsIDsUnion interface {
-	ImplementsGroupListParamsIDsUnion()
-}
-
-type GroupListParamsIDsArray []string
-
-func (r GroupListParamsIDsArray) ImplementsGroupListParamsIDsUnion() {}
-
 type GroupReplaceParams struct {
-	// Name of the group
-	Name param.Field[string] `json:"name,required"`
-	// Textual description of the group
-	Description param.Field[string] `json:"description"`
-	// Ids of the groups this group inherits from
-	//
-	// An inheriting group has all the users contained in its member groups, as well as
-	// all of their inherited users
-	MemberGroups param.Field[[]string] `json:"member_groups" format:"uuid"`
-	// Ids of users which belong to this group
-	MemberUsers param.Field[[]string] `json:"member_users" format:"uuid"`
-	// For nearly all users, this parameter should be unnecessary. But in the rare case
-	// that your API key belongs to multiple organizations, you may specify the name of
-	// the organization the group belongs in.
-	OrgName param.Field[string] `json:"org_name"`
+	CreateGroup shared.CreateGroupParam `json:"create_group,required"`
 }
 
 func (r GroupReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	return apijson.MarshalRoot(r.CreateGroup)
 }

@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -16,6 +15,7 @@ import (
 	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
+	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 // ProjectTagService contains methods and other services that help with interacting
@@ -40,7 +40,7 @@ func NewProjectTagService(opts ...option.RequestOption) (r *ProjectTagService) {
 // Create a new project_tag. If there is an existing project_tag in the project
 // with the same name as the one specified in the request, will return the existing
 // project_tag unmodified
-func (r *ProjectTagService) New(ctx context.Context, body ProjectTagNewParams, opts ...option.RequestOption) (res *ProjectTag, err error) {
+func (r *ProjectTagService) New(ctx context.Context, body ProjectTagNewParams, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/project_tag"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
@@ -48,7 +48,7 @@ func (r *ProjectTagService) New(ctx context.Context, body ProjectTagNewParams, o
 }
 
 // Get a project_tag object by its id
-func (r *ProjectTagService) Get(ctx context.Context, projectTagID string, opts ...option.RequestOption) (res *ProjectTag, err error) {
+func (r *ProjectTagService) Get(ctx context.Context, projectTagID shared.ProjectTagIDParam, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectTagID == "" {
 		err = errors.New("missing required project_tag_id parameter")
@@ -62,7 +62,7 @@ func (r *ProjectTagService) Get(ctx context.Context, projectTagID string, opts .
 // Partially update a project_tag object. Specify the fields to update in the
 // payload. Any object-type fields will be deep-merged with existing content.
 // Currently we do not support removing fields or setting them to null.
-func (r *ProjectTagService) Update(ctx context.Context, projectTagID string, body ProjectTagUpdateParams, opts ...option.RequestOption) (res *ProjectTag, err error) {
+func (r *ProjectTagService) Update(ctx context.Context, projectTagID shared.ProjectTagIDParam, body ProjectTagUpdateParams, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectTagID == "" {
 		err = errors.New("missing required project_tag_id parameter")
@@ -75,7 +75,7 @@ func (r *ProjectTagService) Update(ctx context.Context, projectTagID string, bod
 
 // List out all project_tags. The project_tags are sorted by creation date, with
 // the most recently-created project_tags coming first
-func (r *ProjectTagService) List(ctx context.Context, query ProjectTagListParams, opts ...option.RequestOption) (res *pagination.ListObjects[ProjectTag], err error) {
+func (r *ProjectTagService) List(ctx context.Context, query ProjectTagListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.ProjectTag], err error) {
 	var raw *http.Response
 	opts = append(r.Options[:], opts...)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
@@ -94,12 +94,12 @@ func (r *ProjectTagService) List(ctx context.Context, query ProjectTagListParams
 
 // List out all project_tags. The project_tags are sorted by creation date, with
 // the most recently-created project_tags coming first
-func (r *ProjectTagService) ListAutoPaging(ctx context.Context, query ProjectTagListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[ProjectTag] {
+func (r *ProjectTagService) ListAutoPaging(ctx context.Context, query ProjectTagListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[shared.ProjectTag] {
 	return pagination.NewListObjectsAutoPager(r.List(ctx, query, opts...))
 }
 
 // Delete a project_tag object by its id
-func (r *ProjectTagService) Delete(ctx context.Context, projectTagID string, opts ...option.RequestOption) (res *ProjectTag, err error) {
+func (r *ProjectTagService) Delete(ctx context.Context, projectTagID shared.ProjectTagIDParam, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectTagID == "" {
 		err = errors.New("missing required project_tag_id parameter")
@@ -113,79 +113,27 @@ func (r *ProjectTagService) Delete(ctx context.Context, projectTagID string, opt
 // Create or replace project_tag. If there is an existing project_tag in the
 // project with the same name as the one specified in the request, will replace the
 // existing project_tag with the provided fields
-func (r *ProjectTagService) Replace(ctx context.Context, body ProjectTagReplaceParams, opts ...option.RequestOption) (res *ProjectTag, err error) {
+func (r *ProjectTagService) Replace(ctx context.Context, body ProjectTagReplaceParams, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/project_tag"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
 	return
 }
 
-// A project tag is a user-configured tag for tracking and filtering your
-// experiments, logs, and other data
-type ProjectTag struct {
-	// Unique identifier for the project tag
-	ID string `json:"id,required" format:"uuid"`
-	// Name of the project tag
-	Name string `json:"name,required"`
-	// Unique identifier for the project that the project tag belongs under
-	ProjectID string `json:"project_id,required" format:"uuid"`
-	UserID    string `json:"user_id,required" format:"uuid"`
-	// Color of the tag for the UI
-	Color string `json:"color,nullable"`
-	// Date of project tag creation
-	Created time.Time `json:"created,nullable" format:"date-time"`
-	// Textual description of the project tag
-	Description string         `json:"description,nullable"`
-	JSON        projectTagJSON `json:"-"`
-}
-
-// projectTagJSON contains the JSON metadata for the struct [ProjectTag]
-type projectTagJSON struct {
-	ID          apijson.Field
-	Name        apijson.Field
-	ProjectID   apijson.Field
-	UserID      apijson.Field
-	Color       apijson.Field
-	Created     apijson.Field
-	Description apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ProjectTag) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectTagJSON) RawJSON() string {
-	return r.raw
-}
-
 type ProjectTagNewParams struct {
-	// Name of the project tag
-	Name param.Field[string] `json:"name,required"`
-	// Unique identifier for the project that the project tag belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
-	// Color of the tag for the UI
-	Color param.Field[string] `json:"color"`
-	// Textual description of the project tag
-	Description param.Field[string] `json:"description"`
+	CreateProjectTag shared.CreateProjectTagParam `json:"create_project_tag,required"`
 }
 
 func (r ProjectTagNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	return apijson.MarshalRoot(r.CreateProjectTag)
 }
 
 type ProjectTagUpdateParams struct {
-	// Color of the tag for the UI
-	Color param.Field[string] `json:"color"`
-	// Textual description of the project tag
-	Description param.Field[string] `json:"description"`
-	// Name of the project tag
-	Name param.Field[string] `json:"name"`
+	PatchProjectTag shared.PatchProjectTagParam `json:"patch_project_tag,required"`
 }
 
 func (r ProjectTagUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	return apijson.MarshalRoot(r.PatchProjectTag)
 }
 
 type ProjectTagListParams struct {
@@ -194,24 +142,26 @@ type ProjectTagListParams struct {
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[ProjectTagListParamsIDsUnion] `query:"ids" format:"uuid"`
+	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	Limit param.Field[shared.AppLimitParam] `query:"limit"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Field[shared.OrgNameParam] `query:"org_name"`
+	// Project id
+	ProjectID param.Field[shared.ProjectIDQueryParam] `query:"project_id" format:"uuid"`
 	// Name of the project to search for
-	ProjectName param.Field[string] `query:"project_name"`
+	ProjectName param.Field[shared.ProjectNameParam] `query:"project_name"`
 	// Name of the project_tag to search for
-	ProjectTagName param.Field[string] `query:"project_tag_name"`
+	ProjectTagName param.Field[shared.ProjectTagNameParam] `query:"project_tag_name"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
 }
 
 // URLQuery serializes [ProjectTagListParams]'s query parameters as `url.Values`.
@@ -222,29 +172,10 @@ func (r ProjectTagListParams) URLQuery() (v url.Values) {
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
-//
-// Satisfied by [shared.UnionString], [ProjectTagListParamsIDsArray].
-type ProjectTagListParamsIDsUnion interface {
-	ImplementsProjectTagListParamsIDsUnion()
-}
-
-type ProjectTagListParamsIDsArray []string
-
-func (r ProjectTagListParamsIDsArray) ImplementsProjectTagListParamsIDsUnion() {}
-
 type ProjectTagReplaceParams struct {
-	// Name of the project tag
-	Name param.Field[string] `json:"name,required"`
-	// Unique identifier for the project that the project tag belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
-	// Color of the tag for the UI
-	Color param.Field[string] `json:"color"`
-	// Textual description of the project tag
-	Description param.Field[string] `json:"description"`
+	CreateProjectTag shared.CreateProjectTagParam `json:"create_project_tag,required"`
 }
 
 func (r ProjectTagReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	return apijson.MarshalRoot(r.CreateProjectTag)
 }

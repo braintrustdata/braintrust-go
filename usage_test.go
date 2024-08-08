@@ -10,6 +10,7 @@ import (
 	"github.com/braintrustdata/braintrust-go"
 	"github.com/braintrustdata/braintrust-go/internal/testutil"
 	"github.com/braintrustdata/braintrust-go/option"
+	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 func TestUsage(t *testing.T) {
@@ -25,7 +26,9 @@ func TestUsage(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	project, err := client.Projects.New(context.TODO(), braintrust.ProjectNewParams{
-		Name: braintrust.F("foobar"),
+		CreateProject: shared.CreateProjectParam{
+			Name: braintrust.F("name"),
+		},
 	})
 	if err != nil {
 		t.Error(err)

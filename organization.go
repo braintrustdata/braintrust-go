@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -16,6 +15,7 @@ import (
 	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
+	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 // OrganizationService contains methods and other services that help with
@@ -40,7 +40,7 @@ func NewOrganizationService(opts ...option.RequestOption) (r *OrganizationServic
 }
 
 // Get a organization object by its id
-func (r *OrganizationService) Get(ctx context.Context, organizationID string, opts ...option.RequestOption) (res *Organization, err error) {
+func (r *OrganizationService) Get(ctx context.Context, organizationID shared.OrganizationIDParam, opts ...option.RequestOption) (res *shared.Organization, err error) {
 	opts = append(r.Options[:], opts...)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
@@ -54,7 +54,7 @@ func (r *OrganizationService) Get(ctx context.Context, organizationID string, op
 // Partially update a organization object. Specify the fields to update in the
 // payload. Any object-type fields will be deep-merged with existing content.
 // Currently we do not support removing fields or setting them to null.
-func (r *OrganizationService) Update(ctx context.Context, organizationID string, body OrganizationUpdateParams, opts ...option.RequestOption) (res *Organization, err error) {
+func (r *OrganizationService) Update(ctx context.Context, organizationID shared.OrganizationIDParam, body OrganizationUpdateParams, opts ...option.RequestOption) (res *shared.Organization, err error) {
 	opts = append(r.Options[:], opts...)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
@@ -67,7 +67,7 @@ func (r *OrganizationService) Update(ctx context.Context, organizationID string,
 
 // List out all organizations. The organizations are sorted by creation date, with
 // the most recently-created organizations coming first
-func (r *OrganizationService) List(ctx context.Context, query OrganizationListParams, opts ...option.RequestOption) (res *pagination.ListObjects[Organization], err error) {
+func (r *OrganizationService) List(ctx context.Context, query OrganizationListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.Organization], err error) {
 	var raw *http.Response
 	opts = append(r.Options[:], opts...)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
@@ -86,12 +86,12 @@ func (r *OrganizationService) List(ctx context.Context, query OrganizationListPa
 
 // List out all organizations. The organizations are sorted by creation date, with
 // the most recently-created organizations coming first
-func (r *OrganizationService) ListAutoPaging(ctx context.Context, query OrganizationListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[Organization] {
+func (r *OrganizationService) ListAutoPaging(ctx context.Context, query OrganizationListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[shared.Organization] {
 	return pagination.NewListObjectsAutoPager(r.List(ctx, query, opts...))
 }
 
 // Delete a organization object by its id
-func (r *OrganizationService) Delete(ctx context.Context, organizationID string, opts ...option.RequestOption) (res *Organization, err error) {
+func (r *OrganizationService) Delete(ctx context.Context, organizationID shared.OrganizationIDParam, opts ...option.RequestOption) (res *shared.Organization, err error) {
 	opts = append(r.Options[:], opts...)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
@@ -102,52 +102,12 @@ func (r *OrganizationService) Delete(ctx context.Context, organizationID string,
 	return
 }
 
-type Organization struct {
-	// Unique identifier for the organization
-	ID string `json:"id,required" format:"uuid"`
-	// Name of the organization
-	Name   string `json:"name,required"`
-	APIURL string `json:"api_url,nullable"`
-	// Date of organization creation
-	Created        time.Time        `json:"created,nullable" format:"date-time"`
-	IsUniversalAPI bool             `json:"is_universal_api,nullable"`
-	ProxyURL       string           `json:"proxy_url,nullable"`
-	RealtimeURL    string           `json:"realtime_url,nullable"`
-	JSON           organizationJSON `json:"-"`
-}
-
-// organizationJSON contains the JSON metadata for the struct [Organization]
-type organizationJSON struct {
-	ID             apijson.Field
-	Name           apijson.Field
-	APIURL         apijson.Field
-	Created        apijson.Field
-	IsUniversalAPI apijson.Field
-	ProxyURL       apijson.Field
-	RealtimeURL    apijson.Field
-	raw            string
-	ExtraFields    map[string]apijson.Field
-}
-
-func (r *Organization) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r organizationJSON) RawJSON() string {
-	return r.raw
-}
-
 type OrganizationUpdateParams struct {
-	APIURL         param.Field[string] `json:"api_url"`
-	IsUniversalAPI param.Field[bool]   `json:"is_universal_api"`
-	// Name of the organization
-	Name        param.Field[string] `json:"name"`
-	ProxyURL    param.Field[string] `json:"proxy_url"`
-	RealtimeURL param.Field[string] `json:"realtime_url"`
+	PatchOrganization shared.PatchOrganizationParam `json:"patch_organization,required"`
 }
 
 func (r OrganizationUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	return apijson.MarshalRoot(r.PatchOrganization)
 }
 
 type OrganizationListParams struct {
@@ -156,22 +116,22 @@ type OrganizationListParams struct {
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[OrganizationListParamsIDsUnion] `query:"ids" format:"uuid"`
+	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	Limit param.Field[shared.AppLimitParam] `query:"limit"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Field[shared.OrgNameParam] `query:"org_name"`
 	// Name of the organization to search for
-	OrganizationName param.Field[string] `query:"organization_name"`
+	OrganizationName param.Field[shared.OrganizationNameParam] `query:"organization_name"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
 }
 
 // URLQuery serializes [OrganizationListParams]'s query parameters as `url.Values`.
@@ -181,15 +141,3 @@ func (r OrganizationListParams) URLQuery() (v url.Values) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
-
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
-//
-// Satisfied by [shared.UnionString], [OrganizationListParamsIDsArray].
-type OrganizationListParamsIDsUnion interface {
-	ImplementsOrganizationListParamsIDsUnion()
-}
-
-type OrganizationListParamsIDsArray []string
-
-func (r OrganizationListParamsIDsArray) ImplementsOrganizationListParamsIDsUnion() {}

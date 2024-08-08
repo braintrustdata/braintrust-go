@@ -27,20 +27,22 @@ func TestProjectScoreNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ProjectScores.New(context.TODO(), braintrust.ProjectScoreNewParams{
-		Name:      braintrust.F("name"),
-		ProjectID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ScoreType: braintrust.F(braintrust.ProjectScoreNewParamsScoreTypeSlider),
-		Categories: braintrust.F[braintrust.ProjectScoreNewParamsCategoriesUnion](braintrust.ProjectScoreNewParamsCategoriesCategorical([]braintrust.ProjectScoreCategoryParam{{
-			Name:  braintrust.F("name"),
-			Value: braintrust.F(0.000000),
-		}, {
-			Name:  braintrust.F("name"),
-			Value: braintrust.F(0.000000),
-		}, {
-			Name:  braintrust.F("name"),
-			Value: braintrust.F(0.000000),
-		}})),
-		Description: braintrust.F("description"),
+		CreateProjectScore: shared.CreateProjectScoreParam{
+			ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Name:        braintrust.F("name"),
+			Description: braintrust.F("description"),
+			ScoreType:   braintrust.F(shared.CreateProjectScoreScoreTypeSlider),
+			Categories: braintrust.F[shared.CreateProjectScoreCategoriesUnionParam](shared.CreateProjectScoreCategoriesCategoricalParam([]shared.ProjectScoreCategoryParam{{
+				Name:  braintrust.F("name"),
+				Value: braintrust.F(0.000000),
+			}, {
+				Name:  braintrust.F("name"),
+				Value: braintrust.F(0.000000),
+			}, {
+				Name:  braintrust.F("name"),
+				Value: braintrust.F(0.000000),
+			}})),
+		},
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -89,19 +91,21 @@ func TestProjectScoreUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectScoreUpdateParams{
-			Categories: braintrust.F[braintrust.ProjectScoreUpdateParamsCategoriesUnion](braintrust.ProjectScoreUpdateParamsCategoriesCategorical([]braintrust.ProjectScoreCategoryParam{{
-				Name:  braintrust.F("name"),
-				Value: braintrust.F(0.000000),
-			}, {
-				Name:  braintrust.F("name"),
-				Value: braintrust.F(0.000000),
-			}, {
-				Name:  braintrust.F("name"),
-				Value: braintrust.F(0.000000),
-			}})),
-			Description: braintrust.F("description"),
-			Name:        braintrust.F("name"),
-			ScoreType:   braintrust.F(braintrust.ProjectScoreUpdateParamsScoreTypeSlider),
+			PatchProjectScore: shared.PatchProjectScoreParam{
+				Name:        braintrust.F("name"),
+				Description: braintrust.F("description"),
+				ScoreType:   braintrust.F(shared.PatchProjectScoreScoreTypeSlider),
+				Categories: braintrust.F[shared.PatchProjectScoreCategoriesUnionParam](shared.PatchProjectScoreCategoriesCategoricalParam([]shared.ProjectScoreCategoryParam{{
+					Name:  braintrust.F("name"),
+					Value: braintrust.F(0.000000),
+				}, {
+					Name:  braintrust.F("name"),
+					Value: braintrust.F(0.000000),
+				}, {
+					Name:  braintrust.F("name"),
+					Value: braintrust.F(0.000000),
+				}})),
+			},
 		},
 	)
 	if err != nil {
@@ -127,9 +131,10 @@ func TestProjectScoreListWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.ProjectScores.List(context.TODO(), braintrust.ProjectScoreListParams{
 		EndingBefore:     braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:              braintrust.F[braintrust.ProjectScoreListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
+		IDs:              braintrust.F[shared.IDsUnionParam](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:            braintrust.F(int64(0)),
 		OrgName:          braintrust.F("org_name"),
+		ProjectID:        braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ProjectName:      braintrust.F("project_name"),
 		ProjectScoreName: braintrust.F("project_score_name"),
 		StartingAfter:    braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
@@ -178,20 +183,22 @@ func TestProjectScoreReplaceWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ProjectScores.Replace(context.TODO(), braintrust.ProjectScoreReplaceParams{
-		Name:      braintrust.F("name"),
-		ProjectID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ScoreType: braintrust.F(braintrust.ProjectScoreReplaceParamsScoreTypeSlider),
-		Categories: braintrust.F[braintrust.ProjectScoreReplaceParamsCategoriesUnion](braintrust.ProjectScoreReplaceParamsCategoriesCategorical([]braintrust.ProjectScoreCategoryParam{{
-			Name:  braintrust.F("name"),
-			Value: braintrust.F(0.000000),
-		}, {
-			Name:  braintrust.F("name"),
-			Value: braintrust.F(0.000000),
-		}, {
-			Name:  braintrust.F("name"),
-			Value: braintrust.F(0.000000),
-		}})),
-		Description: braintrust.F("description"),
+		CreateProjectScore: shared.CreateProjectScoreParam{
+			ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Name:        braintrust.F("name"),
+			Description: braintrust.F("description"),
+			ScoreType:   braintrust.F(shared.CreateProjectScoreScoreTypeSlider),
+			Categories: braintrust.F[shared.CreateProjectScoreCategoriesUnionParam](shared.CreateProjectScoreCategoriesCategoricalParam([]shared.ProjectScoreCategoryParam{{
+				Name:  braintrust.F("name"),
+				Value: braintrust.F(0.000000),
+			}, {
+				Name:  braintrust.F("name"),
+				Value: braintrust.F(0.000000),
+			}, {
+				Name:  braintrust.F("name"),
+				Value: braintrust.F(0.000000),
+			}})),
+		},
 	})
 	if err != nil {
 		var apierr *braintrust.Error
