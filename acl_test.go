@@ -27,13 +27,15 @@ func TestACLNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ACLs.New(context.TODO(), braintrust.ACLNewParams{
-		ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType:         braintrust.F(braintrust.ACLNewParamsObjectTypeOrganization),
-		GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Permission:         braintrust.F(braintrust.ACLNewParamsPermissionCreate),
-		RestrictObjectType: braintrust.F(braintrust.ACLNewParamsRestrictObjectTypeOrganization),
-		RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		CreateACL: shared.CreateACLParam{
+			ObjectType:         braintrust.F(shared.CreateACLObjectTypeOrganization),
+			ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Permission:         braintrust.F(shared.CreateACLPermissionCreate),
+			RestrictObjectType: braintrust.F(shared.CreateACLRestrictObjectTypeOrganization),
+			RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		},
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -80,9 +82,9 @@ func TestACLListWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.ACLs.List(context.TODO(), braintrust.ACLListParams{
 		ObjectID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType:    braintrust.F(braintrust.ACLListParamsObjectTypeOrganization),
+		ObjectType:    braintrust.F(shared.ACLObjectTypeOrganization),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:           braintrust.F[braintrust.ACLListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
+		IDs:           braintrust.F[shared.IDsUnionParam](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
