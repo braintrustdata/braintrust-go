@@ -28,29 +28,31 @@ func TestViewNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Views.New(context.TODO(), braintrust.ViewNewParams{
-		Name:       braintrust.F("name"),
-		ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType: braintrust.F(braintrust.ViewNewParamsObjectTypeOrganization),
-		ViewType:   braintrust.F(braintrust.ViewNewParamsViewTypeProjects),
-		DeletedAt:  braintrust.F(time.Now()),
-		Options: braintrust.F(braintrust.ViewOptionsParam{
-			ColumnVisibility: braintrust.F(map[string]bool{
-				"foo": true,
+		CreateView: shared.CreateViewParam{
+			ObjectType: braintrust.F(shared.CreateViewObjectTypeOrganization),
+			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			ViewType:   braintrust.F(shared.CreateViewViewTypeProjects),
+			Name:       braintrust.F("name"),
+			ViewData: braintrust.F(shared.ViewDataParam{
+				Search: braintrust.F(shared.ViewDataSearchParam{
+					Filter: braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
+					Tag:    braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
+					Match:  braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
+					Sort:   braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
+				}),
 			}),
-			ColumnOrder: braintrust.F([]string{"string", "string", "string"}),
-			ColumnSizing: braintrust.F(map[string]float64{
-				"foo": 0.000000,
+			Options: braintrust.F(shared.ViewOptionsParam{
+				ColumnVisibility: braintrust.F(map[string]bool{
+					"foo": true,
+				}),
+				ColumnOrder: braintrust.F([]string{"string", "string", "string"}),
+				ColumnSizing: braintrust.F(map[string]float64{
+					"foo": 0.000000,
+				}),
 			}),
-		}),
-		UserID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ViewData: braintrust.F(braintrust.ViewDataParam{
-			Search: braintrust.F(braintrust.ViewDataSearchParam{
-				Filter: braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-				Tag:    braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-				Match:  braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-				Sort:   braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-			}),
-		}),
+			UserID:    braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			DeletedAt: braintrust.F(time.Now()),
+		},
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -78,7 +80,7 @@ func TestViewGet(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ViewGetParams{
 			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ObjectType: braintrust.F(braintrust.ViewGetParamsObjectTypeOrganization),
+			ObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 		},
 	)
 	if err != nil {
@@ -106,28 +108,30 @@ func TestViewUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ViewUpdateParams{
-			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ObjectType: braintrust.F(braintrust.ViewUpdateParamsObjectTypeOrganization),
-			Name:       braintrust.F("name"),
-			Options: braintrust.F(braintrust.ViewOptionsParam{
-				ColumnVisibility: braintrust.F(map[string]bool{
-					"foo": true,
+			PatchView: shared.PatchViewParam{
+				ObjectType: braintrust.F(shared.PatchViewObjectTypeOrganization),
+				ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+				ViewType:   braintrust.F(shared.PatchViewViewTypeProjects),
+				Name:       braintrust.F("name"),
+				ViewData: braintrust.F(shared.ViewDataParam{
+					Search: braintrust.F(shared.ViewDataSearchParam{
+						Filter: braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
+						Tag:    braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
+						Match:  braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
+						Sort:   braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
+					}),
 				}),
-				ColumnOrder: braintrust.F([]string{"string", "string", "string"}),
-				ColumnSizing: braintrust.F(map[string]float64{
-					"foo": 0.000000,
+				Options: braintrust.F(shared.ViewOptionsParam{
+					ColumnVisibility: braintrust.F(map[string]bool{
+						"foo": true,
+					}),
+					ColumnOrder: braintrust.F([]string{"string", "string", "string"}),
+					ColumnSizing: braintrust.F(map[string]float64{
+						"foo": 0.000000,
+					}),
 				}),
-			}),
-			UserID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ViewData: braintrust.F(braintrust.ViewDataParam{
-				Search: braintrust.F(braintrust.ViewDataSearchParam{
-					Filter: braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-					Tag:    braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-					Match:  braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-					Sort:   braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-				}),
-			}),
-			ViewType: braintrust.F(braintrust.ViewUpdateParamsViewTypeProjects),
+				UserID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			},
 		},
 	)
 	if err != nil {
@@ -153,14 +157,13 @@ func TestViewListWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.Views.List(context.TODO(), braintrust.ViewListParams{
 		ObjectID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType:    braintrust.F(braintrust.ViewListParamsObjectTypeOrganization),
+		ObjectType:    braintrust.F(shared.ACLObjectTypeOrganization),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:           braintrust.F[braintrust.ViewListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
+		IDs:           braintrust.F[shared.IDsUnionParam](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
-		ProjectName:   braintrust.F("project_name"),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ViewName:      braintrust.F("view_name"),
-		ViewType:      braintrust.F(braintrust.ViewListParamsViewTypeProjects),
+		ViewType:      braintrust.F(shared.ViewTypeProjects),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -187,8 +190,10 @@ func TestViewDelete(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ViewDeleteParams{
-			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ObjectType: braintrust.F(braintrust.ViewDeleteParamsObjectTypeOrganization),
+			DeleteView: shared.DeleteViewParam{
+				ObjectType: braintrust.F(shared.DeleteViewObjectTypeOrganization),
+				ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			},
 		},
 	)
 	if err != nil {
@@ -213,29 +218,31 @@ func TestViewReplaceWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Views.Replace(context.TODO(), braintrust.ViewReplaceParams{
-		Name:       braintrust.F("name"),
-		ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType: braintrust.F(braintrust.ViewReplaceParamsObjectTypeOrganization),
-		ViewType:   braintrust.F(braintrust.ViewReplaceParamsViewTypeProjects),
-		DeletedAt:  braintrust.F(time.Now()),
-		Options: braintrust.F(braintrust.ViewOptionsParam{
-			ColumnVisibility: braintrust.F(map[string]bool{
-				"foo": true,
+		CreateView: shared.CreateViewParam{
+			ObjectType: braintrust.F(shared.CreateViewObjectTypeOrganization),
+			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			ViewType:   braintrust.F(shared.CreateViewViewTypeProjects),
+			Name:       braintrust.F("name"),
+			ViewData: braintrust.F(shared.ViewDataParam{
+				Search: braintrust.F(shared.ViewDataSearchParam{
+					Filter: braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
+					Tag:    braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
+					Match:  braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
+					Sort:   braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
+				}),
 			}),
-			ColumnOrder: braintrust.F([]string{"string", "string", "string"}),
-			ColumnSizing: braintrust.F(map[string]float64{
-				"foo": 0.000000,
+			Options: braintrust.F(shared.ViewOptionsParam{
+				ColumnVisibility: braintrust.F(map[string]bool{
+					"foo": true,
+				}),
+				ColumnOrder: braintrust.F([]string{"string", "string", "string"}),
+				ColumnSizing: braintrust.F(map[string]float64{
+					"foo": 0.000000,
+				}),
 			}),
-		}),
-		UserID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ViewData: braintrust.F(braintrust.ViewDataParam{
-			Search: braintrust.F(braintrust.ViewDataSearchParam{
-				Filter: braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-				Tag:    braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-				Match:  braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-				Sort:   braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-			}),
-		}),
+			UserID:    braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			DeletedAt: braintrust.F(time.Now()),
+		},
 	})
 	if err != nil {
 		var apierr *braintrust.Error

@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"reflect"
-	"time"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -17,7 +15,7 @@ import (
 	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
-	"github.com/tidwall/gjson"
+	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 // ProjectScoreService contains methods and other services that help with
@@ -42,7 +40,7 @@ func NewProjectScoreService(opts ...option.RequestOption) (r *ProjectScoreServic
 // Create a new project_score. If there is an existing project_score in the project
 // with the same name as the one specified in the request, will return the existing
 // project_score unmodified
-func (r *ProjectScoreService) New(ctx context.Context, body ProjectScoreNewParams, opts ...option.RequestOption) (res *ProjectScore, err error) {
+func (r *ProjectScoreService) New(ctx context.Context, body ProjectScoreNewParams, opts ...option.RequestOption) (res *shared.ProjectScore, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/project_score"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
@@ -50,7 +48,7 @@ func (r *ProjectScoreService) New(ctx context.Context, body ProjectScoreNewParam
 }
 
 // Get a project_score object by its id
-func (r *ProjectScoreService) Get(ctx context.Context, projectScoreID string, opts ...option.RequestOption) (res *ProjectScore, err error) {
+func (r *ProjectScoreService) Get(ctx context.Context, projectScoreID shared.ProjectScoreIDParam, opts ...option.RequestOption) (res *shared.ProjectScore, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectScoreID == "" {
 		err = errors.New("missing required project_score_id parameter")
@@ -64,7 +62,7 @@ func (r *ProjectScoreService) Get(ctx context.Context, projectScoreID string, op
 // Partially update a project_score object. Specify the fields to update in the
 // payload. Any object-type fields will be deep-merged with existing content.
 // Currently we do not support removing fields or setting them to null.
-func (r *ProjectScoreService) Update(ctx context.Context, projectScoreID string, body ProjectScoreUpdateParams, opts ...option.RequestOption) (res *ProjectScore, err error) {
+func (r *ProjectScoreService) Update(ctx context.Context, projectScoreID shared.ProjectScoreIDParam, body ProjectScoreUpdateParams, opts ...option.RequestOption) (res *shared.ProjectScore, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectScoreID == "" {
 		err = errors.New("missing required project_score_id parameter")
@@ -77,7 +75,7 @@ func (r *ProjectScoreService) Update(ctx context.Context, projectScoreID string,
 
 // List out all project_scores. The project_scores are sorted by creation date,
 // with the most recently-created project_scores coming first
-func (r *ProjectScoreService) List(ctx context.Context, query ProjectScoreListParams, opts ...option.RequestOption) (res *pagination.ListObjects[ProjectScore], err error) {
+func (r *ProjectScoreService) List(ctx context.Context, query ProjectScoreListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.ProjectScore], err error) {
 	var raw *http.Response
 	opts = append(r.Options[:], opts...)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
@@ -96,12 +94,12 @@ func (r *ProjectScoreService) List(ctx context.Context, query ProjectScoreListPa
 
 // List out all project_scores. The project_scores are sorted by creation date,
 // with the most recently-created project_scores coming first
-func (r *ProjectScoreService) ListAutoPaging(ctx context.Context, query ProjectScoreListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[ProjectScore] {
+func (r *ProjectScoreService) ListAutoPaging(ctx context.Context, query ProjectScoreListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[shared.ProjectScore] {
 	return pagination.NewListObjectsAutoPager(r.List(ctx, query, opts...))
 }
 
 // Delete a project_score object by its id
-func (r *ProjectScoreService) Delete(ctx context.Context, projectScoreID string, opts ...option.RequestOption) (res *ProjectScore, err error) {
+func (r *ProjectScoreService) Delete(ctx context.Context, projectScoreID shared.ProjectScoreIDParam, opts ...option.RequestOption) (res *shared.ProjectScore, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectScoreID == "" {
 		err = errors.New("missing required project_score_id parameter")
@@ -115,334 +113,27 @@ func (r *ProjectScoreService) Delete(ctx context.Context, projectScoreID string,
 // Create or replace project_score. If there is an existing project_score in the
 // project with the same name as the one specified in the request, will replace the
 // existing project_score with the provided fields
-func (r *ProjectScoreService) Replace(ctx context.Context, body ProjectScoreReplaceParams, opts ...option.RequestOption) (res *ProjectScore, err error) {
+func (r *ProjectScoreService) Replace(ctx context.Context, body ProjectScoreReplaceParams, opts ...option.RequestOption) (res *shared.ProjectScore, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/project_score"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
 	return
 }
 
-// A project score is a user-configured score, which can be manually-labeled
-// through the UI
-type ProjectScore struct {
-	// Unique identifier for the project score
-	ID string `json:"id,required" format:"uuid"`
-	// Name of the project score
-	Name string `json:"name,required"`
-	// Unique identifier for the project that the project score belongs under
-	ProjectID string `json:"project_id,required" format:"uuid"`
-	// The type of the configured score
-	ScoreType ProjectScoreScoreType `json:"score_type,required,nullable"`
-	UserID    string                `json:"user_id,required" format:"uuid"`
-	// For categorical-type project scores, the list of all categories
-	Categories ProjectScoreCategoriesUnion `json:"categories"`
-	Config     ProjectScoreConfig          `json:"config,nullable"`
-	// Date of project score creation
-	Created time.Time `json:"created,nullable" format:"date-time"`
-	// Textual description of the project score
-	Description string `json:"description,nullable"`
-	// An optional LexoRank-based string that sets the sort position for the score in
-	// the UI
-	Position string           `json:"position,nullable"`
-	JSON     projectScoreJSON `json:"-"`
-}
-
-// projectScoreJSON contains the JSON metadata for the struct [ProjectScore]
-type projectScoreJSON struct {
-	ID          apijson.Field
-	Name        apijson.Field
-	ProjectID   apijson.Field
-	ScoreType   apijson.Field
-	UserID      apijson.Field
-	Categories  apijson.Field
-	Config      apijson.Field
-	Created     apijson.Field
-	Description apijson.Field
-	Position    apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ProjectScore) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectScoreJSON) RawJSON() string {
-	return r.raw
-}
-
-// The type of the configured score
-type ProjectScoreScoreType string
-
-const (
-	ProjectScoreScoreTypeSlider      ProjectScoreScoreType = "slider"
-	ProjectScoreScoreTypeCategorical ProjectScoreScoreType = "categorical"
-	ProjectScoreScoreTypeWeighted    ProjectScoreScoreType = "weighted"
-	ProjectScoreScoreTypeMinimum     ProjectScoreScoreType = "minimum"
-)
-
-func (r ProjectScoreScoreType) IsKnown() bool {
-	switch r {
-	case ProjectScoreScoreTypeSlider, ProjectScoreScoreTypeCategorical, ProjectScoreScoreTypeWeighted, ProjectScoreScoreTypeMinimum:
-		return true
-	}
-	return false
-}
-
-// For categorical-type project scores, the list of all categories
-//
-// Union satisfied by [ProjectScoreCategoriesCategorical],
-// [ProjectScoreCategoriesMinimum] or [ProjectScoreCategoriesNullableVariant].
-type ProjectScoreCategoriesUnion interface {
-	implementsProjectScoreCategoriesUnion()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*ProjectScoreCategoriesUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ProjectScoreCategoriesCategorical{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ProjectScoreCategoriesMinimum{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ProjectScoreCategoriesNullableVariant{}),
-		},
-	)
-}
-
-type ProjectScoreCategoriesCategorical []ProjectScoreCategory
-
-func (r ProjectScoreCategoriesCategorical) implementsProjectScoreCategoriesUnion() {}
-
-type ProjectScoreCategoriesMinimum []string
-
-func (r ProjectScoreCategoriesMinimum) implementsProjectScoreCategoriesUnion() {}
-
-type ProjectScoreCategoriesNullableVariant struct {
-	JSON projectScoreCategoriesNullableVariantJSON `json:"-"`
-}
-
-// projectScoreCategoriesNullableVariantJSON contains the JSON metadata for the
-// struct [ProjectScoreCategoriesNullableVariant]
-type projectScoreCategoriesNullableVariantJSON struct {
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ProjectScoreCategoriesNullableVariant) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectScoreCategoriesNullableVariantJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r ProjectScoreCategoriesNullableVariant) implementsProjectScoreCategoriesUnion() {}
-
-type ProjectScoreConfig struct {
-	Destination ProjectScoreConfigDestination `json:"destination,nullable"`
-	MultiSelect bool                          `json:"multi_select,nullable"`
-	JSON        projectScoreConfigJSON        `json:"-"`
-}
-
-// projectScoreConfigJSON contains the JSON metadata for the struct
-// [ProjectScoreConfig]
-type projectScoreConfigJSON struct {
-	Destination apijson.Field
-	MultiSelect apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ProjectScoreConfig) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectScoreConfigJSON) RawJSON() string {
-	return r.raw
-}
-
-type ProjectScoreConfigDestination string
-
-const (
-	ProjectScoreConfigDestinationExpected ProjectScoreConfigDestination = "expected"
-)
-
-func (r ProjectScoreConfigDestination) IsKnown() bool {
-	switch r {
-	case ProjectScoreConfigDestinationExpected:
-		return true
-	}
-	return false
-}
-
-// For categorical-type project scores, defines a single category
-type ProjectScoreCategory struct {
-	// Name of the category
-	Name string `json:"name,required"`
-	// Numerical value of the category. Must be between 0 and 1, inclusive
-	Value float64                  `json:"value,required"`
-	JSON  projectScoreCategoryJSON `json:"-"`
-}
-
-// projectScoreCategoryJSON contains the JSON metadata for the struct
-// [ProjectScoreCategory]
-type projectScoreCategoryJSON struct {
-	Name        apijson.Field
-	Value       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ProjectScoreCategory) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectScoreCategoryJSON) RawJSON() string {
-	return r.raw
-}
-
-// For categorical-type project scores, defines a single category
-type ProjectScoreCategoryParam struct {
-	// Name of the category
-	Name param.Field[string] `json:"name,required"`
-	// Numerical value of the category. Must be between 0 and 1, inclusive
-	Value param.Field[float64] `json:"value,required"`
-}
-
-func (r ProjectScoreCategoryParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
 type ProjectScoreNewParams struct {
-	// Name of the project score
-	Name param.Field[string] `json:"name,required"`
-	// Unique identifier for the project that the project score belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
-	// The type of the configured score
-	ScoreType param.Field[ProjectScoreNewParamsScoreType] `json:"score_type,required"`
-	// For categorical-type project scores, the list of all categories
-	Categories param.Field[ProjectScoreNewParamsCategoriesUnion] `json:"categories"`
-	// Textual description of the project score
-	Description param.Field[string] `json:"description"`
+	CreateProjectScore shared.CreateProjectScoreParam `json:"create_project_score,required"`
 }
 
 func (r ProjectScoreNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// The type of the configured score
-type ProjectScoreNewParamsScoreType string
-
-const (
-	ProjectScoreNewParamsScoreTypeSlider      ProjectScoreNewParamsScoreType = "slider"
-	ProjectScoreNewParamsScoreTypeCategorical ProjectScoreNewParamsScoreType = "categorical"
-	ProjectScoreNewParamsScoreTypeWeighted    ProjectScoreNewParamsScoreType = "weighted"
-	ProjectScoreNewParamsScoreTypeMinimum     ProjectScoreNewParamsScoreType = "minimum"
-)
-
-func (r ProjectScoreNewParamsScoreType) IsKnown() bool {
-	switch r {
-	case ProjectScoreNewParamsScoreTypeSlider, ProjectScoreNewParamsScoreTypeCategorical, ProjectScoreNewParamsScoreTypeWeighted, ProjectScoreNewParamsScoreTypeMinimum:
-		return true
-	}
-	return false
-}
-
-// For categorical-type project scores, the list of all categories
-//
-// Satisfied by [ProjectScoreNewParamsCategoriesCategorical],
-// [ProjectScoreNewParamsCategoriesMinimum],
-// [ProjectScoreNewParamsCategoriesNullableVariant].
-type ProjectScoreNewParamsCategoriesUnion interface {
-	implementsProjectScoreNewParamsCategoriesUnion()
-}
-
-type ProjectScoreNewParamsCategoriesCategorical []ProjectScoreCategoryParam
-
-func (r ProjectScoreNewParamsCategoriesCategorical) implementsProjectScoreNewParamsCategoriesUnion() {
-}
-
-type ProjectScoreNewParamsCategoriesMinimum []string
-
-func (r ProjectScoreNewParamsCategoriesMinimum) implementsProjectScoreNewParamsCategoriesUnion() {}
-
-type ProjectScoreNewParamsCategoriesNullableVariant struct {
-}
-
-func (r ProjectScoreNewParamsCategoriesNullableVariant) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ProjectScoreNewParamsCategoriesNullableVariant) implementsProjectScoreNewParamsCategoriesUnion() {
+	return apijson.MarshalRoot(r.CreateProjectScore)
 }
 
 type ProjectScoreUpdateParams struct {
-	// For categorical-type project scores, the list of all categories
-	Categories param.Field[ProjectScoreUpdateParamsCategoriesUnion] `json:"categories"`
-	// Textual description of the project score
-	Description param.Field[string] `json:"description"`
-	// Name of the project score
-	Name param.Field[string] `json:"name"`
-	// The type of the configured score
-	ScoreType param.Field[ProjectScoreUpdateParamsScoreType] `json:"score_type"`
+	PatchProjectScore shared.PatchProjectScoreParam `json:"patch_project_score,required"`
 }
 
 func (r ProjectScoreUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// For categorical-type project scores, the list of all categories
-//
-// Satisfied by [ProjectScoreUpdateParamsCategoriesCategorical],
-// [ProjectScoreUpdateParamsCategoriesMinimum],
-// [ProjectScoreUpdateParamsCategoriesNullableVariant].
-type ProjectScoreUpdateParamsCategoriesUnion interface {
-	implementsProjectScoreUpdateParamsCategoriesUnion()
-}
-
-type ProjectScoreUpdateParamsCategoriesCategorical []ProjectScoreCategoryParam
-
-func (r ProjectScoreUpdateParamsCategoriesCategorical) implementsProjectScoreUpdateParamsCategoriesUnion() {
-}
-
-type ProjectScoreUpdateParamsCategoriesMinimum []string
-
-func (r ProjectScoreUpdateParamsCategoriesMinimum) implementsProjectScoreUpdateParamsCategoriesUnion() {
-}
-
-type ProjectScoreUpdateParamsCategoriesNullableVariant struct {
-}
-
-func (r ProjectScoreUpdateParamsCategoriesNullableVariant) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ProjectScoreUpdateParamsCategoriesNullableVariant) implementsProjectScoreUpdateParamsCategoriesUnion() {
-}
-
-// The type of the configured score
-type ProjectScoreUpdateParamsScoreType string
-
-const (
-	ProjectScoreUpdateParamsScoreTypeSlider      ProjectScoreUpdateParamsScoreType = "slider"
-	ProjectScoreUpdateParamsScoreTypeCategorical ProjectScoreUpdateParamsScoreType = "categorical"
-	ProjectScoreUpdateParamsScoreTypeWeighted    ProjectScoreUpdateParamsScoreType = "weighted"
-	ProjectScoreUpdateParamsScoreTypeMinimum     ProjectScoreUpdateParamsScoreType = "minimum"
-)
-
-func (r ProjectScoreUpdateParamsScoreType) IsKnown() bool {
-	switch r {
-	case ProjectScoreUpdateParamsScoreTypeSlider, ProjectScoreUpdateParamsScoreTypeCategorical, ProjectScoreUpdateParamsScoreTypeWeighted, ProjectScoreUpdateParamsScoreTypeMinimum:
-		return true
-	}
-	return false
+	return apijson.MarshalRoot(r.PatchProjectScore)
 }
 
 type ProjectScoreListParams struct {
@@ -451,24 +142,26 @@ type ProjectScoreListParams struct {
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[ProjectScoreListParamsIDsUnion] `query:"ids" format:"uuid"`
+	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	Limit param.Field[shared.AppLimitParam] `query:"limit"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Field[shared.OrgNameParam] `query:"org_name"`
+	// Project id
+	ProjectID param.Field[shared.ProjectIDQueryParam] `query:"project_id" format:"uuid"`
 	// Name of the project to search for
-	ProjectName param.Field[string] `query:"project_name"`
+	ProjectName param.Field[shared.ProjectNameParam] `query:"project_name"`
 	// Name of the project_score to search for
-	ProjectScoreName param.Field[string] `query:"project_score_name"`
+	ProjectScoreName param.Field[shared.ProjectScoreNameParam] `query:"project_score_name"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
 }
 
 // URLQuery serializes [ProjectScoreListParams]'s query parameters as `url.Values`.
@@ -479,78 +172,10 @@ func (r ProjectScoreListParams) URLQuery() (v url.Values) {
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
-//
-// Satisfied by [shared.UnionString], [ProjectScoreListParamsIDsArray].
-type ProjectScoreListParamsIDsUnion interface {
-	ImplementsProjectScoreListParamsIDsUnion()
-}
-
-type ProjectScoreListParamsIDsArray []string
-
-func (r ProjectScoreListParamsIDsArray) ImplementsProjectScoreListParamsIDsUnion() {}
-
 type ProjectScoreReplaceParams struct {
-	// Name of the project score
-	Name param.Field[string] `json:"name,required"`
-	// Unique identifier for the project that the project score belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
-	// The type of the configured score
-	ScoreType param.Field[ProjectScoreReplaceParamsScoreType] `json:"score_type,required"`
-	// For categorical-type project scores, the list of all categories
-	Categories param.Field[ProjectScoreReplaceParamsCategoriesUnion] `json:"categories"`
-	// Textual description of the project score
-	Description param.Field[string] `json:"description"`
+	CreateProjectScore shared.CreateProjectScoreParam `json:"create_project_score,required"`
 }
 
 func (r ProjectScoreReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// The type of the configured score
-type ProjectScoreReplaceParamsScoreType string
-
-const (
-	ProjectScoreReplaceParamsScoreTypeSlider      ProjectScoreReplaceParamsScoreType = "slider"
-	ProjectScoreReplaceParamsScoreTypeCategorical ProjectScoreReplaceParamsScoreType = "categorical"
-	ProjectScoreReplaceParamsScoreTypeWeighted    ProjectScoreReplaceParamsScoreType = "weighted"
-	ProjectScoreReplaceParamsScoreTypeMinimum     ProjectScoreReplaceParamsScoreType = "minimum"
-)
-
-func (r ProjectScoreReplaceParamsScoreType) IsKnown() bool {
-	switch r {
-	case ProjectScoreReplaceParamsScoreTypeSlider, ProjectScoreReplaceParamsScoreTypeCategorical, ProjectScoreReplaceParamsScoreTypeWeighted, ProjectScoreReplaceParamsScoreTypeMinimum:
-		return true
-	}
-	return false
-}
-
-// For categorical-type project scores, the list of all categories
-//
-// Satisfied by [ProjectScoreReplaceParamsCategoriesCategorical],
-// [ProjectScoreReplaceParamsCategoriesMinimum],
-// [ProjectScoreReplaceParamsCategoriesNullableVariant].
-type ProjectScoreReplaceParamsCategoriesUnion interface {
-	implementsProjectScoreReplaceParamsCategoriesUnion()
-}
-
-type ProjectScoreReplaceParamsCategoriesCategorical []ProjectScoreCategoryParam
-
-func (r ProjectScoreReplaceParamsCategoriesCategorical) implementsProjectScoreReplaceParamsCategoriesUnion() {
-}
-
-type ProjectScoreReplaceParamsCategoriesMinimum []string
-
-func (r ProjectScoreReplaceParamsCategoriesMinimum) implementsProjectScoreReplaceParamsCategoriesUnion() {
-}
-
-type ProjectScoreReplaceParamsCategoriesNullableVariant struct {
-}
-
-func (r ProjectScoreReplaceParamsCategoriesNullableVariant) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ProjectScoreReplaceParamsCategoriesNullableVariant) implementsProjectScoreReplaceParamsCategoriesUnion() {
+	return apijson.MarshalRoot(r.CreateProjectScore)
 }

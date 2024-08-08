@@ -28,9 +28,11 @@ func TestDatasetNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Datasets.New(context.TODO(), braintrust.DatasetNewParams{
-		Name:        braintrust.F("name"),
-		Description: braintrust.F("description"),
-		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		CreateDataset: shared.CreateDatasetParam{
+			ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Name:        braintrust.F("name"),
+			Description: braintrust.F("description"),
+		},
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -79,11 +81,13 @@ func TestDatasetUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.DatasetUpdateParams{
-			Description: braintrust.F("description"),
-			Metadata: braintrust.F(map[string]interface{}{
-				"foo": map[string]interface{}{},
-			}),
-			Name: braintrust.F("name"),
+			PatchDataset: shared.PatchDatasetParam{
+				Name:        braintrust.F("name"),
+				Description: braintrust.F("description"),
+				Metadata: braintrust.F(map[string]interface{}{
+					"foo": map[string]interface{}{},
+				}),
+			},
 		},
 	)
 	if err != nil {
@@ -110,9 +114,10 @@ func TestDatasetListWithOptionalParams(t *testing.T) {
 	_, err := client.Datasets.List(context.TODO(), braintrust.DatasetListParams{
 		DatasetName:   braintrust.F("dataset_name"),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:           braintrust.F[braintrust.DatasetListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
+		IDs:           braintrust.F[shared.IDsUnionParam](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
 		OrgName:       braintrust.F("org_name"),
+		ProjectID:     braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ProjectName:   braintrust.F("project_name"),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
@@ -163,28 +168,30 @@ func TestDatasetFeedback(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.DatasetFeedbackParams{
-			Feedback: braintrust.F([]braintrust.DatasetFeedbackParamsFeedback{{
-				ID:      braintrust.F("id"),
-				Comment: braintrust.F("comment"),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": map[string]interface{}{},
-				}),
-				Source: braintrust.F(braintrust.DatasetFeedbackParamsFeedbackSourceApp),
-			}, {
-				ID:      braintrust.F("id"),
-				Comment: braintrust.F("comment"),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": map[string]interface{}{},
-				}),
-				Source: braintrust.F(braintrust.DatasetFeedbackParamsFeedbackSourceApp),
-			}, {
-				ID:      braintrust.F("id"),
-				Comment: braintrust.F("comment"),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": map[string]interface{}{},
-				}),
-				Source: braintrust.F(braintrust.DatasetFeedbackParamsFeedbackSourceApp),
-			}}),
+			FeedbackDatasetEventRequest: shared.FeedbackDatasetEventRequestParam{
+				Feedback: braintrust.F([]shared.FeedbackDatasetItemParam{{
+					ID:      braintrust.F("id"),
+					Comment: braintrust.F("comment"),
+					Metadata: braintrust.F(map[string]interface{}{
+						"foo": map[string]interface{}{},
+					}),
+					Source: braintrust.F(shared.FeedbackDatasetItemSourceApp),
+				}, {
+					ID:      braintrust.F("id"),
+					Comment: braintrust.F("comment"),
+					Metadata: braintrust.F(map[string]interface{}{
+						"foo": map[string]interface{}{},
+					}),
+					Source: braintrust.F(shared.FeedbackDatasetItemSourceApp),
+				}, {
+					ID:      braintrust.F("id"),
+					Comment: braintrust.F("comment"),
+					Metadata: braintrust.F(map[string]interface{}{
+						"foo": map[string]interface{}{},
+					}),
+					Source: braintrust.F(shared.FeedbackDatasetItemSourceApp),
+				}}),
+			},
 		},
 	)
 	if err != nil {
@@ -243,24 +250,26 @@ func TestDatasetFetchPostWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.DatasetFetchPostParams{
-			Cursor: braintrust.F("cursor"),
-			Filters: braintrust.F([]braintrust.DatasetFetchPostParamsFilter{{
-				Type:  braintrust.F(braintrust.DatasetFetchPostParamsFiltersTypePathLookup),
-				Path:  braintrust.F([]string{"string", "string", "string"}),
-				Value: braintrust.F[any](map[string]interface{}{}),
-			}, {
-				Type:  braintrust.F(braintrust.DatasetFetchPostParamsFiltersTypePathLookup),
-				Path:  braintrust.F([]string{"string", "string", "string"}),
-				Value: braintrust.F[any](map[string]interface{}{}),
-			}, {
-				Type:  braintrust.F(braintrust.DatasetFetchPostParamsFiltersTypePathLookup),
-				Path:  braintrust.F([]string{"string", "string", "string"}),
-				Value: braintrust.F[any](map[string]interface{}{}),
-			}}),
-			Limit:         braintrust.F(int64(0)),
-			MaxRootSpanID: braintrust.F("max_root_span_id"),
-			MaxXactID:     braintrust.F("max_xact_id"),
-			Version:       braintrust.F("version"),
+			FetchEventsRequest: shared.FetchEventsRequestParam{
+				Limit:         braintrust.F(int64(0)),
+				Cursor:        braintrust.F("cursor"),
+				MaxXactID:     braintrust.F("max_xact_id"),
+				MaxRootSpanID: braintrust.F("max_root_span_id"),
+				Filters: braintrust.F([]shared.PathLookupFilterParam{{
+					Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
+					Path:  braintrust.F([]string{"string", "string", "string"}),
+					Value: braintrust.F[any](map[string]interface{}{}),
+				}, {
+					Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
+					Path:  braintrust.F([]string{"string", "string", "string"}),
+					Value: braintrust.F[any](map[string]interface{}{}),
+				}, {
+					Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
+					Path:  braintrust.F([]string{"string", "string", "string"}),
+					Value: braintrust.F[any](map[string]interface{}{}),
+				}}),
+				Version: braintrust.F("version"),
+			},
 		},
 	)
 	if err != nil {
@@ -288,43 +297,45 @@ func TestDatasetInsert(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.DatasetInsertParams{
-			Events: braintrust.F([]braintrust.DatasetInsertParamsEventUnion{braintrust.DatasetInsertParamsEventsInsertDatasetEventReplace{
-				Input:    braintrust.F[any](map[string]interface{}{}),
-				Expected: braintrust.F[any](map[string]interface{}{}),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": map[string]interface{}{},
-				}),
-				Tags:         braintrust.F([]string{"string", "string", "string"}),
-				ID:           braintrust.F("id"),
-				Created:      braintrust.F(time.Now()),
-				ObjectDelete: braintrust.F(true),
-				IsMerge:      braintrust.F(true),
-				ParentID:     braintrust.F("_parent_id"),
-			}, braintrust.DatasetInsertParamsEventsInsertDatasetEventReplace{
-				Input:    braintrust.F[any](map[string]interface{}{}),
-				Expected: braintrust.F[any](map[string]interface{}{}),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": map[string]interface{}{},
-				}),
-				Tags:         braintrust.F([]string{"string", "string", "string"}),
-				ID:           braintrust.F("id"),
-				Created:      braintrust.F(time.Now()),
-				ObjectDelete: braintrust.F(true),
-				IsMerge:      braintrust.F(true),
-				ParentID:     braintrust.F("_parent_id"),
-			}, braintrust.DatasetInsertParamsEventsInsertDatasetEventReplace{
-				Input:    braintrust.F[any](map[string]interface{}{}),
-				Expected: braintrust.F[any](map[string]interface{}{}),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": map[string]interface{}{},
-				}),
-				Tags:         braintrust.F([]string{"string", "string", "string"}),
-				ID:           braintrust.F("id"),
-				Created:      braintrust.F(time.Now()),
-				ObjectDelete: braintrust.F(true),
-				IsMerge:      braintrust.F(true),
-				ParentID:     braintrust.F("_parent_id"),
-			}}),
+			InsertDatasetEventRequest: shared.InsertDatasetEventRequestParam{
+				Events: braintrust.F([]shared.InsertDatasetEventUnionParam{shared.InsertDatasetEventReplaceParam{
+					Input:    braintrust.F[any](map[string]interface{}{}),
+					Expected: braintrust.F[any](map[string]interface{}{}),
+					Metadata: braintrust.F(map[string]interface{}{
+						"foo": map[string]interface{}{},
+					}),
+					Tags:         braintrust.F([]string{"string", "string", "string"}),
+					ID:           braintrust.F("id"),
+					Created:      braintrust.F(time.Now()),
+					ObjectDelete: braintrust.F(true),
+					IsMerge:      braintrust.F(true),
+					ParentID:     braintrust.F("_parent_id"),
+				}, shared.InsertDatasetEventReplaceParam{
+					Input:    braintrust.F[any](map[string]interface{}{}),
+					Expected: braintrust.F[any](map[string]interface{}{}),
+					Metadata: braintrust.F(map[string]interface{}{
+						"foo": map[string]interface{}{},
+					}),
+					Tags:         braintrust.F([]string{"string", "string", "string"}),
+					ID:           braintrust.F("id"),
+					Created:      braintrust.F(time.Now()),
+					ObjectDelete: braintrust.F(true),
+					IsMerge:      braintrust.F(true),
+					ParentID:     braintrust.F("_parent_id"),
+				}, shared.InsertDatasetEventReplaceParam{
+					Input:    braintrust.F[any](map[string]interface{}{}),
+					Expected: braintrust.F[any](map[string]interface{}{}),
+					Metadata: braintrust.F(map[string]interface{}{
+						"foo": map[string]interface{}{},
+					}),
+					Tags:         braintrust.F([]string{"string", "string", "string"}),
+					ID:           braintrust.F("id"),
+					Created:      braintrust.F(time.Now()),
+					ObjectDelete: braintrust.F(true),
+					IsMerge:      braintrust.F(true),
+					ParentID:     braintrust.F("_parent_id"),
+				}}),
+			},
 		},
 	)
 	if err != nil {
