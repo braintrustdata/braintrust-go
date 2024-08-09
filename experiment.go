@@ -48,7 +48,7 @@ func (r *ExperimentService) New(ctx context.Context, body ExperimentNewParams, o
 }
 
 // Get an experiment object by its id
-func (r *ExperimentService) Get(ctx context.Context, experimentID shared.ExperimentIDParam, opts ...option.RequestOption) (res *shared.Experiment, err error) {
+func (r *ExperimentService) Get(ctx context.Context, experimentID string, opts ...option.RequestOption) (res *shared.Experiment, err error) {
 	opts = append(r.Options[:], opts...)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
@@ -62,7 +62,7 @@ func (r *ExperimentService) Get(ctx context.Context, experimentID shared.Experim
 // Partially update an experiment object. Specify the fields to update in the
 // payload. Any object-type fields will be deep-merged with existing content.
 // Currently we do not support removing fields or setting them to null.
-func (r *ExperimentService) Update(ctx context.Context, experimentID shared.ExperimentIDParam, body ExperimentUpdateParams, opts ...option.RequestOption) (res *shared.Experiment, err error) {
+func (r *ExperimentService) Update(ctx context.Context, experimentID string, body ExperimentUpdateParams, opts ...option.RequestOption) (res *shared.Experiment, err error) {
 	opts = append(r.Options[:], opts...)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
@@ -99,7 +99,7 @@ func (r *ExperimentService) ListAutoPaging(ctx context.Context, query Experiment
 }
 
 // Delete an experiment object by its id
-func (r *ExperimentService) Delete(ctx context.Context, experimentID shared.ExperimentIDParam, opts ...option.RequestOption) (res *shared.Experiment, err error) {
+func (r *ExperimentService) Delete(ctx context.Context, experimentID string, opts ...option.RequestOption) (res *shared.Experiment, err error) {
 	opts = append(r.Options[:], opts...)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
@@ -111,7 +111,7 @@ func (r *ExperimentService) Delete(ctx context.Context, experimentID shared.Expe
 }
 
 // Log feedback for a set of experiment events
-func (r *ExperimentService) Feedback(ctx context.Context, experimentID shared.ExperimentIDParam, body ExperimentFeedbackParams, opts ...option.RequestOption) (err error) {
+func (r *ExperimentService) Feedback(ctx context.Context, experimentID string, body ExperimentFeedbackParams, opts ...option.RequestOption) (err error) {
 	opts = append(r.Options[:], opts...)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "")}, opts...)
 	if experimentID == "" {
@@ -125,7 +125,7 @@ func (r *ExperimentService) Feedback(ctx context.Context, experimentID shared.Ex
 
 // Fetch the events in an experiment. Equivalent to the POST form of the same path,
 // but with the parameters in the URL query rather than in the request body
-func (r *ExperimentService) Fetch(ctx context.Context, experimentID shared.ExperimentIDParam, query ExperimentFetchParams, opts ...option.RequestOption) (res *shared.FetchExperimentEventsResponse, err error) {
+func (r *ExperimentService) Fetch(ctx context.Context, experimentID string, query ExperimentFetchParams, opts ...option.RequestOption) (res *shared.FetchExperimentEventsResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
@@ -138,7 +138,7 @@ func (r *ExperimentService) Fetch(ctx context.Context, experimentID shared.Exper
 
 // Fetch the events in an experiment. Equivalent to the GET form of the same path,
 // but with the parameters in the request body rather than in the URL query
-func (r *ExperimentService) FetchPost(ctx context.Context, experimentID shared.ExperimentIDParam, body ExperimentFetchPostParams, opts ...option.RequestOption) (res *shared.FetchExperimentEventsResponse, err error) {
+func (r *ExperimentService) FetchPost(ctx context.Context, experimentID string, body ExperimentFetchPostParams, opts ...option.RequestOption) (res *shared.FetchExperimentEventsResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
@@ -150,7 +150,7 @@ func (r *ExperimentService) FetchPost(ctx context.Context, experimentID shared.E
 }
 
 // Insert a set of events into the experiment
-func (r *ExperimentService) Insert(ctx context.Context, experimentID shared.ExperimentIDParam, body ExperimentInsertParams, opts ...option.RequestOption) (res *shared.InsertEventsResponse, err error) {
+func (r *ExperimentService) Insert(ctx context.Context, experimentID string, body ExperimentInsertParams, opts ...option.RequestOption) (res *shared.InsertEventsResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
@@ -162,7 +162,7 @@ func (r *ExperimentService) Insert(ctx context.Context, experimentID shared.Expe
 }
 
 // Summarize experiment
-func (r *ExperimentService) Summarize(ctx context.Context, experimentID shared.ExperimentIDParam, query ExperimentSummarizeParams, opts ...option.RequestOption) (res *shared.SummarizeExperimentResponse, err error) {
+func (r *ExperimentService) Summarize(ctx context.Context, experimentID string, query ExperimentSummarizeParams, opts ...option.RequestOption) (res *shared.SummarizeExperimentResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
@@ -195,26 +195,26 @@ type ExperimentListParams struct {
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
 	// Name of the experiment to search for
-	ExperimentName param.Field[shared.ExperimentNameParam] `query:"experiment_name"`
+	ExperimentName param.Field[string] `query:"experiment_name"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
+	IDs param.Field[ExperimentListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[shared.AppLimitParam] `query:"limit"`
+	Limit param.Field[int64] `query:"limit"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[shared.OrgNameParam] `query:"org_name"`
+	OrgName param.Field[string] `query:"org_name"`
 	// Project id
-	ProjectID param.Field[shared.ProjectIDQueryParam] `query:"project_id" format:"uuid"`
+	ProjectID param.Field[string] `query:"project_id" format:"uuid"`
 	// Name of the project to search for
-	ProjectName param.Field[shared.ProjectNameParam] `query:"project_name"`
+	ProjectName param.Field[string] `query:"project_name"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
 }
 
 // URLQuery serializes [ExperimentListParams]'s query parameters as `url.Values`.
@@ -224,6 +224,18 @@ func (r ExperimentListParams) URLQuery() (v url.Values) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter search results to a particular set of object IDs. To specify a list of
+// IDs, include the query param multiple times
+//
+// Satisfied by [shared.UnionString], [ExperimentListParamsIDsArray].
+type ExperimentListParamsIDsUnion interface {
+	ImplementsExperimentListParamsIDsUnion()
+}
+
+type ExperimentListParamsIDsArray []string
+
+func (r ExperimentListParamsIDsArray) ImplementsExperimentListParamsIDsUnion() {}
 
 type ExperimentFeedbackParams struct {
 	FeedbackExperimentEventRequest shared.FeedbackExperimentEventRequestParam `json:"feedback_experiment_event_request,required"`
@@ -248,7 +260,7 @@ type ExperimentFetchParams struct {
 	// The `limit` parameter controls the number of full traces to return. So you may
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
-	Limit param.Field[shared.FetchLimitParam] `query:"limit"`
+	Limit param.Field[int64] `query:"limit"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -259,7 +271,7 @@ type ExperimentFetchParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxRootSpanID param.Field[shared.MaxRootSpanIDParam] `query:"max_root_span_id"`
+	MaxRootSpanID param.Field[string] `query:"max_root_span_id"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -270,13 +282,13 @@ type ExperimentFetchParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxXactID param.Field[shared.MaxXactIDParam] `query:"max_xact_id"`
+	MaxXactID param.Field[string] `query:"max_xact_id"`
 	// Retrieve a snapshot of events from a past time
 	//
 	// The version id is essentially a filter on the latest event transaction id. You
 	// can use the `max_xact_id` returned by a past fetch as the version to reproduce
 	// that exact fetch.
-	Version param.Field[shared.VersionParam] `query:"version"`
+	Version param.Field[string] `query:"version"`
 }
 
 // URLQuery serializes [ExperimentFetchParams]'s query parameters as `url.Values`.
@@ -308,10 +320,10 @@ type ExperimentSummarizeParams struct {
 	// omitted, will fall back to the `base_exp_id` stored in the experiment metadata,
 	// and then to the most recent experiment run in the same project. Must pass
 	// `summarize_scores=true` for this id to be used
-	ComparisonExperimentID param.Field[shared.ComparisonExperimentIDParam] `query:"comparison_experiment_id" format:"uuid"`
+	ComparisonExperimentID param.Field[string] `query:"comparison_experiment_id" format:"uuid"`
 	// Whether to summarize the scores and metrics. If false (or omitted), only the
 	// metadata will be returned.
-	SummarizeScores param.Field[shared.SummarizeScoresParam] `query:"summarize_scores"`
+	SummarizeScores param.Field[bool] `query:"summarize_scores"`
 }
 
 // URLQuery serializes [ExperimentSummarizeParams]'s query parameters as

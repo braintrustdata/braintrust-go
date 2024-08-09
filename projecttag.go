@@ -48,7 +48,7 @@ func (r *ProjectTagService) New(ctx context.Context, body ProjectTagNewParams, o
 }
 
 // Get a project_tag object by its id
-func (r *ProjectTagService) Get(ctx context.Context, projectTagID shared.ProjectTagIDParam, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
+func (r *ProjectTagService) Get(ctx context.Context, projectTagID string, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectTagID == "" {
 		err = errors.New("missing required project_tag_id parameter")
@@ -62,7 +62,7 @@ func (r *ProjectTagService) Get(ctx context.Context, projectTagID shared.Project
 // Partially update a project_tag object. Specify the fields to update in the
 // payload. Any object-type fields will be deep-merged with existing content.
 // Currently we do not support removing fields or setting them to null.
-func (r *ProjectTagService) Update(ctx context.Context, projectTagID shared.ProjectTagIDParam, body ProjectTagUpdateParams, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
+func (r *ProjectTagService) Update(ctx context.Context, projectTagID string, body ProjectTagUpdateParams, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectTagID == "" {
 		err = errors.New("missing required project_tag_id parameter")
@@ -99,7 +99,7 @@ func (r *ProjectTagService) ListAutoPaging(ctx context.Context, query ProjectTag
 }
 
 // Delete a project_tag object by its id
-func (r *ProjectTagService) Delete(ctx context.Context, projectTagID shared.ProjectTagIDParam, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
+func (r *ProjectTagService) Delete(ctx context.Context, projectTagID string, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectTagID == "" {
 		err = errors.New("missing required project_tag_id parameter")
@@ -142,26 +142,26 @@ type ProjectTagListParams struct {
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
+	IDs param.Field[ProjectTagListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[shared.AppLimitParam] `query:"limit"`
+	Limit param.Field[int64] `query:"limit"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[shared.OrgNameParam] `query:"org_name"`
+	OrgName param.Field[string] `query:"org_name"`
 	// Project id
-	ProjectID param.Field[shared.ProjectIDQueryParam] `query:"project_id" format:"uuid"`
+	ProjectID param.Field[string] `query:"project_id" format:"uuid"`
 	// Name of the project to search for
-	ProjectName param.Field[shared.ProjectNameParam] `query:"project_name"`
+	ProjectName param.Field[string] `query:"project_name"`
 	// Name of the project_tag to search for
-	ProjectTagName param.Field[shared.ProjectTagNameParam] `query:"project_tag_name"`
+	ProjectTagName param.Field[string] `query:"project_tag_name"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
 }
 
 // URLQuery serializes [ProjectTagListParams]'s query parameters as `url.Values`.
@@ -171,6 +171,18 @@ func (r ProjectTagListParams) URLQuery() (v url.Values) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter search results to a particular set of object IDs. To specify a list of
+// IDs, include the query param multiple times
+//
+// Satisfied by [shared.UnionString], [ProjectTagListParamsIDsArray].
+type ProjectTagListParamsIDsUnion interface {
+	ImplementsProjectTagListParamsIDsUnion()
+}
+
+type ProjectTagListParamsIDsArray []string
+
+func (r ProjectTagListParamsIDsArray) ImplementsProjectTagListParamsIDsUnion() {}
 
 type ProjectTagReplaceParams struct {
 	CreateProjectTag shared.CreateProjectTagParam `json:"create_project_tag,required"`

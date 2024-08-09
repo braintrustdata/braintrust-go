@@ -173,7 +173,7 @@ func TestProjectLogInsert(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectLogInsertParams{
 			InsertProjectLogsEventRequest: shared.InsertProjectLogsEventRequestParam{
-				Events: braintrust.F([]shared.InsertProjectLogsEventUnionParam{shared.InsertProjectLogsEventReplaceParam{
+				Events: braintrust.F([]shared.InsertProjectLogsEventRequestEventsUnionParam{shared.InsertProjectLogsEventReplaceParam{
 					Input:    braintrust.F[any](map[string]interface{}{}),
 					Output:   braintrust.F[any](map[string]interface{}{}),
 					Expected: braintrust.F[any](map[string]interface{}{}),

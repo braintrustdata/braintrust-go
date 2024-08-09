@@ -49,7 +49,7 @@ func (r *ProjectService) New(ctx context.Context, body ProjectNewParams, opts ..
 }
 
 // Get a project object by its id
-func (r *ProjectService) Get(ctx context.Context, projectID shared.ProjectIDParam, opts ...option.RequestOption) (res *shared.Project, err error) {
+func (r *ProjectService) Get(ctx context.Context, projectID string, opts ...option.RequestOption) (res *shared.Project, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
@@ -63,7 +63,7 @@ func (r *ProjectService) Get(ctx context.Context, projectID shared.ProjectIDPara
 // Partially update a project object. Specify the fields to update in the payload.
 // Any object-type fields will be deep-merged with existing content. Currently we
 // do not support removing fields or setting them to null.
-func (r *ProjectService) Update(ctx context.Context, projectID shared.ProjectIDParam, body ProjectUpdateParams, opts ...option.RequestOption) (res *shared.Project, err error) {
+func (r *ProjectService) Update(ctx context.Context, projectID string, body ProjectUpdateParams, opts ...option.RequestOption) (res *shared.Project, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
@@ -100,7 +100,7 @@ func (r *ProjectService) ListAutoPaging(ctx context.Context, query ProjectListPa
 }
 
 // Delete a project object by its id
-func (r *ProjectService) Delete(ctx context.Context, projectID shared.ProjectIDParam, opts ...option.RequestOption) (res *shared.Project, err error) {
+func (r *ProjectService) Delete(ctx context.Context, projectID string, opts ...option.RequestOption) (res *shared.Project, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
@@ -133,22 +133,22 @@ type ProjectListParams struct {
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
+	IDs param.Field[ProjectListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[shared.AppLimitParam] `query:"limit"`
+	Limit param.Field[int64] `query:"limit"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[shared.OrgNameParam] `query:"org_name"`
+	OrgName param.Field[string] `query:"org_name"`
 	// Name of the project to search for
-	ProjectName param.Field[shared.ProjectNameParam] `query:"project_name"`
+	ProjectName param.Field[string] `query:"project_name"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
 }
 
 // URLQuery serializes [ProjectListParams]'s query parameters as `url.Values`.
@@ -158,3 +158,15 @@ func (r ProjectListParams) URLQuery() (v url.Values) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter search results to a particular set of object IDs. To specify a list of
+// IDs, include the query param multiple times
+//
+// Satisfied by [shared.UnionString], [ProjectListParamsIDsArray].
+type ProjectListParamsIDsUnion interface {
+	ImplementsProjectListParamsIDsUnion()
+}
+
+type ProjectListParamsIDsArray []string
+
+func (r ProjectListParamsIDsArray) ImplementsProjectListParamsIDsUnion() {}

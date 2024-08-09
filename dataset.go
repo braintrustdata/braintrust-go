@@ -48,7 +48,7 @@ func (r *DatasetService) New(ctx context.Context, body DatasetNewParams, opts ..
 }
 
 // Get a dataset object by its id
-func (r *DatasetService) Get(ctx context.Context, datasetID shared.DatasetIDParam, opts ...option.RequestOption) (res *shared.Dataset, err error) {
+func (r *DatasetService) Get(ctx context.Context, datasetID string, opts ...option.RequestOption) (res *shared.Dataset, err error) {
 	opts = append(r.Options[:], opts...)
 	if datasetID == "" {
 		err = errors.New("missing required dataset_id parameter")
@@ -62,7 +62,7 @@ func (r *DatasetService) Get(ctx context.Context, datasetID shared.DatasetIDPara
 // Partially update a dataset object. Specify the fields to update in the payload.
 // Any object-type fields will be deep-merged with existing content. Currently we
 // do not support removing fields or setting them to null.
-func (r *DatasetService) Update(ctx context.Context, datasetID shared.DatasetIDParam, body DatasetUpdateParams, opts ...option.RequestOption) (res *shared.Dataset, err error) {
+func (r *DatasetService) Update(ctx context.Context, datasetID string, body DatasetUpdateParams, opts ...option.RequestOption) (res *shared.Dataset, err error) {
 	opts = append(r.Options[:], opts...)
 	if datasetID == "" {
 		err = errors.New("missing required dataset_id parameter")
@@ -99,7 +99,7 @@ func (r *DatasetService) ListAutoPaging(ctx context.Context, query DatasetListPa
 }
 
 // Delete a dataset object by its id
-func (r *DatasetService) Delete(ctx context.Context, datasetID shared.DatasetIDParam, opts ...option.RequestOption) (res *shared.Dataset, err error) {
+func (r *DatasetService) Delete(ctx context.Context, datasetID string, opts ...option.RequestOption) (res *shared.Dataset, err error) {
 	opts = append(r.Options[:], opts...)
 	if datasetID == "" {
 		err = errors.New("missing required dataset_id parameter")
@@ -111,7 +111,7 @@ func (r *DatasetService) Delete(ctx context.Context, datasetID shared.DatasetIDP
 }
 
 // Log feedback for a set of dataset events
-func (r *DatasetService) Feedback(ctx context.Context, datasetID shared.DatasetIDParam, body DatasetFeedbackParams, opts ...option.RequestOption) (err error) {
+func (r *DatasetService) Feedback(ctx context.Context, datasetID string, body DatasetFeedbackParams, opts ...option.RequestOption) (err error) {
 	opts = append(r.Options[:], opts...)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "")}, opts...)
 	if datasetID == "" {
@@ -125,7 +125,7 @@ func (r *DatasetService) Feedback(ctx context.Context, datasetID shared.DatasetI
 
 // Fetch the events in a dataset. Equivalent to the POST form of the same path, but
 // with the parameters in the URL query rather than in the request body
-func (r *DatasetService) Fetch(ctx context.Context, datasetID shared.DatasetIDParam, query DatasetFetchParams, opts ...option.RequestOption) (res *shared.FetchDatasetEventsResponse, err error) {
+func (r *DatasetService) Fetch(ctx context.Context, datasetID string, query DatasetFetchParams, opts ...option.RequestOption) (res *shared.FetchDatasetEventsResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if datasetID == "" {
 		err = errors.New("missing required dataset_id parameter")
@@ -138,7 +138,7 @@ func (r *DatasetService) Fetch(ctx context.Context, datasetID shared.DatasetIDPa
 
 // Fetch the events in a dataset. Equivalent to the GET form of the same path, but
 // with the parameters in the request body rather than in the URL query
-func (r *DatasetService) FetchPost(ctx context.Context, datasetID shared.DatasetIDParam, body DatasetFetchPostParams, opts ...option.RequestOption) (res *shared.FetchDatasetEventsResponse, err error) {
+func (r *DatasetService) FetchPost(ctx context.Context, datasetID string, body DatasetFetchPostParams, opts ...option.RequestOption) (res *shared.FetchDatasetEventsResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if datasetID == "" {
 		err = errors.New("missing required dataset_id parameter")
@@ -150,7 +150,7 @@ func (r *DatasetService) FetchPost(ctx context.Context, datasetID shared.Dataset
 }
 
 // Insert a set of events into the dataset
-func (r *DatasetService) Insert(ctx context.Context, datasetID shared.DatasetIDParam, body DatasetInsertParams, opts ...option.RequestOption) (res *shared.InsertEventsResponse, err error) {
+func (r *DatasetService) Insert(ctx context.Context, datasetID string, body DatasetInsertParams, opts ...option.RequestOption) (res *shared.InsertEventsResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if datasetID == "" {
 		err = errors.New("missing required dataset_id parameter")
@@ -162,7 +162,7 @@ func (r *DatasetService) Insert(ctx context.Context, datasetID shared.DatasetIDP
 }
 
 // Summarize dataset
-func (r *DatasetService) Summarize(ctx context.Context, datasetID shared.DatasetIDParam, query DatasetSummarizeParams, opts ...option.RequestOption) (res *shared.SummarizeDatasetResponse, err error) {
+func (r *DatasetService) Summarize(ctx context.Context, datasetID string, query DatasetSummarizeParams, opts ...option.RequestOption) (res *shared.SummarizeDatasetResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if datasetID == "" {
 		err = errors.New("missing required dataset_id parameter")
@@ -191,30 +191,30 @@ func (r DatasetUpdateParams) MarshalJSON() (data []byte, err error) {
 
 type DatasetListParams struct {
 	// Name of the dataset to search for
-	DatasetName param.Field[shared.DatasetNameParam] `query:"dataset_name"`
+	DatasetName param.Field[string] `query:"dataset_name"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
+	IDs param.Field[DatasetListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[shared.AppLimitParam] `query:"limit"`
+	Limit param.Field[int64] `query:"limit"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[shared.OrgNameParam] `query:"org_name"`
+	OrgName param.Field[string] `query:"org_name"`
 	// Project id
-	ProjectID param.Field[shared.ProjectIDQueryParam] `query:"project_id" format:"uuid"`
+	ProjectID param.Field[string] `query:"project_id" format:"uuid"`
 	// Name of the project to search for
-	ProjectName param.Field[shared.ProjectNameParam] `query:"project_name"`
+	ProjectName param.Field[string] `query:"project_name"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
 }
 
 // URLQuery serializes [DatasetListParams]'s query parameters as `url.Values`.
@@ -224,6 +224,18 @@ func (r DatasetListParams) URLQuery() (v url.Values) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter search results to a particular set of object IDs. To specify a list of
+// IDs, include the query param multiple times
+//
+// Satisfied by [shared.UnionString], [DatasetListParamsIDsArray].
+type DatasetListParamsIDsUnion interface {
+	ImplementsDatasetListParamsIDsUnion()
+}
+
+type DatasetListParamsIDsArray []string
+
+func (r DatasetListParamsIDsArray) ImplementsDatasetListParamsIDsUnion() {}
 
 type DatasetFeedbackParams struct {
 	FeedbackDatasetEventRequest shared.FeedbackDatasetEventRequestParam `json:"feedback_dataset_event_request,required"`
@@ -248,7 +260,7 @@ type DatasetFetchParams struct {
 	// The `limit` parameter controls the number of full traces to return. So you may
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
-	Limit param.Field[shared.FetchLimitParam] `query:"limit"`
+	Limit param.Field[int64] `query:"limit"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -259,7 +271,7 @@ type DatasetFetchParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxRootSpanID param.Field[shared.MaxRootSpanIDParam] `query:"max_root_span_id"`
+	MaxRootSpanID param.Field[string] `query:"max_root_span_id"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -270,13 +282,13 @@ type DatasetFetchParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxXactID param.Field[shared.MaxXactIDParam] `query:"max_xact_id"`
+	MaxXactID param.Field[string] `query:"max_xact_id"`
 	// Retrieve a snapshot of events from a past time
 	//
 	// The version id is essentially a filter on the latest event transaction id. You
 	// can use the `max_xact_id` returned by a past fetch as the version to reproduce
 	// that exact fetch.
-	Version param.Field[shared.VersionParam] `query:"version"`
+	Version param.Field[string] `query:"version"`
 }
 
 // URLQuery serializes [DatasetFetchParams]'s query parameters as `url.Values`.
@@ -306,7 +318,7 @@ func (r DatasetInsertParams) MarshalJSON() (data []byte, err error) {
 type DatasetSummarizeParams struct {
 	// Whether to summarize the data. If false (or omitted), only the metadata will be
 	// returned.
-	SummarizeData param.Field[shared.SummarizeDataParam] `query:"summarize_data"`
+	SummarizeData param.Field[bool] `query:"summarize_data"`
 }
 
 // URLQuery serializes [DatasetSummarizeParams]'s query parameters as `url.Values`.

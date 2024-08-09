@@ -47,7 +47,7 @@ func (r *GroupService) New(ctx context.Context, body GroupNewParams, opts ...opt
 }
 
 // Get a group object by its id
-func (r *GroupService) Get(ctx context.Context, groupID shared.GroupIDParam, opts ...option.RequestOption) (res *shared.Group, err error) {
+func (r *GroupService) Get(ctx context.Context, groupID string, opts ...option.RequestOption) (res *shared.Group, err error) {
 	opts = append(r.Options[:], opts...)
 	if groupID == "" {
 		err = errors.New("missing required group_id parameter")
@@ -61,7 +61,7 @@ func (r *GroupService) Get(ctx context.Context, groupID shared.GroupIDParam, opt
 // Partially update a group object. Specify the fields to update in the payload.
 // Any object-type fields will be deep-merged with existing content. Currently we
 // do not support removing fields or setting them to null.
-func (r *GroupService) Update(ctx context.Context, groupID shared.GroupIDParam, body GroupUpdateParams, opts ...option.RequestOption) (res *shared.Group, err error) {
+func (r *GroupService) Update(ctx context.Context, groupID string, body GroupUpdateParams, opts ...option.RequestOption) (res *shared.Group, err error) {
 	opts = append(r.Options[:], opts...)
 	if groupID == "" {
 		err = errors.New("missing required group_id parameter")
@@ -98,7 +98,7 @@ func (r *GroupService) ListAutoPaging(ctx context.Context, query GroupListParams
 }
 
 // Delete a group object by its id
-func (r *GroupService) Delete(ctx context.Context, groupID shared.GroupIDParam, opts ...option.RequestOption) (res *shared.Group, err error) {
+func (r *GroupService) Delete(ctx context.Context, groupID string, opts ...option.RequestOption) (res *shared.Group, err error) {
 	opts = append(r.Options[:], opts...)
 	if groupID == "" {
 		err = errors.New("missing required group_id parameter")
@@ -141,22 +141,22 @@ type GroupListParams struct {
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
 	// Name of the group to search for
-	GroupName param.Field[shared.GroupNameParam] `query:"group_name"`
+	GroupName param.Field[string] `query:"group_name"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
+	IDs param.Field[GroupListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[shared.AppLimitParam] `query:"limit"`
+	Limit param.Field[int64] `query:"limit"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[shared.OrgNameParam] `query:"org_name"`
+	OrgName param.Field[string] `query:"org_name"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
 }
 
 // URLQuery serializes [GroupListParams]'s query parameters as `url.Values`.
@@ -166,6 +166,18 @@ func (r GroupListParams) URLQuery() (v url.Values) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter search results to a particular set of object IDs. To specify a list of
+// IDs, include the query param multiple times
+//
+// Satisfied by [shared.UnionString], [GroupListParamsIDsArray].
+type GroupListParamsIDsUnion interface {
+	ImplementsGroupListParamsIDsUnion()
+}
+
+type GroupListParamsIDsArray []string
+
+func (r GroupListParamsIDsArray) ImplementsGroupListParamsIDsUnion() {}
 
 type GroupReplaceParams struct {
 	CreateGroup shared.CreateGroupParam `json:"create_group,required"`

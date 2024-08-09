@@ -37,7 +37,7 @@ func NewUserService(opts ...option.RequestOption) (r *UserService) {
 }
 
 // Get a user object by its id
-func (r *UserService) Get(ctx context.Context, userID shared.UserIDParam, opts ...option.RequestOption) (res *shared.User, err error) {
+func (r *UserService) Get(ctx context.Context, userID string, opts ...option.RequestOption) (res *shared.User, err error) {
 	opts = append(r.Options[:], opts...)
 	if userID == "" {
 		err = errors.New("missing required user_id parameter")
@@ -76,32 +76,32 @@ func (r *UserService) ListAutoPaging(ctx context.Context, query UserListParams, 
 type UserListParams struct {
 	// Email of the user to search for. You may pass the param multiple times to filter
 	// for more than one email
-	Email param.Field[shared.UserEmailUnionParam] `query:"email"`
+	Email param.Field[UserListParamsEmailUnion] `query:"email"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
 	// Family name of the user to search for. You may pass the param multiple times to
 	// filter for more than one family name
-	FamilyName param.Field[shared.UserFamilyNameUnionParam] `query:"family_name"`
+	FamilyName param.Field[UserListParamsFamilyNameUnion] `query:"family_name"`
 	// Given name of the user to search for. You may pass the param multiple times to
 	// filter for more than one given name
-	GivenName param.Field[shared.UserGivenNameUnionParam] `query:"given_name"`
+	GivenName param.Field[UserListParamsGivenNameUnion] `query:"given_name"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
+	IDs param.Field[UserListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[shared.AppLimitParam] `query:"limit"`
+	Limit param.Field[int64] `query:"limit"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[shared.OrgNameParam] `query:"org_name"`
+	OrgName param.Field[string] `query:"org_name"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
 }
 
 // URLQuery serializes [UserListParams]'s query parameters as `url.Values`.
@@ -111,3 +111,51 @@ func (r UserListParams) URLQuery() (v url.Values) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Email of the user to search for. You may pass the param multiple times to filter
+// for more than one email
+//
+// Satisfied by [shared.UnionString], [UserListParamsEmailArray].
+type UserListParamsEmailUnion interface {
+	ImplementsUserListParamsEmailUnion()
+}
+
+type UserListParamsEmailArray []string
+
+func (r UserListParamsEmailArray) ImplementsUserListParamsEmailUnion() {}
+
+// Family name of the user to search for. You may pass the param multiple times to
+// filter for more than one family name
+//
+// Satisfied by [shared.UnionString], [UserListParamsFamilyNameArray].
+type UserListParamsFamilyNameUnion interface {
+	ImplementsUserListParamsFamilyNameUnion()
+}
+
+type UserListParamsFamilyNameArray []string
+
+func (r UserListParamsFamilyNameArray) ImplementsUserListParamsFamilyNameUnion() {}
+
+// Given name of the user to search for. You may pass the param multiple times to
+// filter for more than one given name
+//
+// Satisfied by [shared.UnionString], [UserListParamsGivenNameArray].
+type UserListParamsGivenNameUnion interface {
+	ImplementsUserListParamsGivenNameUnion()
+}
+
+type UserListParamsGivenNameArray []string
+
+func (r UserListParamsGivenNameArray) ImplementsUserListParamsGivenNameUnion() {}
+
+// Filter search results to a particular set of object IDs. To specify a list of
+// IDs, include the query param multiple times
+//
+// Satisfied by [shared.UnionString], [UserListParamsIDsArray].
+type UserListParamsIDsUnion interface {
+	ImplementsUserListParamsIDsUnion()
+}
+
+type UserListParamsIDsArray []string
+
+func (r UserListParamsIDsArray) ImplementsUserListParamsIDsUnion() {}
