@@ -31,42 +31,40 @@ func TestProjectLogFeedback(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectLogFeedbackParams{
-			FeedbackProjectLogsEventRequest: shared.FeedbackProjectLogsEventRequestParam{
-				Feedback: braintrust.F([]shared.FeedbackProjectLogsItemParam{{
-					ID: braintrust.F("id"),
-					Scores: braintrust.F(map[string]float64{
-						"foo": 0.000000,
-					}),
-					Expected: braintrust.F[any](map[string]interface{}{}),
-					Comment:  braintrust.F("comment"),
-					Metadata: braintrust.F(map[string]interface{}{
-						"foo": map[string]interface{}{},
-					}),
-					Source: braintrust.F(shared.FeedbackProjectLogsItemSourceApp),
-				}, {
-					ID: braintrust.F("id"),
-					Scores: braintrust.F(map[string]float64{
-						"foo": 0.000000,
-					}),
-					Expected: braintrust.F[any](map[string]interface{}{}),
-					Comment:  braintrust.F("comment"),
-					Metadata: braintrust.F(map[string]interface{}{
-						"foo": map[string]interface{}{},
-					}),
-					Source: braintrust.F(shared.FeedbackProjectLogsItemSourceApp),
-				}, {
-					ID: braintrust.F("id"),
-					Scores: braintrust.F(map[string]float64{
-						"foo": 0.000000,
-					}),
-					Expected: braintrust.F[any](map[string]interface{}{}),
-					Comment:  braintrust.F("comment"),
-					Metadata: braintrust.F(map[string]interface{}{
-						"foo": map[string]interface{}{},
-					}),
-					Source: braintrust.F(shared.FeedbackProjectLogsItemSourceApp),
-				}}),
-			},
+			Feedback: braintrust.F([]shared.FeedbackProjectLogsItemParam{{
+				ID: braintrust.F("id"),
+				Scores: braintrust.F(map[string]float64{
+					"foo": 0.000000,
+				}),
+				Expected: braintrust.F[any](map[string]interface{}{}),
+				Comment:  braintrust.F("comment"),
+				Metadata: braintrust.F(map[string]interface{}{
+					"foo": map[string]interface{}{},
+				}),
+				Source: braintrust.F(shared.FeedbackProjectLogsItemSourceApp),
+			}, {
+				ID: braintrust.F("id"),
+				Scores: braintrust.F(map[string]float64{
+					"foo": 0.000000,
+				}),
+				Expected: braintrust.F[any](map[string]interface{}{}),
+				Comment:  braintrust.F("comment"),
+				Metadata: braintrust.F(map[string]interface{}{
+					"foo": map[string]interface{}{},
+				}),
+				Source: braintrust.F(shared.FeedbackProjectLogsItemSourceApp),
+			}, {
+				ID: braintrust.F("id"),
+				Scores: braintrust.F(map[string]float64{
+					"foo": 0.000000,
+				}),
+				Expected: braintrust.F[any](map[string]interface{}{}),
+				Comment:  braintrust.F("comment"),
+				Metadata: braintrust.F(map[string]interface{}{
+					"foo": map[string]interface{}{},
+				}),
+				Source: braintrust.F(shared.FeedbackProjectLogsItemSourceApp),
+			}}),
 		},
 	)
 	if err != nil {
@@ -125,26 +123,24 @@ func TestProjectLogFetchPostWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectLogFetchPostParams{
-			FetchEventsRequest: shared.FetchEventsRequestParam{
-				Limit:         braintrust.F(int64(0)),
-				Cursor:        braintrust.F("cursor"),
-				MaxXactID:     braintrust.F("max_xact_id"),
-				MaxRootSpanID: braintrust.F("max_root_span_id"),
-				Filters: braintrust.F([]shared.PathLookupFilterParam{{
-					Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
-					Path:  braintrust.F([]string{"string", "string", "string"}),
-					Value: braintrust.F[any](map[string]interface{}{}),
-				}, {
-					Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
-					Path:  braintrust.F([]string{"string", "string", "string"}),
-					Value: braintrust.F[any](map[string]interface{}{}),
-				}, {
-					Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
-					Path:  braintrust.F([]string{"string", "string", "string"}),
-					Value: braintrust.F[any](map[string]interface{}{}),
-				}}),
-				Version: braintrust.F("version"),
-			},
+			Cursor: braintrust.F("cursor"),
+			Filters: braintrust.F([]shared.PathLookupFilterParam{{
+				Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
+				Path:  braintrust.F([]string{"string", "string", "string"}),
+				Value: braintrust.F[any](map[string]interface{}{}),
+			}, {
+				Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
+				Path:  braintrust.F([]string{"string", "string", "string"}),
+				Value: braintrust.F[any](map[string]interface{}{}),
+			}, {
+				Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
+				Path:  braintrust.F([]string{"string", "string", "string"}),
+				Value: braintrust.F[any](map[string]interface{}{}),
+			}}),
+			Limit:         braintrust.F(int64(0)),
+			MaxRootSpanID: braintrust.F("max_root_span_id"),
+			MaxXactID:     braintrust.F("max_xact_id"),
+			Version:       braintrust.F("version"),
 		},
 	)
 	if err != nil {
@@ -172,108 +168,106 @@ func TestProjectLogInsert(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectLogInsertParams{
-			InsertProjectLogsEventRequest: shared.InsertProjectLogsEventRequestParam{
-				Events: braintrust.F([]shared.InsertProjectLogsEventRequestEventsUnionParam{shared.InsertProjectLogsEventReplaceParam{
-					Input:    braintrust.F[any](map[string]interface{}{}),
-					Output:   braintrust.F[any](map[string]interface{}{}),
-					Expected: braintrust.F[any](map[string]interface{}{}),
-					Error:    braintrust.F[any](map[string]interface{}{}),
-					Scores: braintrust.F(map[string]float64{
-						"foo": 0.000000,
-					}),
-					Metadata: braintrust.F(map[string]interface{}{
-						"foo": map[string]interface{}{},
-					}),
-					Tags: braintrust.F([]string{"string", "string", "string"}),
-					Metrics: braintrust.F(shared.InsertProjectLogsEventReplaceMetricsParam{
-						Start:            braintrust.F(0.000000),
-						End:              braintrust.F(0.000000),
-						PromptTokens:     braintrust.F(int64(0)),
-						CompletionTokens: braintrust.F(int64(0)),
-						Tokens:           braintrust.F(int64(0)),
-					}),
-					Context: braintrust.F(shared.InsertProjectLogsEventReplaceContextParam{
-						CallerFunctionname: braintrust.F("caller_functionname"),
-						CallerFilename:     braintrust.F("caller_filename"),
-						CallerLineno:       braintrust.F(int64(0)),
-					}),
-					SpanAttributes: braintrust.F(shared.InsertProjectLogsEventReplaceSpanAttributesParam{
-						Name: braintrust.F("name"),
-						Type: braintrust.F(shared.InsertProjectLogsEventReplaceSpanAttributesTypeLlm),
-					}),
-					ID:           braintrust.F("id"),
-					Created:      braintrust.F(time.Now()),
-					ObjectDelete: braintrust.F(true),
-					IsMerge:      braintrust.F(true),
-					ParentID:     braintrust.F("_parent_id"),
-				}, shared.InsertProjectLogsEventReplaceParam{
-					Input:    braintrust.F[any](map[string]interface{}{}),
-					Output:   braintrust.F[any](map[string]interface{}{}),
-					Expected: braintrust.F[any](map[string]interface{}{}),
-					Error:    braintrust.F[any](map[string]interface{}{}),
-					Scores: braintrust.F(map[string]float64{
-						"foo": 0.000000,
-					}),
-					Metadata: braintrust.F(map[string]interface{}{
-						"foo": map[string]interface{}{},
-					}),
-					Tags: braintrust.F([]string{"string", "string", "string"}),
-					Metrics: braintrust.F(shared.InsertProjectLogsEventReplaceMetricsParam{
-						Start:            braintrust.F(0.000000),
-						End:              braintrust.F(0.000000),
-						PromptTokens:     braintrust.F(int64(0)),
-						CompletionTokens: braintrust.F(int64(0)),
-						Tokens:           braintrust.F(int64(0)),
-					}),
-					Context: braintrust.F(shared.InsertProjectLogsEventReplaceContextParam{
-						CallerFunctionname: braintrust.F("caller_functionname"),
-						CallerFilename:     braintrust.F("caller_filename"),
-						CallerLineno:       braintrust.F(int64(0)),
-					}),
-					SpanAttributes: braintrust.F(shared.InsertProjectLogsEventReplaceSpanAttributesParam{
-						Name: braintrust.F("name"),
-						Type: braintrust.F(shared.InsertProjectLogsEventReplaceSpanAttributesTypeLlm),
-					}),
-					ID:           braintrust.F("id"),
-					Created:      braintrust.F(time.Now()),
-					ObjectDelete: braintrust.F(true),
-					IsMerge:      braintrust.F(true),
-					ParentID:     braintrust.F("_parent_id"),
-				}, shared.InsertProjectLogsEventReplaceParam{
-					Input:    braintrust.F[any](map[string]interface{}{}),
-					Output:   braintrust.F[any](map[string]interface{}{}),
-					Expected: braintrust.F[any](map[string]interface{}{}),
-					Error:    braintrust.F[any](map[string]interface{}{}),
-					Scores: braintrust.F(map[string]float64{
-						"foo": 0.000000,
-					}),
-					Metadata: braintrust.F(map[string]interface{}{
-						"foo": map[string]interface{}{},
-					}),
-					Tags: braintrust.F([]string{"string", "string", "string"}),
-					Metrics: braintrust.F(shared.InsertProjectLogsEventReplaceMetricsParam{
-						Start:            braintrust.F(0.000000),
-						End:              braintrust.F(0.000000),
-						PromptTokens:     braintrust.F(int64(0)),
-						CompletionTokens: braintrust.F(int64(0)),
-						Tokens:           braintrust.F(int64(0)),
-					}),
-					Context: braintrust.F(shared.InsertProjectLogsEventReplaceContextParam{
-						CallerFunctionname: braintrust.F("caller_functionname"),
-						CallerFilename:     braintrust.F("caller_filename"),
-						CallerLineno:       braintrust.F(int64(0)),
-					}),
-					SpanAttributes: braintrust.F(shared.InsertProjectLogsEventReplaceSpanAttributesParam{
-						Name: braintrust.F("name"),
-						Type: braintrust.F(shared.InsertProjectLogsEventReplaceSpanAttributesTypeLlm),
-					}),
-					ID:           braintrust.F("id"),
-					Created:      braintrust.F(time.Now()),
-					ObjectDelete: braintrust.F(true),
-					IsMerge:      braintrust.F(true),
-					ParentID:     braintrust.F("_parent_id"),
-				}}),
-			},
+			Events: braintrust.F([]braintrust.ProjectLogInsertParamsEventUnion{shared.InsertProjectLogsEventReplaceParam{
+				Input:    braintrust.F[any](map[string]interface{}{}),
+				Output:   braintrust.F[any](map[string]interface{}{}),
+				Expected: braintrust.F[any](map[string]interface{}{}),
+				Error:    braintrust.F[any](map[string]interface{}{}),
+				Scores: braintrust.F(map[string]float64{
+					"foo": 0.000000,
+				}),
+				Metadata: braintrust.F(map[string]interface{}{
+					"foo": map[string]interface{}{},
+				}),
+				Tags: braintrust.F([]string{"string", "string", "string"}),
+				Metrics: braintrust.F(shared.InsertProjectLogsEventReplaceMetricsParam{
+					Start:            braintrust.F(0.000000),
+					End:              braintrust.F(0.000000),
+					PromptTokens:     braintrust.F(int64(0)),
+					CompletionTokens: braintrust.F(int64(0)),
+					Tokens:           braintrust.F(int64(0)),
+				}),
+				Context: braintrust.F(shared.InsertProjectLogsEventReplaceContextParam{
+					CallerFunctionname: braintrust.F("caller_functionname"),
+					CallerFilename:     braintrust.F("caller_filename"),
+					CallerLineno:       braintrust.F(int64(0)),
+				}),
+				SpanAttributes: braintrust.F(shared.InsertProjectLogsEventReplaceSpanAttributesParam{
+					Name: braintrust.F("name"),
+					Type: braintrust.F(shared.InsertProjectLogsEventReplaceSpanAttributesTypeLlm),
+				}),
+				ID:           braintrust.F("id"),
+				Created:      braintrust.F(time.Now()),
+				ObjectDelete: braintrust.F(true),
+				IsMerge:      braintrust.F(true),
+				ParentID:     braintrust.F("_parent_id"),
+			}, shared.InsertProjectLogsEventReplaceParam{
+				Input:    braintrust.F[any](map[string]interface{}{}),
+				Output:   braintrust.F[any](map[string]interface{}{}),
+				Expected: braintrust.F[any](map[string]interface{}{}),
+				Error:    braintrust.F[any](map[string]interface{}{}),
+				Scores: braintrust.F(map[string]float64{
+					"foo": 0.000000,
+				}),
+				Metadata: braintrust.F(map[string]interface{}{
+					"foo": map[string]interface{}{},
+				}),
+				Tags: braintrust.F([]string{"string", "string", "string"}),
+				Metrics: braintrust.F(shared.InsertProjectLogsEventReplaceMetricsParam{
+					Start:            braintrust.F(0.000000),
+					End:              braintrust.F(0.000000),
+					PromptTokens:     braintrust.F(int64(0)),
+					CompletionTokens: braintrust.F(int64(0)),
+					Tokens:           braintrust.F(int64(0)),
+				}),
+				Context: braintrust.F(shared.InsertProjectLogsEventReplaceContextParam{
+					CallerFunctionname: braintrust.F("caller_functionname"),
+					CallerFilename:     braintrust.F("caller_filename"),
+					CallerLineno:       braintrust.F(int64(0)),
+				}),
+				SpanAttributes: braintrust.F(shared.InsertProjectLogsEventReplaceSpanAttributesParam{
+					Name: braintrust.F("name"),
+					Type: braintrust.F(shared.InsertProjectLogsEventReplaceSpanAttributesTypeLlm),
+				}),
+				ID:           braintrust.F("id"),
+				Created:      braintrust.F(time.Now()),
+				ObjectDelete: braintrust.F(true),
+				IsMerge:      braintrust.F(true),
+				ParentID:     braintrust.F("_parent_id"),
+			}, shared.InsertProjectLogsEventReplaceParam{
+				Input:    braintrust.F[any](map[string]interface{}{}),
+				Output:   braintrust.F[any](map[string]interface{}{}),
+				Expected: braintrust.F[any](map[string]interface{}{}),
+				Error:    braintrust.F[any](map[string]interface{}{}),
+				Scores: braintrust.F(map[string]float64{
+					"foo": 0.000000,
+				}),
+				Metadata: braintrust.F(map[string]interface{}{
+					"foo": map[string]interface{}{},
+				}),
+				Tags: braintrust.F([]string{"string", "string", "string"}),
+				Metrics: braintrust.F(shared.InsertProjectLogsEventReplaceMetricsParam{
+					Start:            braintrust.F(0.000000),
+					End:              braintrust.F(0.000000),
+					PromptTokens:     braintrust.F(int64(0)),
+					CompletionTokens: braintrust.F(int64(0)),
+					Tokens:           braintrust.F(int64(0)),
+				}),
+				Context: braintrust.F(shared.InsertProjectLogsEventReplaceContextParam{
+					CallerFunctionname: braintrust.F("caller_functionname"),
+					CallerFilename:     braintrust.F("caller_filename"),
+					CallerLineno:       braintrust.F(int64(0)),
+				}),
+				SpanAttributes: braintrust.F(shared.InsertProjectLogsEventReplaceSpanAttributesParam{
+					Name: braintrust.F("name"),
+					Type: braintrust.F(shared.InsertProjectLogsEventReplaceSpanAttributesTypeLlm),
+				}),
+				ID:           braintrust.F("id"),
+				Created:      braintrust.F(time.Now()),
+				ObjectDelete: braintrust.F(true),
+				IsMerge:      braintrust.F(true),
+				ParentID:     braintrust.F("_parent_id"),
+			}}),
 		},
 	)
 	if err != nil {

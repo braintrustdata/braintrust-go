@@ -121,19 +121,128 @@ func (r *ProjectScoreService) Replace(ctx context.Context, body ProjectScoreRepl
 }
 
 type ProjectScoreNewParams struct {
-	CreateProjectScore shared.CreateProjectScoreParam `json:"create_project_score,required"`
+	// Name of the project score
+	Name param.Field[string] `json:"name,required"`
+	// Unique identifier for the project that the project score belongs under
+	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	// The type of the configured score
+	ScoreType param.Field[ProjectScoreNewParamsScoreType] `json:"score_type,required"`
+	// For categorical-type project scores, the list of all categories
+	Categories param.Field[ProjectScoreNewParamsCategoriesUnion] `json:"categories"`
+	// Textual description of the project score
+	Description param.Field[string] `json:"description"`
 }
 
 func (r ProjectScoreNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.CreateProjectScore)
+	return apijson.MarshalRoot(r)
+}
+
+// The type of the configured score
+type ProjectScoreNewParamsScoreType string
+
+const (
+	ProjectScoreNewParamsScoreTypeSlider      ProjectScoreNewParamsScoreType = "slider"
+	ProjectScoreNewParamsScoreTypeCategorical ProjectScoreNewParamsScoreType = "categorical"
+	ProjectScoreNewParamsScoreTypeWeighted    ProjectScoreNewParamsScoreType = "weighted"
+	ProjectScoreNewParamsScoreTypeMinimum     ProjectScoreNewParamsScoreType = "minimum"
+)
+
+func (r ProjectScoreNewParamsScoreType) IsKnown() bool {
+	switch r {
+	case ProjectScoreNewParamsScoreTypeSlider, ProjectScoreNewParamsScoreTypeCategorical, ProjectScoreNewParamsScoreTypeWeighted, ProjectScoreNewParamsScoreTypeMinimum:
+		return true
+	}
+	return false
+}
+
+// For categorical-type project scores, the list of all categories
+//
+// Satisfied by [ProjectScoreNewParamsCategoriesCategorical],
+// [ProjectScoreNewParamsCategoriesMinimum],
+// [ProjectScoreNewParamsCategoriesNullableVariant].
+type ProjectScoreNewParamsCategoriesUnion interface {
+	implementsProjectScoreNewParamsCategoriesUnion()
+}
+
+type ProjectScoreNewParamsCategoriesCategorical []shared.ProjectScoreCategoryParam
+
+func (r ProjectScoreNewParamsCategoriesCategorical) implementsProjectScoreNewParamsCategoriesUnion() {
+}
+
+type ProjectScoreNewParamsCategoriesMinimum []string
+
+func (r ProjectScoreNewParamsCategoriesMinimum) implementsProjectScoreNewParamsCategoriesUnion() {}
+
+type ProjectScoreNewParamsCategoriesNullableVariant struct {
+}
+
+func (r ProjectScoreNewParamsCategoriesNullableVariant) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r ProjectScoreNewParamsCategoriesNullableVariant) implementsProjectScoreNewParamsCategoriesUnion() {
 }
 
 type ProjectScoreUpdateParams struct {
-	PatchProjectScore shared.PatchProjectScoreParam `json:"patch_project_score,required"`
+	// For categorical-type project scores, the list of all categories
+	Categories param.Field[ProjectScoreUpdateParamsCategoriesUnion] `json:"categories"`
+	// Textual description of the project score
+	Description param.Field[string] `json:"description"`
+	// Name of the project score
+	Name param.Field[string] `json:"name"`
+	// The type of the configured score
+	ScoreType param.Field[ProjectScoreUpdateParamsScoreType] `json:"score_type"`
 }
 
 func (r ProjectScoreUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.PatchProjectScore)
+	return apijson.MarshalRoot(r)
+}
+
+// For categorical-type project scores, the list of all categories
+//
+// Satisfied by [ProjectScoreUpdateParamsCategoriesCategorical],
+// [ProjectScoreUpdateParamsCategoriesMinimum],
+// [ProjectScoreUpdateParamsCategoriesNullableVariant].
+type ProjectScoreUpdateParamsCategoriesUnion interface {
+	implementsProjectScoreUpdateParamsCategoriesUnion()
+}
+
+type ProjectScoreUpdateParamsCategoriesCategorical []shared.ProjectScoreCategoryParam
+
+func (r ProjectScoreUpdateParamsCategoriesCategorical) implementsProjectScoreUpdateParamsCategoriesUnion() {
+}
+
+type ProjectScoreUpdateParamsCategoriesMinimum []string
+
+func (r ProjectScoreUpdateParamsCategoriesMinimum) implementsProjectScoreUpdateParamsCategoriesUnion() {
+}
+
+type ProjectScoreUpdateParamsCategoriesNullableVariant struct {
+}
+
+func (r ProjectScoreUpdateParamsCategoriesNullableVariant) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r ProjectScoreUpdateParamsCategoriesNullableVariant) implementsProjectScoreUpdateParamsCategoriesUnion() {
+}
+
+// The type of the configured score
+type ProjectScoreUpdateParamsScoreType string
+
+const (
+	ProjectScoreUpdateParamsScoreTypeSlider      ProjectScoreUpdateParamsScoreType = "slider"
+	ProjectScoreUpdateParamsScoreTypeCategorical ProjectScoreUpdateParamsScoreType = "categorical"
+	ProjectScoreUpdateParamsScoreTypeWeighted    ProjectScoreUpdateParamsScoreType = "weighted"
+	ProjectScoreUpdateParamsScoreTypeMinimum     ProjectScoreUpdateParamsScoreType = "minimum"
+)
+
+func (r ProjectScoreUpdateParamsScoreType) IsKnown() bool {
+	switch r {
+	case ProjectScoreUpdateParamsScoreTypeSlider, ProjectScoreUpdateParamsScoreTypeCategorical, ProjectScoreUpdateParamsScoreTypeWeighted, ProjectScoreUpdateParamsScoreTypeMinimum:
+		return true
+	}
+	return false
 }
 
 type ProjectScoreListParams struct {
@@ -185,9 +294,65 @@ type ProjectScoreListParamsIDsArray []string
 func (r ProjectScoreListParamsIDsArray) ImplementsProjectScoreListParamsIDsUnion() {}
 
 type ProjectScoreReplaceParams struct {
-	CreateProjectScore shared.CreateProjectScoreParam `json:"create_project_score,required"`
+	// Name of the project score
+	Name param.Field[string] `json:"name,required"`
+	// Unique identifier for the project that the project score belongs under
+	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	// The type of the configured score
+	ScoreType param.Field[ProjectScoreReplaceParamsScoreType] `json:"score_type,required"`
+	// For categorical-type project scores, the list of all categories
+	Categories param.Field[ProjectScoreReplaceParamsCategoriesUnion] `json:"categories"`
+	// Textual description of the project score
+	Description param.Field[string] `json:"description"`
 }
 
 func (r ProjectScoreReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.CreateProjectScore)
+	return apijson.MarshalRoot(r)
+}
+
+// The type of the configured score
+type ProjectScoreReplaceParamsScoreType string
+
+const (
+	ProjectScoreReplaceParamsScoreTypeSlider      ProjectScoreReplaceParamsScoreType = "slider"
+	ProjectScoreReplaceParamsScoreTypeCategorical ProjectScoreReplaceParamsScoreType = "categorical"
+	ProjectScoreReplaceParamsScoreTypeWeighted    ProjectScoreReplaceParamsScoreType = "weighted"
+	ProjectScoreReplaceParamsScoreTypeMinimum     ProjectScoreReplaceParamsScoreType = "minimum"
+)
+
+func (r ProjectScoreReplaceParamsScoreType) IsKnown() bool {
+	switch r {
+	case ProjectScoreReplaceParamsScoreTypeSlider, ProjectScoreReplaceParamsScoreTypeCategorical, ProjectScoreReplaceParamsScoreTypeWeighted, ProjectScoreReplaceParamsScoreTypeMinimum:
+		return true
+	}
+	return false
+}
+
+// For categorical-type project scores, the list of all categories
+//
+// Satisfied by [ProjectScoreReplaceParamsCategoriesCategorical],
+// [ProjectScoreReplaceParamsCategoriesMinimum],
+// [ProjectScoreReplaceParamsCategoriesNullableVariant].
+type ProjectScoreReplaceParamsCategoriesUnion interface {
+	implementsProjectScoreReplaceParamsCategoriesUnion()
+}
+
+type ProjectScoreReplaceParamsCategoriesCategorical []shared.ProjectScoreCategoryParam
+
+func (r ProjectScoreReplaceParamsCategoriesCategorical) implementsProjectScoreReplaceParamsCategoriesUnion() {
+}
+
+type ProjectScoreReplaceParamsCategoriesMinimum []string
+
+func (r ProjectScoreReplaceParamsCategoriesMinimum) implementsProjectScoreReplaceParamsCategoriesUnion() {
+}
+
+type ProjectScoreReplaceParamsCategoriesNullableVariant struct {
+}
+
+func (r ProjectScoreReplaceParamsCategoriesNullableVariant) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r ProjectScoreReplaceParamsCategoriesNullableVariant) implementsProjectScoreReplaceParamsCategoriesUnion() {
 }

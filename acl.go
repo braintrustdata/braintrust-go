@@ -96,21 +96,103 @@ func (r *ACLService) Delete(ctx context.Context, aclID string, opts ...option.Re
 }
 
 type ACLNewParams struct {
-	// An ACL grants a certain permission or role to a certain user or group on an
-	// object.
-	//
-	// ACLs are inherited across the object hierarchy. So for example, if a user has
-	// read permissions on a project, they will also have read permissions on any
-	// experiment, dataset, etc. created within that project.
-	//
-	// To restrict a grant to a particular sub-object, you may specify
-	// `restrict_object_type` in the ACL, as part of a direct permission grant or as
-	// part of a role.
-	CreateACL shared.CreateACLParam `json:"create_acl,required"`
+	// The id of the object the ACL applies to
+	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	// The object type that the ACL applies to
+	ObjectType param.Field[ACLNewParamsObjectType] `json:"object_type,required"`
+	// Id of the group the ACL applies to. Exactly one of `user_id` and `group_id` will
+	// be provided
+	GroupID param.Field[string] `json:"group_id" format:"uuid"`
+	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
+	// provided
+	Permission param.Field[ACLNewParamsPermission] `json:"permission"`
+	// When setting a permission directly, optionally restricts the permission grant to
+	// just the specified object type. Cannot be set alongside a `role_id`.
+	RestrictObjectType param.Field[ACLNewParamsRestrictObjectType] `json:"restrict_object_type"`
+	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
+	// provided
+	RoleID param.Field[string] `json:"role_id" format:"uuid"`
+	// Id of the user the ACL applies to. Exactly one of `user_id` and `group_id` will
+	// be provided
+	UserID param.Field[string] `json:"user_id" format:"uuid"`
 }
 
 func (r ACLNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.CreateACL)
+	return apijson.MarshalRoot(r)
+}
+
+// The object type that the ACL applies to
+type ACLNewParamsObjectType string
+
+const (
+	ACLNewParamsObjectTypeOrganization  ACLNewParamsObjectType = "organization"
+	ACLNewParamsObjectTypeProject       ACLNewParamsObjectType = "project"
+	ACLNewParamsObjectTypeExperiment    ACLNewParamsObjectType = "experiment"
+	ACLNewParamsObjectTypeDataset       ACLNewParamsObjectType = "dataset"
+	ACLNewParamsObjectTypePrompt        ACLNewParamsObjectType = "prompt"
+	ACLNewParamsObjectTypePromptSession ACLNewParamsObjectType = "prompt_session"
+	ACLNewParamsObjectTypeGroup         ACLNewParamsObjectType = "group"
+	ACLNewParamsObjectTypeRole          ACLNewParamsObjectType = "role"
+	ACLNewParamsObjectTypeOrgMember     ACLNewParamsObjectType = "org_member"
+	ACLNewParamsObjectTypeProjectLog    ACLNewParamsObjectType = "project_log"
+	ACLNewParamsObjectTypeOrgProject    ACLNewParamsObjectType = "org_project"
+)
+
+func (r ACLNewParamsObjectType) IsKnown() bool {
+	switch r {
+	case ACLNewParamsObjectTypeOrganization, ACLNewParamsObjectTypeProject, ACLNewParamsObjectTypeExperiment, ACLNewParamsObjectTypeDataset, ACLNewParamsObjectTypePrompt, ACLNewParamsObjectTypePromptSession, ACLNewParamsObjectTypeGroup, ACLNewParamsObjectTypeRole, ACLNewParamsObjectTypeOrgMember, ACLNewParamsObjectTypeProjectLog, ACLNewParamsObjectTypeOrgProject:
+		return true
+	}
+	return false
+}
+
+// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
+// provided
+type ACLNewParamsPermission string
+
+const (
+	ACLNewParamsPermissionCreate     ACLNewParamsPermission = "create"
+	ACLNewParamsPermissionRead       ACLNewParamsPermission = "read"
+	ACLNewParamsPermissionUpdate     ACLNewParamsPermission = "update"
+	ACLNewParamsPermissionDelete     ACLNewParamsPermission = "delete"
+	ACLNewParamsPermissionCreateACLs ACLNewParamsPermission = "create_acls"
+	ACLNewParamsPermissionReadACLs   ACLNewParamsPermission = "read_acls"
+	ACLNewParamsPermissionUpdateACLs ACLNewParamsPermission = "update_acls"
+	ACLNewParamsPermissionDeleteACLs ACLNewParamsPermission = "delete_acls"
+)
+
+func (r ACLNewParamsPermission) IsKnown() bool {
+	switch r {
+	case ACLNewParamsPermissionCreate, ACLNewParamsPermissionRead, ACLNewParamsPermissionUpdate, ACLNewParamsPermissionDelete, ACLNewParamsPermissionCreateACLs, ACLNewParamsPermissionReadACLs, ACLNewParamsPermissionUpdateACLs, ACLNewParamsPermissionDeleteACLs:
+		return true
+	}
+	return false
+}
+
+// When setting a permission directly, optionally restricts the permission grant to
+// just the specified object type. Cannot be set alongside a `role_id`.
+type ACLNewParamsRestrictObjectType string
+
+const (
+	ACLNewParamsRestrictObjectTypeOrganization  ACLNewParamsRestrictObjectType = "organization"
+	ACLNewParamsRestrictObjectTypeProject       ACLNewParamsRestrictObjectType = "project"
+	ACLNewParamsRestrictObjectTypeExperiment    ACLNewParamsRestrictObjectType = "experiment"
+	ACLNewParamsRestrictObjectTypeDataset       ACLNewParamsRestrictObjectType = "dataset"
+	ACLNewParamsRestrictObjectTypePrompt        ACLNewParamsRestrictObjectType = "prompt"
+	ACLNewParamsRestrictObjectTypePromptSession ACLNewParamsRestrictObjectType = "prompt_session"
+	ACLNewParamsRestrictObjectTypeGroup         ACLNewParamsRestrictObjectType = "group"
+	ACLNewParamsRestrictObjectTypeRole          ACLNewParamsRestrictObjectType = "role"
+	ACLNewParamsRestrictObjectTypeOrgMember     ACLNewParamsRestrictObjectType = "org_member"
+	ACLNewParamsRestrictObjectTypeProjectLog    ACLNewParamsRestrictObjectType = "project_log"
+	ACLNewParamsRestrictObjectTypeOrgProject    ACLNewParamsRestrictObjectType = "org_project"
+)
+
+func (r ACLNewParamsRestrictObjectType) IsKnown() bool {
+	switch r {
+	case ACLNewParamsRestrictObjectTypeOrganization, ACLNewParamsRestrictObjectTypeProject, ACLNewParamsRestrictObjectTypeExperiment, ACLNewParamsRestrictObjectTypeDataset, ACLNewParamsRestrictObjectTypePrompt, ACLNewParamsRestrictObjectTypePromptSession, ACLNewParamsRestrictObjectTypeGroup, ACLNewParamsRestrictObjectTypeRole, ACLNewParamsRestrictObjectTypeOrgMember, ACLNewParamsRestrictObjectTypeProjectLog, ACLNewParamsRestrictObjectTypeOrgProject:
+		return true
+	}
+	return false
 }
 
 type ACLListParams struct {

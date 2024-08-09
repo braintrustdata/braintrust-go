@@ -120,19 +120,236 @@ func (r *RoleService) Replace(ctx context.Context, body RoleReplaceParams, opts 
 }
 
 type RoleNewParams struct {
-	CreateRole shared.CreateRoleParam `json:"create_role,required"`
+	// Name of the role
+	Name param.Field[string] `json:"name,required"`
+	// Textual description of the role
+	Description param.Field[string] `json:"description"`
+	// (permission, restrict_object_type) tuples which belong to this role
+	MemberPermissions param.Field[[]RoleNewParamsMemberPermission] `json:"member_permissions"`
+	// Ids of the roles this role inherits from
+	//
+	// An inheriting role has all the permissions contained in its member roles, as
+	// well as all of their inherited permissions
+	MemberRoles param.Field[[]string] `json:"member_roles" format:"uuid"`
+	// For nearly all users, this parameter should be unnecessary. But in the rare case
+	// that your API key belongs to multiple organizations, you may specify the name of
+	// the organization the role belongs in.
+	OrgName param.Field[string] `json:"org_name"`
 }
 
 func (r RoleNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.CreateRole)
+	return apijson.MarshalRoot(r)
+}
+
+type RoleNewParamsMemberPermission struct {
+	// Each permission permits a certain type of operation on an object in the system
+	//
+	// Permissions can be assigned to to objects on an individual basis, or grouped
+	// into roles
+	Permission param.Field[RoleNewParamsMemberPermissionsPermission] `json:"permission,required"`
+	// The object type that the ACL applies to
+	RestrictObjectType param.Field[RoleNewParamsMemberPermissionsRestrictObjectType] `json:"restrict_object_type"`
+}
+
+func (r RoleNewParamsMemberPermission) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+// Each permission permits a certain type of operation on an object in the system
+//
+// Permissions can be assigned to to objects on an individual basis, or grouped
+// into roles
+type RoleNewParamsMemberPermissionsPermission string
+
+const (
+	RoleNewParamsMemberPermissionsPermissionCreate     RoleNewParamsMemberPermissionsPermission = "create"
+	RoleNewParamsMemberPermissionsPermissionRead       RoleNewParamsMemberPermissionsPermission = "read"
+	RoleNewParamsMemberPermissionsPermissionUpdate     RoleNewParamsMemberPermissionsPermission = "update"
+	RoleNewParamsMemberPermissionsPermissionDelete     RoleNewParamsMemberPermissionsPermission = "delete"
+	RoleNewParamsMemberPermissionsPermissionCreateACLs RoleNewParamsMemberPermissionsPermission = "create_acls"
+	RoleNewParamsMemberPermissionsPermissionReadACLs   RoleNewParamsMemberPermissionsPermission = "read_acls"
+	RoleNewParamsMemberPermissionsPermissionUpdateACLs RoleNewParamsMemberPermissionsPermission = "update_acls"
+	RoleNewParamsMemberPermissionsPermissionDeleteACLs RoleNewParamsMemberPermissionsPermission = "delete_acls"
+)
+
+func (r RoleNewParamsMemberPermissionsPermission) IsKnown() bool {
+	switch r {
+	case RoleNewParamsMemberPermissionsPermissionCreate, RoleNewParamsMemberPermissionsPermissionRead, RoleNewParamsMemberPermissionsPermissionUpdate, RoleNewParamsMemberPermissionsPermissionDelete, RoleNewParamsMemberPermissionsPermissionCreateACLs, RoleNewParamsMemberPermissionsPermissionReadACLs, RoleNewParamsMemberPermissionsPermissionUpdateACLs, RoleNewParamsMemberPermissionsPermissionDeleteACLs:
+		return true
+	}
+	return false
+}
+
+// The object type that the ACL applies to
+type RoleNewParamsMemberPermissionsRestrictObjectType string
+
+const (
+	RoleNewParamsMemberPermissionsRestrictObjectTypeOrganization  RoleNewParamsMemberPermissionsRestrictObjectType = "organization"
+	RoleNewParamsMemberPermissionsRestrictObjectTypeProject       RoleNewParamsMemberPermissionsRestrictObjectType = "project"
+	RoleNewParamsMemberPermissionsRestrictObjectTypeExperiment    RoleNewParamsMemberPermissionsRestrictObjectType = "experiment"
+	RoleNewParamsMemberPermissionsRestrictObjectTypeDataset       RoleNewParamsMemberPermissionsRestrictObjectType = "dataset"
+	RoleNewParamsMemberPermissionsRestrictObjectTypePrompt        RoleNewParamsMemberPermissionsRestrictObjectType = "prompt"
+	RoleNewParamsMemberPermissionsRestrictObjectTypePromptSession RoleNewParamsMemberPermissionsRestrictObjectType = "prompt_session"
+	RoleNewParamsMemberPermissionsRestrictObjectTypeGroup         RoleNewParamsMemberPermissionsRestrictObjectType = "group"
+	RoleNewParamsMemberPermissionsRestrictObjectTypeRole          RoleNewParamsMemberPermissionsRestrictObjectType = "role"
+	RoleNewParamsMemberPermissionsRestrictObjectTypeOrgMember     RoleNewParamsMemberPermissionsRestrictObjectType = "org_member"
+	RoleNewParamsMemberPermissionsRestrictObjectTypeProjectLog    RoleNewParamsMemberPermissionsRestrictObjectType = "project_log"
+	RoleNewParamsMemberPermissionsRestrictObjectTypeOrgProject    RoleNewParamsMemberPermissionsRestrictObjectType = "org_project"
+)
+
+func (r RoleNewParamsMemberPermissionsRestrictObjectType) IsKnown() bool {
+	switch r {
+	case RoleNewParamsMemberPermissionsRestrictObjectTypeOrganization, RoleNewParamsMemberPermissionsRestrictObjectTypeProject, RoleNewParamsMemberPermissionsRestrictObjectTypeExperiment, RoleNewParamsMemberPermissionsRestrictObjectTypeDataset, RoleNewParamsMemberPermissionsRestrictObjectTypePrompt, RoleNewParamsMemberPermissionsRestrictObjectTypePromptSession, RoleNewParamsMemberPermissionsRestrictObjectTypeGroup, RoleNewParamsMemberPermissionsRestrictObjectTypeRole, RoleNewParamsMemberPermissionsRestrictObjectTypeOrgMember, RoleNewParamsMemberPermissionsRestrictObjectTypeProjectLog, RoleNewParamsMemberPermissionsRestrictObjectTypeOrgProject:
+		return true
+	}
+	return false
 }
 
 type RoleUpdateParams struct {
-	PatchRole shared.PatchRoleParam `json:"patch_role,required"`
+	// A list of permissions to add to the role
+	AddMemberPermissions param.Field[[]RoleUpdateParamsAddMemberPermission] `json:"add_member_permissions"`
+	// A list of role IDs to add to the role's inheriting-from set
+	AddMemberRoles param.Field[[]string] `json:"add_member_roles" format:"uuid"`
+	// Textual description of the role
+	Description param.Field[string] `json:"description"`
+	// Name of the role
+	Name param.Field[string] `json:"name"`
+	// A list of permissions to remove from the role
+	RemoveMemberPermissions param.Field[[]RoleUpdateParamsRemoveMemberPermission] `json:"remove_member_permissions"`
+	// A list of role IDs to remove from the role's inheriting-from set
+	RemoveMemberRoles param.Field[[]string] `json:"remove_member_roles" format:"uuid"`
 }
 
 func (r RoleUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.PatchRole)
+	return apijson.MarshalRoot(r)
+}
+
+type RoleUpdateParamsAddMemberPermission struct {
+	// Each permission permits a certain type of operation on an object in the system
+	//
+	// Permissions can be assigned to to objects on an individual basis, or grouped
+	// into roles
+	Permission param.Field[RoleUpdateParamsAddMemberPermissionsPermission] `json:"permission,required"`
+	// The object type that the ACL applies to
+	RestrictObjectType param.Field[RoleUpdateParamsAddMemberPermissionsRestrictObjectType] `json:"restrict_object_type"`
+}
+
+func (r RoleUpdateParamsAddMemberPermission) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+// Each permission permits a certain type of operation on an object in the system
+//
+// Permissions can be assigned to to objects on an individual basis, or grouped
+// into roles
+type RoleUpdateParamsAddMemberPermissionsPermission string
+
+const (
+	RoleUpdateParamsAddMemberPermissionsPermissionCreate     RoleUpdateParamsAddMemberPermissionsPermission = "create"
+	RoleUpdateParamsAddMemberPermissionsPermissionRead       RoleUpdateParamsAddMemberPermissionsPermission = "read"
+	RoleUpdateParamsAddMemberPermissionsPermissionUpdate     RoleUpdateParamsAddMemberPermissionsPermission = "update"
+	RoleUpdateParamsAddMemberPermissionsPermissionDelete     RoleUpdateParamsAddMemberPermissionsPermission = "delete"
+	RoleUpdateParamsAddMemberPermissionsPermissionCreateACLs RoleUpdateParamsAddMemberPermissionsPermission = "create_acls"
+	RoleUpdateParamsAddMemberPermissionsPermissionReadACLs   RoleUpdateParamsAddMemberPermissionsPermission = "read_acls"
+	RoleUpdateParamsAddMemberPermissionsPermissionUpdateACLs RoleUpdateParamsAddMemberPermissionsPermission = "update_acls"
+	RoleUpdateParamsAddMemberPermissionsPermissionDeleteACLs RoleUpdateParamsAddMemberPermissionsPermission = "delete_acls"
+)
+
+func (r RoleUpdateParamsAddMemberPermissionsPermission) IsKnown() bool {
+	switch r {
+	case RoleUpdateParamsAddMemberPermissionsPermissionCreate, RoleUpdateParamsAddMemberPermissionsPermissionRead, RoleUpdateParamsAddMemberPermissionsPermissionUpdate, RoleUpdateParamsAddMemberPermissionsPermissionDelete, RoleUpdateParamsAddMemberPermissionsPermissionCreateACLs, RoleUpdateParamsAddMemberPermissionsPermissionReadACLs, RoleUpdateParamsAddMemberPermissionsPermissionUpdateACLs, RoleUpdateParamsAddMemberPermissionsPermissionDeleteACLs:
+		return true
+	}
+	return false
+}
+
+// The object type that the ACL applies to
+type RoleUpdateParamsAddMemberPermissionsRestrictObjectType string
+
+const (
+	RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeOrganization  RoleUpdateParamsAddMemberPermissionsRestrictObjectType = "organization"
+	RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeProject       RoleUpdateParamsAddMemberPermissionsRestrictObjectType = "project"
+	RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeExperiment    RoleUpdateParamsAddMemberPermissionsRestrictObjectType = "experiment"
+	RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeDataset       RoleUpdateParamsAddMemberPermissionsRestrictObjectType = "dataset"
+	RoleUpdateParamsAddMemberPermissionsRestrictObjectTypePrompt        RoleUpdateParamsAddMemberPermissionsRestrictObjectType = "prompt"
+	RoleUpdateParamsAddMemberPermissionsRestrictObjectTypePromptSession RoleUpdateParamsAddMemberPermissionsRestrictObjectType = "prompt_session"
+	RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeGroup         RoleUpdateParamsAddMemberPermissionsRestrictObjectType = "group"
+	RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeRole          RoleUpdateParamsAddMemberPermissionsRestrictObjectType = "role"
+	RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeOrgMember     RoleUpdateParamsAddMemberPermissionsRestrictObjectType = "org_member"
+	RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeProjectLog    RoleUpdateParamsAddMemberPermissionsRestrictObjectType = "project_log"
+	RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeOrgProject    RoleUpdateParamsAddMemberPermissionsRestrictObjectType = "org_project"
+)
+
+func (r RoleUpdateParamsAddMemberPermissionsRestrictObjectType) IsKnown() bool {
+	switch r {
+	case RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeOrganization, RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeProject, RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeExperiment, RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeDataset, RoleUpdateParamsAddMemberPermissionsRestrictObjectTypePrompt, RoleUpdateParamsAddMemberPermissionsRestrictObjectTypePromptSession, RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeGroup, RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeRole, RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeOrgMember, RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeProjectLog, RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeOrgProject:
+		return true
+	}
+	return false
+}
+
+type RoleUpdateParamsRemoveMemberPermission struct {
+	// Each permission permits a certain type of operation on an object in the system
+	//
+	// Permissions can be assigned to to objects on an individual basis, or grouped
+	// into roles
+	Permission param.Field[RoleUpdateParamsRemoveMemberPermissionsPermission] `json:"permission,required"`
+	// The object type that the ACL applies to
+	RestrictObjectType param.Field[RoleUpdateParamsRemoveMemberPermissionsRestrictObjectType] `json:"restrict_object_type"`
+}
+
+func (r RoleUpdateParamsRemoveMemberPermission) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+// Each permission permits a certain type of operation on an object in the system
+//
+// Permissions can be assigned to to objects on an individual basis, or grouped
+// into roles
+type RoleUpdateParamsRemoveMemberPermissionsPermission string
+
+const (
+	RoleUpdateParamsRemoveMemberPermissionsPermissionCreate     RoleUpdateParamsRemoveMemberPermissionsPermission = "create"
+	RoleUpdateParamsRemoveMemberPermissionsPermissionRead       RoleUpdateParamsRemoveMemberPermissionsPermission = "read"
+	RoleUpdateParamsRemoveMemberPermissionsPermissionUpdate     RoleUpdateParamsRemoveMemberPermissionsPermission = "update"
+	RoleUpdateParamsRemoveMemberPermissionsPermissionDelete     RoleUpdateParamsRemoveMemberPermissionsPermission = "delete"
+	RoleUpdateParamsRemoveMemberPermissionsPermissionCreateACLs RoleUpdateParamsRemoveMemberPermissionsPermission = "create_acls"
+	RoleUpdateParamsRemoveMemberPermissionsPermissionReadACLs   RoleUpdateParamsRemoveMemberPermissionsPermission = "read_acls"
+	RoleUpdateParamsRemoveMemberPermissionsPermissionUpdateACLs RoleUpdateParamsRemoveMemberPermissionsPermission = "update_acls"
+	RoleUpdateParamsRemoveMemberPermissionsPermissionDeleteACLs RoleUpdateParamsRemoveMemberPermissionsPermission = "delete_acls"
+)
+
+func (r RoleUpdateParamsRemoveMemberPermissionsPermission) IsKnown() bool {
+	switch r {
+	case RoleUpdateParamsRemoveMemberPermissionsPermissionCreate, RoleUpdateParamsRemoveMemberPermissionsPermissionRead, RoleUpdateParamsRemoveMemberPermissionsPermissionUpdate, RoleUpdateParamsRemoveMemberPermissionsPermissionDelete, RoleUpdateParamsRemoveMemberPermissionsPermissionCreateACLs, RoleUpdateParamsRemoveMemberPermissionsPermissionReadACLs, RoleUpdateParamsRemoveMemberPermissionsPermissionUpdateACLs, RoleUpdateParamsRemoveMemberPermissionsPermissionDeleteACLs:
+		return true
+	}
+	return false
+}
+
+// The object type that the ACL applies to
+type RoleUpdateParamsRemoveMemberPermissionsRestrictObjectType string
+
+const (
+	RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeOrganization  RoleUpdateParamsRemoveMemberPermissionsRestrictObjectType = "organization"
+	RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeProject       RoleUpdateParamsRemoveMemberPermissionsRestrictObjectType = "project"
+	RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeExperiment    RoleUpdateParamsRemoveMemberPermissionsRestrictObjectType = "experiment"
+	RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeDataset       RoleUpdateParamsRemoveMemberPermissionsRestrictObjectType = "dataset"
+	RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypePrompt        RoleUpdateParamsRemoveMemberPermissionsRestrictObjectType = "prompt"
+	RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypePromptSession RoleUpdateParamsRemoveMemberPermissionsRestrictObjectType = "prompt_session"
+	RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeGroup         RoleUpdateParamsRemoveMemberPermissionsRestrictObjectType = "group"
+	RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeRole          RoleUpdateParamsRemoveMemberPermissionsRestrictObjectType = "role"
+	RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeOrgMember     RoleUpdateParamsRemoveMemberPermissionsRestrictObjectType = "org_member"
+	RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeProjectLog    RoleUpdateParamsRemoveMemberPermissionsRestrictObjectType = "project_log"
+	RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeOrgProject    RoleUpdateParamsRemoveMemberPermissionsRestrictObjectType = "org_project"
+)
+
+func (r RoleUpdateParamsRemoveMemberPermissionsRestrictObjectType) IsKnown() bool {
+	switch r {
+	case RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeOrganization, RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeProject, RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeExperiment, RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeDataset, RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypePrompt, RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypePromptSession, RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeGroup, RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeRole, RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeOrgMember, RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeProjectLog, RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeOrgProject:
+		return true
+	}
+	return false
 }
 
 type RoleListParams struct {
@@ -180,9 +397,87 @@ type RoleListParamsIDsArray []string
 func (r RoleListParamsIDsArray) ImplementsRoleListParamsIDsUnion() {}
 
 type RoleReplaceParams struct {
-	CreateRole shared.CreateRoleParam `json:"create_role,required"`
+	// Name of the role
+	Name param.Field[string] `json:"name,required"`
+	// Textual description of the role
+	Description param.Field[string] `json:"description"`
+	// (permission, restrict_object_type) tuples which belong to this role
+	MemberPermissions param.Field[[]RoleReplaceParamsMemberPermission] `json:"member_permissions"`
+	// Ids of the roles this role inherits from
+	//
+	// An inheriting role has all the permissions contained in its member roles, as
+	// well as all of their inherited permissions
+	MemberRoles param.Field[[]string] `json:"member_roles" format:"uuid"`
+	// For nearly all users, this parameter should be unnecessary. But in the rare case
+	// that your API key belongs to multiple organizations, you may specify the name of
+	// the organization the role belongs in.
+	OrgName param.Field[string] `json:"org_name"`
 }
 
 func (r RoleReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.CreateRole)
+	return apijson.MarshalRoot(r)
+}
+
+type RoleReplaceParamsMemberPermission struct {
+	// Each permission permits a certain type of operation on an object in the system
+	//
+	// Permissions can be assigned to to objects on an individual basis, or grouped
+	// into roles
+	Permission param.Field[RoleReplaceParamsMemberPermissionsPermission] `json:"permission,required"`
+	// The object type that the ACL applies to
+	RestrictObjectType param.Field[RoleReplaceParamsMemberPermissionsRestrictObjectType] `json:"restrict_object_type"`
+}
+
+func (r RoleReplaceParamsMemberPermission) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+// Each permission permits a certain type of operation on an object in the system
+//
+// Permissions can be assigned to to objects on an individual basis, or grouped
+// into roles
+type RoleReplaceParamsMemberPermissionsPermission string
+
+const (
+	RoleReplaceParamsMemberPermissionsPermissionCreate     RoleReplaceParamsMemberPermissionsPermission = "create"
+	RoleReplaceParamsMemberPermissionsPermissionRead       RoleReplaceParamsMemberPermissionsPermission = "read"
+	RoleReplaceParamsMemberPermissionsPermissionUpdate     RoleReplaceParamsMemberPermissionsPermission = "update"
+	RoleReplaceParamsMemberPermissionsPermissionDelete     RoleReplaceParamsMemberPermissionsPermission = "delete"
+	RoleReplaceParamsMemberPermissionsPermissionCreateACLs RoleReplaceParamsMemberPermissionsPermission = "create_acls"
+	RoleReplaceParamsMemberPermissionsPermissionReadACLs   RoleReplaceParamsMemberPermissionsPermission = "read_acls"
+	RoleReplaceParamsMemberPermissionsPermissionUpdateACLs RoleReplaceParamsMemberPermissionsPermission = "update_acls"
+	RoleReplaceParamsMemberPermissionsPermissionDeleteACLs RoleReplaceParamsMemberPermissionsPermission = "delete_acls"
+)
+
+func (r RoleReplaceParamsMemberPermissionsPermission) IsKnown() bool {
+	switch r {
+	case RoleReplaceParamsMemberPermissionsPermissionCreate, RoleReplaceParamsMemberPermissionsPermissionRead, RoleReplaceParamsMemberPermissionsPermissionUpdate, RoleReplaceParamsMemberPermissionsPermissionDelete, RoleReplaceParamsMemberPermissionsPermissionCreateACLs, RoleReplaceParamsMemberPermissionsPermissionReadACLs, RoleReplaceParamsMemberPermissionsPermissionUpdateACLs, RoleReplaceParamsMemberPermissionsPermissionDeleteACLs:
+		return true
+	}
+	return false
+}
+
+// The object type that the ACL applies to
+type RoleReplaceParamsMemberPermissionsRestrictObjectType string
+
+const (
+	RoleReplaceParamsMemberPermissionsRestrictObjectTypeOrganization  RoleReplaceParamsMemberPermissionsRestrictObjectType = "organization"
+	RoleReplaceParamsMemberPermissionsRestrictObjectTypeProject       RoleReplaceParamsMemberPermissionsRestrictObjectType = "project"
+	RoleReplaceParamsMemberPermissionsRestrictObjectTypeExperiment    RoleReplaceParamsMemberPermissionsRestrictObjectType = "experiment"
+	RoleReplaceParamsMemberPermissionsRestrictObjectTypeDataset       RoleReplaceParamsMemberPermissionsRestrictObjectType = "dataset"
+	RoleReplaceParamsMemberPermissionsRestrictObjectTypePrompt        RoleReplaceParamsMemberPermissionsRestrictObjectType = "prompt"
+	RoleReplaceParamsMemberPermissionsRestrictObjectTypePromptSession RoleReplaceParamsMemberPermissionsRestrictObjectType = "prompt_session"
+	RoleReplaceParamsMemberPermissionsRestrictObjectTypeGroup         RoleReplaceParamsMemberPermissionsRestrictObjectType = "group"
+	RoleReplaceParamsMemberPermissionsRestrictObjectTypeRole          RoleReplaceParamsMemberPermissionsRestrictObjectType = "role"
+	RoleReplaceParamsMemberPermissionsRestrictObjectTypeOrgMember     RoleReplaceParamsMemberPermissionsRestrictObjectType = "org_member"
+	RoleReplaceParamsMemberPermissionsRestrictObjectTypeProjectLog    RoleReplaceParamsMemberPermissionsRestrictObjectType = "project_log"
+	RoleReplaceParamsMemberPermissionsRestrictObjectTypeOrgProject    RoleReplaceParamsMemberPermissionsRestrictObjectType = "org_project"
+)
+
+func (r RoleReplaceParamsMemberPermissionsRestrictObjectType) IsKnown() bool {
+	switch r {
+	case RoleReplaceParamsMemberPermissionsRestrictObjectTypeOrganization, RoleReplaceParamsMemberPermissionsRestrictObjectTypeProject, RoleReplaceParamsMemberPermissionsRestrictObjectTypeExperiment, RoleReplaceParamsMemberPermissionsRestrictObjectTypeDataset, RoleReplaceParamsMemberPermissionsRestrictObjectTypePrompt, RoleReplaceParamsMemberPermissionsRestrictObjectTypePromptSession, RoleReplaceParamsMemberPermissionsRestrictObjectTypeGroup, RoleReplaceParamsMemberPermissionsRestrictObjectTypeRole, RoleReplaceParamsMemberPermissionsRestrictObjectTypeOrgMember, RoleReplaceParamsMemberPermissionsRestrictObjectTypeProjectLog, RoleReplaceParamsMemberPermissionsRestrictObjectTypeOrgProject:
+		return true
+	}
+	return false
 }

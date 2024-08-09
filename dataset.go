@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -174,19 +175,29 @@ func (r *DatasetService) Summarize(ctx context.Context, datasetID string, query 
 }
 
 type DatasetNewParams struct {
-	CreateDataset shared.CreateDatasetParam `json:"create_dataset,required"`
+	// Name of the dataset. Within a project, dataset names are unique
+	Name param.Field[string] `json:"name,required"`
+	// Textual description of the dataset
+	Description param.Field[string] `json:"description"`
+	// Unique identifier for the project that the dataset belongs under
+	ProjectID param.Field[string] `json:"project_id" format:"uuid"`
 }
 
 func (r DatasetNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.CreateDataset)
+	return apijson.MarshalRoot(r)
 }
 
 type DatasetUpdateParams struct {
-	PatchDataset shared.PatchDatasetParam `json:"patch_dataset,required"`
+	// Textual description of the dataset
+	Description param.Field[string] `json:"description"`
+	// User-controlled metadata about the dataset
+	Metadata param.Field[map[string]interface{}] `json:"metadata"`
+	// Name of the dataset. Within a project, dataset names are unique
+	Name param.Field[string] `json:"name"`
 }
 
 func (r DatasetUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.PatchDataset)
+	return apijson.MarshalRoot(r)
 }
 
 type DatasetListParams struct {
@@ -238,11 +249,12 @@ type DatasetListParamsIDsArray []string
 func (r DatasetListParamsIDsArray) ImplementsDatasetListParamsIDsUnion() {}
 
 type DatasetFeedbackParams struct {
-	FeedbackDatasetEventRequest shared.FeedbackDatasetEventRequestParam `json:"feedback_dataset_event_request,required"`
+	// A list of dataset feedback items
+	Feedback param.Field[[]shared.FeedbackDatasetItemParam] `json:"feedback,required"`
 }
 
 func (r DatasetFeedbackParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.FeedbackDatasetEventRequest)
+	return apijson.MarshalRoot(r)
 }
 
 type DatasetFetchParams struct {
@@ -300,19 +312,127 @@ func (r DatasetFetchParams) URLQuery() (v url.Values) {
 }
 
 type DatasetFetchPostParams struct {
-	FetchEventsRequest shared.FetchEventsRequestParam `json:"fetch_events_request,required"`
+	// An opaque string to be used as a cursor for the next page of results, in order
+	// from latest to earliest.
+	//
+	// The string can be obtained directly from the `cursor` property of the previous
+	// fetch query
+	Cursor param.Field[string] `json:"cursor"`
+	// A list of filters on the events to fetch. Currently, only path-lookup type
+	// filters are supported, but we may add more in the future
+	Filters param.Field[[]shared.PathLookupFilterParam] `json:"filters"`
+	// limit the number of traces fetched
+	//
+	// Fetch queries may be paginated if the total result size is expected to be large
+	// (e.g. project_logs which accumulate over a long time). Note that fetch queries
+	// only support pagination in descending time order (from latest to earliest
+	// `_xact_id`. Furthermore, later pages may return rows which showed up in earlier
+	// pages, except with an earlier `_xact_id`. This happens because pagination occurs
+	// over the whole version history of the event log. You will most likely want to
+	// exclude any such duplicate, outdated rows (by `id`) from your combined result
+	// set.
+	//
+	// The `limit` parameter controls the number of full traces to return. So you may
+	// end up with more individual rows than the specified limit if you are fetching
+	// events containing traces.
+	Limit param.Field[int64] `json:"limit"`
+	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
+	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
+	// the 'cursor' argument going forwards.
+	//
+	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
+	//
+	// Since a paginated fetch query returns results in order from latest to earliest,
+	// the cursor for the next page can be found as the row with the minimum (earliest)
+	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
+	// for an overview of paginating fetch queries.
+	MaxRootSpanID param.Field[string] `json:"max_root_span_id"`
+	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
+	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
+	// the 'cursor' argument going forwards.
+	//
+	// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
+	//
+	// Since a paginated fetch query returns results in order from latest to earliest,
+	// the cursor for the next page can be found as the row with the minimum (earliest)
+	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
+	// for an overview of paginating fetch queries.
+	MaxXactID param.Field[string] `json:"max_xact_id"`
+	// Retrieve a snapshot of events from a past time
+	//
+	// The version id is essentially a filter on the latest event transaction id. You
+	// can use the `max_xact_id` returned by a past fetch as the version to reproduce
+	// that exact fetch.
+	Version param.Field[string] `json:"version"`
 }
 
 func (r DatasetFetchPostParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.FetchEventsRequest)
+	return apijson.MarshalRoot(r)
 }
 
 type DatasetInsertParams struct {
-	InsertDatasetEventRequest shared.InsertDatasetEventRequestParam `json:"insert_dataset_event_request,required"`
+	// A list of dataset events to insert
+	Events param.Field[[]DatasetInsertParamsEventUnion] `json:"events,required"`
 }
 
 func (r DatasetInsertParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.InsertDatasetEventRequest)
+	return apijson.MarshalRoot(r)
+}
+
+// A dataset event
+type DatasetInsertParamsEvent struct {
+	Input    param.Field[interface{}] `json:"input,required"`
+	Expected param.Field[interface{}] `json:"expected,required"`
+	Metadata param.Field[interface{}] `json:"metadata,required"`
+	Tags     param.Field[interface{}] `json:"tags,required"`
+	// A unique identifier for the dataset event. If you don't provide one, BrainTrust
+	// will generate one for you
+	ID param.Field[string] `json:"id"`
+	// The timestamp the dataset event was created
+	Created param.Field[time.Time] `json:"created" format:"date-time"`
+	// Pass `_object_delete=true` to mark the dataset event deleted. Deleted events
+	// will not show up in subsequent fetches for this dataset
+	ObjectDelete param.Field[bool] `json:"_object_delete"`
+	// The `_is_merge` field controls how the row is merged with any existing row with
+	// the same id in the DB. By default (or when set to `false`), the existing row is
+	// completely replaced by the new row. When set to `true`, the new row is
+	// deep-merged into the existing row
+	//
+	// For example, say there is an existing row in the DB
+	// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
+	// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
+	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
+	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
+	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
+	IsMerge param.Field[bool] `json:"_is_merge"`
+	// Use the `_parent_id` field to create this row as a subspan of an existing row.
+	// It cannot be specified alongside `_is_merge=true`. Tracking hierarchical
+	// relationships are important for tracing (see the
+	// [guide](https://www.braintrust.dev/docs/guides/tracing) for full details).
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"_parent_id": "abc", "id": "llm_call", "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	ParentID   param.Field[string]      `json:"_parent_id"`
+	MergePaths param.Field[interface{}] `json:"_merge_paths,required"`
+}
+
+func (r DatasetInsertParamsEvent) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r DatasetInsertParamsEvent) ImplementsDatasetInsertParamsEventUnion() {}
+
+// A dataset event
+//
+// Satisfied by [shared.InsertDatasetEventReplaceParam],
+// [shared.InsertDatasetEventMergeParam], [DatasetInsertParamsEvent].
+type DatasetInsertParamsEventUnion interface {
+	ImplementsDatasetInsertParamsEventUnion()
 }
 
 type DatasetSummarizeParams struct {
