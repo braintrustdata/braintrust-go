@@ -82,9 +82,9 @@ func TestACLListWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.ACLs.List(context.TODO(), braintrust.ACLListParams{
 		ObjectID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType:    braintrust.F(shared.ACLObjectTypeOrganization),
+		ObjectType:    braintrust.F(braintrust.ACLListParamsObjectTypeOrganization),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:           braintrust.F[shared.IDsUnionParam](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
+		IDs:           braintrust.F[braintrust.ACLListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})

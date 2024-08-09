@@ -48,7 +48,7 @@ func (r *FunctionService) New(ctx context.Context, body FunctionNewParams, opts 
 }
 
 // Get a function object by its id
-func (r *FunctionService) Get(ctx context.Context, functionID shared.FunctionIDParam, opts ...option.RequestOption) (res *shared.Function, err error) {
+func (r *FunctionService) Get(ctx context.Context, functionID string, opts ...option.RequestOption) (res *shared.Function, err error) {
 	opts = append(r.Options[:], opts...)
 	if functionID == "" {
 		err = errors.New("missing required function_id parameter")
@@ -62,7 +62,7 @@ func (r *FunctionService) Get(ctx context.Context, functionID shared.FunctionIDP
 // Partially update a function object. Specify the fields to update in the payload.
 // Any object-type fields will be deep-merged with existing content. Currently we
 // do not support removing fields or setting them to null.
-func (r *FunctionService) Update(ctx context.Context, functionID shared.FunctionIDParam, body FunctionUpdateParams, opts ...option.RequestOption) (res *shared.Function, err error) {
+func (r *FunctionService) Update(ctx context.Context, functionID string, body FunctionUpdateParams, opts ...option.RequestOption) (res *shared.Function, err error) {
 	opts = append(r.Options[:], opts...)
 	if functionID == "" {
 		err = errors.New("missing required function_id parameter")
@@ -99,7 +99,7 @@ func (r *FunctionService) ListAutoPaging(ctx context.Context, query FunctionList
 }
 
 // Delete a function object by its id
-func (r *FunctionService) Delete(ctx context.Context, functionID shared.FunctionIDParam, opts ...option.RequestOption) (res *shared.Function, err error) {
+func (r *FunctionService) Delete(ctx context.Context, functionID string, opts ...option.RequestOption) (res *shared.Function, err error) {
 	opts = append(r.Options[:], opts...)
 	if functionID == "" {
 		err = errors.New("missing required function_id parameter")
@@ -142,33 +142,33 @@ type FunctionListParams struct {
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
 	// Name of the function to search for
-	FunctionName param.Field[shared.FunctionNameParam] `query:"function_name"`
+	FunctionName param.Field[string] `query:"function_name"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
+	IDs param.Field[FunctionListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[shared.AppLimitParam] `query:"limit"`
+	Limit param.Field[int64] `query:"limit"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[shared.OrgNameParam] `query:"org_name"`
+	OrgName param.Field[string] `query:"org_name"`
 	// Project id
-	ProjectID param.Field[shared.ProjectIDQueryParam] `query:"project_id" format:"uuid"`
+	ProjectID param.Field[string] `query:"project_id" format:"uuid"`
 	// Name of the project to search for
-	ProjectName param.Field[shared.ProjectNameParam] `query:"project_name"`
+	ProjectName param.Field[string] `query:"project_name"`
 	// Retrieve prompt with a specific slug
-	Slug param.Field[shared.SlugParam] `query:"slug"`
+	Slug param.Field[string] `query:"slug"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
 	// Retrieve prompt at a specific version.
 	//
 	// The version id can either be a transaction id (e.g. '1000192656880881099') or a
 	// version identifier (e.g. '81cd05ee665fdfb3').
-	Version param.Field[shared.PromptVersionParam] `query:"version"`
+	Version param.Field[string] `query:"version"`
 }
 
 // URLQuery serializes [FunctionListParams]'s query parameters as `url.Values`.
@@ -178,6 +178,18 @@ func (r FunctionListParams) URLQuery() (v url.Values) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter search results to a particular set of object IDs. To specify a list of
+// IDs, include the query param multiple times
+//
+// Satisfied by [shared.UnionString], [FunctionListParamsIDsArray].
+type FunctionListParamsIDsUnion interface {
+	ImplementsFunctionListParamsIDsUnion()
+}
+
+type FunctionListParamsIDsArray []string
+
+func (r FunctionListParamsIDsArray) ImplementsFunctionListParamsIDsUnion() {}
 
 type FunctionReplaceParams struct {
 	CreateFunction shared.CreateFunctionParam `json:"create_function,required"`

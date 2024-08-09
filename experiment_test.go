@@ -148,7 +148,7 @@ func TestExperimentListWithOptionalParams(t *testing.T) {
 	_, err := client.Experiments.List(context.TODO(), braintrust.ExperimentListParams{
 		EndingBefore:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ExperimentName: braintrust.F("experiment_name"),
-		IDs:            braintrust.F[shared.IDsUnionParam](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
+		IDs:            braintrust.F[braintrust.ExperimentListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:          braintrust.F(int64(0)),
 		OrgName:        braintrust.F("org_name"),
 		ProjectID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
@@ -344,7 +344,7 @@ func TestExperimentInsert(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ExperimentInsertParams{
 			InsertExperimentEventRequest: shared.InsertExperimentEventRequestParam{
-				Events: braintrust.F([]shared.InsertExperimentEventUnionParam{shared.InsertExperimentEventReplaceParam{
+				Events: braintrust.F([]shared.InsertExperimentEventRequestEventsUnionParam{shared.InsertExperimentEventReplaceParam{
 					Input:    braintrust.F[any](map[string]interface{}{}),
 					Output:   braintrust.F[any](map[string]interface{}{}),
 					Expected: braintrust.F[any](map[string]interface{}{}),

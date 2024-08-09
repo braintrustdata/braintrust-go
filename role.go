@@ -47,7 +47,7 @@ func (r *RoleService) New(ctx context.Context, body RoleNewParams, opts ...optio
 }
 
 // Get a role object by its id
-func (r *RoleService) Get(ctx context.Context, roleID shared.RoleIDParam, opts ...option.RequestOption) (res *shared.Role, err error) {
+func (r *RoleService) Get(ctx context.Context, roleID string, opts ...option.RequestOption) (res *shared.Role, err error) {
 	opts = append(r.Options[:], opts...)
 	if roleID == "" {
 		err = errors.New("missing required role_id parameter")
@@ -61,7 +61,7 @@ func (r *RoleService) Get(ctx context.Context, roleID shared.RoleIDParam, opts .
 // Partially update a role object. Specify the fields to update in the payload. Any
 // object-type fields will be deep-merged with existing content. Currently we do
 // not support removing fields or setting them to null.
-func (r *RoleService) Update(ctx context.Context, roleID shared.RoleIDParam, body RoleUpdateParams, opts ...option.RequestOption) (res *shared.Role, err error) {
+func (r *RoleService) Update(ctx context.Context, roleID string, body RoleUpdateParams, opts ...option.RequestOption) (res *shared.Role, err error) {
 	opts = append(r.Options[:], opts...)
 	if roleID == "" {
 		err = errors.New("missing required role_id parameter")
@@ -98,7 +98,7 @@ func (r *RoleService) ListAutoPaging(ctx context.Context, query RoleListParams, 
 }
 
 // Delete a role object by its id
-func (r *RoleService) Delete(ctx context.Context, roleID shared.RoleIDParam, opts ...option.RequestOption) (res *shared.Role, err error) {
+func (r *RoleService) Delete(ctx context.Context, roleID string, opts ...option.RequestOption) (res *shared.Role, err error) {
 	opts = append(r.Options[:], opts...)
 	if roleID == "" {
 		err = errors.New("missing required role_id parameter")
@@ -141,22 +141,22 @@ type RoleListParams struct {
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
+	IDs param.Field[RoleListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[shared.AppLimitParam] `query:"limit"`
+	Limit param.Field[int64] `query:"limit"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[shared.OrgNameParam] `query:"org_name"`
+	OrgName param.Field[string] `query:"org_name"`
 	// Name of the role to search for
-	RoleName param.Field[shared.RoleNameParam] `query:"role_name"`
+	RoleName param.Field[string] `query:"role_name"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
 }
 
 // URLQuery serializes [RoleListParams]'s query parameters as `url.Values`.
@@ -166,6 +166,18 @@ func (r RoleListParams) URLQuery() (v url.Values) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter search results to a particular set of object IDs. To specify a list of
+// IDs, include the query param multiple times
+//
+// Satisfied by [shared.UnionString], [RoleListParamsIDsArray].
+type RoleListParamsIDsUnion interface {
+	ImplementsRoleListParamsIDsUnion()
+}
+
+type RoleListParamsIDsArray []string
+
+func (r RoleListParamsIDsArray) ImplementsRoleListParamsIDsUnion() {}
 
 type RoleReplaceParams struct {
 	CreateRole shared.CreateRoleParam `json:"create_role,required"`

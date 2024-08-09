@@ -47,7 +47,7 @@ func (r *ACLService) New(ctx context.Context, body ACLNewParams, opts ...option.
 }
 
 // Get an acl object by its id
-func (r *ACLService) Get(ctx context.Context, aclID shared.ACLIDParam, opts ...option.RequestOption) (res *shared.ACL, err error) {
+func (r *ACLService) Get(ctx context.Context, aclID string, opts ...option.RequestOption) (res *shared.ACL, err error) {
 	opts = append(r.Options[:], opts...)
 	if aclID == "" {
 		err = errors.New("missing required acl_id parameter")
@@ -84,7 +84,7 @@ func (r *ACLService) ListAutoPaging(ctx context.Context, query ACLListParams, op
 }
 
 // Delete an acl object by its id
-func (r *ACLService) Delete(ctx context.Context, aclID shared.ACLIDParam, opts ...option.RequestOption) (res *shared.ACL, err error) {
+func (r *ACLService) Delete(ctx context.Context, aclID string, opts ...option.RequestOption) (res *shared.ACL, err error) {
 	opts = append(r.Options[:], opts...)
 	if aclID == "" {
 		err = errors.New("missing required acl_id parameter")
@@ -115,26 +115,26 @@ func (r ACLNewParams) MarshalJSON() (data []byte, err error) {
 
 type ACLListParams struct {
 	// The id of the object the ACL applies to
-	ObjectID param.Field[shared.ACLObjectIDParam] `query:"object_id,required" format:"uuid"`
+	ObjectID param.Field[string] `query:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `query:"object_type,required"`
+	ObjectType param.Field[ACLListParamsObjectType] `query:"object_type,required"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
+	IDs param.Field[ACLListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[shared.AppLimitParam] `query:"limit"`
+	Limit param.Field[int64] `query:"limit"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
 }
 
 // URLQuery serializes [ACLListParams]'s query parameters as `url.Values`.
@@ -144,3 +144,40 @@ func (r ACLListParams) URLQuery() (v url.Values) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// The object type that the ACL applies to
+type ACLListParamsObjectType string
+
+const (
+	ACLListParamsObjectTypeOrganization  ACLListParamsObjectType = "organization"
+	ACLListParamsObjectTypeProject       ACLListParamsObjectType = "project"
+	ACLListParamsObjectTypeExperiment    ACLListParamsObjectType = "experiment"
+	ACLListParamsObjectTypeDataset       ACLListParamsObjectType = "dataset"
+	ACLListParamsObjectTypePrompt        ACLListParamsObjectType = "prompt"
+	ACLListParamsObjectTypePromptSession ACLListParamsObjectType = "prompt_session"
+	ACLListParamsObjectTypeGroup         ACLListParamsObjectType = "group"
+	ACLListParamsObjectTypeRole          ACLListParamsObjectType = "role"
+	ACLListParamsObjectTypeOrgMember     ACLListParamsObjectType = "org_member"
+	ACLListParamsObjectTypeProjectLog    ACLListParamsObjectType = "project_log"
+	ACLListParamsObjectTypeOrgProject    ACLListParamsObjectType = "org_project"
+)
+
+func (r ACLListParamsObjectType) IsKnown() bool {
+	switch r {
+	case ACLListParamsObjectTypeOrganization, ACLListParamsObjectTypeProject, ACLListParamsObjectTypeExperiment, ACLListParamsObjectTypeDataset, ACLListParamsObjectTypePrompt, ACLListParamsObjectTypePromptSession, ACLListParamsObjectTypeGroup, ACLListParamsObjectTypeRole, ACLListParamsObjectTypeOrgMember, ACLListParamsObjectTypeProjectLog, ACLListParamsObjectTypeOrgProject:
+		return true
+	}
+	return false
+}
+
+// Filter search results to a particular set of object IDs. To specify a list of
+// IDs, include the query param multiple times
+//
+// Satisfied by [shared.UnionString], [ACLListParamsIDsArray].
+type ACLListParamsIDsUnion interface {
+	ImplementsACLListParamsIDsUnion()
+}
+
+type ACLListParamsIDsArray []string
+
+func (r ACLListParamsIDsArray) ImplementsACLListParamsIDsUnion() {}
