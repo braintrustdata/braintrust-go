@@ -112,19 +112,39 @@ func (r *ProjectService) Delete(ctx context.Context, projectID string, opts ...o
 }
 
 type ProjectNewParams struct {
-	CreateProject shared.CreateProjectParam `json:"create_project,required"`
+	// Name of the project
+	Name param.Field[string] `json:"name,required"`
+	// For nearly all users, this parameter should be unnecessary. But in the rare case
+	// that your API key belongs to multiple organizations, you may specify the name of
+	// the organization the project belongs in.
+	OrgName param.Field[string] `json:"org_name"`
 }
 
 func (r ProjectNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.CreateProject)
+	return apijson.MarshalRoot(r)
 }
 
 type ProjectUpdateParams struct {
-	PatchProject shared.PatchProjectParam `json:"patch_project,required"`
+	// Name of the project
+	Name param.Field[string] `json:"name"`
+	// Project settings. Patch operations replace all settings, so make sure you
+	// include all settings you want to keep.
+	Settings param.Field[ProjectUpdateParamsSettings] `json:"settings"`
 }
 
 func (r ProjectUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.PatchProject)
+	return apijson.MarshalRoot(r)
+}
+
+// Project settings. Patch operations replace all settings, so make sure you
+// include all settings you want to keep.
+type ProjectUpdateParamsSettings struct {
+	// The key used to join two experiments (defaults to `input`).
+	ComparisonKey param.Field[string] `json:"comparison_key"`
+}
+
+func (r ProjectUpdateParamsSettings) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }
 
 type ProjectListParams struct {

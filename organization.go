@@ -103,11 +103,16 @@ func (r *OrganizationService) Delete(ctx context.Context, organizationID string,
 }
 
 type OrganizationUpdateParams struct {
-	PatchOrganization shared.PatchOrganizationParam `json:"patch_organization,required"`
+	APIURL         param.Field[string] `json:"api_url"`
+	IsUniversalAPI param.Field[bool]   `json:"is_universal_api"`
+	// Name of the organization
+	Name        param.Field[string] `json:"name"`
+	ProxyURL    param.Field[string] `json:"proxy_url"`
+	RealtimeURL param.Field[string] `json:"realtime_url"`
 }
 
 func (r OrganizationUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.PatchOrganization)
+	return apijson.MarshalRoot(r)
 }
 
 type OrganizationListParams struct {
