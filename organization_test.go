@@ -52,13 +52,11 @@ func TestOrganizationUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.OrganizationUpdateParams{
-			PatchOrganization: shared.PatchOrganizationParam{
-				Name:           braintrust.F("name"),
-				APIURL:         braintrust.F("api_url"),
-				IsUniversalAPI: braintrust.F(true),
-				ProxyURL:       braintrust.F("proxy_url"),
-				RealtimeURL:    braintrust.F("realtime_url"),
-			},
+			APIURL:         braintrust.F("api_url"),
+			IsUniversalAPI: braintrust.F(true),
+			Name:           braintrust.F("name"),
+			ProxyURL:       braintrust.F("proxy_url"),
+			RealtimeURL:    braintrust.F("realtime_url"),
 		},
 	)
 	if err != nil {
