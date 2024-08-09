@@ -121,19 +121,31 @@ func (r *ProjectTagService) Replace(ctx context.Context, body ProjectTagReplaceP
 }
 
 type ProjectTagNewParams struct {
-	CreateProjectTag shared.CreateProjectTagParam `json:"create_project_tag,required"`
+	// Name of the project tag
+	Name param.Field[string] `json:"name,required"`
+	// Unique identifier for the project that the project tag belongs under
+	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	// Color of the tag for the UI
+	Color param.Field[string] `json:"color"`
+	// Textual description of the project tag
+	Description param.Field[string] `json:"description"`
 }
 
 func (r ProjectTagNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.CreateProjectTag)
+	return apijson.MarshalRoot(r)
 }
 
 type ProjectTagUpdateParams struct {
-	PatchProjectTag shared.PatchProjectTagParam `json:"patch_project_tag,required"`
+	// Color of the tag for the UI
+	Color param.Field[string] `json:"color"`
+	// Textual description of the project tag
+	Description param.Field[string] `json:"description"`
+	// Name of the project tag
+	Name param.Field[string] `json:"name"`
 }
 
 func (r ProjectTagUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.PatchProjectTag)
+	return apijson.MarshalRoot(r)
 }
 
 type ProjectTagListParams struct {
@@ -185,9 +197,16 @@ type ProjectTagListParamsIDsArray []string
 func (r ProjectTagListParamsIDsArray) ImplementsProjectTagListParamsIDsUnion() {}
 
 type ProjectTagReplaceParams struct {
-	CreateProjectTag shared.CreateProjectTagParam `json:"create_project_tag,required"`
+	// Name of the project tag
+	Name param.Field[string] `json:"name,required"`
+	// Unique identifier for the project that the project tag belongs under
+	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	// Color of the tag for the UI
+	Color param.Field[string] `json:"color"`
+	// Textual description of the project tag
+	Description param.Field[string] `json:"description"`
 }
 
 func (r ProjectTagReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.CreateProjectTag)
+	return apijson.MarshalRoot(r)
 }

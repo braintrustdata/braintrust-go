@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -120,11 +121,73 @@ func (r *ViewService) Replace(ctx context.Context, body ViewReplaceParams, opts 
 }
 
 type ViewNewParams struct {
-	CreateView shared.CreateViewParam `json:"create_view,required"`
+	// Name of the view
+	Name param.Field[string] `json:"name,required"`
+	// The id of the object the view applies to
+	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	// The object type that the ACL applies to
+	ObjectType param.Field[ViewNewParamsObjectType] `json:"object_type,required"`
+	// Type of table that the view corresponds to.
+	ViewType param.Field[ViewNewParamsViewType] `json:"view_type,required"`
+	// Date of role deletion, or null if the role is still active
+	DeletedAt param.Field[time.Time] `json:"deleted_at" format:"date-time"`
+	// Options for the view in the app
+	Options param.Field[shared.ViewOptionsParam] `json:"options"`
+	// Identifies the user who created the view
+	UserID param.Field[string] `json:"user_id" format:"uuid"`
+	// The view definition
+	ViewData param.Field[shared.ViewDataParam] `json:"view_data"`
 }
 
 func (r ViewNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.CreateView)
+	return apijson.MarshalRoot(r)
+}
+
+// The object type that the ACL applies to
+type ViewNewParamsObjectType string
+
+const (
+	ViewNewParamsObjectTypeOrganization  ViewNewParamsObjectType = "organization"
+	ViewNewParamsObjectTypeProject       ViewNewParamsObjectType = "project"
+	ViewNewParamsObjectTypeExperiment    ViewNewParamsObjectType = "experiment"
+	ViewNewParamsObjectTypeDataset       ViewNewParamsObjectType = "dataset"
+	ViewNewParamsObjectTypePrompt        ViewNewParamsObjectType = "prompt"
+	ViewNewParamsObjectTypePromptSession ViewNewParamsObjectType = "prompt_session"
+	ViewNewParamsObjectTypeGroup         ViewNewParamsObjectType = "group"
+	ViewNewParamsObjectTypeRole          ViewNewParamsObjectType = "role"
+	ViewNewParamsObjectTypeOrgMember     ViewNewParamsObjectType = "org_member"
+	ViewNewParamsObjectTypeProjectLog    ViewNewParamsObjectType = "project_log"
+	ViewNewParamsObjectTypeOrgProject    ViewNewParamsObjectType = "org_project"
+)
+
+func (r ViewNewParamsObjectType) IsKnown() bool {
+	switch r {
+	case ViewNewParamsObjectTypeOrganization, ViewNewParamsObjectTypeProject, ViewNewParamsObjectTypeExperiment, ViewNewParamsObjectTypeDataset, ViewNewParamsObjectTypePrompt, ViewNewParamsObjectTypePromptSession, ViewNewParamsObjectTypeGroup, ViewNewParamsObjectTypeRole, ViewNewParamsObjectTypeOrgMember, ViewNewParamsObjectTypeProjectLog, ViewNewParamsObjectTypeOrgProject:
+		return true
+	}
+	return false
+}
+
+// Type of table that the view corresponds to.
+type ViewNewParamsViewType string
+
+const (
+	ViewNewParamsViewTypeProjects    ViewNewParamsViewType = "projects"
+	ViewNewParamsViewTypeLogs        ViewNewParamsViewType = "logs"
+	ViewNewParamsViewTypeExperiments ViewNewParamsViewType = "experiments"
+	ViewNewParamsViewTypeDatasets    ViewNewParamsViewType = "datasets"
+	ViewNewParamsViewTypePrompts     ViewNewParamsViewType = "prompts"
+	ViewNewParamsViewTypePlaygrounds ViewNewParamsViewType = "playgrounds"
+	ViewNewParamsViewTypeExperiment  ViewNewParamsViewType = "experiment"
+	ViewNewParamsViewTypeDataset     ViewNewParamsViewType = "dataset"
+)
+
+func (r ViewNewParamsViewType) IsKnown() bool {
+	switch r {
+	case ViewNewParamsViewTypeProjects, ViewNewParamsViewTypeLogs, ViewNewParamsViewTypeExperiments, ViewNewParamsViewTypeDatasets, ViewNewParamsViewTypePrompts, ViewNewParamsViewTypePlaygrounds, ViewNewParamsViewTypeExperiment, ViewNewParamsViewTypeDataset:
+		return true
+	}
+	return false
 }
 
 type ViewGetParams struct {
@@ -168,11 +231,71 @@ func (r ViewGetParamsObjectType) IsKnown() bool {
 }
 
 type ViewUpdateParams struct {
-	PatchView shared.PatchViewParam `json:"patch_view,required"`
+	// The id of the object the view applies to
+	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	// The object type that the ACL applies to
+	ObjectType param.Field[ViewUpdateParamsObjectType] `json:"object_type,required"`
+	// Name of the view
+	Name param.Field[string] `json:"name"`
+	// Options for the view in the app
+	Options param.Field[shared.ViewOptionsParam] `json:"options"`
+	// Identifies the user who created the view
+	UserID param.Field[string] `json:"user_id" format:"uuid"`
+	// The view definition
+	ViewData param.Field[shared.ViewDataParam] `json:"view_data"`
+	// Type of table that the view corresponds to.
+	ViewType param.Field[ViewUpdateParamsViewType] `json:"view_type"`
 }
 
 func (r ViewUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.PatchView)
+	return apijson.MarshalRoot(r)
+}
+
+// The object type that the ACL applies to
+type ViewUpdateParamsObjectType string
+
+const (
+	ViewUpdateParamsObjectTypeOrganization  ViewUpdateParamsObjectType = "organization"
+	ViewUpdateParamsObjectTypeProject       ViewUpdateParamsObjectType = "project"
+	ViewUpdateParamsObjectTypeExperiment    ViewUpdateParamsObjectType = "experiment"
+	ViewUpdateParamsObjectTypeDataset       ViewUpdateParamsObjectType = "dataset"
+	ViewUpdateParamsObjectTypePrompt        ViewUpdateParamsObjectType = "prompt"
+	ViewUpdateParamsObjectTypePromptSession ViewUpdateParamsObjectType = "prompt_session"
+	ViewUpdateParamsObjectTypeGroup         ViewUpdateParamsObjectType = "group"
+	ViewUpdateParamsObjectTypeRole          ViewUpdateParamsObjectType = "role"
+	ViewUpdateParamsObjectTypeOrgMember     ViewUpdateParamsObjectType = "org_member"
+	ViewUpdateParamsObjectTypeProjectLog    ViewUpdateParamsObjectType = "project_log"
+	ViewUpdateParamsObjectTypeOrgProject    ViewUpdateParamsObjectType = "org_project"
+)
+
+func (r ViewUpdateParamsObjectType) IsKnown() bool {
+	switch r {
+	case ViewUpdateParamsObjectTypeOrganization, ViewUpdateParamsObjectTypeProject, ViewUpdateParamsObjectTypeExperiment, ViewUpdateParamsObjectTypeDataset, ViewUpdateParamsObjectTypePrompt, ViewUpdateParamsObjectTypePromptSession, ViewUpdateParamsObjectTypeGroup, ViewUpdateParamsObjectTypeRole, ViewUpdateParamsObjectTypeOrgMember, ViewUpdateParamsObjectTypeProjectLog, ViewUpdateParamsObjectTypeOrgProject:
+		return true
+	}
+	return false
+}
+
+// Type of table that the view corresponds to.
+type ViewUpdateParamsViewType string
+
+const (
+	ViewUpdateParamsViewTypeProjects    ViewUpdateParamsViewType = "projects"
+	ViewUpdateParamsViewTypeLogs        ViewUpdateParamsViewType = "logs"
+	ViewUpdateParamsViewTypeExperiments ViewUpdateParamsViewType = "experiments"
+	ViewUpdateParamsViewTypeDatasets    ViewUpdateParamsViewType = "datasets"
+	ViewUpdateParamsViewTypePrompts     ViewUpdateParamsViewType = "prompts"
+	ViewUpdateParamsViewTypePlaygrounds ViewUpdateParamsViewType = "playgrounds"
+	ViewUpdateParamsViewTypeExperiment  ViewUpdateParamsViewType = "experiment"
+	ViewUpdateParamsViewTypeDataset     ViewUpdateParamsViewType = "dataset"
+)
+
+func (r ViewUpdateParamsViewType) IsKnown() bool {
+	switch r {
+	case ViewUpdateParamsViewTypeProjects, ViewUpdateParamsViewTypeLogs, ViewUpdateParamsViewTypeExperiments, ViewUpdateParamsViewTypeDatasets, ViewUpdateParamsViewTypePrompts, ViewUpdateParamsViewTypePlaygrounds, ViewUpdateParamsViewTypeExperiment, ViewUpdateParamsViewTypeDataset:
+		return true
+	}
+	return false
 }
 
 type ViewListParams struct {
@@ -271,17 +394,107 @@ func (r ViewListParamsViewType) IsKnown() bool {
 }
 
 type ViewDeleteParams struct {
-	DeleteView shared.DeleteViewParam `json:"delete_view,required"`
+	// The id of the object the view applies to
+	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	// The object type that the ACL applies to
+	ObjectType param.Field[ViewDeleteParamsObjectType] `json:"object_type,required"`
 }
 
 func (r ViewDeleteParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.DeleteView)
+	return apijson.MarshalRoot(r)
+}
+
+// The object type that the ACL applies to
+type ViewDeleteParamsObjectType string
+
+const (
+	ViewDeleteParamsObjectTypeOrganization  ViewDeleteParamsObjectType = "organization"
+	ViewDeleteParamsObjectTypeProject       ViewDeleteParamsObjectType = "project"
+	ViewDeleteParamsObjectTypeExperiment    ViewDeleteParamsObjectType = "experiment"
+	ViewDeleteParamsObjectTypeDataset       ViewDeleteParamsObjectType = "dataset"
+	ViewDeleteParamsObjectTypePrompt        ViewDeleteParamsObjectType = "prompt"
+	ViewDeleteParamsObjectTypePromptSession ViewDeleteParamsObjectType = "prompt_session"
+	ViewDeleteParamsObjectTypeGroup         ViewDeleteParamsObjectType = "group"
+	ViewDeleteParamsObjectTypeRole          ViewDeleteParamsObjectType = "role"
+	ViewDeleteParamsObjectTypeOrgMember     ViewDeleteParamsObjectType = "org_member"
+	ViewDeleteParamsObjectTypeProjectLog    ViewDeleteParamsObjectType = "project_log"
+	ViewDeleteParamsObjectTypeOrgProject    ViewDeleteParamsObjectType = "org_project"
+)
+
+func (r ViewDeleteParamsObjectType) IsKnown() bool {
+	switch r {
+	case ViewDeleteParamsObjectTypeOrganization, ViewDeleteParamsObjectTypeProject, ViewDeleteParamsObjectTypeExperiment, ViewDeleteParamsObjectTypeDataset, ViewDeleteParamsObjectTypePrompt, ViewDeleteParamsObjectTypePromptSession, ViewDeleteParamsObjectTypeGroup, ViewDeleteParamsObjectTypeRole, ViewDeleteParamsObjectTypeOrgMember, ViewDeleteParamsObjectTypeProjectLog, ViewDeleteParamsObjectTypeOrgProject:
+		return true
+	}
+	return false
 }
 
 type ViewReplaceParams struct {
-	CreateView shared.CreateViewParam `json:"create_view,required"`
+	// Name of the view
+	Name param.Field[string] `json:"name,required"`
+	// The id of the object the view applies to
+	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	// The object type that the ACL applies to
+	ObjectType param.Field[ViewReplaceParamsObjectType] `json:"object_type,required"`
+	// Type of table that the view corresponds to.
+	ViewType param.Field[ViewReplaceParamsViewType] `json:"view_type,required"`
+	// Date of role deletion, or null if the role is still active
+	DeletedAt param.Field[time.Time] `json:"deleted_at" format:"date-time"`
+	// Options for the view in the app
+	Options param.Field[shared.ViewOptionsParam] `json:"options"`
+	// Identifies the user who created the view
+	UserID param.Field[string] `json:"user_id" format:"uuid"`
+	// The view definition
+	ViewData param.Field[shared.ViewDataParam] `json:"view_data"`
 }
 
 func (r ViewReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.CreateView)
+	return apijson.MarshalRoot(r)
+}
+
+// The object type that the ACL applies to
+type ViewReplaceParamsObjectType string
+
+const (
+	ViewReplaceParamsObjectTypeOrganization  ViewReplaceParamsObjectType = "organization"
+	ViewReplaceParamsObjectTypeProject       ViewReplaceParamsObjectType = "project"
+	ViewReplaceParamsObjectTypeExperiment    ViewReplaceParamsObjectType = "experiment"
+	ViewReplaceParamsObjectTypeDataset       ViewReplaceParamsObjectType = "dataset"
+	ViewReplaceParamsObjectTypePrompt        ViewReplaceParamsObjectType = "prompt"
+	ViewReplaceParamsObjectTypePromptSession ViewReplaceParamsObjectType = "prompt_session"
+	ViewReplaceParamsObjectTypeGroup         ViewReplaceParamsObjectType = "group"
+	ViewReplaceParamsObjectTypeRole          ViewReplaceParamsObjectType = "role"
+	ViewReplaceParamsObjectTypeOrgMember     ViewReplaceParamsObjectType = "org_member"
+	ViewReplaceParamsObjectTypeProjectLog    ViewReplaceParamsObjectType = "project_log"
+	ViewReplaceParamsObjectTypeOrgProject    ViewReplaceParamsObjectType = "org_project"
+)
+
+func (r ViewReplaceParamsObjectType) IsKnown() bool {
+	switch r {
+	case ViewReplaceParamsObjectTypeOrganization, ViewReplaceParamsObjectTypeProject, ViewReplaceParamsObjectTypeExperiment, ViewReplaceParamsObjectTypeDataset, ViewReplaceParamsObjectTypePrompt, ViewReplaceParamsObjectTypePromptSession, ViewReplaceParamsObjectTypeGroup, ViewReplaceParamsObjectTypeRole, ViewReplaceParamsObjectTypeOrgMember, ViewReplaceParamsObjectTypeProjectLog, ViewReplaceParamsObjectTypeOrgProject:
+		return true
+	}
+	return false
+}
+
+// Type of table that the view corresponds to.
+type ViewReplaceParamsViewType string
+
+const (
+	ViewReplaceParamsViewTypeProjects    ViewReplaceParamsViewType = "projects"
+	ViewReplaceParamsViewTypeLogs        ViewReplaceParamsViewType = "logs"
+	ViewReplaceParamsViewTypeExperiments ViewReplaceParamsViewType = "experiments"
+	ViewReplaceParamsViewTypeDatasets    ViewReplaceParamsViewType = "datasets"
+	ViewReplaceParamsViewTypePrompts     ViewReplaceParamsViewType = "prompts"
+	ViewReplaceParamsViewTypePlaygrounds ViewReplaceParamsViewType = "playgrounds"
+	ViewReplaceParamsViewTypeExperiment  ViewReplaceParamsViewType = "experiment"
+	ViewReplaceParamsViewTypeDataset     ViewReplaceParamsViewType = "dataset"
+)
+
+func (r ViewReplaceParamsViewType) IsKnown() bool {
+	switch r {
+	case ViewReplaceParamsViewTypeProjects, ViewReplaceParamsViewTypeLogs, ViewReplaceParamsViewTypeExperiments, ViewReplaceParamsViewTypeDatasets, ViewReplaceParamsViewTypePrompts, ViewReplaceParamsViewTypePlaygrounds, ViewReplaceParamsViewTypeExperiment, ViewReplaceParamsViewTypeDataset:
+		return true
+	}
+	return false
 }

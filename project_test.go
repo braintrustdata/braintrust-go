@@ -27,10 +27,8 @@ func TestProjectNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Projects.New(context.TODO(), braintrust.ProjectNewParams{
-		CreateProject: shared.CreateProjectParam{
-			Name:    braintrust.F("name"),
-			OrgName: braintrust.F("org_name"),
-		},
+		Name:    braintrust.F("name"),
+		OrgName: braintrust.F("org_name"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -79,12 +77,10 @@ func TestProjectUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectUpdateParams{
-			PatchProject: shared.PatchProjectParam{
-				Name: braintrust.F("name"),
-				Settings: braintrust.F(shared.PatchProjectSettingsParam{
-					ComparisonKey: braintrust.F("comparison_key"),
-				}),
-			},
+			Name: braintrust.F("name"),
+			Settings: braintrust.F(braintrust.ProjectUpdateParamsSettings{
+				ComparisonKey: braintrust.F("comparison_key"),
+			}),
 		},
 	)
 	if err != nil {

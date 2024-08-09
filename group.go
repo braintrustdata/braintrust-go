@@ -120,19 +120,44 @@ func (r *GroupService) Replace(ctx context.Context, body GroupReplaceParams, opt
 }
 
 type GroupNewParams struct {
-	CreateGroup shared.CreateGroupParam `json:"create_group,required"`
+	// Name of the group
+	Name param.Field[string] `json:"name,required"`
+	// Textual description of the group
+	Description param.Field[string] `json:"description"`
+	// Ids of the groups this group inherits from
+	//
+	// An inheriting group has all the users contained in its member groups, as well as
+	// all of their inherited users
+	MemberGroups param.Field[[]string] `json:"member_groups" format:"uuid"`
+	// Ids of users which belong to this group
+	MemberUsers param.Field[[]string] `json:"member_users" format:"uuid"`
+	// For nearly all users, this parameter should be unnecessary. But in the rare case
+	// that your API key belongs to multiple organizations, you may specify the name of
+	// the organization the group belongs in.
+	OrgName param.Field[string] `json:"org_name"`
 }
 
 func (r GroupNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.CreateGroup)
+	return apijson.MarshalRoot(r)
 }
 
 type GroupUpdateParams struct {
-	PatchGroup shared.PatchGroupParam `json:"patch_group,required"`
+	// A list of group IDs to add to the group's inheriting-from set
+	AddMemberGroups param.Field[[]string] `json:"add_member_groups" format:"uuid"`
+	// A list of user IDs to add to the group
+	AddMemberUsers param.Field[[]string] `json:"add_member_users" format:"uuid"`
+	// Textual description of the group
+	Description param.Field[string] `json:"description"`
+	// Name of the group
+	Name param.Field[string] `json:"name"`
+	// A list of group IDs to remove from the group's inheriting-from set
+	RemoveMemberGroups param.Field[[]string] `json:"remove_member_groups" format:"uuid"`
+	// A list of user IDs to remove from the group
+	RemoveMemberUsers param.Field[[]string] `json:"remove_member_users" format:"uuid"`
 }
 
 func (r GroupUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.PatchGroup)
+	return apijson.MarshalRoot(r)
 }
 
 type GroupListParams struct {
@@ -180,9 +205,23 @@ type GroupListParamsIDsArray []string
 func (r GroupListParamsIDsArray) ImplementsGroupListParamsIDsUnion() {}
 
 type GroupReplaceParams struct {
-	CreateGroup shared.CreateGroupParam `json:"create_group,required"`
+	// Name of the group
+	Name param.Field[string] `json:"name,required"`
+	// Textual description of the group
+	Description param.Field[string] `json:"description"`
+	// Ids of the groups this group inherits from
+	//
+	// An inheriting group has all the users contained in its member groups, as well as
+	// all of their inherited users
+	MemberGroups param.Field[[]string] `json:"member_groups" format:"uuid"`
+	// Ids of users which belong to this group
+	MemberUsers param.Field[[]string] `json:"member_users" format:"uuid"`
+	// For nearly all users, this parameter should be unnecessary. But in the rare case
+	// that your API key belongs to multiple organizations, you may specify the name of
+	// the organization the group belongs in.
+	OrgName param.Field[string] `json:"org_name"`
 }
 
 func (r GroupReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.CreateGroup)
+	return apijson.MarshalRoot(r)
 }

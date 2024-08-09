@@ -121,19 +121,37 @@ func (r *PromptService) Replace(ctx context.Context, body PromptReplaceParams, o
 }
 
 type PromptNewParams struct {
-	CreatePrompt shared.CreatePromptParam `json:"create_prompt,required"`
+	// Name of the prompt
+	Name param.Field[string] `json:"name,required"`
+	// Unique identifier for the project that the prompt belongs under
+	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	// Unique identifier for the prompt
+	Slug param.Field[string] `json:"slug,required"`
+	// Textual description of the prompt
+	Description param.Field[string] `json:"description"`
+	// The prompt, model, and its parameters
+	PromptData param.Field[shared.PromptDataParam] `json:"prompt_data"`
+	// A list of tags for the prompt
+	Tags param.Field[[]string] `json:"tags"`
 }
 
 func (r PromptNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.CreatePrompt)
+	return apijson.MarshalRoot(r)
 }
 
 type PromptUpdateParams struct {
-	PatchPrompt shared.PatchPromptParam `json:"patch_prompt,required"`
+	// Textual description of the prompt
+	Description param.Field[string] `json:"description"`
+	// Name of the prompt
+	Name param.Field[string] `json:"name"`
+	// The prompt, model, and its parameters
+	PromptData param.Field[shared.PromptDataParam] `json:"prompt_data"`
+	// A list of tags for the prompt
+	Tags param.Field[[]string] `json:"tags"`
 }
 
 func (r PromptUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.PatchPrompt)
+	return apijson.MarshalRoot(r)
 }
 
 type PromptListParams struct {
@@ -192,9 +210,20 @@ type PromptListParamsIDsArray []string
 func (r PromptListParamsIDsArray) ImplementsPromptListParamsIDsUnion() {}
 
 type PromptReplaceParams struct {
-	CreatePrompt shared.CreatePromptParam `json:"create_prompt,required"`
+	// Name of the prompt
+	Name param.Field[string] `json:"name,required"`
+	// Unique identifier for the project that the prompt belongs under
+	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	// Unique identifier for the prompt
+	Slug param.Field[string] `json:"slug,required"`
+	// Textual description of the prompt
+	Description param.Field[string] `json:"description"`
+	// The prompt, model, and its parameters
+	PromptData param.Field[shared.PromptDataParam] `json:"prompt_data"`
+	// A list of tags for the prompt
+	Tags param.Field[[]string] `json:"tags"`
 }
 
 func (r PromptReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r.CreatePrompt)
+	return apijson.MarshalRoot(r)
 }

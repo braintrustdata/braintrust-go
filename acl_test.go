@@ -27,15 +27,13 @@ func TestACLNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ACLs.New(context.TODO(), braintrust.ACLNewParams{
-		CreateACL: shared.CreateACLParam{
-			ObjectType:         braintrust.F(shared.CreateACLObjectTypeOrganization),
-			ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			Permission:         braintrust.F(shared.CreateACLPermissionCreate),
-			RestrictObjectType: braintrust.F(shared.CreateACLRestrictObjectTypeOrganization),
-			RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		},
+		ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		ObjectType:         braintrust.F(braintrust.ACLNewParamsObjectTypeOrganization),
+		GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		Permission:         braintrust.F(braintrust.ACLNewParamsPermissionCreate),
+		RestrictObjectType: braintrust.F(braintrust.ACLNewParamsRestrictObjectTypeOrganization),
+		RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error

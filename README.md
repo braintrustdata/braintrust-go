@@ -46,7 +46,6 @@ import (
 
 	"github.com/braintrustdata/braintrust-go"
 	"github.com/braintrustdata/braintrust-go/option"
-	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 func main() {
@@ -54,9 +53,7 @@ func main() {
 		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("BRAINTRUST_API_KEY")
 	)
 	project, err := client.Projects.New(context.TODO(), braintrust.ProjectNewParams{
-		CreateProject: shared.CreateProjectParam{
-			Name: braintrust.F("name"),
-		},
+		Name: braintrust.F("foobar"),
 	})
 	if err != nil {
 		panic(err.Error())
@@ -205,9 +202,7 @@ To handle errors, we recommend that you use the `errors.As` pattern:
 
 ```go
 _, err := client.Projects.New(context.TODO(), braintrust.ProjectNewParams{
-	CreateProject: shared.CreateProjectParam{
-		Name: braintrust.F("name"),
-	},
+	Name: braintrust.F("foobar"),
 })
 if err != nil {
 	var apierr *braintrust.Error
@@ -236,9 +231,7 @@ defer cancel()
 client.Projects.New(
 	ctx,
 	braintrust.ProjectNewParams{
-		CreateProject: shared.CreateProjectParam{
-			Name: braintrust.F("name"),
-		},
+		Name: braintrust.F("foobar"),
 	},
 	// This sets the per-retry timeout
 	option.WithRequestTimeout(20*time.Second),
@@ -276,9 +269,7 @@ client := braintrust.NewClient(
 client.Projects.New(
 	context.TODO(),
 	braintrust.ProjectNewParams{
-		CreateProject: shared.CreateProjectParam{
-			Name: braintrust.F("name"),
-		},
+		Name: braintrust.F("foobar"),
 	},
 	option.WithMaxRetries(5),
 )
