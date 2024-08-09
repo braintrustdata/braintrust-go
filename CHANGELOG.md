@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0 (2024-08-09)
+
+Full Changelog: [v0.2.0...v0.3.0](https://github.com/braintrustdata/braintrust-go/compare/v0.2.0...v0.3.0)
+
+### Features
+
+* **api:** update via SDK Studio ([#60](https://github.com/braintrustdata/braintrust-go/issues/60)) ([0428527](https://github.com/braintrustdata/braintrust-go/commit/04285278647f83c4658d1afbf4dbd196331ef3e7))
+
+
+### Bug Fixes
+
+* deserialization of struct unions that implement json.Unmarshaler ([#62](https://github.com/braintrustdata/braintrust-go/issues/62)) ([9abee30](https://github.com/braintrustdata/braintrust-go/commit/9abee30e0c3db70118e891f17f427d03bbe045a7))
+
 ## 0.2.0 (2024-08-09)
 
 Full Changelog: [v0.1.0...v0.2.0](https://github.com/braintrustdata/braintrust-go/compare/v0.1.0...v0.2.0)
