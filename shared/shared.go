@@ -148,10 +148,6 @@ func (r ACLRestrictObjectType) IsKnown() bool {
 	return false
 }
 
-type ACLIDParam = string
-
-type ACLObjectIDParam = string
-
 type APIKey struct {
 	// Unique identifier for the api key
 	ID string `json:"id,required" format:"uuid"`
@@ -186,14 +182,6 @@ func (r *APIKey) UnmarshalJSON(data []byte) (err error) {
 func (r apiKeyJSON) RawJSON() string {
 	return r.raw
 }
-
-type APIKeyIDParam = string
-
-type APIKeyNameParam = string
-
-type AppLimitParam = int64
-
-type ComparisonExperimentIDParam = string
 
 // An ACL grants a certain permission or role to a certain user or group on an
 // object.
@@ -1030,10 +1018,6 @@ func (r datasetEventJSON) RawJSON() string {
 	return r.raw
 }
 
-type DatasetIDParam = string
-
-type DatasetNameParam = string
-
 type DeleteViewParam struct {
 	// The id of the object the view applies to
 	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
@@ -1069,8 +1053,6 @@ func (r DeleteViewObjectType) IsKnown() bool {
 	}
 	return false
 }
-
-type EndingBeforeParam = string
 
 type Experiment struct {
 	// Unique identifier for the experiment
@@ -1372,10 +1354,6 @@ func (r ExperimentEventSpanAttributesType) IsKnown() bool {
 	return false
 }
 
-type ExperimentIDParam = string
-
-type ExperimentNameParam = string
-
 type FeedbackDatasetEventRequestParam struct {
 	// A list of dataset feedback items
 	Feedback param.Field[[]FeedbackDatasetItemParam] `json:"feedback,required"`
@@ -1545,8 +1523,6 @@ func (r fetchDatasetEventsResponseJSON) RawJSON() string {
 	return r.raw
 }
 
-type FetchEventsFiltersParam []PathLookupFilterParam
-
 type FetchEventsRequestParam struct {
 	// An opaque string to be used as a cursor for the next page of results, in order
 	// from latest to earliest.
@@ -1556,7 +1532,7 @@ type FetchEventsRequestParam struct {
 	Cursor param.Field[string] `json:"cursor"`
 	// A list of filters on the events to fetch. Currently, only path-lookup type
 	// filters are supported, but we may add more in the future
-	Filters param.Field[FetchEventsFiltersParam] `json:"filters"`
+	Filters param.Field[[]PathLookupFilterParam] `json:"filters"`
 	// limit the number of traces fetched
 	//
 	// Fetch queries may be paginated if the total result size is expected to be large
@@ -1633,8 +1609,6 @@ func (r *FetchExperimentEventsResponse) UnmarshalJSON(data []byte) (err error) {
 func (r fetchExperimentEventsResponseJSON) RawJSON() string {
 	return r.raw
 }
-
-type FetchLimitParam = int64
 
 type FetchProjectLogsEventsResponse struct {
 	// A list of fetched events
@@ -2098,10 +2072,6 @@ func (r FunctionLogID) IsKnown() bool {
 	return false
 }
 
-type FunctionIDParam = string
-
-type FunctionNameParam = string
-
 // A group is a collection of users which can be assigned an ACL
 //
 // Groups can consist of individual users, as well as a set of groups they inherit
@@ -2154,78 +2124,6 @@ func (r *Group) UnmarshalJSON(data []byte) (err error) {
 
 func (r groupJSON) RawJSON() string {
 	return r.raw
-}
-
-type GroupIDParam = string
-
-type GroupNameParam = string
-
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
-//
-// Satisfied by [shared.UnionString], [shared.IDsArrayParam].
-type IDsUnionParam interface {
-	ImplementsSharedIDsUnionParam()
-}
-
-type IDsArrayParam []string
-
-func (r IDsArrayParam) ImplementsSharedIDsUnionParam() {}
-
-// A dataset event
-type InsertDatasetEventParam struct {
-	Input    param.Field[interface{}] `json:"input,required"`
-	Expected param.Field[interface{}] `json:"expected,required"`
-	Metadata param.Field[interface{}] `json:"metadata,required"`
-	Tags     param.Field[interface{}] `json:"tags,required"`
-	// A unique identifier for the dataset event. If you don't provide one, BrainTrust
-	// will generate one for you
-	ID param.Field[string] `json:"id"`
-	// The timestamp the dataset event was created
-	Created param.Field[time.Time] `json:"created" format:"date-time"`
-	// Pass `_object_delete=true` to mark the dataset event deleted. Deleted events
-	// will not show up in subsequent fetches for this dataset
-	ObjectDelete param.Field[bool] `json:"_object_delete"`
-	// The `_is_merge` field controls how the row is merged with any existing row with
-	// the same id in the DB. By default (or when set to `false`), the existing row is
-	// completely replaced by the new row. When set to `true`, the new row is
-	// deep-merged into the existing row
-	//
-	// For example, say there is an existing row in the DB
-	// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
-	// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
-	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
-	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
-	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[bool] `json:"_is_merge"`
-	// Use the `_parent_id` field to create this row as a subspan of an existing row.
-	// It cannot be specified alongside `_is_merge=true`. Tracking hierarchical
-	// relationships are important for tracing (see the
-	// [guide](https://www.braintrust.dev/docs/guides/tracing) for full details).
-	//
-	// For example, say we have logged a row
-	// `{"id": "abc", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
-	// We can create a sub-span of the parent row by logging
-	// `{"_parent_id": "abc", "id": "llm_call", "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
-	// In the webapp, only the root span row `"abc"` will show up in the summary view.
-	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
-	// clicking on the "abc" row.
-	ParentID   param.Field[string]      `json:"_parent_id"`
-	MergePaths param.Field[interface{}] `json:"_merge_paths,required"`
-}
-
-func (r InsertDatasetEventParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r InsertDatasetEventParam) ImplementsSharedInsertDatasetEventUnionParam() {}
-
-// A dataset event
-//
-// Satisfied by [shared.InsertDatasetEventReplaceParam],
-// [shared.InsertDatasetEventMergeParam], [InsertDatasetEventParam].
-type InsertDatasetEventUnionParam interface {
-	ImplementsSharedInsertDatasetEventUnionParam()
 }
 
 type InsertDatasetEventMergeParam struct {
@@ -2283,7 +2181,7 @@ func (r InsertDatasetEventMergeParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r InsertDatasetEventMergeParam) ImplementsSharedInsertDatasetEventUnionParam() {}
+func (r InsertDatasetEventMergeParam) ImplementsSharedInsertDatasetEventRequestEventsUnionParam() {}
 
 type InsertDatasetEventReplaceParam struct {
 	// A unique identifier for the dataset event. If you don't provide one, BrainTrust
@@ -2339,62 +2237,30 @@ func (r InsertDatasetEventReplaceParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r InsertDatasetEventReplaceParam) ImplementsSharedInsertDatasetEventUnionParam() {}
+func (r InsertDatasetEventReplaceParam) ImplementsSharedInsertDatasetEventRequestEventsUnionParam() {}
 
 type InsertDatasetEventRequestParam struct {
 	// A list of dataset events to insert
-	Events param.Field[[]InsertDatasetEventUnionParam] `json:"events,required"`
+	Events param.Field[[]InsertDatasetEventRequestEventsUnionParam] `json:"events,required"`
 }
 
 func (r InsertDatasetEventRequestParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-type InsertEventsResponse struct {
-	// The ids of all rows that were inserted, aligning one-to-one with the rows
-	// provided as input
-	RowIDs []string                 `json:"row_ids,required"`
-	JSON   insertEventsResponseJSON `json:"-"`
-}
-
-// insertEventsResponseJSON contains the JSON metadata for the struct
-// [InsertEventsResponse]
-type insertEventsResponseJSON struct {
-	RowIDs      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *InsertEventsResponse) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r insertEventsResponseJSON) RawJSON() string {
-	return r.raw
-}
-
-// An experiment event
-type InsertExperimentEventParam struct {
-	Input          param.Field[interface{}] `json:"input,required"`
-	Output         param.Field[interface{}] `json:"output,required"`
-	Expected       param.Field[interface{}] `json:"expected,required"`
-	Error          param.Field[interface{}] `json:"error,required"`
-	Scores         param.Field[interface{}] `json:"scores,required"`
-	Metadata       param.Field[interface{}] `json:"metadata,required"`
-	Tags           param.Field[interface{}] `json:"tags,required"`
-	Metrics        param.Field[interface{}] `json:"metrics,required"`
-	Context        param.Field[interface{}] `json:"context,required"`
-	SpanAttributes param.Field[interface{}] `json:"span_attributes,required"`
-	// A unique identifier for the experiment event. If you don't provide one,
-	// BrainTrust will generate one for you
+// A dataset event
+type InsertDatasetEventRequestEventParam struct {
+	Input    param.Field[interface{}] `json:"input,required"`
+	Expected param.Field[interface{}] `json:"expected,required"`
+	Metadata param.Field[interface{}] `json:"metadata,required"`
+	Tags     param.Field[interface{}] `json:"tags,required"`
+	// A unique identifier for the dataset event. If you don't provide one, BrainTrust
+	// will generate one for you
 	ID param.Field[string] `json:"id"`
-	// If the experiment is associated to a dataset, this is the event-level dataset id
-	// this experiment event is tied to
-	DatasetRecordID param.Field[string] `json:"dataset_record_id"`
-	// The timestamp the experiment event was created
+	// The timestamp the dataset event was created
 	Created param.Field[time.Time] `json:"created" format:"date-time"`
-	// Pass `_object_delete=true` to mark the experiment event deleted. Deleted events
-	// will not show up in subsequent fetches for this experiment
+	// Pass `_object_delete=true` to mark the dataset event deleted. Deleted events
+	// will not show up in subsequent fetches for this dataset
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
 	// The `_is_merge` field controls how the row is merged with any existing row with
 	// the same id in the DB. By default (or when set to `false`), the existing row is
@@ -2424,18 +2290,42 @@ type InsertExperimentEventParam struct {
 	MergePaths param.Field[interface{}] `json:"_merge_paths,required"`
 }
 
-func (r InsertExperimentEventParam) MarshalJSON() (data []byte, err error) {
+func (r InsertDatasetEventRequestEventParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r InsertExperimentEventParam) ImplementsSharedInsertExperimentEventUnionParam() {}
+func (r InsertDatasetEventRequestEventParam) ImplementsSharedInsertDatasetEventRequestEventsUnionParam() {
+}
 
-// An experiment event
+// A dataset event
 //
-// Satisfied by [shared.InsertExperimentEventReplaceParam],
-// [shared.InsertExperimentEventMergeParam], [InsertExperimentEventParam].
-type InsertExperimentEventUnionParam interface {
-	ImplementsSharedInsertExperimentEventUnionParam()
+// Satisfied by [shared.InsertDatasetEventReplaceParam],
+// [shared.InsertDatasetEventMergeParam], [InsertDatasetEventRequestEventParam].
+type InsertDatasetEventRequestEventsUnionParam interface {
+	ImplementsSharedInsertDatasetEventRequestEventsUnionParam()
+}
+
+type InsertEventsResponse struct {
+	// The ids of all rows that were inserted, aligning one-to-one with the rows
+	// provided as input
+	RowIDs []string                 `json:"row_ids,required"`
+	JSON   insertEventsResponseJSON `json:"-"`
+}
+
+// insertEventsResponseJSON contains the JSON metadata for the struct
+// [InsertEventsResponse]
+type insertEventsResponseJSON struct {
+	RowIDs      apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *InsertEventsResponse) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r insertEventsResponseJSON) RawJSON() string {
+	return r.raw
 }
 
 type InsertExperimentEventMergeParam struct {
@@ -2532,7 +2422,8 @@ func (r InsertExperimentEventMergeParam) MarshalJSON() (data []byte, err error) 
 	return apijson.MarshalRoot(r)
 }
 
-func (r InsertExperimentEventMergeParam) ImplementsSharedInsertExperimentEventUnionParam() {}
+func (r InsertExperimentEventMergeParam) ImplementsSharedInsertExperimentEventRequestEventsUnionParam() {
+}
 
 // Context is additional information about the code that produced the experiment
 // event. It is essentially the textual counterpart to `metrics`. Use the
@@ -2703,7 +2594,8 @@ func (r InsertExperimentEventReplaceParam) MarshalJSON() (data []byte, err error
 	return apijson.MarshalRoot(r)
 }
 
-func (r InsertExperimentEventReplaceParam) ImplementsSharedInsertExperimentEventUnionParam() {}
+func (r InsertExperimentEventReplaceParam) ImplementsSharedInsertExperimentEventRequestEventsUnionParam() {
+}
 
 // Context is additional information about the code that produced the experiment
 // event. It is essentially the textual counterpart to `metrics`. Use the
@@ -2783,15 +2675,15 @@ func (r InsertExperimentEventReplaceSpanAttributesType) IsKnown() bool {
 
 type InsertExperimentEventRequestParam struct {
 	// A list of experiment events to insert
-	Events param.Field[[]InsertExperimentEventUnionParam] `json:"events,required"`
+	Events param.Field[[]InsertExperimentEventRequestEventsUnionParam] `json:"events,required"`
 }
 
 func (r InsertExperimentEventRequestParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-// A project logs event
-type InsertProjectLogsEventParam struct {
+// An experiment event
+type InsertExperimentEventRequestEventParam struct {
 	Input          param.Field[interface{}] `json:"input,required"`
 	Output         param.Field[interface{}] `json:"output,required"`
 	Expected       param.Field[interface{}] `json:"expected,required"`
@@ -2802,13 +2694,16 @@ type InsertProjectLogsEventParam struct {
 	Metrics        param.Field[interface{}] `json:"metrics,required"`
 	Context        param.Field[interface{}] `json:"context,required"`
 	SpanAttributes param.Field[interface{}] `json:"span_attributes,required"`
-	// A unique identifier for the project logs event. If you don't provide one,
+	// A unique identifier for the experiment event. If you don't provide one,
 	// BrainTrust will generate one for you
 	ID param.Field[string] `json:"id"`
-	// The timestamp the project logs event was created
+	// If the experiment is associated to a dataset, this is the event-level dataset id
+	// this experiment event is tied to
+	DatasetRecordID param.Field[string] `json:"dataset_record_id"`
+	// The timestamp the experiment event was created
 	Created param.Field[time.Time] `json:"created" format:"date-time"`
-	// Pass `_object_delete=true` to mark the project logs event deleted. Deleted
-	// events will not show up in subsequent fetches for this project logs
+	// Pass `_object_delete=true` to mark the experiment event deleted. Deleted events
+	// will not show up in subsequent fetches for this experiment
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
 	// The `_is_merge` field controls how the row is merged with any existing row with
 	// the same id in the DB. By default (or when set to `false`), the existing row is
@@ -2838,18 +2733,20 @@ type InsertProjectLogsEventParam struct {
 	MergePaths param.Field[interface{}] `json:"_merge_paths,required"`
 }
 
-func (r InsertProjectLogsEventParam) MarshalJSON() (data []byte, err error) {
+func (r InsertExperimentEventRequestEventParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r InsertProjectLogsEventParam) ImplementsSharedInsertProjectLogsEventUnionParam() {}
+func (r InsertExperimentEventRequestEventParam) ImplementsSharedInsertExperimentEventRequestEventsUnionParam() {
+}
 
-// A project logs event
+// An experiment event
 //
-// Satisfied by [shared.InsertProjectLogsEventReplaceParam],
-// [shared.InsertProjectLogsEventMergeParam], [InsertProjectLogsEventParam].
-type InsertProjectLogsEventUnionParam interface {
-	ImplementsSharedInsertProjectLogsEventUnionParam()
+// Satisfied by [shared.InsertExperimentEventReplaceParam],
+// [shared.InsertExperimentEventMergeParam],
+// [InsertExperimentEventRequestEventParam].
+type InsertExperimentEventRequestEventsUnionParam interface {
+	ImplementsSharedInsertExperimentEventRequestEventsUnionParam()
 }
 
 type InsertProjectLogsEventMergeParam struct {
@@ -2939,7 +2836,8 @@ func (r InsertProjectLogsEventMergeParam) MarshalJSON() (data []byte, err error)
 	return apijson.MarshalRoot(r)
 }
 
-func (r InsertProjectLogsEventMergeParam) ImplementsSharedInsertProjectLogsEventUnionParam() {}
+func (r InsertProjectLogsEventMergeParam) ImplementsSharedInsertProjectLogsEventRequestEventsUnionParam() {
+}
 
 // Context is additional information about the code that produced the project logs
 // event. It is essentially the textual counterpart to `metrics`. Use the
@@ -3103,7 +3001,8 @@ func (r InsertProjectLogsEventReplaceParam) MarshalJSON() (data []byte, err erro
 	return apijson.MarshalRoot(r)
 }
 
-func (r InsertProjectLogsEventReplaceParam) ImplementsSharedInsertProjectLogsEventUnionParam() {}
+func (r InsertProjectLogsEventReplaceParam) ImplementsSharedInsertProjectLogsEventRequestEventsUnionParam() {
+}
 
 // Context is additional information about the code that produced the project logs
 // event. It is essentially the textual counterpart to `metrics`. Use the
@@ -3183,16 +3082,76 @@ func (r InsertProjectLogsEventReplaceSpanAttributesType) IsKnown() bool {
 
 type InsertProjectLogsEventRequestParam struct {
 	// A list of project logs events to insert
-	Events param.Field[[]InsertProjectLogsEventUnionParam] `json:"events,required"`
+	Events param.Field[[]InsertProjectLogsEventRequestEventsUnionParam] `json:"events,required"`
 }
 
 func (r InsertProjectLogsEventRequestParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-type MaxRootSpanIDParam = string
+// A project logs event
+type InsertProjectLogsEventRequestEventParam struct {
+	Input          param.Field[interface{}] `json:"input,required"`
+	Output         param.Field[interface{}] `json:"output,required"`
+	Expected       param.Field[interface{}] `json:"expected,required"`
+	Error          param.Field[interface{}] `json:"error,required"`
+	Scores         param.Field[interface{}] `json:"scores,required"`
+	Metadata       param.Field[interface{}] `json:"metadata,required"`
+	Tags           param.Field[interface{}] `json:"tags,required"`
+	Metrics        param.Field[interface{}] `json:"metrics,required"`
+	Context        param.Field[interface{}] `json:"context,required"`
+	SpanAttributes param.Field[interface{}] `json:"span_attributes,required"`
+	// A unique identifier for the project logs event. If you don't provide one,
+	// BrainTrust will generate one for you
+	ID param.Field[string] `json:"id"`
+	// The timestamp the project logs event was created
+	Created param.Field[time.Time] `json:"created" format:"date-time"`
+	// Pass `_object_delete=true` to mark the project logs event deleted. Deleted
+	// events will not show up in subsequent fetches for this project logs
+	ObjectDelete param.Field[bool] `json:"_object_delete"`
+	// The `_is_merge` field controls how the row is merged with any existing row with
+	// the same id in the DB. By default (or when set to `false`), the existing row is
+	// completely replaced by the new row. When set to `true`, the new row is
+	// deep-merged into the existing row
+	//
+	// For example, say there is an existing row in the DB
+	// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
+	// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
+	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
+	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
+	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
+	IsMerge param.Field[bool] `json:"_is_merge"`
+	// Use the `_parent_id` field to create this row as a subspan of an existing row.
+	// It cannot be specified alongside `_is_merge=true`. Tracking hierarchical
+	// relationships are important for tracing (see the
+	// [guide](https://www.braintrust.dev/docs/guides/tracing) for full details).
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"_parent_id": "abc", "id": "llm_call", "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	ParentID   param.Field[string]      `json:"_parent_id"`
+	MergePaths param.Field[interface{}] `json:"_merge_paths,required"`
+}
 
-type MaxXactIDParam = string
+func (r InsertProjectLogsEventRequestEventParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r InsertProjectLogsEventRequestEventParam) ImplementsSharedInsertProjectLogsEventRequestEventsUnionParam() {
+}
+
+// A project logs event
+//
+// Satisfied by [shared.InsertProjectLogsEventReplaceParam],
+// [shared.InsertProjectLogsEventMergeParam],
+// [InsertProjectLogsEventRequestEventParam].
+type InsertProjectLogsEventRequestEventsUnionParam interface {
+	ImplementsSharedInsertProjectLogsEventRequestEventsUnionParam()
+}
 
 // Summary of a metric's performance
 type MetricSummary struct {
@@ -3231,8 +3190,6 @@ func (r metricSummaryJSON) RawJSON() string {
 	return r.raw
 }
 
-type OrgNameParam = string
-
 type Organization struct {
 	// Unique identifier for the organization
 	ID string `json:"id,required" format:"uuid"`
@@ -3267,10 +3224,6 @@ func (r *Organization) UnmarshalJSON(data []byte) (err error) {
 func (r organizationJSON) RawJSON() string {
 	return r.raw
 }
-
-type OrganizationIDParam = string
-
-type OrganizationNameParam = string
 
 type PatchDatasetParam struct {
 	// Textual description of the dataset
@@ -4049,10 +4002,6 @@ func (r projectSettingsJSON) RawJSON() string {
 	return r.raw
 }
 
-type ProjectIDParam = string
-
-type ProjectIDQueryParam = string
-
 type ProjectLogsEvent struct {
 	// A unique identifier for the project logs event. If you don't provide one,
 	// BrainTrust will generate one for you
@@ -4301,8 +4250,6 @@ func (r ProjectLogsEventSpanAttributesType) IsKnown() bool {
 	return false
 }
 
-type ProjectNameParam = string
-
 // A project score is a user-configured score, which can be manually-labeled
 // through the UI
 type ProjectScore struct {
@@ -4502,10 +4449,6 @@ func (r ProjectScoreCategoryParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-type ProjectScoreIDParam = string
-
-type ProjectScoreNameParam = string
-
 // A project tag is a user-configured tag for tracking and filtering your
 // experiments, logs, and other data
 type ProjectTag struct {
@@ -4545,10 +4488,6 @@ func (r *ProjectTag) UnmarshalJSON(data []byte) (err error) {
 func (r projectTagJSON) RawJSON() string {
 	return r.raw
 }
-
-type ProjectTagIDParam = string
-
-type ProjectTagNameParam = string
 
 type Prompt struct {
 	// Unique identifier for the prompt
@@ -6429,12 +6368,6 @@ func (r PromptDataPromptNullableVariantParam) MarshalJSON() (data []byte, err er
 
 func (r PromptDataPromptNullableVariantParam) implementsSharedPromptDataPromptUnionParam() {}
 
-type PromptIDParam = string
-
-type PromptNameParam = string
-
-type PromptVersionParam = string
-
 // Metadata about the state of the repo when the experiment was created
 type RepoInfo struct {
 	// Email of the author of the most recent commit
@@ -6644,10 +6577,6 @@ func (r RoleMemberPermissionsRestrictObjectType) IsKnown() bool {
 	return false
 }
 
-type RoleIDParam = string
-
-type RoleNameParam = string
-
 // Summary of a score's performance
 type ScoreSummary struct {
 	// Number of improvements in the score
@@ -6681,12 +6610,6 @@ func (r *ScoreSummary) UnmarshalJSON(data []byte) (err error) {
 func (r scoreSummaryJSON) RawJSON() string {
 	return r.raw
 }
-
-type SlugParam = string
-
-type StartingAfterParam = string
-
-type SummarizeDataParam = bool
 
 // Summary of a dataset
 type SummarizeDatasetResponse struct {
@@ -6764,8 +6687,6 @@ func (r summarizeExperimentResponseJSON) RawJSON() string {
 	return r.raw
 }
 
-type SummarizeScoresParam = bool
-
 type User struct {
 	// Unique identifier for the user
 	ID string `json:"id,required" format:"uuid"`
@@ -6801,46 +6722,6 @@ func (r *User) UnmarshalJSON(data []byte) (err error) {
 func (r userJSON) RawJSON() string {
 	return r.raw
 }
-
-// Email of the user to search for. You may pass the param multiple times to filter
-// for more than one email
-//
-// Satisfied by [shared.UnionString], [shared.UserEmailArrayParam].
-type UserEmailUnionParam interface {
-	ImplementsSharedUserEmailUnionParam()
-}
-
-type UserEmailArrayParam []string
-
-func (r UserEmailArrayParam) ImplementsSharedUserEmailUnionParam() {}
-
-// Family name of the user to search for. You may pass the param multiple times to
-// filter for more than one family name
-//
-// Satisfied by [shared.UnionString], [shared.UserFamilyNameArrayParam].
-type UserFamilyNameUnionParam interface {
-	ImplementsSharedUserFamilyNameUnionParam()
-}
-
-type UserFamilyNameArrayParam []string
-
-func (r UserFamilyNameArrayParam) ImplementsSharedUserFamilyNameUnionParam() {}
-
-// Given name of the user to search for. You may pass the param multiple times to
-// filter for more than one given name
-//
-// Satisfied by [shared.UnionString], [shared.UserGivenNameArrayParam].
-type UserGivenNameUnionParam interface {
-	ImplementsSharedUserGivenNameUnionParam()
-}
-
-type UserGivenNameArrayParam []string
-
-func (r UserGivenNameArrayParam) ImplementsSharedUserGivenNameUnionParam() {}
-
-type UserIDParam = string
-
-type VersionParam = string
 
 type View struct {
 	// Unique identifier for the view
@@ -7004,10 +6885,6 @@ func (r ViewDataSearchParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-type ViewIDParam = string
-
-type ViewNameParam = string
-
 // Options for the view in the app
 type ViewOptions struct {
 	ColumnOrder      []string           `json:"columnOrder,nullable"`
@@ -7042,26 +6919,4 @@ type ViewOptionsParam struct {
 
 func (r ViewOptionsParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
-}
-
-// Type of table that the view corresponds to.
-type ViewType string
-
-const (
-	ViewTypeProjects    ViewType = "projects"
-	ViewTypeLogs        ViewType = "logs"
-	ViewTypeExperiments ViewType = "experiments"
-	ViewTypeDatasets    ViewType = "datasets"
-	ViewTypePrompts     ViewType = "prompts"
-	ViewTypePlaygrounds ViewType = "playgrounds"
-	ViewTypeExperiment  ViewType = "experiment"
-	ViewTypeDataset     ViewType = "dataset"
-)
-
-func (r ViewType) IsKnown() bool {
-	switch r {
-	case ViewTypeProjects, ViewTypeLogs, ViewTypeExperiments, ViewTypeDatasets, ViewTypePrompts, ViewTypePlaygrounds, ViewTypeExperiment, ViewTypeDataset:
-		return true
-	}
-	return false
 }

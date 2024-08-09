@@ -47,7 +47,7 @@ func (r *ViewService) New(ctx context.Context, body ViewNewParams, opts ...optio
 }
 
 // Get a view object by its id
-func (r *ViewService) Get(ctx context.Context, viewID shared.ViewIDParam, query ViewGetParams, opts ...option.RequestOption) (res *shared.View, err error) {
+func (r *ViewService) Get(ctx context.Context, viewID string, query ViewGetParams, opts ...option.RequestOption) (res *shared.View, err error) {
 	opts = append(r.Options[:], opts...)
 	if viewID == "" {
 		err = errors.New("missing required view_id parameter")
@@ -61,7 +61,7 @@ func (r *ViewService) Get(ctx context.Context, viewID shared.ViewIDParam, query 
 // Partially update a view object. Specify the fields to update in the payload. Any
 // object-type fields will be deep-merged with existing content. Currently we do
 // not support removing fields or setting them to null.
-func (r *ViewService) Update(ctx context.Context, viewID shared.ViewIDParam, body ViewUpdateParams, opts ...option.RequestOption) (res *shared.View, err error) {
+func (r *ViewService) Update(ctx context.Context, viewID string, body ViewUpdateParams, opts ...option.RequestOption) (res *shared.View, err error) {
 	opts = append(r.Options[:], opts...)
 	if viewID == "" {
 		err = errors.New("missing required view_id parameter")
@@ -98,7 +98,7 @@ func (r *ViewService) ListAutoPaging(ctx context.Context, query ViewListParams, 
 }
 
 // Delete a view object by its id
-func (r *ViewService) Delete(ctx context.Context, viewID shared.ViewIDParam, body ViewDeleteParams, opts ...option.RequestOption) (res *shared.View, err error) {
+func (r *ViewService) Delete(ctx context.Context, viewID string, body ViewDeleteParams, opts ...option.RequestOption) (res *shared.View, err error) {
 	opts = append(r.Options[:], opts...)
 	if viewID == "" {
 		err = errors.New("missing required view_id parameter")
@@ -129,9 +129,9 @@ func (r ViewNewParams) MarshalJSON() (data []byte, err error) {
 
 type ViewGetParams struct {
 	// The id of the object the ACL applies to
-	ObjectID param.Field[shared.ACLObjectIDParam] `query:"object_id,required" format:"uuid"`
+	ObjectID param.Field[string] `query:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `query:"object_type,required"`
+	ObjectType param.Field[ViewGetParamsObjectType] `query:"object_type,required"`
 }
 
 // URLQuery serializes [ViewGetParams]'s query parameters as `url.Values`.
@@ -140,6 +140,31 @@ func (r ViewGetParams) URLQuery() (v url.Values) {
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
+}
+
+// The object type that the ACL applies to
+type ViewGetParamsObjectType string
+
+const (
+	ViewGetParamsObjectTypeOrganization  ViewGetParamsObjectType = "organization"
+	ViewGetParamsObjectTypeProject       ViewGetParamsObjectType = "project"
+	ViewGetParamsObjectTypeExperiment    ViewGetParamsObjectType = "experiment"
+	ViewGetParamsObjectTypeDataset       ViewGetParamsObjectType = "dataset"
+	ViewGetParamsObjectTypePrompt        ViewGetParamsObjectType = "prompt"
+	ViewGetParamsObjectTypePromptSession ViewGetParamsObjectType = "prompt_session"
+	ViewGetParamsObjectTypeGroup         ViewGetParamsObjectType = "group"
+	ViewGetParamsObjectTypeRole          ViewGetParamsObjectType = "role"
+	ViewGetParamsObjectTypeOrgMember     ViewGetParamsObjectType = "org_member"
+	ViewGetParamsObjectTypeProjectLog    ViewGetParamsObjectType = "project_log"
+	ViewGetParamsObjectTypeOrgProject    ViewGetParamsObjectType = "org_project"
+)
+
+func (r ViewGetParamsObjectType) IsKnown() bool {
+	switch r {
+	case ViewGetParamsObjectTypeOrganization, ViewGetParamsObjectTypeProject, ViewGetParamsObjectTypeExperiment, ViewGetParamsObjectTypeDataset, ViewGetParamsObjectTypePrompt, ViewGetParamsObjectTypePromptSession, ViewGetParamsObjectTypeGroup, ViewGetParamsObjectTypeRole, ViewGetParamsObjectTypeOrgMember, ViewGetParamsObjectTypeProjectLog, ViewGetParamsObjectTypeOrgProject:
+		return true
+	}
+	return false
 }
 
 type ViewUpdateParams struct {
@@ -152,30 +177,30 @@ func (r ViewUpdateParams) MarshalJSON() (data []byte, err error) {
 
 type ViewListParams struct {
 	// The id of the object the ACL applies to
-	ObjectID param.Field[shared.ACLObjectIDParam] `query:"object_id,required" format:"uuid"`
+	ObjectID param.Field[string] `query:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `query:"object_type,required"`
+	ObjectType param.Field[ViewListParamsObjectType] `query:"object_type,required"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
+	IDs param.Field[ViewListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[shared.AppLimitParam] `query:"limit"`
+	Limit param.Field[int64] `query:"limit"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
 	// Name of the view to search for
-	ViewName param.Field[shared.ViewNameParam] `query:"view_name"`
+	ViewName param.Field[string] `query:"view_name"`
 	// Type of table that the view corresponds to.
-	ViewType param.Field[shared.ViewType] `query:"view_type"`
+	ViewType param.Field[ViewListParamsViewType] `query:"view_type"`
 }
 
 // URLQuery serializes [ViewListParams]'s query parameters as `url.Values`.
@@ -184,6 +209,65 @@ func (r ViewListParams) URLQuery() (v url.Values) {
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
+}
+
+// The object type that the ACL applies to
+type ViewListParamsObjectType string
+
+const (
+	ViewListParamsObjectTypeOrganization  ViewListParamsObjectType = "organization"
+	ViewListParamsObjectTypeProject       ViewListParamsObjectType = "project"
+	ViewListParamsObjectTypeExperiment    ViewListParamsObjectType = "experiment"
+	ViewListParamsObjectTypeDataset       ViewListParamsObjectType = "dataset"
+	ViewListParamsObjectTypePrompt        ViewListParamsObjectType = "prompt"
+	ViewListParamsObjectTypePromptSession ViewListParamsObjectType = "prompt_session"
+	ViewListParamsObjectTypeGroup         ViewListParamsObjectType = "group"
+	ViewListParamsObjectTypeRole          ViewListParamsObjectType = "role"
+	ViewListParamsObjectTypeOrgMember     ViewListParamsObjectType = "org_member"
+	ViewListParamsObjectTypeProjectLog    ViewListParamsObjectType = "project_log"
+	ViewListParamsObjectTypeOrgProject    ViewListParamsObjectType = "org_project"
+)
+
+func (r ViewListParamsObjectType) IsKnown() bool {
+	switch r {
+	case ViewListParamsObjectTypeOrganization, ViewListParamsObjectTypeProject, ViewListParamsObjectTypeExperiment, ViewListParamsObjectTypeDataset, ViewListParamsObjectTypePrompt, ViewListParamsObjectTypePromptSession, ViewListParamsObjectTypeGroup, ViewListParamsObjectTypeRole, ViewListParamsObjectTypeOrgMember, ViewListParamsObjectTypeProjectLog, ViewListParamsObjectTypeOrgProject:
+		return true
+	}
+	return false
+}
+
+// Filter search results to a particular set of object IDs. To specify a list of
+// IDs, include the query param multiple times
+//
+// Satisfied by [shared.UnionString], [ViewListParamsIDsArray].
+type ViewListParamsIDsUnion interface {
+	ImplementsViewListParamsIDsUnion()
+}
+
+type ViewListParamsIDsArray []string
+
+func (r ViewListParamsIDsArray) ImplementsViewListParamsIDsUnion() {}
+
+// Type of table that the view corresponds to.
+type ViewListParamsViewType string
+
+const (
+	ViewListParamsViewTypeProjects    ViewListParamsViewType = "projects"
+	ViewListParamsViewTypeLogs        ViewListParamsViewType = "logs"
+	ViewListParamsViewTypeExperiments ViewListParamsViewType = "experiments"
+	ViewListParamsViewTypeDatasets    ViewListParamsViewType = "datasets"
+	ViewListParamsViewTypePrompts     ViewListParamsViewType = "prompts"
+	ViewListParamsViewTypePlaygrounds ViewListParamsViewType = "playgrounds"
+	ViewListParamsViewTypeExperiment  ViewListParamsViewType = "experiment"
+	ViewListParamsViewTypeDataset     ViewListParamsViewType = "dataset"
+)
+
+func (r ViewListParamsViewType) IsKnown() bool {
+	switch r {
+	case ViewListParamsViewTypeProjects, ViewListParamsViewTypeLogs, ViewListParamsViewTypeExperiments, ViewListParamsViewTypeDatasets, ViewListParamsViewTypePrompts, ViewListParamsViewTypePlaygrounds, ViewListParamsViewTypeExperiment, ViewListParamsViewTypeDataset:
+		return true
+	}
+	return false
 }
 
 type ViewDeleteParams struct {

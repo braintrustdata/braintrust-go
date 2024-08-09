@@ -48,7 +48,7 @@ func (r *PromptService) New(ctx context.Context, body PromptNewParams, opts ...o
 }
 
 // Get a prompt object by its id
-func (r *PromptService) Get(ctx context.Context, promptID shared.PromptIDParam, opts ...option.RequestOption) (res *shared.Prompt, err error) {
+func (r *PromptService) Get(ctx context.Context, promptID string, opts ...option.RequestOption) (res *shared.Prompt, err error) {
 	opts = append(r.Options[:], opts...)
 	if promptID == "" {
 		err = errors.New("missing required prompt_id parameter")
@@ -62,7 +62,7 @@ func (r *PromptService) Get(ctx context.Context, promptID shared.PromptIDParam, 
 // Partially update a prompt object. Specify the fields to update in the payload.
 // Any object-type fields will be deep-merged with existing content. Currently we
 // do not support removing fields or setting them to null.
-func (r *PromptService) Update(ctx context.Context, promptID shared.PromptIDParam, body PromptUpdateParams, opts ...option.RequestOption) (res *shared.Prompt, err error) {
+func (r *PromptService) Update(ctx context.Context, promptID string, body PromptUpdateParams, opts ...option.RequestOption) (res *shared.Prompt, err error) {
 	opts = append(r.Options[:], opts...)
 	if promptID == "" {
 		err = errors.New("missing required prompt_id parameter")
@@ -99,7 +99,7 @@ func (r *PromptService) ListAutoPaging(ctx context.Context, query PromptListPara
 }
 
 // Delete a prompt object by its id
-func (r *PromptService) Delete(ctx context.Context, promptID shared.PromptIDParam, opts ...option.RequestOption) (res *shared.Prompt, err error) {
+func (r *PromptService) Delete(ctx context.Context, promptID string, opts ...option.RequestOption) (res *shared.Prompt, err error) {
 	opts = append(r.Options[:], opts...)
 	if promptID == "" {
 		err = errors.New("missing required prompt_id parameter")
@@ -142,33 +142,33 @@ type PromptListParams struct {
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
+	IDs param.Field[PromptListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[shared.AppLimitParam] `query:"limit"`
+	Limit param.Field[int64] `query:"limit"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[shared.OrgNameParam] `query:"org_name"`
+	OrgName param.Field[string] `query:"org_name"`
 	// Project id
-	ProjectID param.Field[shared.ProjectIDQueryParam] `query:"project_id" format:"uuid"`
+	ProjectID param.Field[string] `query:"project_id" format:"uuid"`
 	// Name of the project to search for
-	ProjectName param.Field[shared.ProjectNameParam] `query:"project_name"`
+	ProjectName param.Field[string] `query:"project_name"`
 	// Name of the prompt to search for
-	PromptName param.Field[shared.PromptNameParam] `query:"prompt_name"`
+	PromptName param.Field[string] `query:"prompt_name"`
 	// Retrieve prompt with a specific slug
-	Slug param.Field[shared.SlugParam] `query:"slug"`
+	Slug param.Field[string] `query:"slug"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
 	// Retrieve prompt at a specific version.
 	//
 	// The version id can either be a transaction id (e.g. '1000192656880881099') or a
 	// version identifier (e.g. '81cd05ee665fdfb3').
-	Version param.Field[shared.PromptVersionParam] `query:"version"`
+	Version param.Field[string] `query:"version"`
 }
 
 // URLQuery serializes [PromptListParams]'s query parameters as `url.Values`.
@@ -178,6 +178,18 @@ func (r PromptListParams) URLQuery() (v url.Values) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter search results to a particular set of object IDs. To specify a list of
+// IDs, include the query param multiple times
+//
+// Satisfied by [shared.UnionString], [PromptListParamsIDsArray].
+type PromptListParamsIDsUnion interface {
+	ImplementsPromptListParamsIDsUnion()
+}
+
+type PromptListParamsIDsArray []string
+
+func (r PromptListParamsIDsArray) ImplementsPromptListParamsIDsUnion() {}
 
 type PromptReplaceParams struct {
 	CreatePrompt shared.CreatePromptParam `json:"create_prompt,required"`
