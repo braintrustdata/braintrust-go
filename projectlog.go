@@ -37,7 +37,7 @@ func NewProjectLogService(opts ...option.RequestOption) (r *ProjectLogService) {
 }
 
 // Log feedback for a set of project logs events
-func (r *ProjectLogService) Feedback(ctx context.Context, projectID shared.ProjectIDParam, body ProjectLogFeedbackParams, opts ...option.RequestOption) (err error) {
+func (r *ProjectLogService) Feedback(ctx context.Context, projectID string, body ProjectLogFeedbackParams, opts ...option.RequestOption) (err error) {
 	opts = append(r.Options[:], opts...)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "")}, opts...)
 	if projectID == "" {
@@ -51,7 +51,7 @@ func (r *ProjectLogService) Feedback(ctx context.Context, projectID shared.Proje
 
 // Fetch the events in a project logs. Equivalent to the POST form of the same
 // path, but with the parameters in the URL query rather than in the request body
-func (r *ProjectLogService) Fetch(ctx context.Context, projectID shared.ProjectIDParam, query ProjectLogFetchParams, opts ...option.RequestOption) (res *shared.FetchProjectLogsEventsResponse, err error) {
+func (r *ProjectLogService) Fetch(ctx context.Context, projectID string, query ProjectLogFetchParams, opts ...option.RequestOption) (res *shared.FetchProjectLogsEventsResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
@@ -64,7 +64,7 @@ func (r *ProjectLogService) Fetch(ctx context.Context, projectID shared.ProjectI
 
 // Fetch the events in a project logs. Equivalent to the GET form of the same path,
 // but with the parameters in the request body rather than in the URL query
-func (r *ProjectLogService) FetchPost(ctx context.Context, projectID shared.ProjectIDParam, body ProjectLogFetchPostParams, opts ...option.RequestOption) (res *shared.FetchProjectLogsEventsResponse, err error) {
+func (r *ProjectLogService) FetchPost(ctx context.Context, projectID string, body ProjectLogFetchPostParams, opts ...option.RequestOption) (res *shared.FetchProjectLogsEventsResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
@@ -76,7 +76,7 @@ func (r *ProjectLogService) FetchPost(ctx context.Context, projectID shared.Proj
 }
 
 // Insert a set of events into the project logs
-func (r *ProjectLogService) Insert(ctx context.Context, projectID shared.ProjectIDParam, body ProjectLogInsertParams, opts ...option.RequestOption) (res *shared.InsertEventsResponse, err error) {
+func (r *ProjectLogService) Insert(ctx context.Context, projectID string, body ProjectLogInsertParams, opts ...option.RequestOption) (res *shared.InsertEventsResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
@@ -110,7 +110,7 @@ type ProjectLogFetchParams struct {
 	// The `limit` parameter controls the number of full traces to return. So you may
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
-	Limit param.Field[shared.FetchLimitParam] `query:"limit"`
+	Limit param.Field[int64] `query:"limit"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -121,7 +121,7 @@ type ProjectLogFetchParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxRootSpanID param.Field[shared.MaxRootSpanIDParam] `query:"max_root_span_id"`
+	MaxRootSpanID param.Field[string] `query:"max_root_span_id"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -132,13 +132,13 @@ type ProjectLogFetchParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxXactID param.Field[shared.MaxXactIDParam] `query:"max_xact_id"`
+	MaxXactID param.Field[string] `query:"max_xact_id"`
 	// Retrieve a snapshot of events from a past time
 	//
 	// The version id is essentially a filter on the latest event transaction id. You
 	// can use the `max_xact_id` returned by a past fetch as the version to reproduce
 	// that exact fetch.
-	Version param.Field[shared.VersionParam] `query:"version"`
+	Version param.Field[string] `query:"version"`
 }
 
 // URLQuery serializes [ProjectLogFetchParams]'s query parameters as `url.Values`.

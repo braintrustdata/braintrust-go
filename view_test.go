@@ -80,7 +80,7 @@ func TestViewGet(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ViewGetParams{
 			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
+			ObjectType: braintrust.F(braintrust.ViewGetParamsObjectTypeOrganization),
 		},
 	)
 	if err != nil {
@@ -157,13 +157,13 @@ func TestViewListWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.Views.List(context.TODO(), braintrust.ViewListParams{
 		ObjectID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType:    braintrust.F(shared.ACLObjectTypeOrganization),
+		ObjectType:    braintrust.F(braintrust.ViewListParamsObjectTypeOrganization),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:           braintrust.F[shared.IDsUnionParam](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
+		IDs:           braintrust.F[braintrust.ViewListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ViewName:      braintrust.F("view_name"),
-		ViewType:      braintrust.F(shared.ViewTypeProjects),
+		ViewType:      braintrust.F(braintrust.ViewListParamsViewTypeProjects),
 	})
 	if err != nil {
 		var apierr *braintrust.Error

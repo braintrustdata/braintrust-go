@@ -40,7 +40,7 @@ func NewOrganizationService(opts ...option.RequestOption) (r *OrganizationServic
 }
 
 // Get a organization object by its id
-func (r *OrganizationService) Get(ctx context.Context, organizationID shared.OrganizationIDParam, opts ...option.RequestOption) (res *shared.Organization, err error) {
+func (r *OrganizationService) Get(ctx context.Context, organizationID string, opts ...option.RequestOption) (res *shared.Organization, err error) {
 	opts = append(r.Options[:], opts...)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
@@ -54,7 +54,7 @@ func (r *OrganizationService) Get(ctx context.Context, organizationID shared.Org
 // Partially update a organization object. Specify the fields to update in the
 // payload. Any object-type fields will be deep-merged with existing content.
 // Currently we do not support removing fields or setting them to null.
-func (r *OrganizationService) Update(ctx context.Context, organizationID shared.OrganizationIDParam, body OrganizationUpdateParams, opts ...option.RequestOption) (res *shared.Organization, err error) {
+func (r *OrganizationService) Update(ctx context.Context, organizationID string, body OrganizationUpdateParams, opts ...option.RequestOption) (res *shared.Organization, err error) {
 	opts = append(r.Options[:], opts...)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
@@ -91,7 +91,7 @@ func (r *OrganizationService) ListAutoPaging(ctx context.Context, query Organiza
 }
 
 // Delete a organization object by its id
-func (r *OrganizationService) Delete(ctx context.Context, organizationID shared.OrganizationIDParam, opts ...option.RequestOption) (res *shared.Organization, err error) {
+func (r *OrganizationService) Delete(ctx context.Context, organizationID string, opts ...option.RequestOption) (res *shared.Organization, err error) {
 	opts = append(r.Options[:], opts...)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
@@ -116,22 +116,22 @@ type OrganizationListParams struct {
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[shared.EndingBeforeParam] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[shared.IDsUnionParam] `query:"ids" format:"uuid"`
+	IDs param.Field[OrganizationListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
-	Limit param.Field[shared.AppLimitParam] `query:"limit"`
+	Limit param.Field[int64] `query:"limit"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[shared.OrgNameParam] `query:"org_name"`
+	OrgName param.Field[string] `query:"org_name"`
 	// Name of the organization to search for
-	OrganizationName param.Field[shared.OrganizationNameParam] `query:"organization_name"`
+	OrganizationName param.Field[string] `query:"organization_name"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[shared.StartingAfterParam] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
 }
 
 // URLQuery serializes [OrganizationListParams]'s query parameters as `url.Values`.
@@ -141,3 +141,15 @@ func (r OrganizationListParams) URLQuery() (v url.Values) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter search results to a particular set of object IDs. To specify a list of
+// IDs, include the query param multiple times
+//
+// Satisfied by [shared.UnionString], [OrganizationListParamsIDsArray].
+type OrganizationListParamsIDsUnion interface {
+	ImplementsOrganizationListParamsIDsUnion()
+}
+
+type OrganizationListParamsIDsArray []string
+
+func (r OrganizationListParamsIDsArray) ImplementsOrganizationListParamsIDsUnion() {}

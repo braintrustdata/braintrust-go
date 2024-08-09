@@ -130,41 +130,8 @@ const ACLRestrictObjectTypeProjectLog = shared.ACLRestrictObjectTypeProjectLog
 // This is an alias to an internal value.
 const ACLRestrictObjectTypeOrgProject = shared.ACLRestrictObjectTypeOrgProject
 
-// Acl id
-//
-// This is an alias to an internal type.
-type ACLIDParam = shared.ACLIDParam
-
-// The id of the object the ACL applies to
-//
-// This is an alias to an internal type.
-type ACLObjectIDParam = shared.ACLObjectIDParam
-
 // This is an alias to an internal type.
 type APIKey = shared.APIKey
-
-// ApiKey id
-//
-// This is an alias to an internal type.
-type APIKeyIDParam = shared.APIKeyIDParam
-
-// Name of the api_key to search for
-//
-// This is an alias to an internal type.
-type APIKeyNameParam = shared.APIKeyNameParam
-
-// Limit the number of objects to return
-//
-// This is an alias to an internal type.
-type AppLimitParam = shared.AppLimitParam
-
-// The experiment to compare against, if summarizing scores and metrics. If
-// omitted, will fall back to the `base_exp_id` stored in the experiment metadata,
-// and then to the most recent experiment run in the same project. Must pass
-// `summarize_scores=true` for this id to be used
-//
-// This is an alias to an internal type.
-type ComparisonExperimentIDParam = shared.ComparisonExperimentIDParam
 
 // An ACL grants a certain permission or role to a certain user or group on an
 // object.
@@ -581,16 +548,6 @@ type Dataset = shared.Dataset
 // This is an alias to an internal type.
 type DatasetEvent = shared.DatasetEvent
 
-// Dataset id
-//
-// This is an alias to an internal type.
-type DatasetIDParam = shared.DatasetIDParam
-
-// Name of the dataset to search for
-//
-// This is an alias to an internal type.
-type DatasetNameParam = shared.DatasetNameParam
-
 // This is an alias to an internal type.
 type DeleteViewParam = shared.DeleteViewParam
 
@@ -631,15 +588,6 @@ const DeleteViewObjectTypeProjectLog = shared.DeleteViewObjectTypeProjectLog
 
 // This is an alias to an internal value.
 const DeleteViewObjectTypeOrgProject = shared.DeleteViewObjectTypeOrgProject
-
-// Pagination cursor id.
-//
-// For example, if the initial item in the last page you fetched had an id of
-// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
-// pass one of `starting_after` and `ending_before`
-//
-// This is an alias to an internal type.
-type EndingBeforeParam = shared.EndingBeforeParam
 
 // This is an alias to an internal type.
 type Experiment = shared.Experiment
@@ -689,16 +637,6 @@ const ExperimentEventSpanAttributesTypeTask = shared.ExperimentEventSpanAttribut
 
 // This is an alias to an internal value.
 const ExperimentEventSpanAttributesTypeTool = shared.ExperimentEventSpanAttributesTypeTool
-
-// Experiment id
-//
-// This is an alias to an internal type.
-type ExperimentIDParam = shared.ExperimentIDParam
-
-// Name of the experiment to search for
-//
-// This is an alias to an internal type.
-type ExperimentNameParam = shared.ExperimentNameParam
 
 // This is an alias to an internal type.
 type FeedbackDatasetEventRequestParam = shared.FeedbackDatasetEventRequestParam
@@ -763,35 +701,11 @@ const FeedbackProjectLogsItemSourceExternal = shared.FeedbackProjectLogsItemSour
 // This is an alias to an internal type.
 type FetchDatasetEventsResponse = shared.FetchDatasetEventsResponse
 
-// A list of filters on the events to fetch. Currently, only path-lookup type
-// filters are supported, but we may add more in the future
-//
-// This is an alias to an internal type.
-type FetchEventsFiltersParam = shared.FetchEventsFiltersParam
-
 // This is an alias to an internal type.
 type FetchEventsRequestParam = shared.FetchEventsRequestParam
 
 // This is an alias to an internal type.
 type FetchExperimentEventsResponse = shared.FetchExperimentEventsResponse
-
-// limit the number of traces fetched
-//
-// Fetch queries may be paginated if the total result size is expected to be large
-// (e.g. project_logs which accumulate over a long time). Note that fetch queries
-// only support pagination in descending time order (from latest to earliest
-// `_xact_id`. Furthermore, later pages may return rows which showed up in earlier
-// pages, except with an earlier `_xact_id`. This happens because pagination occurs
-// over the whole version history of the event log. You will most likely want to
-// exclude any such duplicate, outdated rows (by `id`) from your combined result
-// set.
-//
-// The `limit` parameter controls the number of full traces to return. So you may
-// end up with more individual rows than the specified limit if you are fetching
-// events containing traces.
-//
-// This is an alias to an internal type.
-type FetchLimitParam = shared.FetchLimitParam
 
 // This is an alias to an internal type.
 type FetchProjectLogsEventsResponse = shared.FetchProjectLogsEventsResponse
@@ -882,16 +796,6 @@ type FunctionLogID = shared.FunctionLogID
 // This is an alias to an internal value.
 const FunctionLogIDP = shared.FunctionLogIDP
 
-// Function id
-//
-// This is an alias to an internal type.
-type FunctionIDParam = shared.FunctionIDParam
-
-// Name of the function to search for
-//
-// This is an alias to an internal type.
-type FunctionNameParam = shared.FunctionNameParam
-
 // A group is a collection of users which can be assigned an ACL
 //
 // Groups can consist of individual users, as well as a set of groups they inherit
@@ -899,30 +803,6 @@ type FunctionNameParam = shared.FunctionNameParam
 //
 // This is an alias to an internal type.
 type Group = shared.Group
-
-// Group id
-//
-// This is an alias to an internal type.
-type GroupIDParam = shared.GroupIDParam
-
-// Name of the group to search for
-//
-// This is an alias to an internal type.
-type GroupNameParam = shared.GroupNameParam
-
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
-//
-// This is an alias to an internal type.
-type IDsUnionParam = shared.IDsUnionParam
-
-// This is an alias to an internal type.
-type IDsArrayParam = shared.IDsArrayParam
-
-// A dataset event
-//
-// This is an alias to an internal type.
-type InsertDatasetEventUnionParam = shared.InsertDatasetEventUnionParam
 
 // This is an alias to an internal type.
 type InsertDatasetEventMergeParam = shared.InsertDatasetEventMergeParam
@@ -933,13 +813,13 @@ type InsertDatasetEventReplaceParam = shared.InsertDatasetEventReplaceParam
 // This is an alias to an internal type.
 type InsertDatasetEventRequestParam = shared.InsertDatasetEventRequestParam
 
-// This is an alias to an internal type.
-type InsertEventsResponse = shared.InsertEventsResponse
-
-// An experiment event
+// A dataset event
 //
 // This is an alias to an internal type.
-type InsertExperimentEventUnionParam = shared.InsertExperimentEventUnionParam
+type InsertDatasetEventRequestEventsUnionParam = shared.InsertDatasetEventRequestEventsUnionParam
+
+// This is an alias to an internal type.
+type InsertEventsResponse = shared.InsertEventsResponse
 
 // This is an alias to an internal type.
 type InsertExperimentEventMergeParam = shared.InsertExperimentEventMergeParam
@@ -1036,10 +916,10 @@ const InsertExperimentEventReplaceSpanAttributesTypeTool = shared.InsertExperime
 // This is an alias to an internal type.
 type InsertExperimentEventRequestParam = shared.InsertExperimentEventRequestParam
 
-// A project logs event
+// An experiment event
 //
 // This is an alias to an internal type.
-type InsertProjectLogsEventUnionParam = shared.InsertProjectLogsEventUnionParam
+type InsertExperimentEventRequestEventsUnionParam = shared.InsertExperimentEventRequestEventsUnionParam
 
 // This is an alias to an internal type.
 type InsertProjectLogsEventMergeParam = shared.InsertProjectLogsEventMergeParam
@@ -1136,56 +1016,18 @@ const InsertProjectLogsEventReplaceSpanAttributesTypeTool = shared.InsertProject
 // This is an alias to an internal type.
 type InsertProjectLogsEventRequestParam = shared.InsertProjectLogsEventRequestParam
 
-// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
-// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
-// the 'cursor' argument going forwards.
-//
-// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
-//
-// Since a paginated fetch query returns results in order from latest to earliest,
-// the cursor for the next page can be found as the row with the minimum (earliest)
-// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
-// for an overview of paginating fetch queries.
+// A project logs event
 //
 // This is an alias to an internal type.
-type MaxRootSpanIDParam = shared.MaxRootSpanIDParam
-
-// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
-// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
-// the 'cursor' argument going forwards.
-//
-// Together, `max_xact_id` and `max_root_span_id` form a pagination cursor
-//
-// Since a paginated fetch query returns results in order from latest to earliest,
-// the cursor for the next page can be found as the row with the minimum (earliest)
-// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
-// for an overview of paginating fetch queries.
-//
-// This is an alias to an internal type.
-type MaxXactIDParam = shared.MaxXactIDParam
+type InsertProjectLogsEventRequestEventsUnionParam = shared.InsertProjectLogsEventRequestEventsUnionParam
 
 // Summary of a metric's performance
 //
 // This is an alias to an internal type.
 type MetricSummary = shared.MetricSummary
 
-// Filter search results to within a particular organization
-//
-// This is an alias to an internal type.
-type OrgNameParam = shared.OrgNameParam
-
 // This is an alias to an internal type.
 type Organization = shared.Organization
-
-// Organization id
-//
-// This is an alias to an internal type.
-type OrganizationIDParam = shared.OrganizationIDParam
-
-// Name of the organization to search for
-//
-// This is an alias to an internal type.
-type OrganizationNameParam = shared.OrganizationNameParam
 
 // This is an alias to an internal type.
 type PatchDatasetParam = shared.PatchDatasetParam
@@ -1587,16 +1429,6 @@ type Project = shared.Project
 // This is an alias to an internal type.
 type ProjectSettings = shared.ProjectSettings
 
-// Project id
-//
-// This is an alias to an internal type.
-type ProjectIDParam = shared.ProjectIDParam
-
-// Project id
-//
-// This is an alias to an internal type.
-type ProjectIDQueryParam = shared.ProjectIDQueryParam
-
 // This is an alias to an internal type.
 type ProjectLogsEvent = shared.ProjectLogsEvent
 
@@ -1650,11 +1482,6 @@ const ProjectLogsEventSpanAttributesTypeTask = shared.ProjectLogsEventSpanAttrib
 
 // This is an alias to an internal value.
 const ProjectLogsEventSpanAttributesTypeTool = shared.ProjectLogsEventSpanAttributesTypeTool
-
-// Name of the project to search for
-//
-// This is an alias to an internal type.
-type ProjectNameParam = shared.ProjectNameParam
 
 // A project score is a user-configured score, which can be manually-labeled
 // through the UI
@@ -1716,31 +1543,11 @@ type ProjectScoreCategory = shared.ProjectScoreCategory
 // This is an alias to an internal type.
 type ProjectScoreCategoryParam = shared.ProjectScoreCategoryParam
 
-// ProjectScore id
-//
-// This is an alias to an internal type.
-type ProjectScoreIDParam = shared.ProjectScoreIDParam
-
-// Name of the project_score to search for
-//
-// This is an alias to an internal type.
-type ProjectScoreNameParam = shared.ProjectScoreNameParam
-
 // A project tag is a user-configured tag for tracking and filtering your
 // experiments, logs, and other data
 //
 // This is an alias to an internal type.
 type ProjectTag = shared.ProjectTag
-
-// ProjectTag id
-//
-// This is an alias to an internal type.
-type ProjectTagIDParam = shared.ProjectTagIDParam
-
-// Name of the project_tag to search for
-//
-// This is an alias to an internal type.
-type ProjectTagNameParam = shared.ProjectTagNameParam
 
 // This is an alias to an internal type.
 type Prompt = shared.Prompt
@@ -2120,24 +1927,6 @@ type PromptDataPromptChatMessagesFallbackParam = shared.PromptDataPromptChatMess
 // This is an alias to an internal type.
 type PromptDataPromptNullableVariantParam = shared.PromptDataPromptNullableVariantParam
 
-// Prompt id
-//
-// This is an alias to an internal type.
-type PromptIDParam = shared.PromptIDParam
-
-// Name of the prompt to search for
-//
-// This is an alias to an internal type.
-type PromptNameParam = shared.PromptNameParam
-
-// Retrieve prompt at a specific version.
-//
-// The version id can either be a transaction id (e.g. '1000192656880881099') or a
-// version identifier (e.g. '81cd05ee665fdfb3').
-//
-// This is an alias to an internal type.
-type PromptVersionParam = shared.PromptVersionParam
-
 // Metadata about the state of the repo when the experiment was created
 //
 // This is an alias to an internal type.
@@ -2229,40 +2018,10 @@ const RoleMemberPermissionsRestrictObjectTypeProjectLog = shared.RoleMemberPermi
 // This is an alias to an internal value.
 const RoleMemberPermissionsRestrictObjectTypeOrgProject = shared.RoleMemberPermissionsRestrictObjectTypeOrgProject
 
-// Role id
-//
-// This is an alias to an internal type.
-type RoleIDParam = shared.RoleIDParam
-
-// Name of the role to search for
-//
-// This is an alias to an internal type.
-type RoleNameParam = shared.RoleNameParam
-
 // Summary of a score's performance
 //
 // This is an alias to an internal type.
 type ScoreSummary = shared.ScoreSummary
-
-// Retrieve prompt with a specific slug
-//
-// This is an alias to an internal type.
-type SlugParam = shared.SlugParam
-
-// Pagination cursor id.
-//
-// For example, if the final item in the last page you fetched had an id of `foo`,
-// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
-// `starting_after` and `ending_before`
-//
-// This is an alias to an internal type.
-type StartingAfterParam = shared.StartingAfterParam
-
-// Whether to summarize the data. If false (or omitted), only the metadata will be
-// returned.
-//
-// This is an alias to an internal type.
-type SummarizeDataParam = shared.SummarizeDataParam
 
 // Summary of a dataset
 //
@@ -2274,55 +2033,8 @@ type SummarizeDatasetResponse = shared.SummarizeDatasetResponse
 // This is an alias to an internal type.
 type SummarizeExperimentResponse = shared.SummarizeExperimentResponse
 
-// Whether to summarize the scores and metrics. If false (or omitted), only the
-// metadata will be returned.
-//
-// This is an alias to an internal type.
-type SummarizeScoresParam = shared.SummarizeScoresParam
-
 // This is an alias to an internal type.
 type User = shared.User
-
-// Email of the user to search for. You may pass the param multiple times to filter
-// for more than one email
-//
-// This is an alias to an internal type.
-type UserEmailUnionParam = shared.UserEmailUnionParam
-
-// This is an alias to an internal type.
-type UserEmailArrayParam = shared.UserEmailArrayParam
-
-// Family name of the user to search for. You may pass the param multiple times to
-// filter for more than one family name
-//
-// This is an alias to an internal type.
-type UserFamilyNameUnionParam = shared.UserFamilyNameUnionParam
-
-// This is an alias to an internal type.
-type UserFamilyNameArrayParam = shared.UserFamilyNameArrayParam
-
-// Given name of the user to search for. You may pass the param multiple times to
-// filter for more than one given name
-//
-// This is an alias to an internal type.
-type UserGivenNameUnionParam = shared.UserGivenNameUnionParam
-
-// This is an alias to an internal type.
-type UserGivenNameArrayParam = shared.UserGivenNameArrayParam
-
-// User id
-//
-// This is an alias to an internal type.
-type UserIDParam = shared.UserIDParam
-
-// Retrieve a snapshot of events from a past time
-//
-// The version id is essentially a filter on the latest event transaction id. You
-// can use the `max_xact_id` returned by a past fetch as the version to reproduce
-// that exact fetch.
-//
-// This is an alias to an internal type.
-type VersionParam = shared.VersionParam
 
 // This is an alias to an internal type.
 type View = shared.View
@@ -2410,16 +2122,6 @@ type ViewDataSearch = shared.ViewDataSearch
 // This is an alias to an internal type.
 type ViewDataSearchParam = shared.ViewDataSearchParam
 
-// View id
-//
-// This is an alias to an internal type.
-type ViewIDParam = shared.ViewIDParam
-
-// Name of the view to search for
-//
-// This is an alias to an internal type.
-type ViewNameParam = shared.ViewNameParam
-
 // Options for the view in the app
 //
 // This is an alias to an internal type.
@@ -2429,32 +2131,3 @@ type ViewOptions = shared.ViewOptions
 //
 // This is an alias to an internal type.
 type ViewOptionsParam = shared.ViewOptionsParam
-
-// Type of table that the view corresponds to.
-//
-// This is an alias to an internal type.
-type ViewType = shared.ViewType
-
-// This is an alias to an internal value.
-const ViewTypeProjects = shared.ViewTypeProjects
-
-// This is an alias to an internal value.
-const ViewTypeLogs = shared.ViewTypeLogs
-
-// This is an alias to an internal value.
-const ViewTypeExperiments = shared.ViewTypeExperiments
-
-// This is an alias to an internal value.
-const ViewTypeDatasets = shared.ViewTypeDatasets
-
-// This is an alias to an internal value.
-const ViewTypePrompts = shared.ViewTypePrompts
-
-// This is an alias to an internal value.
-const ViewTypePlaygrounds = shared.ViewTypePlaygrounds
-
-// This is an alias to an internal value.
-const ViewTypeExperiment = shared.ViewTypeExperiment
-
-// This is an alias to an internal value.
-const ViewTypeDataset = shared.ViewTypeDataset
