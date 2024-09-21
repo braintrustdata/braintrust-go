@@ -4,11 +4,11 @@ package shared
 
 type UnionString string
 
+func (UnionString) ImplementsSharedPromptDataPromptChatMessagesUserContentUnionParam() {}
+func (UnionString) ImplementsSharedPromptDataPromptChatMessagesUserContentUnion()      {}
 func (UnionString) ImplementsProjectListParamsIDsUnion()                               {}
 func (UnionString) ImplementsExperimentListParamsIDsUnion()                            {}
 func (UnionString) ImplementsDatasetListParamsIDsUnion()                               {}
-func (UnionString) ImplementsSharedPromptDataPromptChatMessagesUserContentUnionParam() {}
-func (UnionString) ImplementsSharedPromptDataPromptChatMessagesUserContentUnion()      {}
 func (UnionString) ImplementsPromptListParamsIDsUnion()                                {}
 func (UnionString) ImplementsRoleListParamsIDsUnion()                                  {}
 func (UnionString) ImplementsGroupListParamsIDsUnion()                                 {}
