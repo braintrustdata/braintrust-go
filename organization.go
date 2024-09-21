@@ -39,7 +39,7 @@ func NewOrganizationService(opts ...option.RequestOption) (r *OrganizationServic
 	return
 }
 
-// Get a organization object by its id
+// Get an organization object by its id
 func (r *OrganizationService) Get(ctx context.Context, organizationID string, opts ...option.RequestOption) (res *shared.Organization, err error) {
 	opts = append(r.Options[:], opts...)
 	if organizationID == "" {
@@ -51,7 +51,7 @@ func (r *OrganizationService) Get(ctx context.Context, organizationID string, op
 	return
 }
 
-// Partially update a organization object. Specify the fields to update in the
+// Partially update an organization object. Specify the fields to update in the
 // payload. Any object-type fields will be deep-merged with existing content.
 // Currently we do not support removing fields or setting them to null.
 func (r *OrganizationService) Update(ctx context.Context, organizationID string, body OrganizationUpdateParams, opts ...option.RequestOption) (res *shared.Organization, err error) {
@@ -90,7 +90,7 @@ func (r *OrganizationService) ListAutoPaging(ctx context.Context, query Organiza
 	return pagination.NewListObjectsAutoPager(r.List(ctx, query, opts...))
 }
 
-// Delete a organization object by its id
+// Delete an organization object by its id
 func (r *OrganizationService) Delete(ctx context.Context, organizationID string, opts ...option.RequestOption) (res *shared.Organization, err error) {
 	opts = append(r.Options[:], opts...)
 	if organizationID == "" {
@@ -129,8 +129,6 @@ type OrganizationListParams struct {
 	Limit param.Field[int64] `query:"limit"`
 	// Filter search results to within a particular organization
 	OrgName param.Field[string] `query:"org_name"`
-	// Name of the organization to search for
-	OrganizationName param.Field[string] `query:"organization_name"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,

@@ -15,22 +15,23 @@ import (
 // interacting with the braintrust API. You should not instantiate this client
 // directly, and instead use the [NewClient] method instead.
 type Client struct {
-	Options       []option.RequestOption
-	TopLevel      *TopLevelService
-	Projects      *ProjectService
-	Experiments   *ExperimentService
-	Datasets      *DatasetService
-	Prompts       *PromptService
-	Roles         *RoleService
-	Groups        *GroupService
-	ACLs          *ACLService
-	Users         *UserService
-	ProjectScores *ProjectScoreService
-	ProjectTags   *ProjectTagService
-	Functions     *FunctionService
-	Views         *ViewService
-	Organizations *OrganizationService
-	APIKeys       *APIKeyService
+	Options        []option.RequestOption
+	TopLevel       *TopLevelService
+	Project        *ProjectService
+	Experiment     *ExperimentService
+	Dataset        *DatasetService
+	Prompt         *PromptService
+	Role           *RoleService
+	Group          *GroupService
+	ACL            *ACLService
+	User           *UserService
+	ProjectScore   *ProjectScoreService
+	ProjectTag     *ProjectTagService
+	Function       *FunctionService
+	View           *ViewService
+	Organization   *OrganizationService
+	APIKeyResource *APIKeyResourceService
+	OrgSecret      *OrgSecretService
 }
 
 // NewClient generates a new client with the default option read from the
@@ -47,20 +48,21 @@ func NewClient(opts ...option.RequestOption) (r *Client) {
 	r = &Client{Options: opts}
 
 	r.TopLevel = NewTopLevelService(opts...)
-	r.Projects = NewProjectService(opts...)
-	r.Experiments = NewExperimentService(opts...)
-	r.Datasets = NewDatasetService(opts...)
-	r.Prompts = NewPromptService(opts...)
-	r.Roles = NewRoleService(opts...)
-	r.Groups = NewGroupService(opts...)
-	r.ACLs = NewACLService(opts...)
-	r.Users = NewUserService(opts...)
-	r.ProjectScores = NewProjectScoreService(opts...)
-	r.ProjectTags = NewProjectTagService(opts...)
-	r.Functions = NewFunctionService(opts...)
-	r.Views = NewViewService(opts...)
-	r.Organizations = NewOrganizationService(opts...)
-	r.APIKeys = NewAPIKeyService(opts...)
+	r.Project = NewProjectService(opts...)
+	r.Experiment = NewExperimentService(opts...)
+	r.Dataset = NewDatasetService(opts...)
+	r.Prompt = NewPromptService(opts...)
+	r.Role = NewRoleService(opts...)
+	r.Group = NewGroupService(opts...)
+	r.ACL = NewACLService(opts...)
+	r.User = NewUserService(opts...)
+	r.ProjectScore = NewProjectScoreService(opts...)
+	r.ProjectTag = NewProjectTagService(opts...)
+	r.Function = NewFunctionService(opts...)
+	r.View = NewViewService(opts...)
+	r.Organization = NewOrganizationService(opts...)
+	r.APIKeyResource = NewAPIKeyResourceService(opts...)
+	r.OrgSecret = NewOrgSecretService(opts...)
 
 	return
 }

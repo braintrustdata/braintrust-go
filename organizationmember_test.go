@@ -25,11 +25,13 @@ func TestOrganizationMemberUpdateWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Organizations.Members.Update(context.TODO(), braintrust.OrganizationMemberUpdateParams{
+	_, err := client.Organization.Members.Update(context.TODO(), braintrust.OrganizationMemberUpdateParams{
 		InviteUsers: braintrust.F(braintrust.OrganizationMemberUpdateParamsInviteUsers{
 			IDs:              braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
 			Emails:           braintrust.F([]string{"string", "string", "string"}),
 			SendInviteEmails: braintrust.F(true),
+			GroupIDs:         braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
+			GroupNames:       braintrust.F([]string{"string", "string", "string"}),
 			GroupID:          braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 			GroupName:        braintrust.F("group_name"),
 		}),
