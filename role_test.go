@@ -26,7 +26,7 @@ func TestRoleNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Roles.New(context.TODO(), braintrust.RoleNewParams{
+	_, err := client.Role.New(context.TODO(), braintrust.RoleNewParams{
 		Name:        braintrust.F("name"),
 		Description: braintrust.F("description"),
 		MemberPermissions: braintrust.F([]braintrust.RoleNewParamsMemberPermission{{
@@ -63,7 +63,7 @@ func TestRoleGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Roles.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.Role.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -85,7 +85,7 @@ func TestRoleUpdateWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Roles.Update(
+	_, err := client.Role.Update(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.RoleUpdateParams{
@@ -136,7 +136,7 @@ func TestRoleListWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Roles.List(context.TODO(), braintrust.RoleListParams{
+	_, err := client.Role.List(context.TODO(), braintrust.RoleListParams{
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		IDs:           braintrust.F[braintrust.RoleListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
@@ -165,7 +165,7 @@ func TestRoleDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Roles.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.Role.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -187,7 +187,7 @@ func TestRoleReplaceWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Roles.Replace(context.TODO(), braintrust.RoleReplaceParams{
+	_, err := client.Role.Replace(context.TODO(), braintrust.RoleReplaceParams{
 		Name:        braintrust.F("name"),
 		Description: braintrust.F("description"),
 		MemberPermissions: braintrust.F([]braintrust.RoleReplaceParamsMemberPermission{{

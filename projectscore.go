@@ -145,11 +145,12 @@ const (
 	ProjectScoreNewParamsScoreTypeCategorical ProjectScoreNewParamsScoreType = "categorical"
 	ProjectScoreNewParamsScoreTypeWeighted    ProjectScoreNewParamsScoreType = "weighted"
 	ProjectScoreNewParamsScoreTypeMinimum     ProjectScoreNewParamsScoreType = "minimum"
+	ProjectScoreNewParamsScoreTypeOnline      ProjectScoreNewParamsScoreType = "online"
 )
 
 func (r ProjectScoreNewParamsScoreType) IsKnown() bool {
 	switch r {
-	case ProjectScoreNewParamsScoreTypeSlider, ProjectScoreNewParamsScoreTypeCategorical, ProjectScoreNewParamsScoreTypeWeighted, ProjectScoreNewParamsScoreTypeMinimum:
+	case ProjectScoreNewParamsScoreTypeSlider, ProjectScoreNewParamsScoreTypeCategorical, ProjectScoreNewParamsScoreTypeWeighted, ProjectScoreNewParamsScoreTypeMinimum, ProjectScoreNewParamsScoreTypeOnline:
 		return true
 	}
 	return false
@@ -235,11 +236,12 @@ const (
 	ProjectScoreUpdateParamsScoreTypeCategorical ProjectScoreUpdateParamsScoreType = "categorical"
 	ProjectScoreUpdateParamsScoreTypeWeighted    ProjectScoreUpdateParamsScoreType = "weighted"
 	ProjectScoreUpdateParamsScoreTypeMinimum     ProjectScoreUpdateParamsScoreType = "minimum"
+	ProjectScoreUpdateParamsScoreTypeOnline      ProjectScoreUpdateParamsScoreType = "online"
 )
 
 func (r ProjectScoreUpdateParamsScoreType) IsKnown() bool {
 	switch r {
-	case ProjectScoreUpdateParamsScoreTypeSlider, ProjectScoreUpdateParamsScoreTypeCategorical, ProjectScoreUpdateParamsScoreTypeWeighted, ProjectScoreUpdateParamsScoreTypeMinimum:
+	case ProjectScoreUpdateParamsScoreTypeSlider, ProjectScoreUpdateParamsScoreTypeCategorical, ProjectScoreUpdateParamsScoreTypeWeighted, ProjectScoreUpdateParamsScoreTypeMinimum, ProjectScoreUpdateParamsScoreTypeOnline:
 		return true
 	}
 	return false
@@ -265,6 +267,8 @@ type ProjectScoreListParams struct {
 	ProjectName param.Field[string] `query:"project_name"`
 	// Name of the project_score to search for
 	ProjectScoreName param.Field[string] `query:"project_score_name"`
+	// The type of the configured score
+	ScoreType param.Field[ProjectScoreListParamsScoreTypeUnion] `query:"score_type"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
@@ -293,6 +297,39 @@ type ProjectScoreListParamsIDsArray []string
 
 func (r ProjectScoreListParamsIDsArray) ImplementsProjectScoreListParamsIDsUnion() {}
 
+// The type of the configured score
+//
+// Satisfied by [ProjectScoreListParamsScoreTypeString],
+// [ProjectScoreListParamsScoreTypeArray].
+type ProjectScoreListParamsScoreTypeUnion interface {
+	implementsProjectScoreListParamsScoreTypeUnion()
+}
+
+// The type of the configured score
+type ProjectScoreListParamsScoreTypeString string
+
+const (
+	ProjectScoreListParamsScoreTypeStringSlider      ProjectScoreListParamsScoreTypeString = "slider"
+	ProjectScoreListParamsScoreTypeStringCategorical ProjectScoreListParamsScoreTypeString = "categorical"
+	ProjectScoreListParamsScoreTypeStringWeighted    ProjectScoreListParamsScoreTypeString = "weighted"
+	ProjectScoreListParamsScoreTypeStringMinimum     ProjectScoreListParamsScoreTypeString = "minimum"
+	ProjectScoreListParamsScoreTypeStringOnline      ProjectScoreListParamsScoreTypeString = "online"
+)
+
+func (r ProjectScoreListParamsScoreTypeString) IsKnown() bool {
+	switch r {
+	case ProjectScoreListParamsScoreTypeStringSlider, ProjectScoreListParamsScoreTypeStringCategorical, ProjectScoreListParamsScoreTypeStringWeighted, ProjectScoreListParamsScoreTypeStringMinimum, ProjectScoreListParamsScoreTypeStringOnline:
+		return true
+	}
+	return false
+}
+
+func (r ProjectScoreListParamsScoreTypeString) implementsProjectScoreListParamsScoreTypeUnion() {}
+
+type ProjectScoreListParamsScoreTypeArray []ProjectScoreListParamsScoreTypeArray
+
+func (r ProjectScoreListParamsScoreTypeArray) implementsProjectScoreListParamsScoreTypeUnion() {}
+
 type ProjectScoreReplaceParams struct {
 	// Name of the project score
 	Name param.Field[string] `json:"name,required"`
@@ -318,11 +355,12 @@ const (
 	ProjectScoreReplaceParamsScoreTypeCategorical ProjectScoreReplaceParamsScoreType = "categorical"
 	ProjectScoreReplaceParamsScoreTypeWeighted    ProjectScoreReplaceParamsScoreType = "weighted"
 	ProjectScoreReplaceParamsScoreTypeMinimum     ProjectScoreReplaceParamsScoreType = "minimum"
+	ProjectScoreReplaceParamsScoreTypeOnline      ProjectScoreReplaceParamsScoreType = "online"
 )
 
 func (r ProjectScoreReplaceParamsScoreType) IsKnown() bool {
 	switch r {
-	case ProjectScoreReplaceParamsScoreTypeSlider, ProjectScoreReplaceParamsScoreTypeCategorical, ProjectScoreReplaceParamsScoreTypeWeighted, ProjectScoreReplaceParamsScoreTypeMinimum:
+	case ProjectScoreReplaceParamsScoreTypeSlider, ProjectScoreReplaceParamsScoreTypeCategorical, ProjectScoreReplaceParamsScoreTypeWeighted, ProjectScoreReplaceParamsScoreTypeMinimum, ProjectScoreReplaceParamsScoreTypeOnline:
 		return true
 	}
 	return false
