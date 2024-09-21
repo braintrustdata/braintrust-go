@@ -22,4 +22,6 @@ func (UnionString) ImplementsProjectTagListParamsIDsUnion()                     
 func (UnionString) ImplementsFunctionListParamsIDsUnion()                              {}
 func (UnionString) ImplementsViewListParamsIDsUnion()                                  {}
 func (UnionString) ImplementsOrganizationListParamsIDsUnion()                          {}
-func (UnionString) ImplementsAPIKeyListParamsIDsUnion()                                {}
+func (UnionString) ImplementsAPIKeyResourceListParamsIDsUnion()                        {}
+func (UnionString) ImplementsOrgSecretListParamsIDsUnion()                             {}
+func (UnionString) ImplementsOrgSecretListParamsOrgSecretTypeUnion()                   {}

@@ -14,7 +14,7 @@ import (
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
-func TestOrganizationGet(t *testing.T) {
+func TestAPIKeyResourceNewWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -26,7 +26,10 @@ func TestOrganizationGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Organization.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.APIKeyResource.New(context.TODO(), braintrust.APIKeyResourceNewParams{
+		Name:    braintrust.F("name"),
+		OrgName: braintrust.F("org_name"),
+	})
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -36,7 +39,7 @@ func TestOrganizationGet(t *testing.T) {
 	}
 }
 
-func TestOrganizationUpdateWithOptionalParams(t *testing.T) {
+func TestAPIKeyResourceGet(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -48,17 +51,7 @@ func TestOrganizationUpdateWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Organization.Update(
-		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		braintrust.OrganizationUpdateParams{
-			APIURL:         braintrust.F("api_url"),
-			IsUniversalAPI: braintrust.F(true),
-			Name:           braintrust.F("name"),
-			ProxyURL:       braintrust.F("proxy_url"),
-			RealtimeURL:    braintrust.F("realtime_url"),
-		},
-	)
+	_, err := client.APIKeyResource.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -68,7 +61,7 @@ func TestOrganizationUpdateWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestOrganizationListWithOptionalParams(t *testing.T) {
+func TestAPIKeyResourceListWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -80,9 +73,10 @@ func TestOrganizationListWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Organization.List(context.TODO(), braintrust.OrganizationListParams{
+	_, err := client.APIKeyResource.List(context.TODO(), braintrust.APIKeyResourceListParams{
+		APIKeyName:    braintrust.F("api_key_name"),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:           braintrust.F[braintrust.OrganizationListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
+		IDs:           braintrust.F[braintrust.APIKeyResourceListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
 		OrgName:       braintrust.F("org_name"),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
@@ -96,7 +90,7 @@ func TestOrganizationListWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestOrganizationDelete(t *testing.T) {
+func TestAPIKeyResourceDelete(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -108,7 +102,7 @@ func TestOrganizationDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Organization.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.APIKeyResource.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {

@@ -52,7 +52,7 @@ func main() {
 	client := braintrust.NewClient(
 		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("BRAINTRUST_API_KEY")
 	)
-	project, err := client.Projects.New(context.TODO(), braintrust.ProjectNewParams{
+	project, err := client.Project.New(context.TODO(), braintrust.ProjectNewParams{
 		Name: braintrust.F("foobar"),
 	})
 	if err != nil {
@@ -147,7 +147,7 @@ client := braintrust.NewClient(
 	option.WithHeader("X-Some-Header", "custom_header_info"),
 )
 
-client.Projects.New(context.TODO(), ...,
+client.Project.New(context.TODO(), ...,
 	// Override the header
 	option.WithHeader("X-Some-Header", "some_other_custom_header_info"),
 	// Add an undocumented field to the request body, using sjson syntax
@@ -164,7 +164,7 @@ This library provides some conveniences for working with paginated list endpoint
 You can use `.ListAutoPaging()` methods to iterate through items across all pages:
 
 ```go
-iter := client.Projects.ListAutoPaging(context.TODO(), braintrust.ProjectListParams{})
+iter := client.Project.ListAutoPaging(context.TODO(), braintrust.ProjectListParams{})
 // Automatically fetches more pages as needed.
 for iter.Next() {
 	project := iter.Current()
@@ -179,7 +179,7 @@ Or you can use simple `.List()` methods to fetch a single page and receive a sta
 with additional helper methods like `.GetNextPage()`, e.g.:
 
 ```go
-page, err := client.Projects.List(context.TODO(), braintrust.ProjectListParams{})
+page, err := client.Project.List(context.TODO(), braintrust.ProjectListParams{})
 for page != nil {
 	for _, project := range page.Objects {
 		fmt.Printf("%+v\n", project)
@@ -201,7 +201,7 @@ When the API returns a non-success status code, we return an error with type
 To handle errors, we recommend that you use the `errors.As` pattern:
 
 ```go
-_, err := client.Projects.New(context.TODO(), braintrust.ProjectNewParams{
+_, err := client.Project.New(context.TODO(), braintrust.ProjectNewParams{
 	Name: braintrust.F("foobar"),
 })
 if err != nil {
@@ -228,7 +228,7 @@ To set a per-retry timeout, use `option.WithRequestTimeout()`.
 // This sets the timeout for the request, including all the retries.
 ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 defer cancel()
-client.Projects.New(
+client.Project.New(
 	ctx,
 	braintrust.ProjectNewParams{
 		Name: braintrust.F("foobar"),
@@ -266,7 +266,7 @@ client := braintrust.NewClient(
 )
 
 // Override per-request:
-client.Projects.New(
+client.Project.New(
 	context.TODO(),
 	braintrust.ProjectNewParams{
 		Name: braintrust.F("foobar"),
