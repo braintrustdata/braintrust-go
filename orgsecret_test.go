@@ -29,7 +29,7 @@ func TestOrgSecretNewWithOptionalParams(t *testing.T) {
 	_, err := client.OrgSecret.New(context.TODO(), braintrust.OrgSecretNewParams{
 		Name: braintrust.F("name"),
 		Metadata: braintrust.F(map[string]interface{}{
-			"foo": map[string]interface{}{},
+			"foo": "bar",
 		}),
 		OrgName: braintrust.F("org_name"),
 		Secret:  braintrust.F("secret"),
@@ -83,7 +83,7 @@ func TestOrgSecretUpdateWithOptionalParams(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.OrgSecretUpdateParams{
 			Metadata: braintrust.F(map[string]interface{}{
-				"foo": map[string]interface{}{},
+				"foo": "bar",
 			}),
 			Name:   braintrust.F("name"),
 			Secret: braintrust.F("secret"),
@@ -166,7 +166,7 @@ func TestOrgSecretReplaceWithOptionalParams(t *testing.T) {
 	_, err := client.OrgSecret.Replace(context.TODO(), braintrust.OrgSecretReplaceParams{
 		Name: braintrust.F("name"),
 		Metadata: braintrust.F(map[string]interface{}{
-			"foo": map[string]interface{}{},
+			"foo": "bar",
 		}),
 		OrgName: braintrust.F("org_name"),
 		Secret:  braintrust.F("secret"),
