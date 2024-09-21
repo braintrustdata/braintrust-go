@@ -103,12 +103,14 @@ func (r OrganizationMemberUpdateParams) MarshalJSON() (data []byte, err error) {
 type OrganizationMemberUpdateParamsInviteUsers struct {
 	// Emails of users to invite
 	Emails param.Field[[]string] `json:"emails"`
-	// Optional id of a group to add newly-invited users to. Cannot specify both a
-	// group id and a group name.
+	// Singular form of group_ids
 	GroupID param.Field[string] `json:"group_id" format:"uuid"`
-	// Optional name of a group to add newly-invited users to. Cannot specify both a
-	// group id and a group name.
+	// Optional list of group ids to add newly-invited users to.
+	GroupIDs param.Field[[]string] `json:"group_ids" format:"uuid"`
+	// Singular form of group_names
 	GroupName param.Field[string] `json:"group_name"`
+	// Optional list of group names to add newly-invited users to.
+	GroupNames param.Field[[]string] `json:"group_names"`
 	// Ids of existing users to invite
 	IDs param.Field[[]string] `json:"ids" format:"uuid"`
 	// If true, send invite emails to the users who wore actually added

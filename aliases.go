@@ -248,6 +248,15 @@ const FeedbackProjectLogsItemSourceAPI = shared.FeedbackProjectLogsItemSourceAPI
 const FeedbackProjectLogsItemSourceExternal = shared.FeedbackProjectLogsItemSourceExternal
 
 // This is an alias to an internal type.
+type FeedbackResponseSchema = shared.FeedbackResponseSchema
+
+// This is an alias to an internal type.
+type FeedbackResponseSchemaStatus = shared.FeedbackResponseSchemaStatus
+
+// This is an alias to an internal value.
+const FeedbackResponseSchemaStatusSuccess = shared.FeedbackResponseSchemaStatusSuccess
+
+// This is an alias to an internal type.
 type FetchDatasetEventsResponse = shared.FetchDatasetEventsResponse
 
 // This is an alias to an internal type.
@@ -278,34 +287,85 @@ type FunctionFunctionDataCode = shared.FunctionFunctionDataCode
 type FunctionFunctionDataCodeData = shared.FunctionFunctionDataCodeData
 
 // This is an alias to an internal type.
-type FunctionFunctionDataCodeDataLocation = shared.FunctionFunctionDataCodeDataLocation
+type FunctionFunctionDataCodeDataBundle = shared.FunctionFunctionDataCodeDataBundle
 
 // This is an alias to an internal type.
-type FunctionFunctionDataCodeDataLocationPositionUnion = shared.FunctionFunctionDataCodeDataLocationPositionUnion
+type FunctionFunctionDataCodeDataBundleLocation = shared.FunctionFunctionDataCodeDataBundleLocation
 
 // This is an alias to an internal type.
-type FunctionFunctionDataCodeDataLocationPositionTask = shared.FunctionFunctionDataCodeDataLocationPositionTask
+type FunctionFunctionDataCodeDataBundleLocationPosition = shared.FunctionFunctionDataCodeDataBundleLocationPosition
+
+// This is an alias to an internal type.
+type FunctionFunctionDataCodeDataBundleLocationPositionType = shared.FunctionFunctionDataCodeDataBundleLocationPositionType
+
+// This is an alias to an internal type.
+type FunctionFunctionDataCodeDataBundleLocationPositionTypeType = shared.FunctionFunctionDataCodeDataBundleLocationPositionTypeType
 
 // This is an alias to an internal value.
-const FunctionFunctionDataCodeDataLocationPositionTaskTask = shared.FunctionFunctionDataCodeDataLocationPositionTaskTask
+const FunctionFunctionDataCodeDataBundleLocationPositionTypeTypeTask = shared.FunctionFunctionDataCodeDataBundleLocationPositionTypeTypeTask
 
 // This is an alias to an internal type.
-type FunctionFunctionDataCodeDataLocationPositionScore = shared.FunctionFunctionDataCodeDataLocationPositionScore
+type FunctionFunctionDataCodeDataBundleLocationPositionScorer = shared.FunctionFunctionDataCodeDataBundleLocationPositionScorer
 
 // This is an alias to an internal type.
-type FunctionFunctionDataCodeDataLocationType = shared.FunctionFunctionDataCodeDataLocationType
+type FunctionFunctionDataCodeDataBundleLocationPositionScorerType = shared.FunctionFunctionDataCodeDataBundleLocationPositionScorerType
 
 // This is an alias to an internal value.
-const FunctionFunctionDataCodeDataLocationTypeExperiment = shared.FunctionFunctionDataCodeDataLocationTypeExperiment
+const FunctionFunctionDataCodeDataBundleLocationPositionScorerTypeScorer = shared.FunctionFunctionDataCodeDataBundleLocationPositionScorerTypeScorer
 
 // This is an alias to an internal type.
-type FunctionFunctionDataCodeDataRuntimeContext = shared.FunctionFunctionDataCodeDataRuntimeContext
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataRuntimeContextRuntime = shared.FunctionFunctionDataCodeDataRuntimeContextRuntime
+type FunctionFunctionDataCodeDataBundleLocationType = shared.FunctionFunctionDataCodeDataBundleLocationType
 
 // This is an alias to an internal value.
-const FunctionFunctionDataCodeDataRuntimeContextRuntimeNode = shared.FunctionFunctionDataCodeDataRuntimeContextRuntimeNode
+const FunctionFunctionDataCodeDataBundleLocationTypeExperiment = shared.FunctionFunctionDataCodeDataBundleLocationTypeExperiment
+
+// This is an alias to an internal type.
+type FunctionFunctionDataCodeDataBundleRuntimeContext = shared.FunctionFunctionDataCodeDataBundleRuntimeContext
+
+// This is an alias to an internal type.
+type FunctionFunctionDataCodeDataBundleRuntimeContextRuntime = shared.FunctionFunctionDataCodeDataBundleRuntimeContextRuntime
+
+// This is an alias to an internal value.
+const FunctionFunctionDataCodeDataBundleRuntimeContextRuntimeNode = shared.FunctionFunctionDataCodeDataBundleRuntimeContextRuntimeNode
+
+// This is an alias to an internal value.
+const FunctionFunctionDataCodeDataBundleRuntimeContextRuntimePython = shared.FunctionFunctionDataCodeDataBundleRuntimeContextRuntimePython
+
+// This is an alias to an internal type.
+type FunctionFunctionDataCodeDataBundleType = shared.FunctionFunctionDataCodeDataBundleType
+
+// This is an alias to an internal value.
+const FunctionFunctionDataCodeDataBundleTypeBundle = shared.FunctionFunctionDataCodeDataBundleTypeBundle
+
+// This is an alias to an internal type.
+type FunctionFunctionDataCodeDataInline = shared.FunctionFunctionDataCodeDataInline
+
+// This is an alias to an internal type.
+type FunctionFunctionDataCodeDataInlineRuntimeContext = shared.FunctionFunctionDataCodeDataInlineRuntimeContext
+
+// This is an alias to an internal type.
+type FunctionFunctionDataCodeDataInlineRuntimeContextRuntime = shared.FunctionFunctionDataCodeDataInlineRuntimeContextRuntime
+
+// This is an alias to an internal value.
+const FunctionFunctionDataCodeDataInlineRuntimeContextRuntimeNode = shared.FunctionFunctionDataCodeDataInlineRuntimeContextRuntimeNode
+
+// This is an alias to an internal value.
+const FunctionFunctionDataCodeDataInlineRuntimeContextRuntimePython = shared.FunctionFunctionDataCodeDataInlineRuntimeContextRuntimePython
+
+// This is an alias to an internal type.
+type FunctionFunctionDataCodeDataInlineType = shared.FunctionFunctionDataCodeDataInlineType
+
+// This is an alias to an internal value.
+const FunctionFunctionDataCodeDataInlineTypeInline = shared.FunctionFunctionDataCodeDataInlineTypeInline
+
+// This is an alias to an internal type.
+type FunctionFunctionDataCodeDataType = shared.FunctionFunctionDataCodeDataType
+
+// This is an alias to an internal value.
+const FunctionFunctionDataCodeDataTypeBundle = shared.FunctionFunctionDataCodeDataTypeBundle
+
+// This is an alias to an internal value.
+const FunctionFunctionDataCodeDataTypeInline = shared.FunctionFunctionDataCodeDataTypeInline
 
 // This is an alias to an internal type.
 type FunctionFunctionDataCodeType = shared.FunctionFunctionDataCodeType
@@ -341,6 +401,59 @@ type FunctionLogID = shared.FunctionLogID
 
 // This is an alias to an internal value.
 const FunctionLogIDP = shared.FunctionLogIDP
+
+// This is an alias to an internal type.
+type FunctionFunctionType = shared.FunctionFunctionType
+
+// This is an alias to an internal value.
+const FunctionFunctionTypeTask = shared.FunctionFunctionTypeTask
+
+// This is an alias to an internal value.
+const FunctionFunctionTypeLlm = shared.FunctionFunctionTypeLlm
+
+// This is an alias to an internal value.
+const FunctionFunctionTypeScorer = shared.FunctionFunctionTypeScorer
+
+// This is an alias to an internal type.
+type FunctionOrigin = shared.FunctionOrigin
+
+// The object type that the ACL applies to
+//
+// This is an alias to an internal type.
+type FunctionOriginObjectType = shared.FunctionOriginObjectType
+
+// This is an alias to an internal value.
+const FunctionOriginObjectTypeOrganization = shared.FunctionOriginObjectTypeOrganization
+
+// This is an alias to an internal value.
+const FunctionOriginObjectTypeProject = shared.FunctionOriginObjectTypeProject
+
+// This is an alias to an internal value.
+const FunctionOriginObjectTypeExperiment = shared.FunctionOriginObjectTypeExperiment
+
+// This is an alias to an internal value.
+const FunctionOriginObjectTypeDataset = shared.FunctionOriginObjectTypeDataset
+
+// This is an alias to an internal value.
+const FunctionOriginObjectTypePrompt = shared.FunctionOriginObjectTypePrompt
+
+// This is an alias to an internal value.
+const FunctionOriginObjectTypePromptSession = shared.FunctionOriginObjectTypePromptSession
+
+// This is an alias to an internal value.
+const FunctionOriginObjectTypeGroup = shared.FunctionOriginObjectTypeGroup
+
+// This is an alias to an internal value.
+const FunctionOriginObjectTypeRole = shared.FunctionOriginObjectTypeRole
+
+// This is an alias to an internal value.
+const FunctionOriginObjectTypeOrgMember = shared.FunctionOriginObjectTypeOrgMember
+
+// This is an alias to an internal value.
+const FunctionOriginObjectTypeProjectLog = shared.FunctionOriginObjectTypeProjectLog
+
+// This is an alias to an internal value.
+const FunctionOriginObjectTypeOrgProject = shared.FunctionOriginObjectTypeOrgProject
 
 // A group is a collection of users which can be assigned an ACL
 //
@@ -549,6 +662,9 @@ const InsertProjectLogsEventReplaceSpanAttributesTypeTool = shared.InsertProject
 type MetricSummary = shared.MetricSummary
 
 // This is an alias to an internal type.
+type OrgSecret = shared.OrgSecret
+
+// This is an alias to an internal type.
 type Organization = shared.Organization
 
 // A path-lookup filter describes an equality comparison against a specific
@@ -650,6 +766,9 @@ const ProjectScoreScoreTypeWeighted = shared.ProjectScoreScoreTypeWeighted
 // This is an alias to an internal value.
 const ProjectScoreScoreTypeMinimum = shared.ProjectScoreScoreTypeMinimum
 
+// This is an alias to an internal value.
+const ProjectScoreScoreTypeOnline = shared.ProjectScoreScoreTypeOnline
+
 // For categorical-type project scores, the list of all categories
 //
 // This is an alias to an internal type.
@@ -677,6 +796,39 @@ type ProjectScoreConfigDestination = shared.ProjectScoreConfigDestination
 // This is an alias to an internal value.
 const ProjectScoreConfigDestinationExpected = shared.ProjectScoreConfigDestinationExpected
 
+// This is an alias to an internal type.
+type ProjectScoreConfigOnline = shared.ProjectScoreConfigOnline
+
+// This is an alias to an internal type.
+type ProjectScoreConfigOnlineScorer = shared.ProjectScoreConfigOnlineScorer
+
+// This is an alias to an internal type.
+type ProjectScoreConfigOnlineScorersFunction = shared.ProjectScoreConfigOnlineScorersFunction
+
+// This is an alias to an internal type.
+type ProjectScoreConfigOnlineScorersFunctionType = shared.ProjectScoreConfigOnlineScorersFunctionType
+
+// This is an alias to an internal value.
+const ProjectScoreConfigOnlineScorersFunctionTypeFunction = shared.ProjectScoreConfigOnlineScorersFunctionTypeFunction
+
+// This is an alias to an internal type.
+type ProjectScoreConfigOnlineScorersGlobal = shared.ProjectScoreConfigOnlineScorersGlobal
+
+// This is an alias to an internal type.
+type ProjectScoreConfigOnlineScorersGlobalType = shared.ProjectScoreConfigOnlineScorersGlobalType
+
+// This is an alias to an internal value.
+const ProjectScoreConfigOnlineScorersGlobalTypeGlobal = shared.ProjectScoreConfigOnlineScorersGlobalTypeGlobal
+
+// This is an alias to an internal type.
+type ProjectScoreConfigOnlineScorersType = shared.ProjectScoreConfigOnlineScorersType
+
+// This is an alias to an internal value.
+const ProjectScoreConfigOnlineScorersTypeFunction = shared.ProjectScoreConfigOnlineScorersTypeFunction
+
+// This is an alias to an internal value.
+const ProjectScoreConfigOnlineScorersTypeGlobal = shared.ProjectScoreConfigOnlineScorersTypeGlobal
+
 // For categorical-type project scores, defines a single category
 //
 // This is an alias to an internal type.
@@ -703,6 +855,18 @@ type PromptLogID = shared.PromptLogID
 
 // This is an alias to an internal value.
 const PromptLogIDP = shared.PromptLogIDP
+
+// This is an alias to an internal type.
+type PromptFunctionType = shared.PromptFunctionType
+
+// This is an alias to an internal value.
+const PromptFunctionTypeTask = shared.PromptFunctionTypeTask
+
+// This is an alias to an internal value.
+const PromptFunctionTypeLlm = shared.PromptFunctionTypeLlm
+
+// This is an alias to an internal value.
+const PromptFunctionTypeScorer = shared.PromptFunctionTypeScorer
 
 // The prompt, model, and its parameters
 //
@@ -786,6 +950,15 @@ type PromptDataOptionsParamsJsCompletionParams = shared.PromptDataOptionsParamsJ
 
 // This is an alias to an internal type.
 type PromptDataOrigin = shared.PromptDataOrigin
+
+// This is an alias to an internal type.
+type PromptDataParser = shared.PromptDataParser
+
+// This is an alias to an internal type.
+type PromptDataParserType = shared.PromptDataParserType
+
+// This is an alias to an internal value.
+const PromptDataParserTypeLlmClassifier = shared.PromptDataParserTypeLlmClassifier
 
 // This is an alias to an internal type.
 type PromptDataPrompt = shared.PromptDataPrompt
@@ -1010,6 +1183,9 @@ type PromptDataOptionsParamsJsCompletionParamsParam = shared.PromptDataOptionsPa
 
 // This is an alias to an internal type.
 type PromptDataOriginParam = shared.PromptDataOriginParam
+
+// This is an alias to an internal type.
+type PromptDataParserParam = shared.PromptDataParserParam
 
 // This is an alias to an internal type.
 type PromptDataPromptUnionParam = shared.PromptDataPromptUnionParam

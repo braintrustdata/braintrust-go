@@ -24,7 +24,7 @@ func TestManualPagination(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	page, err := client.Projects.List(context.TODO(), braintrust.ProjectListParams{})
+	page, err := client.Project.List(context.TODO(), braintrust.ProjectListParams{})
 	if err != nil {
 		t.Fatalf("err should be nil: %s", err.Error())
 	}
