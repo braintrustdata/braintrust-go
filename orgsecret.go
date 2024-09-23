@@ -203,16 +203,14 @@ type OrgSecretListParamsIDsArray []string
 
 func (r OrgSecretListParamsIDsArray) ImplementsOrgSecretListParamsIDsUnion() {}
 
-// Satisfied by [shared.UnionString],
-// [OrgSecretListParamsOrgSecretTypeOrgSecretMultiple].
+// Satisfied by [shared.UnionString], [OrgSecretListParamsOrgSecretTypeArray].
 type OrgSecretListParamsOrgSecretTypeUnion interface {
 	ImplementsOrgSecretListParamsOrgSecretTypeUnion()
 }
 
-type OrgSecretListParamsOrgSecretTypeOrgSecretMultiple []string
+type OrgSecretListParamsOrgSecretTypeArray []string
 
-func (r OrgSecretListParamsOrgSecretTypeOrgSecretMultiple) ImplementsOrgSecretListParamsOrgSecretTypeUnion() {
-}
+func (r OrgSecretListParamsOrgSecretTypeArray) ImplementsOrgSecretListParamsOrgSecretTypeUnion() {}
 
 type OrgSecretFindAndDeleteParams struct {
 	// Name of the org secret
