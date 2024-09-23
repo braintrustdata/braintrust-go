@@ -110,6 +110,18 @@ func (r *FunctionService) Delete(ctx context.Context, functionID string, opts ..
 	return
 }
 
+// Invoke a function.
+func (r *FunctionService) Invoke(ctx context.Context, functionID string, body FunctionInvokeParams, opts ...option.RequestOption) (res *FunctionInvokeResponse, err error) {
+	opts = append(r.Options[:], opts...)
+	if functionID == "" {
+		err = errors.New("missing required function_id parameter")
+		return
+	}
+	path := fmt.Sprintf("v1/function/%s/invoke", functionID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
+	return
+}
+
 // Create or replace function. If there is an existing function in the project with
 // the same slug as the one specified in the request, will replace the existing
 // function with the provided fields
@@ -119,6 +131,8 @@ func (r *FunctionService) Replace(ctx context.Context, body FunctionReplaceParam
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
 	return
 }
+
+type FunctionInvokeResponse = interface{}
 
 type FunctionNewParams struct {
 	FunctionData param.Field[FunctionNewParamsFunctionDataUnion] `json:"function_data,required"`
@@ -974,6 +988,75 @@ type FunctionListParamsIDsUnion interface {
 type FunctionListParamsIDsArray []string
 
 func (r FunctionListParamsIDsArray) ImplementsFunctionListParamsIDsUnion() {}
+
+type FunctionInvokeParams struct {
+	// Argument to the function, which can be any JSON serializable value
+	Input param.Field[interface{}] `json:"input"`
+	// Options for tracing the function call
+	Parent param.Field[FunctionInvokeParamsParentUnion] `json:"parent"`
+	// Whether to stream the response. If true, results will be returned in the
+	// Braintrust SSE format.
+	Stream param.Field[bool] `json:"stream"`
+	// The version of the function
+	Version param.Field[string] `json:"version"`
+}
+
+func (r FunctionInvokeParams) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+// Options for tracing the function call
+//
+// Satisfied by [FunctionInvokeParamsParentSpanParentStruct], [shared.UnionString].
+type FunctionInvokeParamsParentUnion interface {
+	ImplementsFunctionInvokeParamsParentUnion()
+}
+
+// Span parent properties
+type FunctionInvokeParamsParentSpanParentStruct struct {
+	// The id of the container object you are logging to
+	ObjectID   param.Field[string]                                               `json:"object_id,required"`
+	ObjectType param.Field[FunctionInvokeParamsParentSpanParentStructObjectType] `json:"object_type,required"`
+	// Include these properties in every span created under this parent
+	PropagatedEvent param.Field[map[string]interface{}] `json:"propagated_event"`
+	// Identifiers for the row to to log a subspan under
+	RowIDs param.Field[FunctionInvokeParamsParentSpanParentStructRowIDs] `json:"row_ids"`
+}
+
+func (r FunctionInvokeParamsParentSpanParentStruct) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsParentSpanParentStruct) ImplementsFunctionInvokeParamsParentUnion() {}
+
+type FunctionInvokeParamsParentSpanParentStructObjectType string
+
+const (
+	FunctionInvokeParamsParentSpanParentStructObjectTypeProjectLogs FunctionInvokeParamsParentSpanParentStructObjectType = "project_logs"
+	FunctionInvokeParamsParentSpanParentStructObjectTypeExperiment  FunctionInvokeParamsParentSpanParentStructObjectType = "experiment"
+)
+
+func (r FunctionInvokeParamsParentSpanParentStructObjectType) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsParentSpanParentStructObjectTypeProjectLogs, FunctionInvokeParamsParentSpanParentStructObjectTypeExperiment:
+		return true
+	}
+	return false
+}
+
+// Identifiers for the row to to log a subspan under
+type FunctionInvokeParamsParentSpanParentStructRowIDs struct {
+	// The id of the row
+	ID param.Field[string] `json:"id,required"`
+	// The root_span_id of the row
+	RootSpanID param.Field[string] `json:"root_span_id,required"`
+	// The span_id of the row
+	SpanID param.Field[string] `json:"span_id,required"`
+}
+
+func (r FunctionInvokeParamsParentSpanParentStructRowIDs) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
 
 type FunctionReplaceParams struct {
 	FunctionData param.Field[FunctionReplaceParamsFunctionDataUnion] `json:"function_data,required"`

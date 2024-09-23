@@ -11,6 +11,42 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+type AISecret struct {
+	// Unique identifier for the AI secret
+	ID string `json:"id,required" format:"uuid"`
+	// Name of the AI secret
+	Name string `json:"name,required"`
+	// Unique identifier for the organization
+	OrgID string `json:"org_id,required" format:"uuid"`
+	// Date of AI secret creation
+	Created       time.Time              `json:"created,nullable" format:"date-time"`
+	Metadata      map[string]interface{} `json:"metadata,nullable"`
+	PreviewSecret string                 `json:"preview_secret,nullable"`
+	Type          string                 `json:"type,nullable"`
+	JSON          aiSecretJSON           `json:"-"`
+}
+
+// aiSecretJSON contains the JSON metadata for the struct [AISecret]
+type aiSecretJSON struct {
+	ID            apijson.Field
+	Name          apijson.Field
+	OrgID         apijson.Field
+	Created       apijson.Field
+	Metadata      apijson.Field
+	PreviewSecret apijson.Field
+	Type          apijson.Field
+	raw           string
+	ExtraFields   map[string]apijson.Field
+}
+
+func (r *AISecret) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r aiSecretJSON) RawJSON() string {
+	return r.raw
+}
+
 // An ACL grants a certain permission or role to a certain user or group on an
 // object.
 //
@@ -2554,42 +2590,6 @@ func (r *MetricSummary) UnmarshalJSON(data []byte) (err error) {
 }
 
 func (r metricSummaryJSON) RawJSON() string {
-	return r.raw
-}
-
-type OrgSecret struct {
-	// Unique identifier for the org secret
-	ID string `json:"id,required" format:"uuid"`
-	// Name of the org secret
-	Name string `json:"name,required"`
-	// Unique identifier for the organization
-	OrgID string `json:"org_id,required" format:"uuid"`
-	// Date of org secret creation
-	Created       time.Time              `json:"created,nullable" format:"date-time"`
-	Metadata      map[string]interface{} `json:"metadata,nullable"`
-	PreviewSecret string                 `json:"preview_secret,nullable"`
-	Type          string                 `json:"type,nullable"`
-	JSON          orgSecretJSON          `json:"-"`
-}
-
-// orgSecretJSON contains the JSON metadata for the struct [OrgSecret]
-type orgSecretJSON struct {
-	ID            apijson.Field
-	Name          apijson.Field
-	OrgID         apijson.Field
-	Created       apijson.Field
-	Metadata      apijson.Field
-	PreviewSecret apijson.Field
-	Type          apijson.Field
-	raw           string
-	ExtraFields   map[string]apijson.Field
-}
-
-func (r *OrgSecret) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r orgSecretJSON) RawJSON() string {
 	return r.raw
 }
 
