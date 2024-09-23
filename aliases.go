@@ -684,12 +684,6 @@ type PathLookupFilterType = shared.PathLookupFilterType
 const PathLookupFilterTypePathLookup = shared.PathLookupFilterTypePathLookup
 
 // This is an alias to an internal type.
-type Project = shared.Project
-
-// This is an alias to an internal type.
-type ProjectSettings = shared.ProjectSettings
-
-// This is an alias to an internal type.
 type ProjectLogsEvent = shared.ProjectLogsEvent
 
 // A literal 'g' which identifies the log as a project log
@@ -742,6 +736,12 @@ const ProjectLogsEventSpanAttributesTypeTask = shared.ProjectLogsEventSpanAttrib
 
 // This is an alias to an internal value.
 const ProjectLogsEventSpanAttributesTypeTool = shared.ProjectLogsEventSpanAttributesTypeTool
+
+// This is an alias to an internal type.
+type ProjectModel = shared.ProjectModel
+
+// This is an alias to an internal type.
+type ProjectModelSettings = shared.ProjectModelSettings
 
 // A project score is a user-configured score, which can be manually-labeled
 // through the UI
