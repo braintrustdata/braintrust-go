@@ -300,7 +300,7 @@ func (r ProjectScoreListParamsIDsArray) ImplementsProjectScoreListParamsIDsUnion
 // The type of the configured score
 //
 // Satisfied by [ProjectScoreListParamsScoreTypeString],
-// [ProjectScoreListParamsScoreTypeArray].
+// [ProjectScoreListParamsScoreTypeProjectScoreMultiple].
 type ProjectScoreListParamsScoreTypeUnion interface {
 	implementsProjectScoreListParamsScoreTypeUnion()
 }
@@ -326,9 +326,10 @@ func (r ProjectScoreListParamsScoreTypeString) IsKnown() bool {
 
 func (r ProjectScoreListParamsScoreTypeString) implementsProjectScoreListParamsScoreTypeUnion() {}
 
-type ProjectScoreListParamsScoreTypeArray []ProjectScoreListParamsScoreTypeArray
+type ProjectScoreListParamsScoreTypeProjectScoreMultiple []ProjectScoreListParamsScoreTypeProjectScoreMultiple
 
-func (r ProjectScoreListParamsScoreTypeArray) implementsProjectScoreListParamsScoreTypeUnion() {}
+func (r ProjectScoreListParamsScoreTypeProjectScoreMultiple) implementsProjectScoreListParamsScoreTypeUnion() {
+}
 
 type ProjectScoreReplaceParams struct {
 	// Name of the project score
