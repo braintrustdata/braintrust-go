@@ -133,7 +133,7 @@ func TestProjectScoreListWithOptionalParams(t *testing.T) {
 		ProjectID:        braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ProjectName:      braintrust.F("project_name"),
 		ProjectScoreName: braintrust.F("project_score_name"),
-		ScoreType:        braintrust.F[braintrust.ProjectScoreListParamsScoreTypeUnion](braintrust.ProjectScoreListParamsScoreTypeString(braintrust.ProjectScoreListParamsScoreTypeStringSlider)),
+		ScoreType:        braintrust.F[braintrust.ProjectScoreListParamsScoreTypeUnion](braintrust.ProjectScoreListParamsScoreTypeProjectScoreTypeSingle(braintrust.ProjectScoreListParamsScoreTypeProjectScoreTypeSingleSlider)),
 		StartingAfter:    braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
