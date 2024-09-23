@@ -115,38 +115,38 @@ func (r UserListParams) URLQuery() (v url.Values) {
 // Email of the user to search for. You may pass the param multiple times to filter
 // for more than one email
 //
-// Satisfied by [shared.UnionString], [UserListParamsEmailArray].
+// Satisfied by [shared.UnionString], [UserListParamsEmailEmailMultiple].
 type UserListParamsEmailUnion interface {
 	ImplementsUserListParamsEmailUnion()
 }
 
-type UserListParamsEmailArray []string
+type UserListParamsEmailEmailMultiple []string
 
-func (r UserListParamsEmailArray) ImplementsUserListParamsEmailUnion() {}
+func (r UserListParamsEmailEmailMultiple) ImplementsUserListParamsEmailUnion() {}
 
 // Family name of the user to search for. You may pass the param multiple times to
 // filter for more than one family name
 //
-// Satisfied by [shared.UnionString], [UserListParamsFamilyNameArray].
+// Satisfied by [shared.UnionString], [UserListParamsFamilyNameFamilyNameMultiple].
 type UserListParamsFamilyNameUnion interface {
 	ImplementsUserListParamsFamilyNameUnion()
 }
 
-type UserListParamsFamilyNameArray []string
+type UserListParamsFamilyNameFamilyNameMultiple []string
 
-func (r UserListParamsFamilyNameArray) ImplementsUserListParamsFamilyNameUnion() {}
+func (r UserListParamsFamilyNameFamilyNameMultiple) ImplementsUserListParamsFamilyNameUnion() {}
 
 // Given name of the user to search for. You may pass the param multiple times to
 // filter for more than one given name
 //
-// Satisfied by [shared.UnionString], [UserListParamsGivenNameArray].
+// Satisfied by [shared.UnionString], [UserListParamsGivenNameGivenNameMultiple].
 type UserListParamsGivenNameUnion interface {
 	ImplementsUserListParamsGivenNameUnion()
 }
 
-type UserListParamsGivenNameArray []string
+type UserListParamsGivenNameGivenNameMultiple []string
 
-func (r UserListParamsGivenNameArray) ImplementsUserListParamsGivenNameUnion() {}
+func (r UserListParamsGivenNameGivenNameMultiple) ImplementsUserListParamsGivenNameUnion() {}
 
 // Filter search results to a particular set of object IDs. To specify a list of
 // IDs, include the query param multiple times

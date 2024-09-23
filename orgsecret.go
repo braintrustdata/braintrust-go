@@ -110,6 +110,14 @@ func (r *OrgSecretService) Delete(ctx context.Context, orgSecretID string, opts 
 	return
 }
 
+// Delete a single org_secret
+func (r *OrgSecretService) FindAndDelete(ctx context.Context, body OrgSecretFindAndDeleteParams, opts ...option.RequestOption) (res *shared.OrgSecret, err error) {
+	opts = append(r.Options[:], opts...)
+	path := "v1/org_secret"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, body, &res, opts...)
+	return
+}
+
 // Create or replace org_secret. If there is an existing org_secret with the same
 // name as the one specified in the request, will replace the existing org_secret
 // with the provided fields
@@ -195,14 +203,29 @@ type OrgSecretListParamsIDsArray []string
 
 func (r OrgSecretListParamsIDsArray) ImplementsOrgSecretListParamsIDsUnion() {}
 
-// Satisfied by [shared.UnionString], [OrgSecretListParamsOrgSecretTypeArray].
+// Satisfied by [shared.UnionString],
+// [OrgSecretListParamsOrgSecretTypeOrgSecretMultiple].
 type OrgSecretListParamsOrgSecretTypeUnion interface {
 	ImplementsOrgSecretListParamsOrgSecretTypeUnion()
 }
 
-type OrgSecretListParamsOrgSecretTypeArray []string
+type OrgSecretListParamsOrgSecretTypeOrgSecretMultiple []string
 
-func (r OrgSecretListParamsOrgSecretTypeArray) ImplementsOrgSecretListParamsOrgSecretTypeUnion() {}
+func (r OrgSecretListParamsOrgSecretTypeOrgSecretMultiple) ImplementsOrgSecretListParamsOrgSecretTypeUnion() {
+}
+
+type OrgSecretFindAndDeleteParams struct {
+	// Name of the org secret
+	Name param.Field[string] `json:"name,required"`
+	// For nearly all users, this parameter should be unnecessary. But in the rare case
+	// that your API key belongs to multiple organizations, you may specify the name of
+	// the organization the Org Secret belongs in.
+	OrgName param.Field[string] `json:"org_name"`
+}
+
+func (r OrgSecretFindAndDeleteParams) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
 
 type OrgSecretReplaceParams struct {
 	// Name of the org secret

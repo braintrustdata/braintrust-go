@@ -299,32 +299,33 @@ func (r ProjectScoreListParamsIDsArray) ImplementsProjectScoreListParamsIDsUnion
 
 // The type of the configured score
 //
-// Satisfied by [ProjectScoreListParamsScoreTypeString],
+// Satisfied by [ProjectScoreListParamsScoreTypeProjectScoreSingle],
 // [ProjectScoreListParamsScoreTypeProjectScoreMultiple].
 type ProjectScoreListParamsScoreTypeUnion interface {
 	implementsProjectScoreListParamsScoreTypeUnion()
 }
 
 // The type of the configured score
-type ProjectScoreListParamsScoreTypeString string
+type ProjectScoreListParamsScoreTypeProjectScoreSingle string
 
 const (
-	ProjectScoreListParamsScoreTypeStringSlider      ProjectScoreListParamsScoreTypeString = "slider"
-	ProjectScoreListParamsScoreTypeStringCategorical ProjectScoreListParamsScoreTypeString = "categorical"
-	ProjectScoreListParamsScoreTypeStringWeighted    ProjectScoreListParamsScoreTypeString = "weighted"
-	ProjectScoreListParamsScoreTypeStringMinimum     ProjectScoreListParamsScoreTypeString = "minimum"
-	ProjectScoreListParamsScoreTypeStringOnline      ProjectScoreListParamsScoreTypeString = "online"
+	ProjectScoreListParamsScoreTypeProjectScoreSingleSlider      ProjectScoreListParamsScoreTypeProjectScoreSingle = "slider"
+	ProjectScoreListParamsScoreTypeProjectScoreSingleCategorical ProjectScoreListParamsScoreTypeProjectScoreSingle = "categorical"
+	ProjectScoreListParamsScoreTypeProjectScoreSingleWeighted    ProjectScoreListParamsScoreTypeProjectScoreSingle = "weighted"
+	ProjectScoreListParamsScoreTypeProjectScoreSingleMinimum     ProjectScoreListParamsScoreTypeProjectScoreSingle = "minimum"
+	ProjectScoreListParamsScoreTypeProjectScoreSingleOnline      ProjectScoreListParamsScoreTypeProjectScoreSingle = "online"
 )
 
-func (r ProjectScoreListParamsScoreTypeString) IsKnown() bool {
+func (r ProjectScoreListParamsScoreTypeProjectScoreSingle) IsKnown() bool {
 	switch r {
-	case ProjectScoreListParamsScoreTypeStringSlider, ProjectScoreListParamsScoreTypeStringCategorical, ProjectScoreListParamsScoreTypeStringWeighted, ProjectScoreListParamsScoreTypeStringMinimum, ProjectScoreListParamsScoreTypeStringOnline:
+	case ProjectScoreListParamsScoreTypeProjectScoreSingleSlider, ProjectScoreListParamsScoreTypeProjectScoreSingleCategorical, ProjectScoreListParamsScoreTypeProjectScoreSingleWeighted, ProjectScoreListParamsScoreTypeProjectScoreSingleMinimum, ProjectScoreListParamsScoreTypeProjectScoreSingleOnline:
 		return true
 	}
 	return false
 }
 
-func (r ProjectScoreListParamsScoreTypeString) implementsProjectScoreListParamsScoreTypeUnion() {}
+func (r ProjectScoreListParamsScoreTypeProjectScoreSingle) implementsProjectScoreListParamsScoreTypeUnion() {
+}
 
 type ProjectScoreListParamsScoreTypeProjectScoreMultiple []ProjectScoreListParamsScoreTypeProjectScoreMultiple
 
