@@ -24,11 +24,11 @@ func TestUsage(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	project, err := client.Project.New(context.TODO(), braintrust.ProjectNewParams{
+	projectModel, err := client.Project.New(context.TODO(), braintrust.ProjectNewParams{
 		Name: braintrust.F("foobar"),
 	})
 	if err != nil {
 		t.Error(err)
 	}
-	t.Logf("%+v\n", project.ID)
+	t.Logf("%+v\n", projectModel.ID)
 }

@@ -2666,65 +2666,6 @@ func (r PathLookupFilterType) IsKnown() bool {
 	return false
 }
 
-type Project struct {
-	// Unique identifier for the project
-	ID string `json:"id,required" format:"uuid"`
-	// Name of the project
-	Name string `json:"name,required"`
-	// Unique id for the organization that the project belongs under
-	OrgID string `json:"org_id,required" format:"uuid"`
-	// Date of project creation
-	Created time.Time `json:"created,nullable" format:"date-time"`
-	// Date of project deletion, or null if the project is still active
-	DeletedAt time.Time       `json:"deleted_at,nullable" format:"date-time"`
-	Settings  ProjectSettings `json:"settings,nullable"`
-	// Identifies the user who created the project
-	UserID string      `json:"user_id,nullable" format:"uuid"`
-	JSON   projectJSON `json:"-"`
-}
-
-// projectJSON contains the JSON metadata for the struct [Project]
-type projectJSON struct {
-	ID          apijson.Field
-	Name        apijson.Field
-	OrgID       apijson.Field
-	Created     apijson.Field
-	DeletedAt   apijson.Field
-	Settings    apijson.Field
-	UserID      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *Project) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectJSON) RawJSON() string {
-	return r.raw
-}
-
-type ProjectSettings struct {
-	// The key used to join two experiments (defaults to `input`).
-	ComparisonKey string              `json:"comparison_key,nullable"`
-	JSON          projectSettingsJSON `json:"-"`
-}
-
-// projectSettingsJSON contains the JSON metadata for the struct [ProjectSettings]
-type projectSettingsJSON struct {
-	ComparisonKey apijson.Field
-	raw           string
-	ExtraFields   map[string]apijson.Field
-}
-
-func (r *ProjectSettings) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectSettingsJSON) RawJSON() string {
-	return r.raw
-}
-
 type ProjectLogsEvent struct {
 	// A unique identifier for the project logs event. If you don't provide one,
 	// BrainTrust will generate one for you
@@ -2971,6 +2912,66 @@ func (r ProjectLogsEventSpanAttributesType) IsKnown() bool {
 		return true
 	}
 	return false
+}
+
+type ProjectModel struct {
+	// Unique identifier for the project
+	ID string `json:"id,required" format:"uuid"`
+	// Name of the project
+	Name string `json:"name,required"`
+	// Unique id for the organization that the project belongs under
+	OrgID string `json:"org_id,required" format:"uuid"`
+	// Date of project creation
+	Created time.Time `json:"created,nullable" format:"date-time"`
+	// Date of project deletion, or null if the project is still active
+	DeletedAt time.Time            `json:"deleted_at,nullable" format:"date-time"`
+	Settings  ProjectModelSettings `json:"settings,nullable"`
+	// Identifies the user who created the project
+	UserID string           `json:"user_id,nullable" format:"uuid"`
+	JSON   projectModelJSON `json:"-"`
+}
+
+// projectModelJSON contains the JSON metadata for the struct [ProjectModel]
+type projectModelJSON struct {
+	ID          apijson.Field
+	Name        apijson.Field
+	OrgID       apijson.Field
+	Created     apijson.Field
+	DeletedAt   apijson.Field
+	Settings    apijson.Field
+	UserID      apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *ProjectModel) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r projectModelJSON) RawJSON() string {
+	return r.raw
+}
+
+type ProjectModelSettings struct {
+	// The key used to join two experiments (defaults to `input`).
+	ComparisonKey string                   `json:"comparison_key,nullable"`
+	JSON          projectModelSettingsJSON `json:"-"`
+}
+
+// projectModelSettingsJSON contains the JSON metadata for the struct
+// [ProjectModelSettings]
+type projectModelSettingsJSON struct {
+	ComparisonKey apijson.Field
+	raw           string
+	ExtraFields   map[string]apijson.Field
+}
+
+func (r *ProjectModelSettings) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r projectModelSettingsJSON) RawJSON() string {
+	return r.raw
 }
 
 // A project score is a user-configured score, which can be manually-labeled
