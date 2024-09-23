@@ -52,13 +52,13 @@ func main() {
 	client := braintrust.NewClient(
 		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("BRAINTRUST_API_KEY")
 	)
-	project, err := client.Project.New(context.TODO(), braintrust.ProjectNewParams{
+	projectModel, err := client.Project.New(context.TODO(), braintrust.ProjectNewParams{
 		Name: braintrust.F("foobar"),
 	})
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Printf("%+v\n", project.ID)
+	fmt.Printf("%+v\n", projectModel.ID)
 }
 
 ```
@@ -167,8 +167,8 @@ You can use `.ListAutoPaging()` methods to iterate through items across all page
 iter := client.Project.ListAutoPaging(context.TODO(), braintrust.ProjectListParams{})
 // Automatically fetches more pages as needed.
 for iter.Next() {
-	project := iter.Current()
-	fmt.Printf("%+v\n", project)
+	projectModel := iter.Current()
+	fmt.Printf("%+v\n", projectModel)
 }
 if err := iter.Err(); err != nil {
 	panic(err.Error())
