@@ -20,7 +20,7 @@ or products provided by Braintrust please follow the respective company's securi
 
 ### Braintrust Terms and Policies
 
-Please contact infotest@braintrustdata.com for any questions or concerns regarding security of our services.
+Please contact info@braintrustdata.com for any questions or concerns regarding security of our services.
 
 ---
 
