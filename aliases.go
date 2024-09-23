@@ -9,6 +9,9 @@ import (
 
 type Error = apierror.Error
 
+// This is an alias to an internal type.
+type AISecret = shared.AISecret
+
 // An ACL grants a certain permission or role to a certain user or group on an
 // object.
 //
@@ -660,9 +663,6 @@ const InsertProjectLogsEventReplaceSpanAttributesTypeTool = shared.InsertProject
 //
 // This is an alias to an internal type.
 type MetricSummary = shared.MetricSummary
-
-// This is an alias to an internal type.
-type OrgSecret = shared.OrgSecret
 
 // This is an alias to an internal type.
 type Organization = shared.Organization
