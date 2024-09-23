@@ -14,7 +14,7 @@ import (
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
-func TestOrgSecretNewWithOptionalParams(t *testing.T) {
+func TestAISecretNewWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -26,7 +26,7 @@ func TestOrgSecretNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.OrgSecret.New(context.TODO(), braintrust.OrgSecretNewParams{
+	_, err := client.AISecret.New(context.TODO(), braintrust.AISecretNewParams{
 		Name: braintrust.F("name"),
 		Metadata: braintrust.F(map[string]interface{}{
 			"foo": "bar",
@@ -44,7 +44,7 @@ func TestOrgSecretNewWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestOrgSecretGet(t *testing.T) {
+func TestAISecretGet(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -56,7 +56,7 @@ func TestOrgSecretGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.OrgSecret.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.AISecret.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -66,7 +66,7 @@ func TestOrgSecretGet(t *testing.T) {
 	}
 }
 
-func TestOrgSecretUpdateWithOptionalParams(t *testing.T) {
+func TestAISecretUpdateWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -78,10 +78,10 @@ func TestOrgSecretUpdateWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.OrgSecret.Update(
+	_, err := client.AISecret.Update(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		braintrust.OrgSecretUpdateParams{
+		braintrust.AISecretUpdateParams{
 			Metadata: braintrust.F(map[string]interface{}{
 				"foo": "bar",
 			}),
@@ -99,7 +99,7 @@ func TestOrgSecretUpdateWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestOrgSecretListWithOptionalParams(t *testing.T) {
+func TestAISecretListWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -111,13 +111,13 @@ func TestOrgSecretListWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.OrgSecret.List(context.TODO(), braintrust.OrgSecretListParams{
+	_, err := client.AISecret.List(context.TODO(), braintrust.AISecretListParams{
+		AISecretName:  braintrust.F("ai_secret_name"),
+		AISecretType:  braintrust.F[braintrust.AISecretListParamsAISecretTypeUnion](shared.UnionString("string")),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:           braintrust.F[braintrust.OrgSecretListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
+		IDs:           braintrust.F[braintrust.AISecretListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
 		OrgName:       braintrust.F("org_name"),
-		OrgSecretName: braintrust.F("org_secret_name"),
-		OrgSecretType: braintrust.F[braintrust.OrgSecretListParamsOrgSecretTypeUnion](shared.UnionString("string")),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
@@ -129,7 +129,7 @@ func TestOrgSecretListWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestOrgSecretDelete(t *testing.T) {
+func TestAISecretDelete(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -141,7 +141,7 @@ func TestOrgSecretDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.OrgSecret.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.AISecret.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -151,7 +151,7 @@ func TestOrgSecretDelete(t *testing.T) {
 	}
 }
 
-func TestOrgSecretFindAndDeleteWithOptionalParams(t *testing.T) {
+func TestAISecretFindAndDeleteWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -163,7 +163,7 @@ func TestOrgSecretFindAndDeleteWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.OrgSecret.FindAndDelete(context.TODO(), braintrust.OrgSecretFindAndDeleteParams{
+	_, err := client.AISecret.FindAndDelete(context.TODO(), braintrust.AISecretFindAndDeleteParams{
 		Name:    braintrust.F("name"),
 		OrgName: braintrust.F("org_name"),
 	})
@@ -176,7 +176,7 @@ func TestOrgSecretFindAndDeleteWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestOrgSecretReplaceWithOptionalParams(t *testing.T) {
+func TestAISecretReplaceWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -188,7 +188,7 @@ func TestOrgSecretReplaceWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.OrgSecret.Replace(context.TODO(), braintrust.OrgSecretReplaceParams{
+	_, err := client.AISecret.Replace(context.TODO(), braintrust.AISecretReplaceParams{
 		Name: braintrust.F("name"),
 		Metadata: braintrust.F(map[string]interface{}{
 			"foo": "bar",

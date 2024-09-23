@@ -235,6 +235,48 @@ func TestFunctionDelete(t *testing.T) {
 	}
 }
 
+func TestFunctionInvokeWithOptionalParams(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := braintrust.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.Function.Invoke(
+		context.TODO(),
+		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		braintrust.FunctionInvokeParams{
+			Input: braintrust.F[any](map[string]interface{}{}),
+			Parent: braintrust.F[braintrust.FunctionInvokeParamsParentUnion](braintrust.FunctionInvokeParamsParentSpanParentStruct{
+				ObjectID:   braintrust.F("object_id"),
+				ObjectType: braintrust.F(braintrust.FunctionInvokeParamsParentSpanParentStructObjectTypeProjectLogs),
+				PropagatedEvent: braintrust.F(map[string]interface{}{
+					"foo": "bar",
+				}),
+				RowIDs: braintrust.F(braintrust.FunctionInvokeParamsParentSpanParentStructRowIDs{
+					ID:         braintrust.F("id"),
+					RootSpanID: braintrust.F("root_span_id"),
+					SpanID:     braintrust.F("span_id"),
+				}),
+			}),
+			Stream:  braintrust.F(true),
+			Version: braintrust.F("version"),
+		},
+	)
+	if err != nil {
+		var apierr *braintrust.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
 func TestFunctionReplaceWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
