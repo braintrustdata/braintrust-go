@@ -31,7 +31,7 @@ type Client struct {
 	View           *ViewService
 	Organization   *OrganizationService
 	APIKeyResource *APIKeyResourceService
-	OrgSecret      *OrgSecretService
+	AISecret       *AISecretService
 }
 
 // NewClient generates a new client with the default option read from the
@@ -62,7 +62,7 @@ func NewClient(opts ...option.RequestOption) (r *Client) {
 	r.View = NewViewService(opts...)
 	r.Organization = NewOrganizationService(opts...)
 	r.APIKeyResource = NewAPIKeyResourceService(opts...)
-	r.OrgSecret = NewOrgSecretService(opts...)
+	r.AISecret = NewAISecretService(opts...)
 
 	return
 }
