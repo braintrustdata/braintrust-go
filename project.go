@@ -41,7 +41,7 @@ func NewProjectService(opts ...option.RequestOption) (r *ProjectService) {
 
 // Create a new project. If there is an existing project with the same name as the
 // one specified in the request, will return the existing project unmodified
-func (r *ProjectService) New(ctx context.Context, body ProjectNewParams, opts ...option.RequestOption) (res *shared.ProjectModel, err error) {
+func (r *ProjectService) New(ctx context.Context, body ProjectNewParams, opts ...option.RequestOption) (res *shared.Project, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/project"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
@@ -49,7 +49,7 @@ func (r *ProjectService) New(ctx context.Context, body ProjectNewParams, opts ..
 }
 
 // Get a project object by its id
-func (r *ProjectService) Get(ctx context.Context, projectID string, opts ...option.RequestOption) (res *shared.ProjectModel, err error) {
+func (r *ProjectService) Get(ctx context.Context, projectID string, opts ...option.RequestOption) (res *shared.Project, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
@@ -63,7 +63,7 @@ func (r *ProjectService) Get(ctx context.Context, projectID string, opts ...opti
 // Partially update a project object. Specify the fields to update in the payload.
 // Any object-type fields will be deep-merged with existing content. Currently we
 // do not support removing fields or setting them to null.
-func (r *ProjectService) Update(ctx context.Context, projectID string, body ProjectUpdateParams, opts ...option.RequestOption) (res *shared.ProjectModel, err error) {
+func (r *ProjectService) Update(ctx context.Context, projectID string, body ProjectUpdateParams, opts ...option.RequestOption) (res *shared.Project, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
@@ -76,7 +76,7 @@ func (r *ProjectService) Update(ctx context.Context, projectID string, body Proj
 
 // List out all projects. The projects are sorted by creation date, with the most
 // recently-created projects coming first
-func (r *ProjectService) List(ctx context.Context, query ProjectListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.ProjectModel], err error) {
+func (r *ProjectService) List(ctx context.Context, query ProjectListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.Project], err error) {
 	var raw *http.Response
 	opts = append(r.Options[:], opts...)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
@@ -95,12 +95,12 @@ func (r *ProjectService) List(ctx context.Context, query ProjectListParams, opts
 
 // List out all projects. The projects are sorted by creation date, with the most
 // recently-created projects coming first
-func (r *ProjectService) ListAutoPaging(ctx context.Context, query ProjectListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[shared.ProjectModel] {
+func (r *ProjectService) ListAutoPaging(ctx context.Context, query ProjectListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[shared.Project] {
 	return pagination.NewListObjectsAutoPager(r.List(ctx, query, opts...))
 }
 
 // Delete a project object by its id
-func (r *ProjectService) Delete(ctx context.Context, projectID string, opts ...option.RequestOption) (res *shared.ProjectModel, err error) {
+func (r *ProjectService) Delete(ctx context.Context, projectID string, opts ...option.RequestOption) (res *shared.Project, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")

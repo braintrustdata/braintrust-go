@@ -14,7 +14,7 @@ import (
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
-func TestAPIKeyResourceNewWithOptionalParams(t *testing.T) {
+func TestAPIKeyNewWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -26,7 +26,7 @@ func TestAPIKeyResourceNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.APIKeyResource.New(context.TODO(), braintrust.APIKeyResourceNewParams{
+	_, err := client.APIKeys.New(context.TODO(), braintrust.APIKeyNewParams{
 		Name:    braintrust.F("name"),
 		OrgName: braintrust.F("org_name"),
 	})
@@ -39,7 +39,7 @@ func TestAPIKeyResourceNewWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestAPIKeyResourceGet(t *testing.T) {
+func TestAPIKeyGet(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -51,7 +51,7 @@ func TestAPIKeyResourceGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.APIKeyResource.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.APIKeys.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -61,7 +61,7 @@ func TestAPIKeyResourceGet(t *testing.T) {
 	}
 }
 
-func TestAPIKeyResourceListWithOptionalParams(t *testing.T) {
+func TestAPIKeyListWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -73,10 +73,10 @@ func TestAPIKeyResourceListWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.APIKeyResource.List(context.TODO(), braintrust.APIKeyResourceListParams{
+	_, err := client.APIKeys.List(context.TODO(), braintrust.APIKeyListParams{
 		APIKeyName:    braintrust.F("api_key_name"),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:           braintrust.F[braintrust.APIKeyResourceListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
+		IDs:           braintrust.F[braintrust.APIKeyListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
 		OrgName:       braintrust.F("org_name"),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
@@ -90,7 +90,7 @@ func TestAPIKeyResourceListWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestAPIKeyResourceDelete(t *testing.T) {
+func TestAPIKeyDelete(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -102,7 +102,7 @@ func TestAPIKeyResourceDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.APIKeyResource.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.APIKeys.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
