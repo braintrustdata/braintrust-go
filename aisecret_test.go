@@ -26,7 +26,7 @@ func TestAISecretNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.AISecret.New(context.TODO(), braintrust.AISecretNewParams{
+	_, err := client.AISecrets.New(context.TODO(), braintrust.AISecretNewParams{
 		Name: braintrust.F("name"),
 		Metadata: braintrust.F(map[string]interface{}{
 			"foo": "bar",
@@ -56,7 +56,7 @@ func TestAISecretGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.AISecret.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.AISecrets.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -78,7 +78,7 @@ func TestAISecretUpdateWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.AISecret.Update(
+	_, err := client.AISecrets.Update(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.AISecretUpdateParams{
@@ -111,7 +111,7 @@ func TestAISecretListWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.AISecret.List(context.TODO(), braintrust.AISecretListParams{
+	_, err := client.AISecrets.List(context.TODO(), braintrust.AISecretListParams{
 		AISecretName:  braintrust.F("ai_secret_name"),
 		AISecretType:  braintrust.F[braintrust.AISecretListParamsAISecretTypeUnion](shared.UnionString("string")),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
@@ -141,7 +141,7 @@ func TestAISecretDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.AISecret.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.AISecrets.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -163,7 +163,7 @@ func TestAISecretFindAndDeleteWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.AISecret.FindAndDelete(context.TODO(), braintrust.AISecretFindAndDeleteParams{
+	_, err := client.AISecrets.FindAndDelete(context.TODO(), braintrust.AISecretFindAndDeleteParams{
 		Name:    braintrust.F("name"),
 		OrgName: braintrust.F("org_name"),
 	})
@@ -188,7 +188,7 @@ func TestAISecretReplaceWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.AISecret.Replace(context.TODO(), braintrust.AISecretReplaceParams{
+	_, err := client.AISecrets.Replace(context.TODO(), braintrust.AISecretReplaceParams{
 		Name: braintrust.F("name"),
 		Metadata: braintrust.F(map[string]interface{}{
 			"foo": "bar",

@@ -36,7 +36,7 @@ func TestUserAgentHeader(t *testing.T) {
 			},
 		}),
 	)
-	client.Project.New(context.Background(), braintrust.ProjectNewParams{
+	client.Projects.New(context.Background(), braintrust.ProjectNewParams{
 		Name: braintrust.F("foobar"),
 	})
 	if userAgent != fmt.Sprintf("Braintrust/Go %s", internal.PackageVersion) {
@@ -61,7 +61,7 @@ func TestRetryAfter(t *testing.T) {
 			},
 		}),
 	)
-	res, err := client.Project.New(context.Background(), braintrust.ProjectNewParams{
+	res, err := client.Projects.New(context.Background(), braintrust.ProjectNewParams{
 		Name: braintrust.F("foobar"),
 	})
 	if err == nil || res != nil {
@@ -89,7 +89,7 @@ func TestRetryAfterMs(t *testing.T) {
 			},
 		}),
 	)
-	res, err := client.Project.New(context.Background(), braintrust.ProjectNewParams{
+	res, err := client.Projects.New(context.Background(), braintrust.ProjectNewParams{
 		Name: braintrust.F("foobar"),
 	})
 	if err == nil || res != nil {
@@ -113,7 +113,7 @@ func TestContextCancel(t *testing.T) {
 	)
 	cancelCtx, cancel := context.WithCancel(context.Background())
 	cancel()
-	res, err := client.Project.New(cancelCtx, braintrust.ProjectNewParams{
+	res, err := client.Projects.New(cancelCtx, braintrust.ProjectNewParams{
 		Name: braintrust.F("foobar"),
 	})
 	if err == nil || res != nil {
@@ -134,7 +134,7 @@ func TestContextCancelDelay(t *testing.T) {
 	)
 	cancelCtx, cancel := context.WithTimeout(context.Background(), 2*time.Millisecond)
 	defer cancel()
-	res, err := client.Project.New(cancelCtx, braintrust.ProjectNewParams{
+	res, err := client.Projects.New(cancelCtx, braintrust.ProjectNewParams{
 		Name: braintrust.F("foobar"),
 	})
 	if err == nil || res != nil {
@@ -161,7 +161,7 @@ func TestContextDeadline(t *testing.T) {
 				},
 			}),
 		)
-		res, err := client.Project.New(deadlineCtx, braintrust.ProjectNewParams{
+		res, err := client.Projects.New(deadlineCtx, braintrust.ProjectNewParams{
 			Name: braintrust.F("foobar"),
 		})
 		if err == nil || res != nil {

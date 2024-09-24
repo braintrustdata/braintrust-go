@@ -20,9 +20,10 @@ func (UnionString) ImplementsUserListParamsIDsUnion()                           
 func (UnionString) ImplementsProjectScoreListParamsIDsUnion()                          {}
 func (UnionString) ImplementsProjectTagListParamsIDsUnion()                            {}
 func (UnionString) ImplementsFunctionListParamsIDsUnion()                              {}
+func (UnionString) ImplementsFunctionInvokeParamsMessagesUserContentUnion()            {}
 func (UnionString) ImplementsFunctionInvokeParamsParentUnion()                         {}
 func (UnionString) ImplementsViewListParamsIDsUnion()                                  {}
 func (UnionString) ImplementsOrganizationListParamsIDsUnion()                          {}
-func (UnionString) ImplementsAPIKeyResourceListParamsIDsUnion()                        {}
+func (UnionString) ImplementsAPIKeyListParamsIDsUnion()                                {}
 func (UnionString) ImplementsAISecretListParamsAISecretTypeUnion()                     {}
 func (UnionString) ImplementsAISecretListParamsIDsUnion()                              {}

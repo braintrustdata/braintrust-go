@@ -941,8 +941,10 @@ type Function struct {
 	// Date of prompt creation
 	Created time.Time `json:"created,nullable" format:"date-time"`
 	// Textual description of the prompt
-	Description  string               `json:"description,nullable"`
-	FunctionType FunctionFunctionType `json:"function_type,nullable"`
+	Description string `json:"description,nullable"`
+	// JSON schema for the function's parameters and return type
+	FunctionSchema FunctionFunctionSchema `json:"function_schema,nullable"`
+	FunctionType   FunctionFunctionType   `json:"function_type,nullable"`
 	// User-controlled metadata about the prompt
 	Metadata map[string]interface{} `json:"metadata,nullable"`
 	Origin   FunctionOrigin         `json:"origin,nullable"`
@@ -955,23 +957,24 @@ type Function struct {
 
 // functionJSON contains the JSON metadata for the struct [Function]
 type functionJSON struct {
-	ID           apijson.Field
-	XactID       apijson.Field
-	FunctionData apijson.Field
-	LogID        apijson.Field
-	Name         apijson.Field
-	OrgID        apijson.Field
-	ProjectID    apijson.Field
-	Slug         apijson.Field
-	Created      apijson.Field
-	Description  apijson.Field
-	FunctionType apijson.Field
-	Metadata     apijson.Field
-	Origin       apijson.Field
-	PromptData   apijson.Field
-	Tags         apijson.Field
-	raw          string
-	ExtraFields  map[string]apijson.Field
+	ID             apijson.Field
+	XactID         apijson.Field
+	FunctionData   apijson.Field
+	LogID          apijson.Field
+	Name           apijson.Field
+	OrgID          apijson.Field
+	ProjectID      apijson.Field
+	Slug           apijson.Field
+	Created        apijson.Field
+	Description    apijson.Field
+	FunctionSchema apijson.Field
+	FunctionType   apijson.Field
+	Metadata       apijson.Field
+	Origin         apijson.Field
+	PromptData     apijson.Field
+	Tags           apijson.Field
+	raw            string
+	ExtraFields    map[string]apijson.Field
 }
 
 func (r *Function) UnmarshalJSON(data []byte) (err error) {
@@ -1217,52 +1220,33 @@ func (r functionFunctionDataCodeDataBundleJSON) RawJSON() string {
 func (r FunctionFunctionDataCodeDataBundle) implementsSharedFunctionFunctionDataCodeData() {}
 
 type FunctionFunctionDataCodeDataBundleLocation struct {
-	EvalName string                                             `json:"eval_name,required"`
-	Position FunctionFunctionDataCodeDataBundleLocationPosition `json:"position,required"`
-	Type     FunctionFunctionDataCodeDataBundleLocationType     `json:"type,required"`
-	JSON     functionFunctionDataCodeDataBundleLocationJSON     `json:"-"`
+	Type     FunctionFunctionDataCodeDataBundleLocationType `json:"type,required"`
+	EvalName string                                         `json:"eval_name"`
+	// This field can have the runtime type of
+	// [FunctionFunctionDataCodeDataBundleLocationExperimentPosition].
+	Position interface{}                                    `json:"position,required"`
+	Index    int64                                          `json:"index"`
+	JSON     functionFunctionDataCodeDataBundleLocationJSON `json:"-"`
+	union    FunctionFunctionDataCodeDataBundleLocationUnion
 }
 
 // functionFunctionDataCodeDataBundleLocationJSON contains the JSON metadata for
 // the struct [FunctionFunctionDataCodeDataBundleLocation]
 type functionFunctionDataCodeDataBundleLocationJSON struct {
+	Type        apijson.Field
 	EvalName    apijson.Field
 	Position    apijson.Field
-	Type        apijson.Field
+	Index       apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataCodeDataBundleLocation) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
 }
 
 func (r functionFunctionDataCodeDataBundleLocationJSON) RawJSON() string {
 	return r.raw
 }
 
-type FunctionFunctionDataCodeDataBundleLocationPosition struct {
-	Type  FunctionFunctionDataCodeDataBundleLocationPositionType `json:"type,required"`
-	Index float64                                                `json:"index"`
-	JSON  functionFunctionDataCodeDataBundleLocationPositionJSON `json:"-"`
-	union FunctionFunctionDataCodeDataBundleLocationPositionUnion
-}
-
-// functionFunctionDataCodeDataBundleLocationPositionJSON contains the JSON
-// metadata for the struct [FunctionFunctionDataCodeDataBundleLocationPosition]
-type functionFunctionDataCodeDataBundleLocationPositionJSON struct {
-	Type        apijson.Field
-	Index       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r functionFunctionDataCodeDataBundleLocationPositionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *FunctionFunctionDataCodeDataBundleLocationPosition) UnmarshalJSON(data []byte) (err error) {
-	*r = FunctionFunctionDataCodeDataBundleLocationPosition{}
+func (r *FunctionFunctionDataCodeDataBundleLocation) UnmarshalJSON(data []byte) (err error) {
+	*r = FunctionFunctionDataCodeDataBundleLocation{}
 	err = apijson.UnmarshalRoot(data, &r.union)
 	if err != nil {
 		return err
@@ -1270,112 +1254,257 @@ func (r *FunctionFunctionDataCodeDataBundleLocationPosition) UnmarshalJSON(data 
 	return apijson.Port(r.union, &r)
 }
 
-// AsUnion returns a [FunctionFunctionDataCodeDataBundleLocationPositionUnion]
-// interface which you can cast to the specific types for more type safety.
+// AsUnion returns a [FunctionFunctionDataCodeDataBundleLocationUnion] interface
+// which you can cast to the specific types for more type safety.
 //
 // Possible runtime types of the union are
-// [shared.FunctionFunctionDataCodeDataBundleLocationPositionType],
-// [shared.FunctionFunctionDataCodeDataBundleLocationPositionScorer].
-func (r FunctionFunctionDataCodeDataBundleLocationPosition) AsUnion() FunctionFunctionDataCodeDataBundleLocationPositionUnion {
+// [shared.FunctionFunctionDataCodeDataBundleLocationExperiment],
+// [shared.FunctionFunctionDataCodeDataBundleLocationFunction].
+func (r FunctionFunctionDataCodeDataBundleLocation) AsUnion() FunctionFunctionDataCodeDataBundleLocationUnion {
 	return r.union
 }
 
-// Union satisfied by
-// [shared.FunctionFunctionDataCodeDataBundleLocationPositionType] or
-// [shared.FunctionFunctionDataCodeDataBundleLocationPositionScorer].
-type FunctionFunctionDataCodeDataBundleLocationPositionUnion interface {
-	implementsSharedFunctionFunctionDataCodeDataBundleLocationPosition()
+// Union satisfied by [shared.FunctionFunctionDataCodeDataBundleLocationExperiment]
+// or [shared.FunctionFunctionDataCodeDataBundleLocationFunction].
+type FunctionFunctionDataCodeDataBundleLocationUnion interface {
+	implementsSharedFunctionFunctionDataCodeDataBundleLocation()
 }
 
 func init() {
 	apijson.RegisterUnion(
-		reflect.TypeOf((*FunctionFunctionDataCodeDataBundleLocationPositionUnion)(nil)).Elem(),
+		reflect.TypeOf((*FunctionFunctionDataCodeDataBundleLocationUnion)(nil)).Elem(),
 		"",
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(FunctionFunctionDataCodeDataBundleLocationPositionType{}),
+			Type:       reflect.TypeOf(FunctionFunctionDataCodeDataBundleLocationExperiment{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(FunctionFunctionDataCodeDataBundleLocationPositionScorer{}),
+			Type:       reflect.TypeOf(FunctionFunctionDataCodeDataBundleLocationFunction{}),
 		},
 	)
 }
 
-type FunctionFunctionDataCodeDataBundleLocationPositionType struct {
-	Type FunctionFunctionDataCodeDataBundleLocationPositionTypeType `json:"type,required"`
-	JSON functionFunctionDataCodeDataBundleLocationPositionTypeJSON `json:"-"`
+type FunctionFunctionDataCodeDataBundleLocationExperiment struct {
+	EvalName string                                                       `json:"eval_name,required"`
+	Position FunctionFunctionDataCodeDataBundleLocationExperimentPosition `json:"position,required"`
+	Type     FunctionFunctionDataCodeDataBundleLocationExperimentType     `json:"type,required"`
+	JSON     functionFunctionDataCodeDataBundleLocationExperimentJSON     `json:"-"`
 }
 
-// functionFunctionDataCodeDataBundleLocationPositionTypeJSON contains the JSON
-// metadata for the struct [FunctionFunctionDataCodeDataBundleLocationPositionType]
-type functionFunctionDataCodeDataBundleLocationPositionTypeJSON struct {
+// functionFunctionDataCodeDataBundleLocationExperimentJSON contains the JSON
+// metadata for the struct [FunctionFunctionDataCodeDataBundleLocationExperiment]
+type functionFunctionDataCodeDataBundleLocationExperimentJSON struct {
+	EvalName    apijson.Field
+	Position    apijson.Field
 	Type        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *FunctionFunctionDataCodeDataBundleLocationPositionType) UnmarshalJSON(data []byte) (err error) {
+func (r *FunctionFunctionDataCodeDataBundleLocationExperiment) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r functionFunctionDataCodeDataBundleLocationPositionTypeJSON) RawJSON() string {
+func (r functionFunctionDataCodeDataBundleLocationExperimentJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r FunctionFunctionDataCodeDataBundleLocationPositionType) implementsSharedFunctionFunctionDataCodeDataBundleLocationPosition() {
+func (r FunctionFunctionDataCodeDataBundleLocationExperiment) implementsSharedFunctionFunctionDataCodeDataBundleLocation() {
 }
 
-type FunctionFunctionDataCodeDataBundleLocationPositionTypeType string
+type FunctionFunctionDataCodeDataBundleLocationExperimentPosition struct {
+	Type  FunctionFunctionDataCodeDataBundleLocationExperimentPositionType `json:"type,required"`
+	Index int64                                                            `json:"index"`
+	JSON  functionFunctionDataCodeDataBundleLocationExperimentPositionJSON `json:"-"`
+	union FunctionFunctionDataCodeDataBundleLocationExperimentPositionUnion
+}
+
+// functionFunctionDataCodeDataBundleLocationExperimentPositionJSON contains the
+// JSON metadata for the struct
+// [FunctionFunctionDataCodeDataBundleLocationExperimentPosition]
+type functionFunctionDataCodeDataBundleLocationExperimentPositionJSON struct {
+	Type        apijson.Field
+	Index       apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r functionFunctionDataCodeDataBundleLocationExperimentPositionJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r *FunctionFunctionDataCodeDataBundleLocationExperimentPosition) UnmarshalJSON(data []byte) (err error) {
+	*r = FunctionFunctionDataCodeDataBundleLocationExperimentPosition{}
+	err = apijson.UnmarshalRoot(data, &r.union)
+	if err != nil {
+		return err
+	}
+	return apijson.Port(r.union, &r)
+}
+
+// AsUnion returns a
+// [FunctionFunctionDataCodeDataBundleLocationExperimentPositionUnion] interface
+// which you can cast to the specific types for more type safety.
+//
+// Possible runtime types of the union are
+// [shared.FunctionFunctionDataCodeDataBundleLocationExperimentPositionType],
+// [shared.FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer].
+func (r FunctionFunctionDataCodeDataBundleLocationExperimentPosition) AsUnion() FunctionFunctionDataCodeDataBundleLocationExperimentPositionUnion {
+	return r.union
+}
+
+// Union satisfied by
+// [shared.FunctionFunctionDataCodeDataBundleLocationExperimentPositionType] or
+// [shared.FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer].
+type FunctionFunctionDataCodeDataBundleLocationExperimentPositionUnion interface {
+	implementsSharedFunctionFunctionDataCodeDataBundleLocationExperimentPosition()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*FunctionFunctionDataCodeDataBundleLocationExperimentPositionUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(FunctionFunctionDataCodeDataBundleLocationExperimentPositionType{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer{}),
+		},
+	)
+}
+
+type FunctionFunctionDataCodeDataBundleLocationExperimentPositionType struct {
+	Type FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeType `json:"type,required"`
+	JSON functionFunctionDataCodeDataBundleLocationExperimentPositionTypeJSON `json:"-"`
+}
+
+// functionFunctionDataCodeDataBundleLocationExperimentPositionTypeJSON contains
+// the JSON metadata for the struct
+// [FunctionFunctionDataCodeDataBundleLocationExperimentPositionType]
+type functionFunctionDataCodeDataBundleLocationExperimentPositionTypeJSON struct {
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *FunctionFunctionDataCodeDataBundleLocationExperimentPositionType) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r functionFunctionDataCodeDataBundleLocationExperimentPositionTypeJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r FunctionFunctionDataCodeDataBundleLocationExperimentPositionType) implementsSharedFunctionFunctionDataCodeDataBundleLocationExperimentPosition() {
+}
+
+type FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeType string
 
 const (
-	FunctionFunctionDataCodeDataBundleLocationPositionTypeTypeTask FunctionFunctionDataCodeDataBundleLocationPositionTypeType = "task"
+	FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeTypeTask FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeType = "task"
 )
 
-func (r FunctionFunctionDataCodeDataBundleLocationPositionTypeType) IsKnown() bool {
+func (r FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeType) IsKnown() bool {
 	switch r {
-	case FunctionFunctionDataCodeDataBundleLocationPositionTypeTypeTask:
+	case FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeTypeTask:
 		return true
 	}
 	return false
 }
 
-type FunctionFunctionDataCodeDataBundleLocationPositionScorer struct {
-	Index float64                                                      `json:"index,required"`
-	Type  FunctionFunctionDataCodeDataBundleLocationPositionScorerType `json:"type,required"`
-	JSON  functionFunctionDataCodeDataBundleLocationPositionScorerJSON `json:"-"`
+type FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer struct {
+	Index int64                                                                  `json:"index,required"`
+	Type  FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerType `json:"type,required"`
+	JSON  functionFunctionDataCodeDataBundleLocationExperimentPositionScorerJSON `json:"-"`
 }
 
-// functionFunctionDataCodeDataBundleLocationPositionScorerJSON contains the JSON
-// metadata for the struct
-// [FunctionFunctionDataCodeDataBundleLocationPositionScorer]
-type functionFunctionDataCodeDataBundleLocationPositionScorerJSON struct {
+// functionFunctionDataCodeDataBundleLocationExperimentPositionScorerJSON contains
+// the JSON metadata for the struct
+// [FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer]
+type functionFunctionDataCodeDataBundleLocationExperimentPositionScorerJSON struct {
 	Index       apijson.Field
 	Type        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
 
-func (r *FunctionFunctionDataCodeDataBundleLocationPositionScorer) UnmarshalJSON(data []byte) (err error) {
+func (r *FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer) UnmarshalJSON(data []byte) (err error) {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r functionFunctionDataCodeDataBundleLocationPositionScorerJSON) RawJSON() string {
+func (r functionFunctionDataCodeDataBundleLocationExperimentPositionScorerJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r FunctionFunctionDataCodeDataBundleLocationPositionScorer) implementsSharedFunctionFunctionDataCodeDataBundleLocationPosition() {
+func (r FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer) implementsSharedFunctionFunctionDataCodeDataBundleLocationExperimentPosition() {
 }
 
-type FunctionFunctionDataCodeDataBundleLocationPositionScorerType string
+type FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerType string
 
 const (
-	FunctionFunctionDataCodeDataBundleLocationPositionScorerTypeScorer FunctionFunctionDataCodeDataBundleLocationPositionScorerType = "scorer"
+	FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerTypeScorer FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerType = "scorer"
 )
 
-func (r FunctionFunctionDataCodeDataBundleLocationPositionScorerType) IsKnown() bool {
+func (r FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerType) IsKnown() bool {
 	switch r {
-	case FunctionFunctionDataCodeDataBundleLocationPositionScorerTypeScorer:
+	case FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerTypeScorer:
+		return true
+	}
+	return false
+}
+
+type FunctionFunctionDataCodeDataBundleLocationExperimentType string
+
+const (
+	FunctionFunctionDataCodeDataBundleLocationExperimentTypeExperiment FunctionFunctionDataCodeDataBundleLocationExperimentType = "experiment"
+)
+
+func (r FunctionFunctionDataCodeDataBundleLocationExperimentType) IsKnown() bool {
+	switch r {
+	case FunctionFunctionDataCodeDataBundleLocationExperimentTypeExperiment:
+		return true
+	}
+	return false
+}
+
+type FunctionFunctionDataCodeDataBundleLocationFunction struct {
+	Index int64                                                  `json:"index,required"`
+	Type  FunctionFunctionDataCodeDataBundleLocationFunctionType `json:"type,required"`
+	JSON  functionFunctionDataCodeDataBundleLocationFunctionJSON `json:"-"`
+}
+
+// functionFunctionDataCodeDataBundleLocationFunctionJSON contains the JSON
+// metadata for the struct [FunctionFunctionDataCodeDataBundleLocationFunction]
+type functionFunctionDataCodeDataBundleLocationFunctionJSON struct {
+	Index       apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *FunctionFunctionDataCodeDataBundleLocationFunction) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r functionFunctionDataCodeDataBundleLocationFunctionJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r FunctionFunctionDataCodeDataBundleLocationFunction) implementsSharedFunctionFunctionDataCodeDataBundleLocation() {
+}
+
+type FunctionFunctionDataCodeDataBundleLocationFunctionType string
+
+const (
+	FunctionFunctionDataCodeDataBundleLocationFunctionTypeFunction FunctionFunctionDataCodeDataBundleLocationFunctionType = "function"
+)
+
+func (r FunctionFunctionDataCodeDataBundleLocationFunctionType) IsKnown() bool {
+	switch r {
+	case FunctionFunctionDataCodeDataBundleLocationFunctionTypeFunction:
 		return true
 	}
 	return false
@@ -1385,11 +1514,12 @@ type FunctionFunctionDataCodeDataBundleLocationType string
 
 const (
 	FunctionFunctionDataCodeDataBundleLocationTypeExperiment FunctionFunctionDataCodeDataBundleLocationType = "experiment"
+	FunctionFunctionDataCodeDataBundleLocationTypeFunction   FunctionFunctionDataCodeDataBundleLocationType = "function"
 )
 
 func (r FunctionFunctionDataCodeDataBundleLocationType) IsKnown() bool {
 	switch r {
-	case FunctionFunctionDataCodeDataBundleLocationTypeExperiment:
+	case FunctionFunctionDataCodeDataBundleLocationTypeExperiment, FunctionFunctionDataCodeDataBundleLocationTypeFunction:
 		return true
 	}
 	return false
@@ -1625,17 +1755,42 @@ func (r FunctionLogID) IsKnown() bool {
 	return false
 }
 
+// JSON schema for the function's parameters and return type
+type FunctionFunctionSchema struct {
+	Parameters interface{}                `json:"parameters"`
+	Returns    interface{}                `json:"returns"`
+	JSON       functionFunctionSchemaJSON `json:"-"`
+}
+
+// functionFunctionSchemaJSON contains the JSON metadata for the struct
+// [FunctionFunctionSchema]
+type functionFunctionSchemaJSON struct {
+	Parameters  apijson.Field
+	Returns     apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *FunctionFunctionSchema) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r functionFunctionSchemaJSON) RawJSON() string {
+	return r.raw
+}
+
 type FunctionFunctionType string
 
 const (
-	FunctionFunctionTypeTask   FunctionFunctionType = "task"
 	FunctionFunctionTypeLlm    FunctionFunctionType = "llm"
 	FunctionFunctionTypeScorer FunctionFunctionType = "scorer"
+	FunctionFunctionTypeTask   FunctionFunctionType = "task"
+	FunctionFunctionTypeTool   FunctionFunctionType = "tool"
 )
 
 func (r FunctionFunctionType) IsKnown() bool {
 	switch r {
-	case FunctionFunctionTypeTask, FunctionFunctionTypeLlm, FunctionFunctionTypeScorer:
+	case FunctionFunctionTypeLlm, FunctionFunctionTypeScorer, FunctionFunctionTypeTask, FunctionFunctionTypeTool:
 		return true
 	}
 	return false
@@ -2666,6 +2821,65 @@ func (r PathLookupFilterType) IsKnown() bool {
 	return false
 }
 
+type Project struct {
+	// Unique identifier for the project
+	ID string `json:"id,required" format:"uuid"`
+	// Name of the project
+	Name string `json:"name,required"`
+	// Unique id for the organization that the project belongs under
+	OrgID string `json:"org_id,required" format:"uuid"`
+	// Date of project creation
+	Created time.Time `json:"created,nullable" format:"date-time"`
+	// Date of project deletion, or null if the project is still active
+	DeletedAt time.Time       `json:"deleted_at,nullable" format:"date-time"`
+	Settings  ProjectSettings `json:"settings,nullable"`
+	// Identifies the user who created the project
+	UserID string      `json:"user_id,nullable" format:"uuid"`
+	JSON   projectJSON `json:"-"`
+}
+
+// projectJSON contains the JSON metadata for the struct [Project]
+type projectJSON struct {
+	ID          apijson.Field
+	Name        apijson.Field
+	OrgID       apijson.Field
+	Created     apijson.Field
+	DeletedAt   apijson.Field
+	Settings    apijson.Field
+	UserID      apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *Project) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r projectJSON) RawJSON() string {
+	return r.raw
+}
+
+type ProjectSettings struct {
+	// The key used to join two experiments (defaults to `input`).
+	ComparisonKey string              `json:"comparison_key,nullable"`
+	JSON          projectSettingsJSON `json:"-"`
+}
+
+// projectSettingsJSON contains the JSON metadata for the struct [ProjectSettings]
+type projectSettingsJSON struct {
+	ComparisonKey apijson.Field
+	raw           string
+	ExtraFields   map[string]apijson.Field
+}
+
+func (r *ProjectSettings) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r projectSettingsJSON) RawJSON() string {
+	return r.raw
+}
+
 type ProjectLogsEvent struct {
 	// A unique identifier for the project logs event. If you don't provide one,
 	// BrainTrust will generate one for you
@@ -2912,66 +3126,6 @@ func (r ProjectLogsEventSpanAttributesType) IsKnown() bool {
 		return true
 	}
 	return false
-}
-
-type ProjectModel struct {
-	// Unique identifier for the project
-	ID string `json:"id,required" format:"uuid"`
-	// Name of the project
-	Name string `json:"name,required"`
-	// Unique id for the organization that the project belongs under
-	OrgID string `json:"org_id,required" format:"uuid"`
-	// Date of project creation
-	Created time.Time `json:"created,nullable" format:"date-time"`
-	// Date of project deletion, or null if the project is still active
-	DeletedAt time.Time            `json:"deleted_at,nullable" format:"date-time"`
-	Settings  ProjectModelSettings `json:"settings,nullable"`
-	// Identifies the user who created the project
-	UserID string           `json:"user_id,nullable" format:"uuid"`
-	JSON   projectModelJSON `json:"-"`
-}
-
-// projectModelJSON contains the JSON metadata for the struct [ProjectModel]
-type projectModelJSON struct {
-	ID          apijson.Field
-	Name        apijson.Field
-	OrgID       apijson.Field
-	Created     apijson.Field
-	DeletedAt   apijson.Field
-	Settings    apijson.Field
-	UserID      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ProjectModel) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectModelJSON) RawJSON() string {
-	return r.raw
-}
-
-type ProjectModelSettings struct {
-	// The key used to join two experiments (defaults to `input`).
-	ComparisonKey string                   `json:"comparison_key,nullable"`
-	JSON          projectModelSettingsJSON `json:"-"`
-}
-
-// projectModelSettingsJSON contains the JSON metadata for the struct
-// [ProjectModelSettings]
-type projectModelSettingsJSON struct {
-	ComparisonKey apijson.Field
-	raw           string
-	ExtraFields   map[string]apijson.Field
-}
-
-func (r *ProjectModelSettings) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectModelSettingsJSON) RawJSON() string {
-	return r.raw
 }
 
 // A project score is a user-configured score, which can be manually-labeled
@@ -3479,14 +3633,15 @@ func (r PromptLogID) IsKnown() bool {
 type PromptFunctionType string
 
 const (
-	PromptFunctionTypeTask   PromptFunctionType = "task"
 	PromptFunctionTypeLlm    PromptFunctionType = "llm"
 	PromptFunctionTypeScorer PromptFunctionType = "scorer"
+	PromptFunctionTypeTask   PromptFunctionType = "task"
+	PromptFunctionTypeTool   PromptFunctionType = "tool"
 )
 
 func (r PromptFunctionType) IsKnown() bool {
 	switch r {
-	case PromptFunctionTypeTask, PromptFunctionTypeLlm, PromptFunctionTypeScorer:
+	case PromptFunctionTypeLlm, PromptFunctionTypeScorer, PromptFunctionTypeTask, PromptFunctionTypeTool:
 		return true
 	}
 	return false
@@ -3494,21 +3649,23 @@ func (r PromptFunctionType) IsKnown() bool {
 
 // The prompt, model, and its parameters
 type PromptData struct {
-	Options PromptDataOptions `json:"options,nullable"`
-	Origin  PromptDataOrigin  `json:"origin,nullable"`
-	Parser  PromptDataParser  `json:"parser,nullable"`
-	Prompt  PromptDataPrompt  `json:"prompt"`
-	JSON    promptDataJSON    `json:"-"`
+	Options       PromptDataOptions        `json:"options,nullable"`
+	Origin        PromptDataOrigin         `json:"origin,nullable"`
+	Parser        PromptDataParser         `json:"parser,nullable"`
+	Prompt        PromptDataPrompt         `json:"prompt"`
+	ToolFunctions []PromptDataToolFunction `json:"tool_functions,nullable"`
+	JSON          promptDataJSON           `json:"-"`
 }
 
 // promptDataJSON contains the JSON metadata for the struct [PromptData]
 type promptDataJSON struct {
-	Options     apijson.Field
-	Origin      apijson.Field
-	Parser      apijson.Field
-	Prompt      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
+	Options       apijson.Field
+	Origin        apijson.Field
+	Parser        apijson.Field
+	Prompt        apijson.Field
+	ToolFunctions apijson.Field
+	raw           string
+	ExtraFields   map[string]apijson.Field
 }
 
 func (r *PromptData) UnmarshalJSON(data []byte) (err error) {
@@ -4920,12 +5077,168 @@ func (r PromptDataPromptType) IsKnown() bool {
 	return false
 }
 
+type PromptDataToolFunction struct {
+	Type  PromptDataToolFunctionsType `json:"type,required"`
+	ID    string                      `json:"id"`
+	Name  string                      `json:"name"`
+	JSON  promptDataToolFunctionJSON  `json:"-"`
+	union PromptDataToolFunctionsUnion
+}
+
+// promptDataToolFunctionJSON contains the JSON metadata for the struct
+// [PromptDataToolFunction]
+type promptDataToolFunctionJSON struct {
+	Type        apijson.Field
+	ID          apijson.Field
+	Name        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r promptDataToolFunctionJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r *PromptDataToolFunction) UnmarshalJSON(data []byte) (err error) {
+	*r = PromptDataToolFunction{}
+	err = apijson.UnmarshalRoot(data, &r.union)
+	if err != nil {
+		return err
+	}
+	return apijson.Port(r.union, &r)
+}
+
+// AsUnion returns a [PromptDataToolFunctionsUnion] interface which you can cast to
+// the specific types for more type safety.
+//
+// Possible runtime types of the union are
+// [shared.PromptDataToolFunctionsFunction],
+// [shared.PromptDataToolFunctionsGlobal].
+func (r PromptDataToolFunction) AsUnion() PromptDataToolFunctionsUnion {
+	return r.union
+}
+
+// Union satisfied by [shared.PromptDataToolFunctionsFunction] or
+// [shared.PromptDataToolFunctionsGlobal].
+type PromptDataToolFunctionsUnion interface {
+	implementsSharedPromptDataToolFunction()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*PromptDataToolFunctionsUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptDataToolFunctionsFunction{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptDataToolFunctionsGlobal{}),
+		},
+	)
+}
+
+type PromptDataToolFunctionsFunction struct {
+	ID   string                              `json:"id,required"`
+	Type PromptDataToolFunctionsFunctionType `json:"type,required"`
+	JSON promptDataToolFunctionsFunctionJSON `json:"-"`
+}
+
+// promptDataToolFunctionsFunctionJSON contains the JSON metadata for the struct
+// [PromptDataToolFunctionsFunction]
+type promptDataToolFunctionsFunctionJSON struct {
+	ID          apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptDataToolFunctionsFunction) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptDataToolFunctionsFunctionJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptDataToolFunctionsFunction) implementsSharedPromptDataToolFunction() {}
+
+type PromptDataToolFunctionsFunctionType string
+
+const (
+	PromptDataToolFunctionsFunctionTypeFunction PromptDataToolFunctionsFunctionType = "function"
+)
+
+func (r PromptDataToolFunctionsFunctionType) IsKnown() bool {
+	switch r {
+	case PromptDataToolFunctionsFunctionTypeFunction:
+		return true
+	}
+	return false
+}
+
+type PromptDataToolFunctionsGlobal struct {
+	Name string                            `json:"name,required"`
+	Type PromptDataToolFunctionsGlobalType `json:"type,required"`
+	JSON promptDataToolFunctionsGlobalJSON `json:"-"`
+}
+
+// promptDataToolFunctionsGlobalJSON contains the JSON metadata for the struct
+// [PromptDataToolFunctionsGlobal]
+type promptDataToolFunctionsGlobalJSON struct {
+	Name        apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptDataToolFunctionsGlobal) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptDataToolFunctionsGlobalJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptDataToolFunctionsGlobal) implementsSharedPromptDataToolFunction() {}
+
+type PromptDataToolFunctionsGlobalType string
+
+const (
+	PromptDataToolFunctionsGlobalTypeGlobal PromptDataToolFunctionsGlobalType = "global"
+)
+
+func (r PromptDataToolFunctionsGlobalType) IsKnown() bool {
+	switch r {
+	case PromptDataToolFunctionsGlobalTypeGlobal:
+		return true
+	}
+	return false
+}
+
+type PromptDataToolFunctionsType string
+
+const (
+	PromptDataToolFunctionsTypeFunction PromptDataToolFunctionsType = "function"
+	PromptDataToolFunctionsTypeGlobal   PromptDataToolFunctionsType = "global"
+)
+
+func (r PromptDataToolFunctionsType) IsKnown() bool {
+	switch r {
+	case PromptDataToolFunctionsTypeFunction, PromptDataToolFunctionsTypeGlobal:
+		return true
+	}
+	return false
+}
+
 // The prompt, model, and its parameters
 type PromptDataParam struct {
-	Options param.Field[PromptDataOptionsParam]     `json:"options"`
-	Origin  param.Field[PromptDataOriginParam]      `json:"origin"`
-	Parser  param.Field[PromptDataParserParam]      `json:"parser"`
-	Prompt  param.Field[PromptDataPromptUnionParam] `json:"prompt"`
+	Options       param.Field[PromptDataOptionsParam]              `json:"options"`
+	Origin        param.Field[PromptDataOriginParam]               `json:"origin"`
+	Parser        param.Field[PromptDataParserParam]               `json:"parser"`
+	Prompt        param.Field[PromptDataPromptUnionParam]          `json:"prompt"`
+	ToolFunctions param.Field[[]PromptDataToolFunctionsUnionParam] `json:"tool_functions"`
 }
 
 func (r PromptDataParam) MarshalJSON() (data []byte, err error) {
@@ -5350,6 +5663,46 @@ func (r PromptDataPromptNullableVariantParam) MarshalJSON() (data []byte, err er
 }
 
 func (r PromptDataPromptNullableVariantParam) implementsSharedPromptDataPromptUnionParam() {}
+
+type PromptDataToolFunctionParam struct {
+	Type param.Field[PromptDataToolFunctionsType] `json:"type,required"`
+	ID   param.Field[string]                      `json:"id"`
+	Name param.Field[string]                      `json:"name"`
+}
+
+func (r PromptDataToolFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataToolFunctionParam) implementsSharedPromptDataToolFunctionsUnionParam() {}
+
+// Satisfied by [shared.PromptDataToolFunctionsFunctionParam],
+// [shared.PromptDataToolFunctionsGlobalParam], [PromptDataToolFunctionParam].
+type PromptDataToolFunctionsUnionParam interface {
+	implementsSharedPromptDataToolFunctionsUnionParam()
+}
+
+type PromptDataToolFunctionsFunctionParam struct {
+	ID   param.Field[string]                              `json:"id,required"`
+	Type param.Field[PromptDataToolFunctionsFunctionType] `json:"type,required"`
+}
+
+func (r PromptDataToolFunctionsFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataToolFunctionsFunctionParam) implementsSharedPromptDataToolFunctionsUnionParam() {}
+
+type PromptDataToolFunctionsGlobalParam struct {
+	Name param.Field[string]                            `json:"name,required"`
+	Type param.Field[PromptDataToolFunctionsGlobalType] `json:"type,required"`
+}
+
+func (r PromptDataToolFunctionsGlobalParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataToolFunctionsGlobalParam) implementsSharedPromptDataToolFunctionsUnionParam() {}
 
 // Metadata about the state of the repo when the experiment was created
 type RepoInfo struct {

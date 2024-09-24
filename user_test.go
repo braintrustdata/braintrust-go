@@ -26,7 +26,7 @@ func TestUserGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.User.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.Users.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -48,7 +48,7 @@ func TestUserListWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.User.List(context.TODO(), braintrust.UserListParams{
+	_, err := client.Users.List(context.TODO(), braintrust.UserListParams{
 		Email:         braintrust.F[braintrust.UserListParamsEmailUnion](shared.UnionString("string")),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		FamilyName:    braintrust.F[braintrust.UserListParamsFamilyNameUnion](shared.UnionString("string")),

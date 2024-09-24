@@ -25,7 +25,7 @@ func TestOrganizationMemberUpdateWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Organization.Members.Update(context.TODO(), braintrust.OrganizationMemberUpdateParams{
+	_, err := client.Organizations.Members.Update(context.TODO(), braintrust.OrganizationMemberUpdateParams{
 		InviteUsers: braintrust.F(braintrust.OrganizationMemberUpdateParamsInviteUsers{
 			Emails:           braintrust.F([]string{"string", "string", "string"}),
 			GroupID:          braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
