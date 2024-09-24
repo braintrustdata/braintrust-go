@@ -26,15 +26,19 @@ func TestFunctionNewWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Function.New(context.TODO(), braintrust.FunctionNewParams{
+	_, err := client.Functions.New(context.TODO(), braintrust.FunctionNewParams{
 		FunctionData: braintrust.F[braintrust.FunctionNewParamsFunctionDataUnion](braintrust.FunctionNewParamsFunctionDataPrompt{
 			Type: braintrust.F(braintrust.FunctionNewParamsFunctionDataPromptTypePrompt),
 		}),
-		Name:         braintrust.F("name"),
-		ProjectID:    braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Slug:         braintrust.F("slug"),
-		Description:  braintrust.F("description"),
-		FunctionType: braintrust.F(braintrust.FunctionNewParamsFunctionTypeTask),
+		Name:        braintrust.F("name"),
+		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		Slug:        braintrust.F("slug"),
+		Description: braintrust.F("description"),
+		FunctionSchema: braintrust.F(braintrust.FunctionNewParamsFunctionSchema{
+			Parameters: braintrust.F[any](map[string]interface{}{}),
+			Returns:    braintrust.F[any](map[string]interface{}{}),
+		}),
+		FunctionType: braintrust.F(braintrust.FunctionNewParamsFunctionTypeLlm),
 		Origin: braintrust.F(braintrust.FunctionNewParamsOrigin{
 			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 			ObjectType: braintrust.F(braintrust.FunctionNewParamsOriginObjectTypeOrganization),
@@ -76,6 +80,16 @@ func TestFunctionNewWithOptionalParams(t *testing.T) {
 				Content: braintrust.F("content"),
 				Type:    braintrust.F(shared.PromptDataPromptCompletionTypeCompletion),
 			}),
+			ToolFunctions: braintrust.F([]shared.PromptDataToolFunctionsUnionParam{shared.PromptDataToolFunctionsFunctionParam{
+				ID:   braintrust.F("id"),
+				Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
+			}, shared.PromptDataToolFunctionsFunctionParam{
+				ID:   braintrust.F("id"),
+				Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
+			}, shared.PromptDataToolFunctionsFunctionParam{
+				ID:   braintrust.F("id"),
+				Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
+			}}),
 		}),
 		Tags: braintrust.F([]string{"string", "string", "string"}),
 	})
@@ -100,7 +114,7 @@ func TestFunctionGet(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Function.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.Functions.Get(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -122,13 +136,13 @@ func TestFunctionUpdateWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Function.Update(
+	_, err := client.Functions.Update(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.FunctionUpdateParams{
 			Description: braintrust.F("description"),
-			FunctionData: braintrust.F[braintrust.FunctionUpdateParamsFunctionDataUnion](braintrust.FunctionUpdateParamsFunctionDataPrompt{
-				Type: braintrust.F(braintrust.FunctionUpdateParamsFunctionDataPromptTypePrompt),
+			FunctionData: braintrust.F(braintrust.FunctionUpdateParamsFunctionData{
+				Type: "prompt",
 			}),
 			Name: braintrust.F("name"),
 			PromptData: braintrust.F(shared.PromptDataParam{
@@ -167,6 +181,16 @@ func TestFunctionUpdateWithOptionalParams(t *testing.T) {
 					Content: braintrust.F("content"),
 					Type:    braintrust.F(shared.PromptDataPromptCompletionTypeCompletion),
 				}),
+				ToolFunctions: braintrust.F([]shared.PromptDataToolFunctionsUnionParam{shared.PromptDataToolFunctionsFunctionParam{
+					ID:   braintrust.F("id"),
+					Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
+				}, shared.PromptDataToolFunctionsFunctionParam{
+					ID:   braintrust.F("id"),
+					Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
+				}, shared.PromptDataToolFunctionsFunctionParam{
+					ID:   braintrust.F("id"),
+					Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
+				}}),
 			}),
 			Tags: braintrust.F([]string{"string", "string", "string"}),
 		},
@@ -192,7 +216,7 @@ func TestFunctionListWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Function.List(context.TODO(), braintrust.FunctionListParams{
+	_, err := client.Functions.List(context.TODO(), braintrust.FunctionListParams{
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		FunctionName:  braintrust.F("function_name"),
 		IDs:           braintrust.F[braintrust.FunctionListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
@@ -225,7 +249,7 @@ func TestFunctionDelete(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Function.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.Functions.Delete(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
 	if err != nil {
 		var apierr *braintrust.Error
 		if errors.As(err, &apierr) {
@@ -247,11 +271,25 @@ func TestFunctionInvokeWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Function.Invoke(
+	_, err := client.Functions.Invoke(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.FunctionInvokeParams{
 			Input: braintrust.F[any](map[string]interface{}{}),
+			Messages: braintrust.F([]braintrust.FunctionInvokeParamsMessageUnion{braintrust.FunctionInvokeParamsMessagesSystem{
+				Role:    braintrust.F(braintrust.FunctionInvokeParamsMessagesSystemRoleSystem),
+				Content: braintrust.F("content"),
+				Name:    braintrust.F("name"),
+			}, braintrust.FunctionInvokeParamsMessagesSystem{
+				Role:    braintrust.F(braintrust.FunctionInvokeParamsMessagesSystemRoleSystem),
+				Content: braintrust.F("content"),
+				Name:    braintrust.F("name"),
+			}, braintrust.FunctionInvokeParamsMessagesSystem{
+				Role:    braintrust.F(braintrust.FunctionInvokeParamsMessagesSystemRoleSystem),
+				Content: braintrust.F("content"),
+				Name:    braintrust.F("name"),
+			}}),
+			Mode: braintrust.F(braintrust.FunctionInvokeParamsModeAuto),
 			Parent: braintrust.F[braintrust.FunctionInvokeParamsParentUnion](braintrust.FunctionInvokeParamsParentSpanParentStruct{
 				ObjectID:   braintrust.F("object_id"),
 				ObjectType: braintrust.F(braintrust.FunctionInvokeParamsParentSpanParentStructObjectTypeProjectLogs),
@@ -289,15 +327,19 @@ func TestFunctionReplaceWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Function.Replace(context.TODO(), braintrust.FunctionReplaceParams{
+	_, err := client.Functions.Replace(context.TODO(), braintrust.FunctionReplaceParams{
 		FunctionData: braintrust.F[braintrust.FunctionReplaceParamsFunctionDataUnion](braintrust.FunctionReplaceParamsFunctionDataPrompt{
 			Type: braintrust.F(braintrust.FunctionReplaceParamsFunctionDataPromptTypePrompt),
 		}),
-		Name:         braintrust.F("name"),
-		ProjectID:    braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Slug:         braintrust.F("slug"),
-		Description:  braintrust.F("description"),
-		FunctionType: braintrust.F(braintrust.FunctionReplaceParamsFunctionTypeTask),
+		Name:        braintrust.F("name"),
+		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		Slug:        braintrust.F("slug"),
+		Description: braintrust.F("description"),
+		FunctionSchema: braintrust.F(braintrust.FunctionReplaceParamsFunctionSchema{
+			Parameters: braintrust.F[any](map[string]interface{}{}),
+			Returns:    braintrust.F[any](map[string]interface{}{}),
+		}),
+		FunctionType: braintrust.F(braintrust.FunctionReplaceParamsFunctionTypeLlm),
 		Origin: braintrust.F(braintrust.FunctionReplaceParamsOrigin{
 			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 			ObjectType: braintrust.F(braintrust.FunctionReplaceParamsOriginObjectTypeOrganization),
@@ -339,6 +381,16 @@ func TestFunctionReplaceWithOptionalParams(t *testing.T) {
 				Content: braintrust.F("content"),
 				Type:    braintrust.F(shared.PromptDataPromptCompletionTypeCompletion),
 			}),
+			ToolFunctions: braintrust.F([]shared.PromptDataToolFunctionsUnionParam{shared.PromptDataToolFunctionsFunctionParam{
+				ID:   braintrust.F("id"),
+				Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
+			}, shared.PromptDataToolFunctionsFunctionParam{
+				ID:   braintrust.F("id"),
+				Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
+			}, shared.PromptDataToolFunctionsFunctionParam{
+				ID:   braintrust.F("id"),
+				Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
+			}}),
 		}),
 		Tags: braintrust.F([]string{"string", "string", "string"}),
 	})

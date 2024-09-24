@@ -143,14 +143,15 @@ func (r PromptNewParams) MarshalJSON() (data []byte, err error) {
 type PromptNewParamsFunctionType string
 
 const (
-	PromptNewParamsFunctionTypeTask   PromptNewParamsFunctionType = "task"
 	PromptNewParamsFunctionTypeLlm    PromptNewParamsFunctionType = "llm"
 	PromptNewParamsFunctionTypeScorer PromptNewParamsFunctionType = "scorer"
+	PromptNewParamsFunctionTypeTask   PromptNewParamsFunctionType = "task"
+	PromptNewParamsFunctionTypeTool   PromptNewParamsFunctionType = "tool"
 )
 
 func (r PromptNewParamsFunctionType) IsKnown() bool {
 	switch r {
-	case PromptNewParamsFunctionTypeTask, PromptNewParamsFunctionTypeLlm, PromptNewParamsFunctionTypeScorer:
+	case PromptNewParamsFunctionTypeLlm, PromptNewParamsFunctionTypeScorer, PromptNewParamsFunctionTypeTask, PromptNewParamsFunctionTypeTool:
 		return true
 	}
 	return false
@@ -251,14 +252,15 @@ func (r PromptReplaceParams) MarshalJSON() (data []byte, err error) {
 type PromptReplaceParamsFunctionType string
 
 const (
-	PromptReplaceParamsFunctionTypeTask   PromptReplaceParamsFunctionType = "task"
 	PromptReplaceParamsFunctionTypeLlm    PromptReplaceParamsFunctionType = "llm"
 	PromptReplaceParamsFunctionTypeScorer PromptReplaceParamsFunctionType = "scorer"
+	PromptReplaceParamsFunctionTypeTask   PromptReplaceParamsFunctionType = "task"
+	PromptReplaceParamsFunctionTypeTool   PromptReplaceParamsFunctionType = "tool"
 )
 
 func (r PromptReplaceParamsFunctionType) IsKnown() bool {
 	switch r {
-	case PromptReplaceParamsFunctionTypeTask, PromptReplaceParamsFunctionTypeLlm, PromptReplaceParamsFunctionTypeScorer:
+	case PromptReplaceParamsFunctionTypeLlm, PromptReplaceParamsFunctionTypeScorer, PromptReplaceParamsFunctionTypeTask, PromptReplaceParamsFunctionTypeTool:
 		return true
 	}
 	return false
