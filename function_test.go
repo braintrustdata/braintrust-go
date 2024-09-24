@@ -141,8 +141,8 @@ func TestFunctionUpdateWithOptionalParams(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.FunctionUpdateParams{
 			Description: braintrust.F("description"),
-			FunctionData: braintrust.F(braintrust.FunctionUpdateParamsFunctionData{
-				Type: "prompt",
+			FunctionData: braintrust.F[braintrust.FunctionUpdateParamsFunctionDataUnion](braintrust.FunctionUpdateParamsFunctionDataPrompt{
+				Type: braintrust.F(braintrust.FunctionUpdateParamsFunctionDataPromptTypePrompt),
 			}),
 			Name: braintrust.F("name"),
 			PromptData: braintrust.F(shared.PromptDataParam{
