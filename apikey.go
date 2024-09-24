@@ -18,28 +18,28 @@ import (
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
-// APIKeyResourceService contains methods and other services that help with
-// interacting with the braintrust API.
+// APIKeyService contains methods and other services that help with interacting
+// with the braintrust API.
 //
 // Note, unlike clients, this service does not read variables from the environment
 // automatically. You should not instantiate this service directly, and instead use
-// the [NewAPIKeyResourceService] method instead.
-type APIKeyResourceService struct {
+// the [NewAPIKeyService] method instead.
+type APIKeyService struct {
 	Options []option.RequestOption
 }
 
-// NewAPIKeyResourceService generates a new service that applies the given options
-// to each request. These options are applied after the parent client's options (if
-// there is one), and before any request-specific options.
-func NewAPIKeyResourceService(opts ...option.RequestOption) (r *APIKeyResourceService) {
-	r = &APIKeyResourceService{}
+// NewAPIKeyService generates a new service that applies the given options to each
+// request. These options are applied after the parent client's options (if there
+// is one), and before any request-specific options.
+func NewAPIKeyService(opts ...option.RequestOption) (r *APIKeyService) {
+	r = &APIKeyService{}
 	r.Options = opts
 	return
 }
 
 // Create a new api_key. It is possible to have multiple API keys with the same
 // name. There is no de-duplication
-func (r *APIKeyResourceService) New(ctx context.Context, body APIKeyResourceNewParams, opts ...option.RequestOption) (res *shared.CreateAPIKeyOutput, err error) {
+func (r *APIKeyService) New(ctx context.Context, body APIKeyNewParams, opts ...option.RequestOption) (res *shared.CreateAPIKeyOutput, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/api_key"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
@@ -47,7 +47,7 @@ func (r *APIKeyResourceService) New(ctx context.Context, body APIKeyResourceNewP
 }
 
 // Get an api_key object by its id
-func (r *APIKeyResourceService) Get(ctx context.Context, apiKeyID string, opts ...option.RequestOption) (res *shared.APIKey, err error) {
+func (r *APIKeyService) Get(ctx context.Context, apiKeyID string, opts ...option.RequestOption) (res *shared.APIKey, err error) {
 	opts = append(r.Options[:], opts...)
 	if apiKeyID == "" {
 		err = errors.New("missing required api_key_id parameter")
@@ -60,7 +60,7 @@ func (r *APIKeyResourceService) Get(ctx context.Context, apiKeyID string, opts .
 
 // List out all api_keys. The api_keys are sorted by creation date, with the most
 // recently-created api_keys coming first
-func (r *APIKeyResourceService) List(ctx context.Context, query APIKeyResourceListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.APIKey], err error) {
+func (r *APIKeyService) List(ctx context.Context, query APIKeyListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.APIKey], err error) {
 	var raw *http.Response
 	opts = append(r.Options[:], opts...)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
@@ -79,12 +79,12 @@ func (r *APIKeyResourceService) List(ctx context.Context, query APIKeyResourceLi
 
 // List out all api_keys. The api_keys are sorted by creation date, with the most
 // recently-created api_keys coming first
-func (r *APIKeyResourceService) ListAutoPaging(ctx context.Context, query APIKeyResourceListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[shared.APIKey] {
+func (r *APIKeyService) ListAutoPaging(ctx context.Context, query APIKeyListParams, opts ...option.RequestOption) *pagination.ListObjectsAutoPager[shared.APIKey] {
 	return pagination.NewListObjectsAutoPager(r.List(ctx, query, opts...))
 }
 
 // Delete an api_key object by its id
-func (r *APIKeyResourceService) Delete(ctx context.Context, apiKeyID string, opts ...option.RequestOption) (res *shared.APIKey, err error) {
+func (r *APIKeyService) Delete(ctx context.Context, apiKeyID string, opts ...option.RequestOption) (res *shared.APIKey, err error) {
 	opts = append(r.Options[:], opts...)
 	if apiKeyID == "" {
 		err = errors.New("missing required api_key_id parameter")
@@ -95,7 +95,7 @@ func (r *APIKeyResourceService) Delete(ctx context.Context, apiKeyID string, opt
 	return
 }
 
-type APIKeyResourceNewParams struct {
+type APIKeyNewParams struct {
 	// Name of the api key. Does not have to be unique
 	Name param.Field[string] `json:"name,required"`
 	// For nearly all users, this parameter should be unnecessary. But in the rare case
@@ -104,11 +104,11 @@ type APIKeyResourceNewParams struct {
 	OrgName param.Field[string] `json:"org_name"`
 }
 
-func (r APIKeyResourceNewParams) MarshalJSON() (data []byte, err error) {
+func (r APIKeyNewParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-type APIKeyResourceListParams struct {
+type APIKeyListParams struct {
 	// Name of the api_key to search for
 	APIKeyName param.Field[string] `query:"api_key_name"`
 	// Pagination cursor id.
@@ -119,7 +119,7 @@ type APIKeyResourceListParams struct {
 	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[APIKeyResourceListParamsIDsUnion] `query:"ids" format:"uuid"`
+	IDs param.Field[APIKeyListParamsIDsUnion] `query:"ids" format:"uuid"`
 	// Limit the number of objects to return
 	Limit param.Field[int64] `query:"limit"`
 	// Filter search results to within a particular organization
@@ -132,9 +132,8 @@ type APIKeyResourceListParams struct {
 	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
 }
 
-// URLQuery serializes [APIKeyResourceListParams]'s query parameters as
-// `url.Values`.
-func (r APIKeyResourceListParams) URLQuery() (v url.Values) {
+// URLQuery serializes [APIKeyListParams]'s query parameters as `url.Values`.
+func (r APIKeyListParams) URLQuery() (v url.Values) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -144,11 +143,11 @@ func (r APIKeyResourceListParams) URLQuery() (v url.Values) {
 // Filter search results to a particular set of object IDs. To specify a list of
 // IDs, include the query param multiple times
 //
-// Satisfied by [shared.UnionString], [APIKeyResourceListParamsIDsArray].
-type APIKeyResourceListParamsIDsUnion interface {
-	ImplementsAPIKeyResourceListParamsIDsUnion()
+// Satisfied by [shared.UnionString], [APIKeyListParamsIDsArray].
+type APIKeyListParamsIDsUnion interface {
+	ImplementsAPIKeyListParamsIDsUnion()
 }
 
-type APIKeyResourceListParamsIDsArray []string
+type APIKeyListParamsIDsArray []string
 
-func (r APIKeyResourceListParamsIDsArray) ImplementsAPIKeyResourceListParamsIDsUnion() {}
+func (r APIKeyListParamsIDsArray) ImplementsAPIKeyListParamsIDsUnion() {}

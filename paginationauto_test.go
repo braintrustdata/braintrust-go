@@ -24,7 +24,7 @@ func TestAutoPagination(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	iter := client.Project.ListAutoPaging(context.TODO(), braintrust.ProjectListParams{})
+	iter := client.Projects.ListAutoPaging(context.TODO(), braintrust.ProjectListParams{})
 	// Prism mock isn't going to give us real pagination
 	for i := 0; i < 3 && iter.Next(); i++ {
 		project := iter.Current()
