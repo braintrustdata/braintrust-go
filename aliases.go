@@ -299,27 +299,6 @@ type FunctionFunctionDataCodeDataBundleLocation = shared.FunctionFunctionDataCod
 type FunctionFunctionDataCodeDataBundleLocationExperiment = shared.FunctionFunctionDataCodeDataBundleLocationExperiment
 
 // This is an alias to an internal type.
-type FunctionFunctionDataCodeDataBundleLocationExperimentPosition = shared.FunctionFunctionDataCodeDataBundleLocationExperimentPosition
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataBundleLocationExperimentPositionType = shared.FunctionFunctionDataCodeDataBundleLocationExperimentPositionType
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeType = shared.FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeType
-
-// This is an alias to an internal value.
-const FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeTypeTask = shared.FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeTypeTask
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer = shared.FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerType = shared.FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerType
-
-// This is an alias to an internal value.
-const FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerTypeScorer = shared.FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerTypeScorer
-
-// This is an alias to an internal type.
 type FunctionFunctionDataCodeDataBundleLocationExperimentType = shared.FunctionFunctionDataCodeDataBundleLocationExperimentType
 
 // This is an alias to an internal value.
@@ -711,6 +690,27 @@ type PathLookupFilterType = shared.PathLookupFilterType
 
 // This is an alias to an internal value.
 const PathLookupFilterTypePathLookup = shared.PathLookupFilterTypePathLookup
+
+// This is an alias to an internal type.
+type Position = shared.Position
+
+// This is an alias to an internal type.
+type PositionType = shared.PositionType
+
+// This is an alias to an internal type.
+type PositionTypeType = shared.PositionTypeType
+
+// This is an alias to an internal value.
+const PositionTypeTypeTask = shared.PositionTypeTypeTask
+
+// This is an alias to an internal type.
+type PositionScorer = shared.PositionScorer
+
+// This is an alias to an internal type.
+type PositionScorerType = shared.PositionScorerType
+
+// This is an alias to an internal value.
+const PositionScorerTypeScorer = shared.PositionScorerTypeScorer
 
 // This is an alias to an internal type.
 type Project = shared.Project

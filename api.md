@@ -37,6 +37,7 @@
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#InsertEventsResponse">InsertEventsResponse</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#MetricSummary">MetricSummary</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#Organization">Organization</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#Position">Position</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#Project">Project</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ProjectLogsEvent">ProjectLogsEvent</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ProjectScore">ProjectScore</a>
