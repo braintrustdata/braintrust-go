@@ -1222,9 +1222,7 @@ func (r FunctionFunctionDataCodeDataBundle) implementsSharedFunctionFunctionData
 type FunctionFunctionDataCodeDataBundleLocation struct {
 	Type     FunctionFunctionDataCodeDataBundleLocationType `json:"type,required"`
 	EvalName string                                         `json:"eval_name"`
-	// This field can have the runtime type of
-	// [FunctionFunctionDataCodeDataBundleLocationExperimentPosition].
-	Position interface{}                                    `json:"position,required"`
+	Position Position                                       `json:"position"`
 	Index    int64                                          `json:"index"`
 	JSON     functionFunctionDataCodeDataBundleLocationJSON `json:"-"`
 	union    FunctionFunctionDataCodeDataBundleLocationUnion
@@ -1286,10 +1284,10 @@ func init() {
 }
 
 type FunctionFunctionDataCodeDataBundleLocationExperiment struct {
-	EvalName string                                                       `json:"eval_name,required"`
-	Position FunctionFunctionDataCodeDataBundleLocationExperimentPosition `json:"position,required"`
-	Type     FunctionFunctionDataCodeDataBundleLocationExperimentType     `json:"type,required"`
-	JSON     functionFunctionDataCodeDataBundleLocationExperimentJSON     `json:"-"`
+	EvalName string                                                   `json:"eval_name,required"`
+	Position Position                                                 `json:"position,required"`
+	Type     FunctionFunctionDataCodeDataBundleLocationExperimentType `json:"type,required"`
+	JSON     functionFunctionDataCodeDataBundleLocationExperimentJSON `json:"-"`
 }
 
 // functionFunctionDataCodeDataBundleLocationExperimentJSON contains the JSON
@@ -1311,149 +1309,6 @@ func (r functionFunctionDataCodeDataBundleLocationExperimentJSON) RawJSON() stri
 }
 
 func (r FunctionFunctionDataCodeDataBundleLocationExperiment) implementsSharedFunctionFunctionDataCodeDataBundleLocation() {
-}
-
-type FunctionFunctionDataCodeDataBundleLocationExperimentPosition struct {
-	Type  FunctionFunctionDataCodeDataBundleLocationExperimentPositionType `json:"type,required"`
-	Index int64                                                            `json:"index"`
-	JSON  functionFunctionDataCodeDataBundleLocationExperimentPositionJSON `json:"-"`
-	union FunctionFunctionDataCodeDataBundleLocationExperimentPositionUnion
-}
-
-// functionFunctionDataCodeDataBundleLocationExperimentPositionJSON contains the
-// JSON metadata for the struct
-// [FunctionFunctionDataCodeDataBundleLocationExperimentPosition]
-type functionFunctionDataCodeDataBundleLocationExperimentPositionJSON struct {
-	Type        apijson.Field
-	Index       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r functionFunctionDataCodeDataBundleLocationExperimentPositionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *FunctionFunctionDataCodeDataBundleLocationExperimentPosition) UnmarshalJSON(data []byte) (err error) {
-	*r = FunctionFunctionDataCodeDataBundleLocationExperimentPosition{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a
-// [FunctionFunctionDataCodeDataBundleLocationExperimentPositionUnion] interface
-// which you can cast to the specific types for more type safety.
-//
-// Possible runtime types of the union are
-// [shared.FunctionFunctionDataCodeDataBundleLocationExperimentPositionType],
-// [shared.FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer].
-func (r FunctionFunctionDataCodeDataBundleLocationExperimentPosition) AsUnion() FunctionFunctionDataCodeDataBundleLocationExperimentPositionUnion {
-	return r.union
-}
-
-// Union satisfied by
-// [shared.FunctionFunctionDataCodeDataBundleLocationExperimentPositionType] or
-// [shared.FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer].
-type FunctionFunctionDataCodeDataBundleLocationExperimentPositionUnion interface {
-	implementsSharedFunctionFunctionDataCodeDataBundleLocationExperimentPosition()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*FunctionFunctionDataCodeDataBundleLocationExperimentPositionUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(FunctionFunctionDataCodeDataBundleLocationExperimentPositionType{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer{}),
-		},
-	)
-}
-
-type FunctionFunctionDataCodeDataBundleLocationExperimentPositionType struct {
-	Type FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeType `json:"type,required"`
-	JSON functionFunctionDataCodeDataBundleLocationExperimentPositionTypeJSON `json:"-"`
-}
-
-// functionFunctionDataCodeDataBundleLocationExperimentPositionTypeJSON contains
-// the JSON metadata for the struct
-// [FunctionFunctionDataCodeDataBundleLocationExperimentPositionType]
-type functionFunctionDataCodeDataBundleLocationExperimentPositionTypeJSON struct {
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataCodeDataBundleLocationExperimentPositionType) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r functionFunctionDataCodeDataBundleLocationExperimentPositionTypeJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r FunctionFunctionDataCodeDataBundleLocationExperimentPositionType) implementsSharedFunctionFunctionDataCodeDataBundleLocationExperimentPosition() {
-}
-
-type FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeType string
-
-const (
-	FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeTypeTask FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeType = "task"
-)
-
-func (r FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeDataBundleLocationExperimentPositionTypeTypeTask:
-		return true
-	}
-	return false
-}
-
-type FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer struct {
-	Index int64                                                                  `json:"index,required"`
-	Type  FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerType `json:"type,required"`
-	JSON  functionFunctionDataCodeDataBundleLocationExperimentPositionScorerJSON `json:"-"`
-}
-
-// functionFunctionDataCodeDataBundleLocationExperimentPositionScorerJSON contains
-// the JSON metadata for the struct
-// [FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer]
-type functionFunctionDataCodeDataBundleLocationExperimentPositionScorerJSON struct {
-	Index       apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r functionFunctionDataCodeDataBundleLocationExperimentPositionScorerJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorer) implementsSharedFunctionFunctionDataCodeDataBundleLocationExperimentPosition() {
-}
-
-type FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerType string
-
-const (
-	FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerTypeScorer FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerType = "scorer"
-)
-
-func (r FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeDataBundleLocationExperimentPositionScorerTypeScorer:
-		return true
-	}
-	return false
 }
 
 type FunctionFunctionDataCodeDataBundleLocationExperimentType string
@@ -2816,6 +2671,137 @@ const (
 func (r PathLookupFilterType) IsKnown() bool {
 	switch r {
 	case PathLookupFilterTypePathLookup:
+		return true
+	}
+	return false
+}
+
+type Position struct {
+	Type  PositionType `json:"type,required"`
+	Index int64        `json:"index"`
+	JSON  positionJSON `json:"-"`
+	union PositionUnion
+}
+
+// positionJSON contains the JSON metadata for the struct [Position]
+type positionJSON struct {
+	Type        apijson.Field
+	Index       apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r positionJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r *Position) UnmarshalJSON(data []byte) (err error) {
+	*r = Position{}
+	err = apijson.UnmarshalRoot(data, &r.union)
+	if err != nil {
+		return err
+	}
+	return apijson.Port(r.union, &r)
+}
+
+// AsUnion returns a [PositionUnion] interface which you can cast to the specific
+// types for more type safety.
+//
+// Possible runtime types of the union are [shared.PositionType],
+// [shared.PositionScorer].
+func (r Position) AsUnion() PositionUnion {
+	return r.union
+}
+
+// Union satisfied by [shared.PositionType] or [shared.PositionScorer].
+type PositionUnion interface {
+	implementsSharedPosition()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*PositionUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PositionType{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PositionScorer{}),
+		},
+	)
+}
+
+type PositionType struct {
+	Type PositionTypeType `json:"type,required"`
+	JSON positionTypeJSON `json:"-"`
+}
+
+// positionTypeJSON contains the JSON metadata for the struct [PositionType]
+type positionTypeJSON struct {
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PositionType) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r positionTypeJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PositionType) implementsSharedPosition() {}
+
+type PositionTypeType string
+
+const (
+	PositionTypeTypeTask PositionTypeType = "task"
+)
+
+func (r PositionTypeType) IsKnown() bool {
+	switch r {
+	case PositionTypeTypeTask:
+		return true
+	}
+	return false
+}
+
+type PositionScorer struct {
+	Index int64              `json:"index,required"`
+	Type  PositionScorerType `json:"type,required"`
+	JSON  positionScorerJSON `json:"-"`
+}
+
+// positionScorerJSON contains the JSON metadata for the struct [PositionScorer]
+type positionScorerJSON struct {
+	Index       apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PositionScorer) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r positionScorerJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PositionScorer) implementsSharedPosition() {}
+
+type PositionScorerType string
+
+const (
+	PositionScorerTypeScorer PositionScorerType = "scorer"
+)
+
+func (r PositionScorerType) IsKnown() bool {
+	switch r {
+	case PositionScorerTypeScorer:
 		return true
 	}
 	return false
