@@ -168,12 +168,13 @@ func (r FunctionNewParamsFunctionData) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r FunctionNewParamsFunctionData) ImplementsFunctionNewParamsFunctionDataUnion() {}
+func (r FunctionNewParamsFunctionData) implementsFunctionNewParamsFunctionDataUnion() {}
 
-// Satisfied by [FunctionNewParamsFunctionDataPrompt], [shared.CodeParam],
-// [FunctionNewParamsFunctionDataGlobal], [FunctionNewParamsFunctionData].
+// Satisfied by [FunctionNewParamsFunctionDataPrompt],
+// [FunctionNewParamsFunctionDataCode], [FunctionNewParamsFunctionDataGlobal],
+// [FunctionNewParamsFunctionData].
 type FunctionNewParamsFunctionDataUnion interface {
-	ImplementsFunctionNewParamsFunctionDataUnion()
+	implementsFunctionNewParamsFunctionDataUnion()
 }
 
 type FunctionNewParamsFunctionDataPrompt struct {
@@ -184,7 +185,7 @@ func (r FunctionNewParamsFunctionDataPrompt) MarshalJSON() (data []byte, err err
 	return apijson.MarshalRoot(r)
 }
 
-func (r FunctionNewParamsFunctionDataPrompt) ImplementsFunctionNewParamsFunctionDataUnion() {}
+func (r FunctionNewParamsFunctionDataPrompt) implementsFunctionNewParamsFunctionDataUnion() {}
 
 type FunctionNewParamsFunctionDataPromptType string
 
@@ -200,6 +201,129 @@ func (r FunctionNewParamsFunctionDataPromptType) IsKnown() bool {
 	return false
 }
 
+type FunctionNewParamsFunctionDataCode struct {
+	Data param.Field[FunctionNewParamsFunctionDataCodeDataUnion] `json:"data,required"`
+	Type param.Field[FunctionNewParamsFunctionDataCodeType]      `json:"type,required"`
+}
+
+func (r FunctionNewParamsFunctionDataCode) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionNewParamsFunctionDataCode) implementsFunctionNewParamsFunctionDataUnion() {}
+
+// Satisfied by [FunctionNewParamsFunctionDataCodeDataBundle],
+// [FunctionNewParamsFunctionDataCodeDataInline].
+type FunctionNewParamsFunctionDataCodeDataUnion interface {
+	implementsFunctionNewParamsFunctionDataCodeDataUnion()
+}
+
+type FunctionNewParamsFunctionDataCodeDataBundle struct {
+	Type param.Field[FunctionNewParamsFunctionDataCodeDataBundleType] `json:"type,required"`
+	shared.CodeBundleParam
+}
+
+func (r FunctionNewParamsFunctionDataCodeDataBundle) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionNewParamsFunctionDataCodeDataBundle) implementsFunctionNewParamsFunctionDataCodeDataUnion() {
+}
+
+type FunctionNewParamsFunctionDataCodeDataBundleType string
+
+const (
+	FunctionNewParamsFunctionDataCodeDataBundleTypeBundle FunctionNewParamsFunctionDataCodeDataBundleType = "bundle"
+)
+
+func (r FunctionNewParamsFunctionDataCodeDataBundleType) IsKnown() bool {
+	switch r {
+	case FunctionNewParamsFunctionDataCodeDataBundleTypeBundle:
+		return true
+	}
+	return false
+}
+
+type FunctionNewParamsFunctionDataCodeDataInline struct {
+	Code           param.Field[string]                                                    `json:"code,required"`
+	RuntimeContext param.Field[FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext] `json:"runtime_context,required"`
+	Type           param.Field[FunctionNewParamsFunctionDataCodeDataInlineType]           `json:"type,required"`
+}
+
+func (r FunctionNewParamsFunctionDataCodeDataInline) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionNewParamsFunctionDataCodeDataInline) implementsFunctionNewParamsFunctionDataCodeDataUnion() {
+}
+
+type FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext struct {
+	Runtime param.Field[FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntime] `json:"runtime,required"`
+	Version param.Field[string]                                                           `json:"version,required"`
+}
+
+func (r FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntime string
+
+const (
+	FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntimeNode   FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntime = "node"
+	FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntimePython FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntime = "python"
+)
+
+func (r FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntime) IsKnown() bool {
+	switch r {
+	case FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntimeNode, FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntimePython:
+		return true
+	}
+	return false
+}
+
+type FunctionNewParamsFunctionDataCodeDataInlineType string
+
+const (
+	FunctionNewParamsFunctionDataCodeDataInlineTypeInline FunctionNewParamsFunctionDataCodeDataInlineType = "inline"
+)
+
+func (r FunctionNewParamsFunctionDataCodeDataInlineType) IsKnown() bool {
+	switch r {
+	case FunctionNewParamsFunctionDataCodeDataInlineTypeInline:
+		return true
+	}
+	return false
+}
+
+type FunctionNewParamsFunctionDataCodeDataType string
+
+const (
+	FunctionNewParamsFunctionDataCodeDataTypeBundle FunctionNewParamsFunctionDataCodeDataType = "bundle"
+	FunctionNewParamsFunctionDataCodeDataTypeInline FunctionNewParamsFunctionDataCodeDataType = "inline"
+)
+
+func (r FunctionNewParamsFunctionDataCodeDataType) IsKnown() bool {
+	switch r {
+	case FunctionNewParamsFunctionDataCodeDataTypeBundle, FunctionNewParamsFunctionDataCodeDataTypeInline:
+		return true
+	}
+	return false
+}
+
+type FunctionNewParamsFunctionDataCodeType string
+
+const (
+	FunctionNewParamsFunctionDataCodeTypeCode FunctionNewParamsFunctionDataCodeType = "code"
+)
+
+func (r FunctionNewParamsFunctionDataCodeType) IsKnown() bool {
+	switch r {
+	case FunctionNewParamsFunctionDataCodeTypeCode:
+		return true
+	}
+	return false
+}
+
 type FunctionNewParamsFunctionDataGlobal struct {
 	Name param.Field[string]                                  `json:"name,required"`
 	Type param.Field[FunctionNewParamsFunctionDataGlobalType] `json:"type,required"`
@@ -209,7 +333,7 @@ func (r FunctionNewParamsFunctionDataGlobal) MarshalJSON() (data []byte, err err
 	return apijson.MarshalRoot(r)
 }
 
-func (r FunctionNewParamsFunctionDataGlobal) ImplementsFunctionNewParamsFunctionDataUnion() {}
+func (r FunctionNewParamsFunctionDataGlobal) implementsFunctionNewParamsFunctionDataUnion() {}
 
 type FunctionNewParamsFunctionDataGlobalType string
 
@@ -333,14 +457,15 @@ func (r FunctionUpdateParamsFunctionData) MarshalJSON() (data []byte, err error)
 	return apijson.MarshalRoot(r)
 }
 
-func (r FunctionUpdateParamsFunctionData) ImplementsFunctionUpdateParamsFunctionDataUnion() {}
+func (r FunctionUpdateParamsFunctionData) implementsFunctionUpdateParamsFunctionDataUnion() {}
 
-// Satisfied by [FunctionUpdateParamsFunctionDataPrompt], [shared.CodeParam],
+// Satisfied by [FunctionUpdateParamsFunctionDataPrompt],
+// [FunctionUpdateParamsFunctionDataCode],
 // [FunctionUpdateParamsFunctionDataGlobal],
 // [FunctionUpdateParamsFunctionDataNullableVariant],
 // [FunctionUpdateParamsFunctionData].
 type FunctionUpdateParamsFunctionDataUnion interface {
-	ImplementsFunctionUpdateParamsFunctionDataUnion()
+	implementsFunctionUpdateParamsFunctionDataUnion()
 }
 
 type FunctionUpdateParamsFunctionDataPrompt struct {
@@ -351,7 +476,7 @@ func (r FunctionUpdateParamsFunctionDataPrompt) MarshalJSON() (data []byte, err 
 	return apijson.MarshalRoot(r)
 }
 
-func (r FunctionUpdateParamsFunctionDataPrompt) ImplementsFunctionUpdateParamsFunctionDataUnion() {}
+func (r FunctionUpdateParamsFunctionDataPrompt) implementsFunctionUpdateParamsFunctionDataUnion() {}
 
 type FunctionUpdateParamsFunctionDataPromptType string
 
@@ -367,6 +492,129 @@ func (r FunctionUpdateParamsFunctionDataPromptType) IsKnown() bool {
 	return false
 }
 
+type FunctionUpdateParamsFunctionDataCode struct {
+	Data param.Field[FunctionUpdateParamsFunctionDataCodeDataUnion] `json:"data,required"`
+	Type param.Field[FunctionUpdateParamsFunctionDataCodeType]      `json:"type,required"`
+}
+
+func (r FunctionUpdateParamsFunctionDataCode) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionUpdateParamsFunctionDataCode) implementsFunctionUpdateParamsFunctionDataUnion() {}
+
+// Satisfied by [FunctionUpdateParamsFunctionDataCodeDataBundle],
+// [FunctionUpdateParamsFunctionDataCodeDataInline].
+type FunctionUpdateParamsFunctionDataCodeDataUnion interface {
+	implementsFunctionUpdateParamsFunctionDataCodeDataUnion()
+}
+
+type FunctionUpdateParamsFunctionDataCodeDataBundle struct {
+	Type param.Field[FunctionUpdateParamsFunctionDataCodeDataBundleType] `json:"type,required"`
+	shared.CodeBundleParam
+}
+
+func (r FunctionUpdateParamsFunctionDataCodeDataBundle) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionUpdateParamsFunctionDataCodeDataBundle) implementsFunctionUpdateParamsFunctionDataCodeDataUnion() {
+}
+
+type FunctionUpdateParamsFunctionDataCodeDataBundleType string
+
+const (
+	FunctionUpdateParamsFunctionDataCodeDataBundleTypeBundle FunctionUpdateParamsFunctionDataCodeDataBundleType = "bundle"
+)
+
+func (r FunctionUpdateParamsFunctionDataCodeDataBundleType) IsKnown() bool {
+	switch r {
+	case FunctionUpdateParamsFunctionDataCodeDataBundleTypeBundle:
+		return true
+	}
+	return false
+}
+
+type FunctionUpdateParamsFunctionDataCodeDataInline struct {
+	Code           param.Field[string]                                                       `json:"code,required"`
+	RuntimeContext param.Field[FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext] `json:"runtime_context,required"`
+	Type           param.Field[FunctionUpdateParamsFunctionDataCodeDataInlineType]           `json:"type,required"`
+}
+
+func (r FunctionUpdateParamsFunctionDataCodeDataInline) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionUpdateParamsFunctionDataCodeDataInline) implementsFunctionUpdateParamsFunctionDataCodeDataUnion() {
+}
+
+type FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext struct {
+	Runtime param.Field[FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntime] `json:"runtime,required"`
+	Version param.Field[string]                                                              `json:"version,required"`
+}
+
+func (r FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntime string
+
+const (
+	FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntimeNode   FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntime = "node"
+	FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntimePython FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntime = "python"
+)
+
+func (r FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntime) IsKnown() bool {
+	switch r {
+	case FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntimeNode, FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntimePython:
+		return true
+	}
+	return false
+}
+
+type FunctionUpdateParamsFunctionDataCodeDataInlineType string
+
+const (
+	FunctionUpdateParamsFunctionDataCodeDataInlineTypeInline FunctionUpdateParamsFunctionDataCodeDataInlineType = "inline"
+)
+
+func (r FunctionUpdateParamsFunctionDataCodeDataInlineType) IsKnown() bool {
+	switch r {
+	case FunctionUpdateParamsFunctionDataCodeDataInlineTypeInline:
+		return true
+	}
+	return false
+}
+
+type FunctionUpdateParamsFunctionDataCodeDataType string
+
+const (
+	FunctionUpdateParamsFunctionDataCodeDataTypeBundle FunctionUpdateParamsFunctionDataCodeDataType = "bundle"
+	FunctionUpdateParamsFunctionDataCodeDataTypeInline FunctionUpdateParamsFunctionDataCodeDataType = "inline"
+)
+
+func (r FunctionUpdateParamsFunctionDataCodeDataType) IsKnown() bool {
+	switch r {
+	case FunctionUpdateParamsFunctionDataCodeDataTypeBundle, FunctionUpdateParamsFunctionDataCodeDataTypeInline:
+		return true
+	}
+	return false
+}
+
+type FunctionUpdateParamsFunctionDataCodeType string
+
+const (
+	FunctionUpdateParamsFunctionDataCodeTypeCode FunctionUpdateParamsFunctionDataCodeType = "code"
+)
+
+func (r FunctionUpdateParamsFunctionDataCodeType) IsKnown() bool {
+	switch r {
+	case FunctionUpdateParamsFunctionDataCodeTypeCode:
+		return true
+	}
+	return false
+}
+
 type FunctionUpdateParamsFunctionDataGlobal struct {
 	Name param.Field[string]                                     `json:"name,required"`
 	Type param.Field[FunctionUpdateParamsFunctionDataGlobalType] `json:"type,required"`
@@ -376,7 +624,7 @@ func (r FunctionUpdateParamsFunctionDataGlobal) MarshalJSON() (data []byte, err 
 	return apijson.MarshalRoot(r)
 }
 
-func (r FunctionUpdateParamsFunctionDataGlobal) ImplementsFunctionUpdateParamsFunctionDataUnion() {}
+func (r FunctionUpdateParamsFunctionDataGlobal) implementsFunctionUpdateParamsFunctionDataUnion() {}
 
 type FunctionUpdateParamsFunctionDataGlobalType string
 
@@ -399,7 +647,7 @@ func (r FunctionUpdateParamsFunctionDataNullableVariant) MarshalJSON() (data []b
 	return apijson.MarshalRoot(r)
 }
 
-func (r FunctionUpdateParamsFunctionDataNullableVariant) ImplementsFunctionUpdateParamsFunctionDataUnion() {
+func (r FunctionUpdateParamsFunctionDataNullableVariant) implementsFunctionUpdateParamsFunctionDataUnion() {
 }
 
 type FunctionUpdateParamsFunctionDataType string
@@ -477,7 +725,7 @@ type FunctionInvokeParams struct {
 	// Argument to the function, which can be any JSON serializable value
 	Input param.Field[interface{}] `json:"input"`
 	// If the function is an LLM, additional messages to pass along to it
-	Messages param.Field[[]shared.MessagesUnionParam] `json:"messages"`
+	Messages param.Field[[]FunctionInvokeParamsMessageUnion] `json:"messages"`
 	// The mode format of the returned value (defaults to 'auto')
 	Mode param.Field[FunctionInvokeParamsMode] `json:"mode"`
 	// Options for tracing the function call
@@ -491,6 +739,260 @@ type FunctionInvokeParams struct {
 
 func (r FunctionInvokeParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
+}
+
+type FunctionInvokeParamsMessage struct {
+	Content      param.Field[interface{}]                      `json:"content,required"`
+	Role         param.Field[FunctionInvokeParamsMessagesRole] `json:"role,required"`
+	Name         param.Field[string]                           `json:"name"`
+	FunctionCall param.Field[interface{}]                      `json:"function_call,required"`
+	ToolCalls    param.Field[interface{}]                      `json:"tool_calls,required"`
+	ToolCallID   param.Field[string]                           `json:"tool_call_id"`
+}
+
+func (r FunctionInvokeParamsMessage) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessage) implementsFunctionInvokeParamsMessageUnion() {}
+
+// Satisfied by [FunctionInvokeParamsMessagesSystem],
+// [FunctionInvokeParamsMessagesUser], [FunctionInvokeParamsMessagesAssistant],
+// [FunctionInvokeParamsMessagesTool], [FunctionInvokeParamsMessagesFunction],
+// [FunctionInvokeParamsMessagesFallback], [FunctionInvokeParamsMessage].
+type FunctionInvokeParamsMessageUnion interface {
+	implementsFunctionInvokeParamsMessageUnion()
+}
+
+type FunctionInvokeParamsMessagesSystem struct {
+	Role    param.Field[FunctionInvokeParamsMessagesSystemRole] `json:"role,required"`
+	Content param.Field[string]                                 `json:"content"`
+	Name    param.Field[string]                                 `json:"name"`
+}
+
+func (r FunctionInvokeParamsMessagesSystem) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessagesSystem) implementsFunctionInvokeParamsMessageUnion() {}
+
+type FunctionInvokeParamsMessagesSystemRole string
+
+const (
+	FunctionInvokeParamsMessagesSystemRoleSystem FunctionInvokeParamsMessagesSystemRole = "system"
+)
+
+func (r FunctionInvokeParamsMessagesSystemRole) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesSystemRoleSystem:
+		return true
+	}
+	return false
+}
+
+type FunctionInvokeParamsMessagesUser struct {
+	Role    param.Field[FunctionInvokeParamsMessagesUserRole]         `json:"role,required"`
+	Content param.Field[FunctionInvokeParamsMessagesUserContentUnion] `json:"content"`
+	Name    param.Field[string]                                       `json:"name"`
+}
+
+func (r FunctionInvokeParamsMessagesUser) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessagesUser) implementsFunctionInvokeParamsMessageUnion() {}
+
+type FunctionInvokeParamsMessagesUserRole string
+
+const (
+	FunctionInvokeParamsMessagesUserRoleUser FunctionInvokeParamsMessagesUserRole = "user"
+)
+
+func (r FunctionInvokeParamsMessagesUserRole) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesUserRoleUser:
+		return true
+	}
+	return false
+}
+
+// Satisfied by [shared.UnionString],
+// [FunctionInvokeParamsMessagesUserContentArray].
+type FunctionInvokeParamsMessagesUserContentUnion interface {
+	ImplementsFunctionInvokeParamsMessagesUserContentUnion()
+}
+
+type FunctionInvokeParamsMessagesUserContentArray []FunctionInvokeParamsMessagesUserContentArrayUnion
+
+func (r FunctionInvokeParamsMessagesUserContentArray) ImplementsFunctionInvokeParamsMessagesUserContentUnion() {
+}
+
+type FunctionInvokeParamsMessagesUserContentArray struct {
+	Text     param.Field[string]                                           `json:"text"`
+	Type     param.Field[FunctionInvokeParamsMessagesUserContentArrayType] `json:"type,required"`
+	ImageURL param.Field[interface{}]                                      `json:"image_url,required"`
+}
+
+func (r FunctionInvokeParamsMessagesUserContentArray) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessagesUserContentArray) ImplementsFunctionInvokeParamsMessagesUserContentArrayUnion() {
+}
+
+// Satisfied by [shared.ChatCompletionContentPartTextParam],
+// [shared.ChatCompletionContentPartImageParam],
+// [FunctionInvokeParamsMessagesUserContentArray].
+type FunctionInvokeParamsMessagesUserContentArrayUnion interface {
+	ImplementsFunctionInvokeParamsMessagesUserContentArrayUnion()
+}
+
+type FunctionInvokeParamsMessagesUserContentArrayType string
+
+const (
+	FunctionInvokeParamsMessagesUserContentArrayTypeText     FunctionInvokeParamsMessagesUserContentArrayType = "text"
+	FunctionInvokeParamsMessagesUserContentArrayTypeImageURL FunctionInvokeParamsMessagesUserContentArrayType = "image_url"
+)
+
+func (r FunctionInvokeParamsMessagesUserContentArrayType) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesUserContentArrayTypeText, FunctionInvokeParamsMessagesUserContentArrayTypeImageURL:
+		return true
+	}
+	return false
+}
+
+type FunctionInvokeParamsMessagesAssistant struct {
+	Role         param.Field[FunctionInvokeParamsMessagesAssistantRole]         `json:"role,required"`
+	Content      param.Field[string]                                            `json:"content"`
+	FunctionCall param.Field[FunctionInvokeParamsMessagesAssistantFunctionCall] `json:"function_call"`
+	Name         param.Field[string]                                            `json:"name"`
+	ToolCalls    param.Field[[]shared.ChatCompletionMessageToolCallParam]       `json:"tool_calls"`
+}
+
+func (r FunctionInvokeParamsMessagesAssistant) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessagesAssistant) implementsFunctionInvokeParamsMessageUnion() {}
+
+type FunctionInvokeParamsMessagesAssistantRole string
+
+const (
+	FunctionInvokeParamsMessagesAssistantRoleAssistant FunctionInvokeParamsMessagesAssistantRole = "assistant"
+)
+
+func (r FunctionInvokeParamsMessagesAssistantRole) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesAssistantRoleAssistant:
+		return true
+	}
+	return false
+}
+
+type FunctionInvokeParamsMessagesAssistantFunctionCall struct {
+	Arguments param.Field[string] `json:"arguments,required"`
+	Name      param.Field[string] `json:"name,required"`
+}
+
+func (r FunctionInvokeParamsMessagesAssistantFunctionCall) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type FunctionInvokeParamsMessagesTool struct {
+	Role       param.Field[FunctionInvokeParamsMessagesToolRole] `json:"role,required"`
+	Content    param.Field[string]                               `json:"content"`
+	ToolCallID param.Field[string]                               `json:"tool_call_id"`
+}
+
+func (r FunctionInvokeParamsMessagesTool) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessagesTool) implementsFunctionInvokeParamsMessageUnion() {}
+
+type FunctionInvokeParamsMessagesToolRole string
+
+const (
+	FunctionInvokeParamsMessagesToolRoleTool FunctionInvokeParamsMessagesToolRole = "tool"
+)
+
+func (r FunctionInvokeParamsMessagesToolRole) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesToolRoleTool:
+		return true
+	}
+	return false
+}
+
+type FunctionInvokeParamsMessagesFunction struct {
+	Name    param.Field[string]                                   `json:"name,required"`
+	Role    param.Field[FunctionInvokeParamsMessagesFunctionRole] `json:"role,required"`
+	Content param.Field[string]                                   `json:"content"`
+}
+
+func (r FunctionInvokeParamsMessagesFunction) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessagesFunction) implementsFunctionInvokeParamsMessageUnion() {}
+
+type FunctionInvokeParamsMessagesFunctionRole string
+
+const (
+	FunctionInvokeParamsMessagesFunctionRoleFunction FunctionInvokeParamsMessagesFunctionRole = "function"
+)
+
+func (r FunctionInvokeParamsMessagesFunctionRole) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesFunctionRoleFunction:
+		return true
+	}
+	return false
+}
+
+type FunctionInvokeParamsMessagesFallback struct {
+	Role    param.Field[FunctionInvokeParamsMessagesFallbackRole] `json:"role,required"`
+	Content param.Field[string]                                   `json:"content"`
+}
+
+func (r FunctionInvokeParamsMessagesFallback) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessagesFallback) implementsFunctionInvokeParamsMessageUnion() {}
+
+type FunctionInvokeParamsMessagesFallbackRole string
+
+const (
+	FunctionInvokeParamsMessagesFallbackRoleModel FunctionInvokeParamsMessagesFallbackRole = "model"
+)
+
+func (r FunctionInvokeParamsMessagesFallbackRole) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesFallbackRoleModel:
+		return true
+	}
+	return false
+}
+
+type FunctionInvokeParamsMessagesRole string
+
+const (
+	FunctionInvokeParamsMessagesRoleSystem    FunctionInvokeParamsMessagesRole = "system"
+	FunctionInvokeParamsMessagesRoleUser      FunctionInvokeParamsMessagesRole = "user"
+	FunctionInvokeParamsMessagesRoleAssistant FunctionInvokeParamsMessagesRole = "assistant"
+	FunctionInvokeParamsMessagesRoleTool      FunctionInvokeParamsMessagesRole = "tool"
+	FunctionInvokeParamsMessagesRoleFunction  FunctionInvokeParamsMessagesRole = "function"
+	FunctionInvokeParamsMessagesRoleModel     FunctionInvokeParamsMessagesRole = "model"
+)
+
+func (r FunctionInvokeParamsMessagesRole) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesRoleSystem, FunctionInvokeParamsMessagesRoleUser, FunctionInvokeParamsMessagesRoleAssistant, FunctionInvokeParamsMessagesRoleTool, FunctionInvokeParamsMessagesRoleFunction, FunctionInvokeParamsMessagesRoleModel:
+		return true
+	}
+	return false
 }
 
 // The mode format of the returned value (defaults to 'auto')
@@ -596,12 +1098,13 @@ func (r FunctionReplaceParamsFunctionData) MarshalJSON() (data []byte, err error
 	return apijson.MarshalRoot(r)
 }
 
-func (r FunctionReplaceParamsFunctionData) ImplementsFunctionReplaceParamsFunctionDataUnion() {}
+func (r FunctionReplaceParamsFunctionData) implementsFunctionReplaceParamsFunctionDataUnion() {}
 
-// Satisfied by [FunctionReplaceParamsFunctionDataPrompt], [shared.CodeParam],
+// Satisfied by [FunctionReplaceParamsFunctionDataPrompt],
+// [FunctionReplaceParamsFunctionDataCode],
 // [FunctionReplaceParamsFunctionDataGlobal], [FunctionReplaceParamsFunctionData].
 type FunctionReplaceParamsFunctionDataUnion interface {
-	ImplementsFunctionReplaceParamsFunctionDataUnion()
+	implementsFunctionReplaceParamsFunctionDataUnion()
 }
 
 type FunctionReplaceParamsFunctionDataPrompt struct {
@@ -612,7 +1115,7 @@ func (r FunctionReplaceParamsFunctionDataPrompt) MarshalJSON() (data []byte, err
 	return apijson.MarshalRoot(r)
 }
 
-func (r FunctionReplaceParamsFunctionDataPrompt) ImplementsFunctionReplaceParamsFunctionDataUnion() {}
+func (r FunctionReplaceParamsFunctionDataPrompt) implementsFunctionReplaceParamsFunctionDataUnion() {}
 
 type FunctionReplaceParamsFunctionDataPromptType string
 
@@ -628,6 +1131,129 @@ func (r FunctionReplaceParamsFunctionDataPromptType) IsKnown() bool {
 	return false
 }
 
+type FunctionReplaceParamsFunctionDataCode struct {
+	Data param.Field[FunctionReplaceParamsFunctionDataCodeDataUnion] `json:"data,required"`
+	Type param.Field[FunctionReplaceParamsFunctionDataCodeType]      `json:"type,required"`
+}
+
+func (r FunctionReplaceParamsFunctionDataCode) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionReplaceParamsFunctionDataCode) implementsFunctionReplaceParamsFunctionDataUnion() {}
+
+// Satisfied by [FunctionReplaceParamsFunctionDataCodeDataBundle],
+// [FunctionReplaceParamsFunctionDataCodeDataInline].
+type FunctionReplaceParamsFunctionDataCodeDataUnion interface {
+	implementsFunctionReplaceParamsFunctionDataCodeDataUnion()
+}
+
+type FunctionReplaceParamsFunctionDataCodeDataBundle struct {
+	Type param.Field[FunctionReplaceParamsFunctionDataCodeDataBundleType] `json:"type,required"`
+	shared.CodeBundleParam
+}
+
+func (r FunctionReplaceParamsFunctionDataCodeDataBundle) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionReplaceParamsFunctionDataCodeDataBundle) implementsFunctionReplaceParamsFunctionDataCodeDataUnion() {
+}
+
+type FunctionReplaceParamsFunctionDataCodeDataBundleType string
+
+const (
+	FunctionReplaceParamsFunctionDataCodeDataBundleTypeBundle FunctionReplaceParamsFunctionDataCodeDataBundleType = "bundle"
+)
+
+func (r FunctionReplaceParamsFunctionDataCodeDataBundleType) IsKnown() bool {
+	switch r {
+	case FunctionReplaceParamsFunctionDataCodeDataBundleTypeBundle:
+		return true
+	}
+	return false
+}
+
+type FunctionReplaceParamsFunctionDataCodeDataInline struct {
+	Code           param.Field[string]                                                        `json:"code,required"`
+	RuntimeContext param.Field[FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext] `json:"runtime_context,required"`
+	Type           param.Field[FunctionReplaceParamsFunctionDataCodeDataInlineType]           `json:"type,required"`
+}
+
+func (r FunctionReplaceParamsFunctionDataCodeDataInline) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionReplaceParamsFunctionDataCodeDataInline) implementsFunctionReplaceParamsFunctionDataCodeDataUnion() {
+}
+
+type FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext struct {
+	Runtime param.Field[FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntime] `json:"runtime,required"`
+	Version param.Field[string]                                                               `json:"version,required"`
+}
+
+func (r FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntime string
+
+const (
+	FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntimeNode   FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntime = "node"
+	FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntimePython FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntime = "python"
+)
+
+func (r FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntime) IsKnown() bool {
+	switch r {
+	case FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntimeNode, FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntimePython:
+		return true
+	}
+	return false
+}
+
+type FunctionReplaceParamsFunctionDataCodeDataInlineType string
+
+const (
+	FunctionReplaceParamsFunctionDataCodeDataInlineTypeInline FunctionReplaceParamsFunctionDataCodeDataInlineType = "inline"
+)
+
+func (r FunctionReplaceParamsFunctionDataCodeDataInlineType) IsKnown() bool {
+	switch r {
+	case FunctionReplaceParamsFunctionDataCodeDataInlineTypeInline:
+		return true
+	}
+	return false
+}
+
+type FunctionReplaceParamsFunctionDataCodeDataType string
+
+const (
+	FunctionReplaceParamsFunctionDataCodeDataTypeBundle FunctionReplaceParamsFunctionDataCodeDataType = "bundle"
+	FunctionReplaceParamsFunctionDataCodeDataTypeInline FunctionReplaceParamsFunctionDataCodeDataType = "inline"
+)
+
+func (r FunctionReplaceParamsFunctionDataCodeDataType) IsKnown() bool {
+	switch r {
+	case FunctionReplaceParamsFunctionDataCodeDataTypeBundle, FunctionReplaceParamsFunctionDataCodeDataTypeInline:
+		return true
+	}
+	return false
+}
+
+type FunctionReplaceParamsFunctionDataCodeType string
+
+const (
+	FunctionReplaceParamsFunctionDataCodeTypeCode FunctionReplaceParamsFunctionDataCodeType = "code"
+)
+
+func (r FunctionReplaceParamsFunctionDataCodeType) IsKnown() bool {
+	switch r {
+	case FunctionReplaceParamsFunctionDataCodeTypeCode:
+		return true
+	}
+	return false
+}
+
 type FunctionReplaceParamsFunctionDataGlobal struct {
 	Name param.Field[string]                                      `json:"name,required"`
 	Type param.Field[FunctionReplaceParamsFunctionDataGlobalType] `json:"type,required"`
@@ -637,7 +1263,7 @@ func (r FunctionReplaceParamsFunctionDataGlobal) MarshalJSON() (data []byte, err
 	return apijson.MarshalRoot(r)
 }
 
-func (r FunctionReplaceParamsFunctionDataGlobal) ImplementsFunctionReplaceParamsFunctionDataUnion() {}
+func (r FunctionReplaceParamsFunctionDataGlobal) implementsFunctionReplaceParamsFunctionDataUnion() {}
 
 type FunctionReplaceParamsFunctionDataGlobalType string
 
