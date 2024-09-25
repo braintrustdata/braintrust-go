@@ -20,7 +20,6 @@ func (UnionString) ImplementsUserListParamsIDsUnion()                           
 func (UnionString) ImplementsProjectScoreListParamsIDsUnion()                          {}
 func (UnionString) ImplementsProjectTagListParamsIDsUnion()                            {}
 func (UnionString) ImplementsFunctionListParamsIDsUnion()                              {}
-func (UnionString) ImplementsFunctionInvokeParamsMessagesUserContentUnion()            {}
 func (UnionString) ImplementsFunctionInvokeParamsParentUnion()                         {}
 func (UnionString) ImplementsViewListParamsIDsUnion()                                  {}
 func (UnionString) ImplementsOrganizationListParamsIDsUnion()                          {}
