@@ -1203,9 +1203,8 @@ func (r FunctionInvokeParamsMessagesSystemRole) IsKnown() bool {
 }
 
 type FunctionInvokeParamsMessagesUser struct {
-	Role    param.Field[FunctionInvokeParamsMessagesUserRole]         `json:"role,required"`
-	Content param.Field[FunctionInvokeParamsMessagesUserContentUnion] `json:"content"`
-	Name    param.Field[string]                                       `json:"name"`
+	Role param.Field[FunctionInvokeParamsMessagesUserRole] `json:"role,required"`
+	Name param.Field[string]                               `json:"name"`
 }
 
 func (r FunctionInvokeParamsMessagesUser) MarshalJSON() (data []byte, err error) {
@@ -1223,129 +1222,6 @@ const (
 func (r FunctionInvokeParamsMessagesUserRole) IsKnown() bool {
 	switch r {
 	case FunctionInvokeParamsMessagesUserRoleUser:
-		return true
-	}
-	return false
-}
-
-// Satisfied by [shared.UnionString],
-// [FunctionInvokeParamsMessagesUserContentArray].
-type FunctionInvokeParamsMessagesUserContentUnion interface {
-	ImplementsFunctionInvokeParamsMessagesUserContentUnion()
-}
-
-type FunctionInvokeParamsMessagesUserContentArray []FunctionInvokeParamsMessagesUserContentArrayUnion
-
-func (r FunctionInvokeParamsMessagesUserContentArray) ImplementsFunctionInvokeParamsMessagesUserContentUnion() {
-}
-
-type FunctionInvokeParamsMessagesUserContentArray struct {
-	Text     param.Field[string]                                           `json:"text"`
-	Type     param.Field[FunctionInvokeParamsMessagesUserContentArrayType] `json:"type,required"`
-	ImageURL param.Field[interface{}]                                      `json:"image_url,required"`
-}
-
-func (r FunctionInvokeParamsMessagesUserContentArray) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r FunctionInvokeParamsMessagesUserContentArray) implementsFunctionInvokeParamsMessagesUserContentArrayUnion() {
-}
-
-// Satisfied by [FunctionInvokeParamsMessagesUserContentArrayText],
-// [FunctionInvokeParamsMessagesUserContentArrayImageURL],
-// [FunctionInvokeParamsMessagesUserContentArray].
-type FunctionInvokeParamsMessagesUserContentArrayUnion interface {
-	implementsFunctionInvokeParamsMessagesUserContentArrayUnion()
-}
-
-type FunctionInvokeParamsMessagesUserContentArrayText struct {
-	Type param.Field[FunctionInvokeParamsMessagesUserContentArrayTextType] `json:"type,required"`
-	Text param.Field[string]                                               `json:"text"`
-}
-
-func (r FunctionInvokeParamsMessagesUserContentArrayText) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r FunctionInvokeParamsMessagesUserContentArrayText) implementsFunctionInvokeParamsMessagesUserContentArrayUnion() {
-}
-
-type FunctionInvokeParamsMessagesUserContentArrayTextType string
-
-const (
-	FunctionInvokeParamsMessagesUserContentArrayTextTypeText FunctionInvokeParamsMessagesUserContentArrayTextType = "text"
-)
-
-func (r FunctionInvokeParamsMessagesUserContentArrayTextType) IsKnown() bool {
-	switch r {
-	case FunctionInvokeParamsMessagesUserContentArrayTextTypeText:
-		return true
-	}
-	return false
-}
-
-type FunctionInvokeParamsMessagesUserContentArrayImageURL struct {
-	ImageURL param.Field[FunctionInvokeParamsMessagesUserContentArrayImageURLImageURL] `json:"image_url,required"`
-	Type     param.Field[FunctionInvokeParamsMessagesUserContentArrayImageURLType]     `json:"type,required"`
-}
-
-func (r FunctionInvokeParamsMessagesUserContentArrayImageURL) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r FunctionInvokeParamsMessagesUserContentArrayImageURL) implementsFunctionInvokeParamsMessagesUserContentArrayUnion() {
-}
-
-type FunctionInvokeParamsMessagesUserContentArrayImageURLImageURL struct {
-	URL    param.Field[string]                                                             `json:"url,required"`
-	Detail param.Field[FunctionInvokeParamsMessagesUserContentArrayImageURLImageURLDetail] `json:"detail"`
-}
-
-func (r FunctionInvokeParamsMessagesUserContentArrayImageURLImageURL) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type FunctionInvokeParamsMessagesUserContentArrayImageURLImageURLDetail string
-
-const (
-	FunctionInvokeParamsMessagesUserContentArrayImageURLImageURLDetailAuto FunctionInvokeParamsMessagesUserContentArrayImageURLImageURLDetail = "auto"
-	FunctionInvokeParamsMessagesUserContentArrayImageURLImageURLDetailLow  FunctionInvokeParamsMessagesUserContentArrayImageURLImageURLDetail = "low"
-	FunctionInvokeParamsMessagesUserContentArrayImageURLImageURLDetailHigh FunctionInvokeParamsMessagesUserContentArrayImageURLImageURLDetail = "high"
-)
-
-func (r FunctionInvokeParamsMessagesUserContentArrayImageURLImageURLDetail) IsKnown() bool {
-	switch r {
-	case FunctionInvokeParamsMessagesUserContentArrayImageURLImageURLDetailAuto, FunctionInvokeParamsMessagesUserContentArrayImageURLImageURLDetailLow, FunctionInvokeParamsMessagesUserContentArrayImageURLImageURLDetailHigh:
-		return true
-	}
-	return false
-}
-
-type FunctionInvokeParamsMessagesUserContentArrayImageURLType string
-
-const (
-	FunctionInvokeParamsMessagesUserContentArrayImageURLTypeImageURL FunctionInvokeParamsMessagesUserContentArrayImageURLType = "image_url"
-)
-
-func (r FunctionInvokeParamsMessagesUserContentArrayImageURLType) IsKnown() bool {
-	switch r {
-	case FunctionInvokeParamsMessagesUserContentArrayImageURLTypeImageURL:
-		return true
-	}
-	return false
-}
-
-type FunctionInvokeParamsMessagesUserContentArrayType string
-
-const (
-	FunctionInvokeParamsMessagesUserContentArrayTypeText     FunctionInvokeParamsMessagesUserContentArrayType = "text"
-	FunctionInvokeParamsMessagesUserContentArrayTypeImageURL FunctionInvokeParamsMessagesUserContentArrayType = "image_url"
-)
-
-func (r FunctionInvokeParamsMessagesUserContentArrayType) IsKnown() bool {
-	switch r {
-	case FunctionInvokeParamsMessagesUserContentArrayTypeText, FunctionInvokeParamsMessagesUserContentArrayTypeImageURL:
 		return true
 	}
 	return false
