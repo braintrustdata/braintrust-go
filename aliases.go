@@ -137,6 +137,141 @@ const ACLRestrictObjectTypeOrgProject = shared.ACLRestrictObjectTypeOrgProject
 type APIKey = shared.APIKey
 
 // This is an alias to an internal type.
+type Code = shared.Code
+
+// This is an alias to an internal type.
+type CodeData = shared.CodeData
+
+// This is an alias to an internal type.
+type CodeDataBundle = shared.CodeDataBundle
+
+// This is an alias to an internal type.
+type CodeDataBundleLocation = shared.CodeDataBundleLocation
+
+// This is an alias to an internal type.
+type CodeDataBundleLocationExperiment = shared.CodeDataBundleLocationExperiment
+
+// This is an alias to an internal type.
+type CodeDataBundleLocationExperimentPosition = shared.CodeDataBundleLocationExperimentPosition
+
+// This is an alias to an internal type.
+type CodeDataBundleLocationExperimentPositionType = shared.CodeDataBundleLocationExperimentPositionType
+
+// This is an alias to an internal value.
+const CodeDataBundleLocationExperimentPositionTypeTask = shared.CodeDataBundleLocationExperimentPositionTypeTask
+
+// This is an alias to an internal value.
+const CodeDataBundleLocationExperimentPositionTypeScorer = shared.CodeDataBundleLocationExperimentPositionTypeScorer
+
+// This is an alias to an internal type.
+type CodeDataBundleLocationExperimentType = shared.CodeDataBundleLocationExperimentType
+
+// This is an alias to an internal value.
+const CodeDataBundleLocationExperimentTypeExperiment = shared.CodeDataBundleLocationExperimentTypeExperiment
+
+// This is an alias to an internal type.
+type CodeDataBundleLocationFunction = shared.CodeDataBundleLocationFunction
+
+// This is an alias to an internal type.
+type CodeDataBundleLocationFunctionType = shared.CodeDataBundleLocationFunctionType
+
+// This is an alias to an internal value.
+const CodeDataBundleLocationFunctionTypeFunction = shared.CodeDataBundleLocationFunctionTypeFunction
+
+// This is an alias to an internal type.
+type CodeDataBundleLocationType = shared.CodeDataBundleLocationType
+
+// This is an alias to an internal value.
+const CodeDataBundleLocationTypeExperiment = shared.CodeDataBundleLocationTypeExperiment
+
+// This is an alias to an internal value.
+const CodeDataBundleLocationTypeFunction = shared.CodeDataBundleLocationTypeFunction
+
+// This is an alias to an internal type.
+type CodeDataBundleRuntimeContext = shared.CodeDataBundleRuntimeContext
+
+// This is an alias to an internal type.
+type CodeDataBundleRuntimeContextRuntime = shared.CodeDataBundleRuntimeContextRuntime
+
+// This is an alias to an internal value.
+const CodeDataBundleRuntimeContextRuntimeNode = shared.CodeDataBundleRuntimeContextRuntimeNode
+
+// This is an alias to an internal value.
+const CodeDataBundleRuntimeContextRuntimePython = shared.CodeDataBundleRuntimeContextRuntimePython
+
+// This is an alias to an internal type.
+type CodeDataBundleType = shared.CodeDataBundleType
+
+// This is an alias to an internal value.
+const CodeDataBundleTypeBundle = shared.CodeDataBundleTypeBundle
+
+// This is an alias to an internal type.
+type CodeDataInline = shared.CodeDataInline
+
+// This is an alias to an internal type.
+type CodeDataInlineRuntimeContext = shared.CodeDataInlineRuntimeContext
+
+// This is an alias to an internal type.
+type CodeDataInlineRuntimeContextRuntime = shared.CodeDataInlineRuntimeContextRuntime
+
+// This is an alias to an internal value.
+const CodeDataInlineRuntimeContextRuntimeNode = shared.CodeDataInlineRuntimeContextRuntimeNode
+
+// This is an alias to an internal value.
+const CodeDataInlineRuntimeContextRuntimePython = shared.CodeDataInlineRuntimeContextRuntimePython
+
+// This is an alias to an internal type.
+type CodeDataInlineType = shared.CodeDataInlineType
+
+// This is an alias to an internal value.
+const CodeDataInlineTypeInline = shared.CodeDataInlineTypeInline
+
+// This is an alias to an internal type.
+type CodeDataType = shared.CodeDataType
+
+// This is an alias to an internal value.
+const CodeDataTypeBundle = shared.CodeDataTypeBundle
+
+// This is an alias to an internal value.
+const CodeDataTypeInline = shared.CodeDataTypeInline
+
+// This is an alias to an internal type.
+type CodeType = shared.CodeType
+
+// This is an alias to an internal value.
+const CodeTypeCode = shared.CodeTypeCode
+
+// This is an alias to an internal type.
+type CodeParam = shared.CodeParam
+
+// This is an alias to an internal type.
+type CodeDataUnionParam = shared.CodeDataUnionParam
+
+// This is an alias to an internal type.
+type CodeDataBundleParam = shared.CodeDataBundleParam
+
+// This is an alias to an internal type.
+type CodeDataBundleLocationUnionParam = shared.CodeDataBundleLocationUnionParam
+
+// This is an alias to an internal type.
+type CodeDataBundleLocationExperimentParam = shared.CodeDataBundleLocationExperimentParam
+
+// This is an alias to an internal type.
+type CodeDataBundleLocationExperimentPositionUnionParam = shared.CodeDataBundleLocationExperimentPositionUnionParam
+
+// This is an alias to an internal type.
+type CodeDataBundleLocationFunctionParam = shared.CodeDataBundleLocationFunctionParam
+
+// This is an alias to an internal type.
+type CodeDataBundleRuntimeContextParam = shared.CodeDataBundleRuntimeContextParam
+
+// This is an alias to an internal type.
+type CodeDataInlineParam = shared.CodeDataInlineParam
+
+// This is an alias to an internal type.
+type CodeDataInlineRuntimeContextParam = shared.CodeDataInlineRuntimeContextParam
+
+// This is an alias to an internal type.
 type CreateAPIKeyOutput = shared.CreateAPIKeyOutput
 
 // Summary of a dataset's data
@@ -282,99 +417,6 @@ type FunctionFunctionDataPromptType = shared.FunctionFunctionDataPromptType
 
 // This is an alias to an internal value.
 const FunctionFunctionDataPromptTypePrompt = shared.FunctionFunctionDataPromptTypePrompt
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCode = shared.FunctionFunctionDataCode
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeData = shared.FunctionFunctionDataCodeData
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataBundle = shared.FunctionFunctionDataCodeDataBundle
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataBundleLocation = shared.FunctionFunctionDataCodeDataBundleLocation
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataBundleLocationExperiment = shared.FunctionFunctionDataCodeDataBundleLocationExperiment
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataBundleLocationExperimentType = shared.FunctionFunctionDataCodeDataBundleLocationExperimentType
-
-// This is an alias to an internal value.
-const FunctionFunctionDataCodeDataBundleLocationExperimentTypeExperiment = shared.FunctionFunctionDataCodeDataBundleLocationExperimentTypeExperiment
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataBundleLocationFunction = shared.FunctionFunctionDataCodeDataBundleLocationFunction
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataBundleLocationFunctionType = shared.FunctionFunctionDataCodeDataBundleLocationFunctionType
-
-// This is an alias to an internal value.
-const FunctionFunctionDataCodeDataBundleLocationFunctionTypeFunction = shared.FunctionFunctionDataCodeDataBundleLocationFunctionTypeFunction
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataBundleLocationType = shared.FunctionFunctionDataCodeDataBundleLocationType
-
-// This is an alias to an internal value.
-const FunctionFunctionDataCodeDataBundleLocationTypeExperiment = shared.FunctionFunctionDataCodeDataBundleLocationTypeExperiment
-
-// This is an alias to an internal value.
-const FunctionFunctionDataCodeDataBundleLocationTypeFunction = shared.FunctionFunctionDataCodeDataBundleLocationTypeFunction
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataBundleRuntimeContext = shared.FunctionFunctionDataCodeDataBundleRuntimeContext
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataBundleRuntimeContextRuntime = shared.FunctionFunctionDataCodeDataBundleRuntimeContextRuntime
-
-// This is an alias to an internal value.
-const FunctionFunctionDataCodeDataBundleRuntimeContextRuntimeNode = shared.FunctionFunctionDataCodeDataBundleRuntimeContextRuntimeNode
-
-// This is an alias to an internal value.
-const FunctionFunctionDataCodeDataBundleRuntimeContextRuntimePython = shared.FunctionFunctionDataCodeDataBundleRuntimeContextRuntimePython
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataBundleType = shared.FunctionFunctionDataCodeDataBundleType
-
-// This is an alias to an internal value.
-const FunctionFunctionDataCodeDataBundleTypeBundle = shared.FunctionFunctionDataCodeDataBundleTypeBundle
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataInline = shared.FunctionFunctionDataCodeDataInline
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataInlineRuntimeContext = shared.FunctionFunctionDataCodeDataInlineRuntimeContext
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataInlineRuntimeContextRuntime = shared.FunctionFunctionDataCodeDataInlineRuntimeContextRuntime
-
-// This is an alias to an internal value.
-const FunctionFunctionDataCodeDataInlineRuntimeContextRuntimeNode = shared.FunctionFunctionDataCodeDataInlineRuntimeContextRuntimeNode
-
-// This is an alias to an internal value.
-const FunctionFunctionDataCodeDataInlineRuntimeContextRuntimePython = shared.FunctionFunctionDataCodeDataInlineRuntimeContextRuntimePython
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataInlineType = shared.FunctionFunctionDataCodeDataInlineType
-
-// This is an alias to an internal value.
-const FunctionFunctionDataCodeDataInlineTypeInline = shared.FunctionFunctionDataCodeDataInlineTypeInline
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeDataType = shared.FunctionFunctionDataCodeDataType
-
-// This is an alias to an internal value.
-const FunctionFunctionDataCodeDataTypeBundle = shared.FunctionFunctionDataCodeDataTypeBundle
-
-// This is an alias to an internal value.
-const FunctionFunctionDataCodeDataTypeInline = shared.FunctionFunctionDataCodeDataTypeInline
-
-// This is an alias to an internal type.
-type FunctionFunctionDataCodeType = shared.FunctionFunctionDataCodeType
-
-// This is an alias to an internal value.
-const FunctionFunctionDataCodeTypeCode = shared.FunctionFunctionDataCodeTypeCode
 
 // This is an alias to an internal type.
 type FunctionFunctionDataGlobal = shared.FunctionFunctionDataGlobal
@@ -667,6 +709,129 @@ const InsertProjectLogsEventReplaceSpanAttributesTypeTask = shared.InsertProject
 // This is an alias to an internal value.
 const InsertProjectLogsEventReplaceSpanAttributesTypeTool = shared.InsertProjectLogsEventReplaceSpanAttributesTypeTool
 
+// This is an alias to an internal type.
+type Messages = shared.Messages
+
+// This is an alias to an internal type.
+type MessagesSystem = shared.MessagesSystem
+
+// This is an alias to an internal type.
+type MessagesSystemRole = shared.MessagesSystemRole
+
+// This is an alias to an internal value.
+const MessagesSystemRoleSystem = shared.MessagesSystemRoleSystem
+
+// This is an alias to an internal type.
+type MessagesUser = shared.MessagesUser
+
+// This is an alias to an internal type.
+type MessagesUserRole = shared.MessagesUserRole
+
+// This is an alias to an internal value.
+const MessagesUserRoleUser = shared.MessagesUserRoleUser
+
+// This is an alias to an internal type.
+type MessagesAssistant = shared.MessagesAssistant
+
+// This is an alias to an internal type.
+type MessagesAssistantRole = shared.MessagesAssistantRole
+
+// This is an alias to an internal value.
+const MessagesAssistantRoleAssistant = shared.MessagesAssistantRoleAssistant
+
+// This is an alias to an internal type.
+type MessagesAssistantFunctionCall = shared.MessagesAssistantFunctionCall
+
+// This is an alias to an internal type.
+type MessagesAssistantToolCall = shared.MessagesAssistantToolCall
+
+// This is an alias to an internal type.
+type MessagesAssistantToolCallsFunction = shared.MessagesAssistantToolCallsFunction
+
+// This is an alias to an internal type.
+type MessagesAssistantToolCallsType = shared.MessagesAssistantToolCallsType
+
+// This is an alias to an internal value.
+const MessagesAssistantToolCallsTypeFunction = shared.MessagesAssistantToolCallsTypeFunction
+
+// This is an alias to an internal type.
+type MessagesTool = shared.MessagesTool
+
+// This is an alias to an internal type.
+type MessagesToolRole = shared.MessagesToolRole
+
+// This is an alias to an internal value.
+const MessagesToolRoleTool = shared.MessagesToolRoleTool
+
+// This is an alias to an internal type.
+type MessagesFunction = shared.MessagesFunction
+
+// This is an alias to an internal type.
+type MessagesFunctionRole = shared.MessagesFunctionRole
+
+// This is an alias to an internal value.
+const MessagesFunctionRoleFunction = shared.MessagesFunctionRoleFunction
+
+// This is an alias to an internal type.
+type MessagesFallback = shared.MessagesFallback
+
+// This is an alias to an internal type.
+type MessagesFallbackRole = shared.MessagesFallbackRole
+
+// This is an alias to an internal value.
+const MessagesFallbackRoleModel = shared.MessagesFallbackRoleModel
+
+// This is an alias to an internal type.
+type MessagesRole = shared.MessagesRole
+
+// This is an alias to an internal value.
+const MessagesRoleSystem = shared.MessagesRoleSystem
+
+// This is an alias to an internal value.
+const MessagesRoleUser = shared.MessagesRoleUser
+
+// This is an alias to an internal value.
+const MessagesRoleAssistant = shared.MessagesRoleAssistant
+
+// This is an alias to an internal value.
+const MessagesRoleTool = shared.MessagesRoleTool
+
+// This is an alias to an internal value.
+const MessagesRoleFunction = shared.MessagesRoleFunction
+
+// This is an alias to an internal value.
+const MessagesRoleModel = shared.MessagesRoleModel
+
+// This is an alias to an internal type.
+type MessagesUnionParam = shared.MessagesUnionParam
+
+// This is an alias to an internal type.
+type MessagesSystemParam = shared.MessagesSystemParam
+
+// This is an alias to an internal type.
+type MessagesUserParam = shared.MessagesUserParam
+
+// This is an alias to an internal type.
+type MessagesAssistantParam = shared.MessagesAssistantParam
+
+// This is an alias to an internal type.
+type MessagesAssistantFunctionCallParam = shared.MessagesAssistantFunctionCallParam
+
+// This is an alias to an internal type.
+type MessagesAssistantToolCallParam = shared.MessagesAssistantToolCallParam
+
+// This is an alias to an internal type.
+type MessagesAssistantToolCallsFunctionParam = shared.MessagesAssistantToolCallsFunctionParam
+
+// This is an alias to an internal type.
+type MessagesToolParam = shared.MessagesToolParam
+
+// This is an alias to an internal type.
+type MessagesFunctionParam = shared.MessagesFunctionParam
+
+// This is an alias to an internal type.
+type MessagesFallbackParam = shared.MessagesFallbackParam
+
 // Summary of a metric's performance
 //
 // This is an alias to an internal type.
@@ -690,27 +855,6 @@ type PathLookupFilterType = shared.PathLookupFilterType
 
 // This is an alias to an internal value.
 const PathLookupFilterTypePathLookup = shared.PathLookupFilterTypePathLookup
-
-// This is an alias to an internal type.
-type Position = shared.Position
-
-// This is an alias to an internal type.
-type PositionType = shared.PositionType
-
-// This is an alias to an internal type.
-type PositionTypeType = shared.PositionTypeType
-
-// This is an alias to an internal value.
-const PositionTypeTypeTask = shared.PositionTypeTypeTask
-
-// This is an alias to an internal type.
-type PositionScorer = shared.PositionScorer
-
-// This is an alias to an internal type.
-type PositionScorerType = shared.PositionScorerType
-
-// This is an alias to an internal value.
-const PositionScorerTypeScorer = shared.PositionScorerTypeScorer
 
 // This is an alias to an internal type.
 type Project = shared.Project
@@ -960,9 +1104,6 @@ const PromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone = shared.Prompt
 type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction
 
 // This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction
-
-// This is an alias to an internal type.
 type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType
 
 // This is an alias to an internal value.
@@ -1006,150 +1147,6 @@ const PromptDataPromptCompletionTypeCompletion = shared.PromptDataPromptCompleti
 
 // This is an alias to an internal type.
 type PromptDataPromptChat = shared.PromptDataPromptChat
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessage = shared.PromptDataPromptChatMessage
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesSystem = shared.PromptDataPromptChatMessagesSystem
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesSystemRole = shared.PromptDataPromptChatMessagesSystemRole
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesSystemRoleSystem = shared.PromptDataPromptChatMessagesSystemRoleSystem
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUser = shared.PromptDataPromptChatMessagesUser
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserRole = shared.PromptDataPromptChatMessagesUserRole
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesUserRoleUser = shared.PromptDataPromptChatMessagesUserRoleUser
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentUnion = shared.PromptDataPromptChatMessagesUserContentUnion
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArray = shared.PromptDataPromptChatMessagesUserContentArray
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayItem = shared.PromptDataPromptChatMessagesUserContentArrayItem
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayText = shared.PromptDataPromptChatMessagesUserContentArrayText
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayTextType = shared.PromptDataPromptChatMessagesUserContentArrayTextType
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesUserContentArrayTextTypeText = shared.PromptDataPromptChatMessagesUserContentArrayTextTypeText
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayImageURL = shared.PromptDataPromptChatMessagesUserContentArrayImageURL
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayImageURLImageURL = shared.PromptDataPromptChatMessagesUserContentArrayImageURLImageURL
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = shared.PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailAuto = shared.PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailAuto
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailLow = shared.PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailLow
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailHigh = shared.PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailHigh
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayImageURLType = shared.PromptDataPromptChatMessagesUserContentArrayImageURLType
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesUserContentArrayImageURLTypeImageURL = shared.PromptDataPromptChatMessagesUserContentArrayImageURLTypeImageURL
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayType = shared.PromptDataPromptChatMessagesUserContentArrayType
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesUserContentArrayTypeText = shared.PromptDataPromptChatMessagesUserContentArrayTypeText
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesUserContentArrayTypeImageURL = shared.PromptDataPromptChatMessagesUserContentArrayTypeImageURL
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesAssistant = shared.PromptDataPromptChatMessagesAssistant
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesAssistantRole = shared.PromptDataPromptChatMessagesAssistantRole
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesAssistantRoleAssistant = shared.PromptDataPromptChatMessagesAssistantRoleAssistant
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesAssistantFunctionCall = shared.PromptDataPromptChatMessagesAssistantFunctionCall
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesAssistantToolCall = shared.PromptDataPromptChatMessagesAssistantToolCall
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesAssistantToolCallsFunction = shared.PromptDataPromptChatMessagesAssistantToolCallsFunction
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesAssistantToolCallsType = shared.PromptDataPromptChatMessagesAssistantToolCallsType
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesAssistantToolCallsTypeFunction = shared.PromptDataPromptChatMessagesAssistantToolCallsTypeFunction
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesTool = shared.PromptDataPromptChatMessagesTool
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesToolRole = shared.PromptDataPromptChatMessagesToolRole
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesToolRoleTool = shared.PromptDataPromptChatMessagesToolRoleTool
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesFunction = shared.PromptDataPromptChatMessagesFunction
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesFunctionRole = shared.PromptDataPromptChatMessagesFunctionRole
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesFunctionRoleFunction = shared.PromptDataPromptChatMessagesFunctionRoleFunction
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesFallback = shared.PromptDataPromptChatMessagesFallback
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesFallbackRole = shared.PromptDataPromptChatMessagesFallbackRole
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesFallbackRoleModel = shared.PromptDataPromptChatMessagesFallbackRoleModel
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesRole = shared.PromptDataPromptChatMessagesRole
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesRoleSystem = shared.PromptDataPromptChatMessagesRoleSystem
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesRoleUser = shared.PromptDataPromptChatMessagesRoleUser
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesRoleAssistant = shared.PromptDataPromptChatMessagesRoleAssistant
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesRoleTool = shared.PromptDataPromptChatMessagesRoleTool
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesRoleFunction = shared.PromptDataPromptChatMessagesRoleFunction
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesRoleModel = shared.PromptDataPromptChatMessagesRoleModel
 
 // This is an alias to an internal type.
 type PromptDataPromptChatType = shared.PromptDataPromptChatType
@@ -1229,9 +1226,6 @@ type PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam = shared.Promp
 type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam
 
 // This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam
-
-// This is an alias to an internal type.
 type PromptDataOptionsParamsAnthropicModelParamsParam = shared.PromptDataOptionsParamsAnthropicModelParamsParam
 
 // This is an alias to an internal type.
@@ -1259,54 +1253,6 @@ type PromptDataPromptCompletionParam = shared.PromptDataPromptCompletionParam
 type PromptDataPromptChatParam = shared.PromptDataPromptChatParam
 
 // This is an alias to an internal type.
-type PromptDataPromptChatMessagesUnionParam = shared.PromptDataPromptChatMessagesUnionParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesSystemParam = shared.PromptDataPromptChatMessagesSystemParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserParam = shared.PromptDataPromptChatMessagesUserParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentUnionParam = shared.PromptDataPromptChatMessagesUserContentUnionParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayParam = shared.PromptDataPromptChatMessagesUserContentArrayParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayUnionItemParam = shared.PromptDataPromptChatMessagesUserContentArrayUnionItemParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayTextParam = shared.PromptDataPromptChatMessagesUserContentArrayTextParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayImageURLParam = shared.PromptDataPromptChatMessagesUserContentArrayImageURLParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayImageURLImageURLParam = shared.PromptDataPromptChatMessagesUserContentArrayImageURLImageURLParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesAssistantParam = shared.PromptDataPromptChatMessagesAssistantParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesAssistantFunctionCallParam = shared.PromptDataPromptChatMessagesAssistantFunctionCallParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesAssistantToolCallParam = shared.PromptDataPromptChatMessagesAssistantToolCallParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesAssistantToolCallsFunctionParam = shared.PromptDataPromptChatMessagesAssistantToolCallsFunctionParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesToolParam = shared.PromptDataPromptChatMessagesToolParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesFunctionParam = shared.PromptDataPromptChatMessagesFunctionParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesFallbackParam = shared.PromptDataPromptChatMessagesFallbackParam
-
-// This is an alias to an internal type.
 type PromptDataPromptNullableVariantParam = shared.PromptDataPromptNullableVariantParam
 
 // This is an alias to an internal type.
@@ -1317,6 +1263,24 @@ type PromptDataToolFunctionsFunctionParam = shared.PromptDataToolFunctionsFuncti
 
 // This is an alias to an internal type.
 type PromptDataToolFunctionsGlobalParam = shared.PromptDataToolFunctionsGlobalParam
+
+// This is an alias to an internal type.
+type PromptImageURL = shared.PromptImageURL
+
+// This is an alias to an internal type.
+type PromptImageURLDetail = shared.PromptImageURLDetail
+
+// This is an alias to an internal value.
+const PromptImageURLDetailAuto = shared.PromptImageURLDetailAuto
+
+// This is an alias to an internal value.
+const PromptImageURLDetailLow = shared.PromptImageURLDetailLow
+
+// This is an alias to an internal value.
+const PromptImageURLDetailHigh = shared.PromptImageURLDetailHigh
+
+// This is an alias to an internal type.
+type PromptImageURLParam = shared.PromptImageURLParam
 
 // Metadata about the state of the repo when the experiment was created
 //
@@ -1414,6 +1378,15 @@ const RoleMemberPermissionsRestrictObjectTypeOrgProject = shared.RoleMemberPermi
 // This is an alias to an internal type.
 type ScoreSummary = shared.ScoreSummary
 
+// This is an alias to an internal type.
+type Scorer = shared.Scorer
+
+// This is an alias to an internal type.
+type ScorerType = shared.ScorerType
+
+// This is an alias to an internal value.
+const ScorerTypeScorer = shared.ScorerTypeScorer
+
 // Summary of a dataset
 //
 // This is an alias to an internal type.
@@ -1423,6 +1396,21 @@ type SummarizeDatasetResponse = shared.SummarizeDatasetResponse
 //
 // This is an alias to an internal type.
 type SummarizeExperimentResponse = shared.SummarizeExperimentResponse
+
+// This is an alias to an internal type.
+type Task = shared.Task
+
+// This is an alias to an internal type.
+type TaskType = shared.TaskType
+
+// This is an alias to an internal value.
+const TaskTypeTask = shared.TaskTypeTask
+
+// This is an alias to an internal type.
+type ToolChoiceFunction = shared.ToolChoiceFunction
+
+// This is an alias to an internal type.
+type ToolChoiceFunctionParam = shared.ToolChoiceFunctionParam
 
 // This is an alias to an internal type.
 type User = shared.User

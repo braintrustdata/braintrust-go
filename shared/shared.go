@@ -219,6 +219,664 @@ func (r apiKeyJSON) RawJSON() string {
 	return r.raw
 }
 
+type Code struct {
+	Data CodeData `json:"data,required"`
+	Type CodeType `json:"type,required"`
+	JSON codeJSON `json:"-"`
+}
+
+// codeJSON contains the JSON metadata for the struct [Code]
+type codeJSON struct {
+	Data        apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *Code) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r codeJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r Code) ImplementsSharedFunctionFunctionData() {}
+
+type CodeData struct {
+	Type CodeDataType `json:"type,required"`
+	// This field can have the runtime type of [CodeDataBundleRuntimeContext],
+	// [CodeDataInlineRuntimeContext].
+	RuntimeContext interface{} `json:"runtime_context"`
+	// This field can have the runtime type of [CodeDataBundleLocation].
+	Location interface{} `json:"location,required"`
+	BundleID string      `json:"bundle_id"`
+	// A preview of the code
+	Preview string       `json:"preview,nullable"`
+	Code    string       `json:"code"`
+	JSON    codeDataJSON `json:"-"`
+	union   CodeDataUnion
+}
+
+// codeDataJSON contains the JSON metadata for the struct [CodeData]
+type codeDataJSON struct {
+	Type           apijson.Field
+	RuntimeContext apijson.Field
+	Location       apijson.Field
+	BundleID       apijson.Field
+	Preview        apijson.Field
+	Code           apijson.Field
+	raw            string
+	ExtraFields    map[string]apijson.Field
+}
+
+func (r codeDataJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r *CodeData) UnmarshalJSON(data []byte) (err error) {
+	*r = CodeData{}
+	err = apijson.UnmarshalRoot(data, &r.union)
+	if err != nil {
+		return err
+	}
+	return apijson.Port(r.union, &r)
+}
+
+// AsUnion returns a [CodeDataUnion] interface which you can cast to the specific
+// types for more type safety.
+//
+// Possible runtime types of the union are [shared.CodeDataBundle],
+// [shared.CodeDataInline].
+func (r CodeData) AsUnion() CodeDataUnion {
+	return r.union
+}
+
+// Union satisfied by [shared.CodeDataBundle] or [shared.CodeDataInline].
+type CodeDataUnion interface {
+	implementsSharedCodeData()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*CodeDataUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(CodeDataBundle{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(CodeDataInline{}),
+		},
+	)
+}
+
+type CodeDataBundle struct {
+	BundleID       string                       `json:"bundle_id,required"`
+	Location       CodeDataBundleLocation       `json:"location,required"`
+	RuntimeContext CodeDataBundleRuntimeContext `json:"runtime_context,required"`
+	Type           CodeDataBundleType           `json:"type,required"`
+	// A preview of the code
+	Preview string             `json:"preview,nullable"`
+	JSON    codeDataBundleJSON `json:"-"`
+}
+
+// codeDataBundleJSON contains the JSON metadata for the struct [CodeDataBundle]
+type codeDataBundleJSON struct {
+	BundleID       apijson.Field
+	Location       apijson.Field
+	RuntimeContext apijson.Field
+	Type           apijson.Field
+	Preview        apijson.Field
+	raw            string
+	ExtraFields    map[string]apijson.Field
+}
+
+func (r *CodeDataBundle) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r codeDataBundleJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r CodeDataBundle) implementsSharedCodeData() {}
+
+type CodeDataBundleLocation struct {
+	Type     CodeDataBundleLocationType `json:"type,required"`
+	EvalName string                     `json:"eval_name"`
+	// This field can have the runtime type of
+	// [CodeDataBundleLocationExperimentPosition].
+	Position interface{}                `json:"position,required"`
+	Index    int64                      `json:"index"`
+	JSON     codeDataBundleLocationJSON `json:"-"`
+	union    CodeDataBundleLocationUnion
+}
+
+// codeDataBundleLocationJSON contains the JSON metadata for the struct
+// [CodeDataBundleLocation]
+type codeDataBundleLocationJSON struct {
+	Type        apijson.Field
+	EvalName    apijson.Field
+	Position    apijson.Field
+	Index       apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r codeDataBundleLocationJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r *CodeDataBundleLocation) UnmarshalJSON(data []byte) (err error) {
+	*r = CodeDataBundleLocation{}
+	err = apijson.UnmarshalRoot(data, &r.union)
+	if err != nil {
+		return err
+	}
+	return apijson.Port(r.union, &r)
+}
+
+// AsUnion returns a [CodeDataBundleLocationUnion] interface which you can cast to
+// the specific types for more type safety.
+//
+// Possible runtime types of the union are
+// [shared.CodeDataBundleLocationExperiment],
+// [shared.CodeDataBundleLocationFunction].
+func (r CodeDataBundleLocation) AsUnion() CodeDataBundleLocationUnion {
+	return r.union
+}
+
+// Union satisfied by [shared.CodeDataBundleLocationExperiment] or
+// [shared.CodeDataBundleLocationFunction].
+type CodeDataBundleLocationUnion interface {
+	implementsSharedCodeDataBundleLocation()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*CodeDataBundleLocationUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(CodeDataBundleLocationExperiment{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(CodeDataBundleLocationFunction{}),
+		},
+	)
+}
+
+type CodeDataBundleLocationExperiment struct {
+	EvalName string                                   `json:"eval_name,required"`
+	Position CodeDataBundleLocationExperimentPosition `json:"position,required"`
+	Type     CodeDataBundleLocationExperimentType     `json:"type,required"`
+	JSON     codeDataBundleLocationExperimentJSON     `json:"-"`
+}
+
+// codeDataBundleLocationExperimentJSON contains the JSON metadata for the struct
+// [CodeDataBundleLocationExperiment]
+type codeDataBundleLocationExperimentJSON struct {
+	EvalName    apijson.Field
+	Position    apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *CodeDataBundleLocationExperiment) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r codeDataBundleLocationExperimentJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r CodeDataBundleLocationExperiment) implementsSharedCodeDataBundleLocation() {}
+
+type CodeDataBundleLocationExperimentPosition struct {
+	Type  CodeDataBundleLocationExperimentPositionType `json:"type,required"`
+	Index int64                                        `json:"index"`
+	JSON  codeDataBundleLocationExperimentPositionJSON `json:"-"`
+	union CodeDataBundleLocationExperimentPositionUnion
+}
+
+// codeDataBundleLocationExperimentPositionJSON contains the JSON metadata for the
+// struct [CodeDataBundleLocationExperimentPosition]
+type codeDataBundleLocationExperimentPositionJSON struct {
+	Type        apijson.Field
+	Index       apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r codeDataBundleLocationExperimentPositionJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r *CodeDataBundleLocationExperimentPosition) UnmarshalJSON(data []byte) (err error) {
+	*r = CodeDataBundleLocationExperimentPosition{}
+	err = apijson.UnmarshalRoot(data, &r.union)
+	if err != nil {
+		return err
+	}
+	return apijson.Port(r.union, &r)
+}
+
+// AsUnion returns a [CodeDataBundleLocationExperimentPositionUnion] interface
+// which you can cast to the specific types for more type safety.
+//
+// Possible runtime types of the union are [shared.Task], [shared.Scorer].
+func (r CodeDataBundleLocationExperimentPosition) AsUnion() CodeDataBundleLocationExperimentPositionUnion {
+	return r.union
+}
+
+// Union satisfied by [shared.Task] or [shared.Scorer].
+type CodeDataBundleLocationExperimentPositionUnion interface {
+	ImplementsSharedCodeDataBundleLocationExperimentPosition()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*CodeDataBundleLocationExperimentPositionUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(Task{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(Scorer{}),
+		},
+	)
+}
+
+type CodeDataBundleLocationExperimentPositionType string
+
+const (
+	CodeDataBundleLocationExperimentPositionTypeTask   CodeDataBundleLocationExperimentPositionType = "task"
+	CodeDataBundleLocationExperimentPositionTypeScorer CodeDataBundleLocationExperimentPositionType = "scorer"
+)
+
+func (r CodeDataBundleLocationExperimentPositionType) IsKnown() bool {
+	switch r {
+	case CodeDataBundleLocationExperimentPositionTypeTask, CodeDataBundleLocationExperimentPositionTypeScorer:
+		return true
+	}
+	return false
+}
+
+type CodeDataBundleLocationExperimentType string
+
+const (
+	CodeDataBundleLocationExperimentTypeExperiment CodeDataBundleLocationExperimentType = "experiment"
+)
+
+func (r CodeDataBundleLocationExperimentType) IsKnown() bool {
+	switch r {
+	case CodeDataBundleLocationExperimentTypeExperiment:
+		return true
+	}
+	return false
+}
+
+type CodeDataBundleLocationFunction struct {
+	Index int64                              `json:"index,required"`
+	Type  CodeDataBundleLocationFunctionType `json:"type,required"`
+	JSON  codeDataBundleLocationFunctionJSON `json:"-"`
+}
+
+// codeDataBundleLocationFunctionJSON contains the JSON metadata for the struct
+// [CodeDataBundleLocationFunction]
+type codeDataBundleLocationFunctionJSON struct {
+	Index       apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *CodeDataBundleLocationFunction) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r codeDataBundleLocationFunctionJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r CodeDataBundleLocationFunction) implementsSharedCodeDataBundleLocation() {}
+
+type CodeDataBundleLocationFunctionType string
+
+const (
+	CodeDataBundleLocationFunctionTypeFunction CodeDataBundleLocationFunctionType = "function"
+)
+
+func (r CodeDataBundleLocationFunctionType) IsKnown() bool {
+	switch r {
+	case CodeDataBundleLocationFunctionTypeFunction:
+		return true
+	}
+	return false
+}
+
+type CodeDataBundleLocationType string
+
+const (
+	CodeDataBundleLocationTypeExperiment CodeDataBundleLocationType = "experiment"
+	CodeDataBundleLocationTypeFunction   CodeDataBundleLocationType = "function"
+)
+
+func (r CodeDataBundleLocationType) IsKnown() bool {
+	switch r {
+	case CodeDataBundleLocationTypeExperiment, CodeDataBundleLocationTypeFunction:
+		return true
+	}
+	return false
+}
+
+type CodeDataBundleRuntimeContext struct {
+	Runtime CodeDataBundleRuntimeContextRuntime `json:"runtime,required"`
+	Version string                              `json:"version,required"`
+	JSON    codeDataBundleRuntimeContextJSON    `json:"-"`
+}
+
+// codeDataBundleRuntimeContextJSON contains the JSON metadata for the struct
+// [CodeDataBundleRuntimeContext]
+type codeDataBundleRuntimeContextJSON struct {
+	Runtime     apijson.Field
+	Version     apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *CodeDataBundleRuntimeContext) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r codeDataBundleRuntimeContextJSON) RawJSON() string {
+	return r.raw
+}
+
+type CodeDataBundleRuntimeContextRuntime string
+
+const (
+	CodeDataBundleRuntimeContextRuntimeNode   CodeDataBundleRuntimeContextRuntime = "node"
+	CodeDataBundleRuntimeContextRuntimePython CodeDataBundleRuntimeContextRuntime = "python"
+)
+
+func (r CodeDataBundleRuntimeContextRuntime) IsKnown() bool {
+	switch r {
+	case CodeDataBundleRuntimeContextRuntimeNode, CodeDataBundleRuntimeContextRuntimePython:
+		return true
+	}
+	return false
+}
+
+type CodeDataBundleType string
+
+const (
+	CodeDataBundleTypeBundle CodeDataBundleType = "bundle"
+)
+
+func (r CodeDataBundleType) IsKnown() bool {
+	switch r {
+	case CodeDataBundleTypeBundle:
+		return true
+	}
+	return false
+}
+
+type CodeDataInline struct {
+	Code           string                       `json:"code,required"`
+	RuntimeContext CodeDataInlineRuntimeContext `json:"runtime_context,required"`
+	Type           CodeDataInlineType           `json:"type,required"`
+	JSON           codeDataInlineJSON           `json:"-"`
+}
+
+// codeDataInlineJSON contains the JSON metadata for the struct [CodeDataInline]
+type codeDataInlineJSON struct {
+	Code           apijson.Field
+	RuntimeContext apijson.Field
+	Type           apijson.Field
+	raw            string
+	ExtraFields    map[string]apijson.Field
+}
+
+func (r *CodeDataInline) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r codeDataInlineJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r CodeDataInline) implementsSharedCodeData() {}
+
+type CodeDataInlineRuntimeContext struct {
+	Runtime CodeDataInlineRuntimeContextRuntime `json:"runtime,required"`
+	Version string                              `json:"version,required"`
+	JSON    codeDataInlineRuntimeContextJSON    `json:"-"`
+}
+
+// codeDataInlineRuntimeContextJSON contains the JSON metadata for the struct
+// [CodeDataInlineRuntimeContext]
+type codeDataInlineRuntimeContextJSON struct {
+	Runtime     apijson.Field
+	Version     apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *CodeDataInlineRuntimeContext) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r codeDataInlineRuntimeContextJSON) RawJSON() string {
+	return r.raw
+}
+
+type CodeDataInlineRuntimeContextRuntime string
+
+const (
+	CodeDataInlineRuntimeContextRuntimeNode   CodeDataInlineRuntimeContextRuntime = "node"
+	CodeDataInlineRuntimeContextRuntimePython CodeDataInlineRuntimeContextRuntime = "python"
+)
+
+func (r CodeDataInlineRuntimeContextRuntime) IsKnown() bool {
+	switch r {
+	case CodeDataInlineRuntimeContextRuntimeNode, CodeDataInlineRuntimeContextRuntimePython:
+		return true
+	}
+	return false
+}
+
+type CodeDataInlineType string
+
+const (
+	CodeDataInlineTypeInline CodeDataInlineType = "inline"
+)
+
+func (r CodeDataInlineType) IsKnown() bool {
+	switch r {
+	case CodeDataInlineTypeInline:
+		return true
+	}
+	return false
+}
+
+type CodeDataType string
+
+const (
+	CodeDataTypeBundle CodeDataType = "bundle"
+	CodeDataTypeInline CodeDataType = "inline"
+)
+
+func (r CodeDataType) IsKnown() bool {
+	switch r {
+	case CodeDataTypeBundle, CodeDataTypeInline:
+		return true
+	}
+	return false
+}
+
+type CodeType string
+
+const (
+	CodeTypeCode CodeType = "code"
+)
+
+func (r CodeType) IsKnown() bool {
+	switch r {
+	case CodeTypeCode:
+		return true
+	}
+	return false
+}
+
+type CodeParam struct {
+	Data param.Field[CodeDataUnionParam] `json:"data,required"`
+	Type param.Field[CodeType]           `json:"type,required"`
+}
+
+func (r CodeParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r CodeParam) ImplementsFunctionNewParamsFunctionDataUnion() {}
+
+func (r CodeParam) ImplementsFunctionUpdateParamsFunctionDataUnion() {}
+
+func (r CodeParam) ImplementsFunctionReplaceParamsFunctionDataUnion() {}
+
+type CodeDataParam struct {
+	Type           param.Field[CodeDataType] `json:"type,required"`
+	RuntimeContext param.Field[interface{}]  `json:"runtime_context"`
+	Location       param.Field[interface{}]  `json:"location,required"`
+	BundleID       param.Field[string]       `json:"bundle_id"`
+	// A preview of the code
+	Preview param.Field[string] `json:"preview"`
+	Code    param.Field[string] `json:"code"`
+}
+
+func (r CodeDataParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r CodeDataParam) implementsSharedCodeDataUnionParam() {}
+
+// Satisfied by [shared.CodeDataBundleParam], [shared.CodeDataInlineParam],
+// [CodeDataParam].
+type CodeDataUnionParam interface {
+	implementsSharedCodeDataUnionParam()
+}
+
+type CodeDataBundleParam struct {
+	BundleID       param.Field[string]                            `json:"bundle_id,required"`
+	Location       param.Field[CodeDataBundleLocationUnionParam]  `json:"location,required"`
+	RuntimeContext param.Field[CodeDataBundleRuntimeContextParam] `json:"runtime_context,required"`
+	Type           param.Field[CodeDataBundleType]                `json:"type,required"`
+	// A preview of the code
+	Preview param.Field[string] `json:"preview"`
+}
+
+func (r CodeDataBundleParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r CodeDataBundleParam) implementsSharedCodeDataUnionParam() {}
+
+type CodeDataBundleLocationParam struct {
+	Type     param.Field[CodeDataBundleLocationType] `json:"type,required"`
+	EvalName param.Field[string]                     `json:"eval_name"`
+	Position param.Field[interface{}]                `json:"position,required"`
+	Index    param.Field[int64]                      `json:"index"`
+}
+
+func (r CodeDataBundleLocationParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r CodeDataBundleLocationParam) implementsSharedCodeDataBundleLocationUnionParam() {}
+
+// Satisfied by [shared.CodeDataBundleLocationExperimentParam],
+// [shared.CodeDataBundleLocationFunctionParam], [CodeDataBundleLocationParam].
+type CodeDataBundleLocationUnionParam interface {
+	implementsSharedCodeDataBundleLocationUnionParam()
+}
+
+type CodeDataBundleLocationExperimentParam struct {
+	EvalName param.Field[string]                                             `json:"eval_name,required"`
+	Position param.Field[CodeDataBundleLocationExperimentPositionUnionParam] `json:"position,required"`
+	Type     param.Field[CodeDataBundleLocationExperimentType]               `json:"type,required"`
+}
+
+func (r CodeDataBundleLocationExperimentParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r CodeDataBundleLocationExperimentParam) implementsSharedCodeDataBundleLocationUnionParam() {}
+
+type CodeDataBundleLocationExperimentPositionParam struct {
+	Type  param.Field[CodeDataBundleLocationExperimentPositionType] `json:"type,required"`
+	Index param.Field[int64]                                        `json:"index"`
+}
+
+func (r CodeDataBundleLocationExperimentPositionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r CodeDataBundleLocationExperimentPositionParam) ImplementsSharedCodeDataBundleLocationExperimentPositionUnionParam() {
+}
+
+// Satisfied by [shared.TaskParam], [shared.ScorerParam],
+// [CodeDataBundleLocationExperimentPositionParam].
+type CodeDataBundleLocationExperimentPositionUnionParam interface {
+	ImplementsSharedCodeDataBundleLocationExperimentPositionUnionParam()
+}
+
+type CodeDataBundleLocationFunctionParam struct {
+	Index param.Field[int64]                              `json:"index,required"`
+	Type  param.Field[CodeDataBundleLocationFunctionType] `json:"type,required"`
+}
+
+func (r CodeDataBundleLocationFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r CodeDataBundleLocationFunctionParam) implementsSharedCodeDataBundleLocationUnionParam() {}
+
+type CodeDataBundleRuntimeContextParam struct {
+	Runtime param.Field[CodeDataBundleRuntimeContextRuntime] `json:"runtime,required"`
+	Version param.Field[string]                              `json:"version,required"`
+}
+
+func (r CodeDataBundleRuntimeContextParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type CodeDataInlineParam struct {
+	Code           param.Field[string]                            `json:"code,required"`
+	RuntimeContext param.Field[CodeDataInlineRuntimeContextParam] `json:"runtime_context,required"`
+	Type           param.Field[CodeDataInlineType]                `json:"type,required"`
+}
+
+func (r CodeDataInlineParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r CodeDataInlineParam) implementsSharedCodeDataUnionParam() {}
+
+type CodeDataInlineRuntimeContextParam struct {
+	Runtime param.Field[CodeDataInlineRuntimeContextRuntime] `json:"runtime,required"`
+	Version param.Field[string]                              `json:"version,required"`
+}
+
+func (r CodeDataInlineRuntimeContextParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
 type CreateAPIKeyOutput struct {
 	// Unique identifier for the api key
 	ID string `json:"id,required" format:"uuid"`
@@ -987,7 +1645,7 @@ func (r functionJSON) RawJSON() string {
 
 type FunctionFunctionData struct {
 	Type FunctionFunctionDataType `json:"type,required"`
-	// This field can have the runtime type of [FunctionFunctionDataCodeData].
+	// This field can have the runtime type of [CodeData].
 	Data  interface{}              `json:"data,required"`
 	Name  string                   `json:"name"`
 	JSON  functionFunctionDataJSON `json:"-"`
@@ -1021,15 +1679,15 @@ func (r *FunctionFunctionData) UnmarshalJSON(data []byte) (err error) {
 // the specific types for more type safety.
 //
 // Possible runtime types of the union are [shared.FunctionFunctionDataPrompt],
-// [shared.FunctionFunctionDataCode], [shared.FunctionFunctionDataGlobal].
+// [shared.Code], [shared.FunctionFunctionDataGlobal].
 func (r FunctionFunctionData) AsUnion() FunctionFunctionDataUnion {
 	return r.union
 }
 
-// Union satisfied by [shared.FunctionFunctionDataPrompt],
-// [shared.FunctionFunctionDataCode] or [shared.FunctionFunctionDataGlobal].
+// Union satisfied by [shared.FunctionFunctionDataPrompt], [shared.Code] or
+// [shared.FunctionFunctionDataGlobal].
 type FunctionFunctionDataUnion interface {
-	implementsSharedFunctionFunctionData()
+	ImplementsSharedFunctionFunctionData()
 }
 
 func init() {
@@ -1042,7 +1700,7 @@ func init() {
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(FunctionFunctionDataCode{}),
+			Type:       reflect.TypeOf(Code{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
@@ -1072,7 +1730,7 @@ func (r functionFunctionDataPromptJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r FunctionFunctionDataPrompt) implementsSharedFunctionFunctionData() {}
+func (r FunctionFunctionDataPrompt) ImplementsSharedFunctionFunctionData() {}
 
 type FunctionFunctionDataPromptType string
 
@@ -1083,458 +1741,6 @@ const (
 func (r FunctionFunctionDataPromptType) IsKnown() bool {
 	switch r {
 	case FunctionFunctionDataPromptTypePrompt:
-		return true
-	}
-	return false
-}
-
-type FunctionFunctionDataCode struct {
-	Data FunctionFunctionDataCodeData `json:"data,required"`
-	Type FunctionFunctionDataCodeType `json:"type,required"`
-	JSON functionFunctionDataCodeJSON `json:"-"`
-}
-
-// functionFunctionDataCodeJSON contains the JSON metadata for the struct
-// [FunctionFunctionDataCode]
-type functionFunctionDataCodeJSON struct {
-	Data        apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataCode) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r functionFunctionDataCodeJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r FunctionFunctionDataCode) implementsSharedFunctionFunctionData() {}
-
-type FunctionFunctionDataCodeData struct {
-	Type FunctionFunctionDataCodeDataType `json:"type,required"`
-	// This field can have the runtime type of
-	// [FunctionFunctionDataCodeDataBundleRuntimeContext],
-	// [FunctionFunctionDataCodeDataInlineRuntimeContext].
-	RuntimeContext interface{} `json:"runtime_context"`
-	// This field can have the runtime type of
-	// [FunctionFunctionDataCodeDataBundleLocation].
-	Location interface{} `json:"location,required"`
-	BundleID string      `json:"bundle_id"`
-	// A preview of the code
-	Preview string                           `json:"preview,nullable"`
-	Code    string                           `json:"code"`
-	JSON    functionFunctionDataCodeDataJSON `json:"-"`
-	union   FunctionFunctionDataCodeDataUnion
-}
-
-// functionFunctionDataCodeDataJSON contains the JSON metadata for the struct
-// [FunctionFunctionDataCodeData]
-type functionFunctionDataCodeDataJSON struct {
-	Type           apijson.Field
-	RuntimeContext apijson.Field
-	Location       apijson.Field
-	BundleID       apijson.Field
-	Preview        apijson.Field
-	Code           apijson.Field
-	raw            string
-	ExtraFields    map[string]apijson.Field
-}
-
-func (r functionFunctionDataCodeDataJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *FunctionFunctionDataCodeData) UnmarshalJSON(data []byte) (err error) {
-	*r = FunctionFunctionDataCodeData{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [FunctionFunctionDataCodeDataUnion] interface which you can
-// cast to the specific types for more type safety.
-//
-// Possible runtime types of the union are
-// [shared.FunctionFunctionDataCodeDataBundle],
-// [shared.FunctionFunctionDataCodeDataInline].
-func (r FunctionFunctionDataCodeData) AsUnion() FunctionFunctionDataCodeDataUnion {
-	return r.union
-}
-
-// Union satisfied by [shared.FunctionFunctionDataCodeDataBundle] or
-// [shared.FunctionFunctionDataCodeDataInline].
-type FunctionFunctionDataCodeDataUnion interface {
-	implementsSharedFunctionFunctionDataCodeData()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*FunctionFunctionDataCodeDataUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(FunctionFunctionDataCodeDataBundle{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(FunctionFunctionDataCodeDataInline{}),
-		},
-	)
-}
-
-type FunctionFunctionDataCodeDataBundle struct {
-	BundleID       string                                           `json:"bundle_id,required"`
-	Location       FunctionFunctionDataCodeDataBundleLocation       `json:"location,required"`
-	RuntimeContext FunctionFunctionDataCodeDataBundleRuntimeContext `json:"runtime_context,required"`
-	Type           FunctionFunctionDataCodeDataBundleType           `json:"type,required"`
-	// A preview of the code
-	Preview string                                 `json:"preview,nullable"`
-	JSON    functionFunctionDataCodeDataBundleJSON `json:"-"`
-}
-
-// functionFunctionDataCodeDataBundleJSON contains the JSON metadata for the struct
-// [FunctionFunctionDataCodeDataBundle]
-type functionFunctionDataCodeDataBundleJSON struct {
-	BundleID       apijson.Field
-	Location       apijson.Field
-	RuntimeContext apijson.Field
-	Type           apijson.Field
-	Preview        apijson.Field
-	raw            string
-	ExtraFields    map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataCodeDataBundle) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r functionFunctionDataCodeDataBundleJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r FunctionFunctionDataCodeDataBundle) implementsSharedFunctionFunctionDataCodeData() {}
-
-type FunctionFunctionDataCodeDataBundleLocation struct {
-	Type     FunctionFunctionDataCodeDataBundleLocationType `json:"type,required"`
-	EvalName string                                         `json:"eval_name"`
-	Position Position                                       `json:"position"`
-	Index    int64                                          `json:"index"`
-	JSON     functionFunctionDataCodeDataBundleLocationJSON `json:"-"`
-	union    FunctionFunctionDataCodeDataBundleLocationUnion
-}
-
-// functionFunctionDataCodeDataBundleLocationJSON contains the JSON metadata for
-// the struct [FunctionFunctionDataCodeDataBundleLocation]
-type functionFunctionDataCodeDataBundleLocationJSON struct {
-	Type        apijson.Field
-	EvalName    apijson.Field
-	Position    apijson.Field
-	Index       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r functionFunctionDataCodeDataBundleLocationJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *FunctionFunctionDataCodeDataBundleLocation) UnmarshalJSON(data []byte) (err error) {
-	*r = FunctionFunctionDataCodeDataBundleLocation{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [FunctionFunctionDataCodeDataBundleLocationUnion] interface
-// which you can cast to the specific types for more type safety.
-//
-// Possible runtime types of the union are
-// [shared.FunctionFunctionDataCodeDataBundleLocationExperiment],
-// [shared.FunctionFunctionDataCodeDataBundleLocationFunction].
-func (r FunctionFunctionDataCodeDataBundleLocation) AsUnion() FunctionFunctionDataCodeDataBundleLocationUnion {
-	return r.union
-}
-
-// Union satisfied by [shared.FunctionFunctionDataCodeDataBundleLocationExperiment]
-// or [shared.FunctionFunctionDataCodeDataBundleLocationFunction].
-type FunctionFunctionDataCodeDataBundleLocationUnion interface {
-	implementsSharedFunctionFunctionDataCodeDataBundleLocation()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*FunctionFunctionDataCodeDataBundleLocationUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(FunctionFunctionDataCodeDataBundleLocationExperiment{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(FunctionFunctionDataCodeDataBundleLocationFunction{}),
-		},
-	)
-}
-
-type FunctionFunctionDataCodeDataBundleLocationExperiment struct {
-	EvalName string                                                   `json:"eval_name,required"`
-	Position Position                                                 `json:"position,required"`
-	Type     FunctionFunctionDataCodeDataBundleLocationExperimentType `json:"type,required"`
-	JSON     functionFunctionDataCodeDataBundleLocationExperimentJSON `json:"-"`
-}
-
-// functionFunctionDataCodeDataBundleLocationExperimentJSON contains the JSON
-// metadata for the struct [FunctionFunctionDataCodeDataBundleLocationExperiment]
-type functionFunctionDataCodeDataBundleLocationExperimentJSON struct {
-	EvalName    apijson.Field
-	Position    apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataCodeDataBundleLocationExperiment) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r functionFunctionDataCodeDataBundleLocationExperimentJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r FunctionFunctionDataCodeDataBundleLocationExperiment) implementsSharedFunctionFunctionDataCodeDataBundleLocation() {
-}
-
-type FunctionFunctionDataCodeDataBundleLocationExperimentType string
-
-const (
-	FunctionFunctionDataCodeDataBundleLocationExperimentTypeExperiment FunctionFunctionDataCodeDataBundleLocationExperimentType = "experiment"
-)
-
-func (r FunctionFunctionDataCodeDataBundleLocationExperimentType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeDataBundleLocationExperimentTypeExperiment:
-		return true
-	}
-	return false
-}
-
-type FunctionFunctionDataCodeDataBundleLocationFunction struct {
-	Index int64                                                  `json:"index,required"`
-	Type  FunctionFunctionDataCodeDataBundleLocationFunctionType `json:"type,required"`
-	JSON  functionFunctionDataCodeDataBundleLocationFunctionJSON `json:"-"`
-}
-
-// functionFunctionDataCodeDataBundleLocationFunctionJSON contains the JSON
-// metadata for the struct [FunctionFunctionDataCodeDataBundleLocationFunction]
-type functionFunctionDataCodeDataBundleLocationFunctionJSON struct {
-	Index       apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataCodeDataBundleLocationFunction) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r functionFunctionDataCodeDataBundleLocationFunctionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r FunctionFunctionDataCodeDataBundleLocationFunction) implementsSharedFunctionFunctionDataCodeDataBundleLocation() {
-}
-
-type FunctionFunctionDataCodeDataBundleLocationFunctionType string
-
-const (
-	FunctionFunctionDataCodeDataBundleLocationFunctionTypeFunction FunctionFunctionDataCodeDataBundleLocationFunctionType = "function"
-)
-
-func (r FunctionFunctionDataCodeDataBundleLocationFunctionType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeDataBundleLocationFunctionTypeFunction:
-		return true
-	}
-	return false
-}
-
-type FunctionFunctionDataCodeDataBundleLocationType string
-
-const (
-	FunctionFunctionDataCodeDataBundleLocationTypeExperiment FunctionFunctionDataCodeDataBundleLocationType = "experiment"
-	FunctionFunctionDataCodeDataBundleLocationTypeFunction   FunctionFunctionDataCodeDataBundleLocationType = "function"
-)
-
-func (r FunctionFunctionDataCodeDataBundleLocationType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeDataBundleLocationTypeExperiment, FunctionFunctionDataCodeDataBundleLocationTypeFunction:
-		return true
-	}
-	return false
-}
-
-type FunctionFunctionDataCodeDataBundleRuntimeContext struct {
-	Runtime FunctionFunctionDataCodeDataBundleRuntimeContextRuntime `json:"runtime,required"`
-	Version string                                                  `json:"version,required"`
-	JSON    functionFunctionDataCodeDataBundleRuntimeContextJSON    `json:"-"`
-}
-
-// functionFunctionDataCodeDataBundleRuntimeContextJSON contains the JSON metadata
-// for the struct [FunctionFunctionDataCodeDataBundleRuntimeContext]
-type functionFunctionDataCodeDataBundleRuntimeContextJSON struct {
-	Runtime     apijson.Field
-	Version     apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataCodeDataBundleRuntimeContext) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r functionFunctionDataCodeDataBundleRuntimeContextJSON) RawJSON() string {
-	return r.raw
-}
-
-type FunctionFunctionDataCodeDataBundleRuntimeContextRuntime string
-
-const (
-	FunctionFunctionDataCodeDataBundleRuntimeContextRuntimeNode   FunctionFunctionDataCodeDataBundleRuntimeContextRuntime = "node"
-	FunctionFunctionDataCodeDataBundleRuntimeContextRuntimePython FunctionFunctionDataCodeDataBundleRuntimeContextRuntime = "python"
-)
-
-func (r FunctionFunctionDataCodeDataBundleRuntimeContextRuntime) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeDataBundleRuntimeContextRuntimeNode, FunctionFunctionDataCodeDataBundleRuntimeContextRuntimePython:
-		return true
-	}
-	return false
-}
-
-type FunctionFunctionDataCodeDataBundleType string
-
-const (
-	FunctionFunctionDataCodeDataBundleTypeBundle FunctionFunctionDataCodeDataBundleType = "bundle"
-)
-
-func (r FunctionFunctionDataCodeDataBundleType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeDataBundleTypeBundle:
-		return true
-	}
-	return false
-}
-
-type FunctionFunctionDataCodeDataInline struct {
-	Code           string                                           `json:"code,required"`
-	RuntimeContext FunctionFunctionDataCodeDataInlineRuntimeContext `json:"runtime_context,required"`
-	Type           FunctionFunctionDataCodeDataInlineType           `json:"type,required"`
-	JSON           functionFunctionDataCodeDataInlineJSON           `json:"-"`
-}
-
-// functionFunctionDataCodeDataInlineJSON contains the JSON metadata for the struct
-// [FunctionFunctionDataCodeDataInline]
-type functionFunctionDataCodeDataInlineJSON struct {
-	Code           apijson.Field
-	RuntimeContext apijson.Field
-	Type           apijson.Field
-	raw            string
-	ExtraFields    map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataCodeDataInline) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r functionFunctionDataCodeDataInlineJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r FunctionFunctionDataCodeDataInline) implementsSharedFunctionFunctionDataCodeData() {}
-
-type FunctionFunctionDataCodeDataInlineRuntimeContext struct {
-	Runtime FunctionFunctionDataCodeDataInlineRuntimeContextRuntime `json:"runtime,required"`
-	Version string                                                  `json:"version,required"`
-	JSON    functionFunctionDataCodeDataInlineRuntimeContextJSON    `json:"-"`
-}
-
-// functionFunctionDataCodeDataInlineRuntimeContextJSON contains the JSON metadata
-// for the struct [FunctionFunctionDataCodeDataInlineRuntimeContext]
-type functionFunctionDataCodeDataInlineRuntimeContextJSON struct {
-	Runtime     apijson.Field
-	Version     apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataCodeDataInlineRuntimeContext) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r functionFunctionDataCodeDataInlineRuntimeContextJSON) RawJSON() string {
-	return r.raw
-}
-
-type FunctionFunctionDataCodeDataInlineRuntimeContextRuntime string
-
-const (
-	FunctionFunctionDataCodeDataInlineRuntimeContextRuntimeNode   FunctionFunctionDataCodeDataInlineRuntimeContextRuntime = "node"
-	FunctionFunctionDataCodeDataInlineRuntimeContextRuntimePython FunctionFunctionDataCodeDataInlineRuntimeContextRuntime = "python"
-)
-
-func (r FunctionFunctionDataCodeDataInlineRuntimeContextRuntime) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeDataInlineRuntimeContextRuntimeNode, FunctionFunctionDataCodeDataInlineRuntimeContextRuntimePython:
-		return true
-	}
-	return false
-}
-
-type FunctionFunctionDataCodeDataInlineType string
-
-const (
-	FunctionFunctionDataCodeDataInlineTypeInline FunctionFunctionDataCodeDataInlineType = "inline"
-)
-
-func (r FunctionFunctionDataCodeDataInlineType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeDataInlineTypeInline:
-		return true
-	}
-	return false
-}
-
-type FunctionFunctionDataCodeDataType string
-
-const (
-	FunctionFunctionDataCodeDataTypeBundle FunctionFunctionDataCodeDataType = "bundle"
-	FunctionFunctionDataCodeDataTypeInline FunctionFunctionDataCodeDataType = "inline"
-)
-
-func (r FunctionFunctionDataCodeDataType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeDataTypeBundle, FunctionFunctionDataCodeDataTypeInline:
-		return true
-	}
-	return false
-}
-
-type FunctionFunctionDataCodeType string
-
-const (
-	FunctionFunctionDataCodeTypeCode FunctionFunctionDataCodeType = "code"
-)
-
-func (r FunctionFunctionDataCodeType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeTypeCode:
 		return true
 	}
 	return false
@@ -1563,7 +1769,7 @@ func (r functionFunctionDataGlobalJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r FunctionFunctionDataGlobal) implementsSharedFunctionFunctionData() {}
+func (r FunctionFunctionDataGlobal) ImplementsSharedFunctionFunctionData() {}
 
 type FunctionFunctionDataGlobalType string
 
@@ -2566,6 +2772,562 @@ func (r InsertProjectLogsEventReplaceSpanAttributesType) IsKnown() bool {
 	return false
 }
 
+type Messages struct {
+	// This field can have the runtime type of [string].
+	Content interface{}  `json:"content,required"`
+	Role    MessagesRole `json:"role,required"`
+	Name    string       `json:"name"`
+	// This field can have the runtime type of [MessagesAssistantFunctionCall].
+	FunctionCall interface{} `json:"function_call,required"`
+	// This field can have the runtime type of [[]MessagesAssistantToolCall].
+	ToolCalls  interface{}  `json:"tool_calls,required"`
+	ToolCallID string       `json:"tool_call_id"`
+	JSON       messagesJSON `json:"-"`
+	union      MessagesUnion
+}
+
+// messagesJSON contains the JSON metadata for the struct [Messages]
+type messagesJSON struct {
+	Content      apijson.Field
+	Role         apijson.Field
+	Name         apijson.Field
+	FunctionCall apijson.Field
+	ToolCalls    apijson.Field
+	ToolCallID   apijson.Field
+	raw          string
+	ExtraFields  map[string]apijson.Field
+}
+
+func (r messagesJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r *Messages) UnmarshalJSON(data []byte) (err error) {
+	*r = Messages{}
+	err = apijson.UnmarshalRoot(data, &r.union)
+	if err != nil {
+		return err
+	}
+	return apijson.Port(r.union, &r)
+}
+
+// AsUnion returns a [MessagesUnion] interface which you can cast to the specific
+// types for more type safety.
+//
+// Possible runtime types of the union are [shared.MessagesSystem],
+// [shared.MessagesUser], [shared.MessagesAssistant], [shared.MessagesTool],
+// [shared.MessagesFunction], [shared.MessagesFallback].
+func (r Messages) AsUnion() MessagesUnion {
+	return r.union
+}
+
+// Union satisfied by [shared.MessagesSystem], [shared.MessagesUser],
+// [shared.MessagesAssistant], [shared.MessagesTool], [shared.MessagesFunction] or
+// [shared.MessagesFallback].
+type MessagesUnion interface {
+	implementsSharedMessages()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*MessagesUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(MessagesSystem{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(MessagesUser{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(MessagesAssistant{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(MessagesTool{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(MessagesFunction{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(MessagesFallback{}),
+		},
+	)
+}
+
+type MessagesSystem struct {
+	Role    MessagesSystemRole `json:"role,required"`
+	Content string             `json:"content"`
+	Name    string             `json:"name"`
+	JSON    messagesSystemJSON `json:"-"`
+}
+
+// messagesSystemJSON contains the JSON metadata for the struct [MessagesSystem]
+type messagesSystemJSON struct {
+	Role        apijson.Field
+	Content     apijson.Field
+	Name        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *MessagesSystem) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r messagesSystemJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r MessagesSystem) implementsSharedMessages() {}
+
+type MessagesSystemRole string
+
+const (
+	MessagesSystemRoleSystem MessagesSystemRole = "system"
+)
+
+func (r MessagesSystemRole) IsKnown() bool {
+	switch r {
+	case MessagesSystemRoleSystem:
+		return true
+	}
+	return false
+}
+
+type MessagesUser struct {
+	Role MessagesUserRole `json:"role,required"`
+	Name string           `json:"name"`
+	JSON messagesUserJSON `json:"-"`
+}
+
+// messagesUserJSON contains the JSON metadata for the struct [MessagesUser]
+type messagesUserJSON struct {
+	Role        apijson.Field
+	Name        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *MessagesUser) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r messagesUserJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r MessagesUser) implementsSharedMessages() {}
+
+type MessagesUserRole string
+
+const (
+	MessagesUserRoleUser MessagesUserRole = "user"
+)
+
+func (r MessagesUserRole) IsKnown() bool {
+	switch r {
+	case MessagesUserRoleUser:
+		return true
+	}
+	return false
+}
+
+type MessagesAssistant struct {
+	Role         MessagesAssistantRole         `json:"role,required"`
+	Content      string                        `json:"content,nullable"`
+	FunctionCall MessagesAssistantFunctionCall `json:"function_call,nullable"`
+	Name         string                        `json:"name,nullable"`
+	ToolCalls    []MessagesAssistantToolCall   `json:"tool_calls,nullable"`
+	JSON         messagesAssistantJSON         `json:"-"`
+}
+
+// messagesAssistantJSON contains the JSON metadata for the struct
+// [MessagesAssistant]
+type messagesAssistantJSON struct {
+	Role         apijson.Field
+	Content      apijson.Field
+	FunctionCall apijson.Field
+	Name         apijson.Field
+	ToolCalls    apijson.Field
+	raw          string
+	ExtraFields  map[string]apijson.Field
+}
+
+func (r *MessagesAssistant) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r messagesAssistantJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r MessagesAssistant) implementsSharedMessages() {}
+
+type MessagesAssistantRole string
+
+const (
+	MessagesAssistantRoleAssistant MessagesAssistantRole = "assistant"
+)
+
+func (r MessagesAssistantRole) IsKnown() bool {
+	switch r {
+	case MessagesAssistantRoleAssistant:
+		return true
+	}
+	return false
+}
+
+type MessagesAssistantFunctionCall struct {
+	Arguments string                            `json:"arguments,required"`
+	Name      string                            `json:"name,required"`
+	JSON      messagesAssistantFunctionCallJSON `json:"-"`
+}
+
+// messagesAssistantFunctionCallJSON contains the JSON metadata for the struct
+// [MessagesAssistantFunctionCall]
+type messagesAssistantFunctionCallJSON struct {
+	Arguments   apijson.Field
+	Name        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *MessagesAssistantFunctionCall) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r messagesAssistantFunctionCallJSON) RawJSON() string {
+	return r.raw
+}
+
+type MessagesAssistantToolCall struct {
+	ID       string                             `json:"id,required"`
+	Function MessagesAssistantToolCallsFunction `json:"function,required"`
+	Type     MessagesAssistantToolCallsType     `json:"type,required"`
+	JSON     messagesAssistantToolCallJSON      `json:"-"`
+}
+
+// messagesAssistantToolCallJSON contains the JSON metadata for the struct
+// [MessagesAssistantToolCall]
+type messagesAssistantToolCallJSON struct {
+	ID          apijson.Field
+	Function    apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *MessagesAssistantToolCall) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r messagesAssistantToolCallJSON) RawJSON() string {
+	return r.raw
+}
+
+type MessagesAssistantToolCallsFunction struct {
+	Arguments string                                 `json:"arguments,required"`
+	Name      string                                 `json:"name,required"`
+	JSON      messagesAssistantToolCallsFunctionJSON `json:"-"`
+}
+
+// messagesAssistantToolCallsFunctionJSON contains the JSON metadata for the struct
+// [MessagesAssistantToolCallsFunction]
+type messagesAssistantToolCallsFunctionJSON struct {
+	Arguments   apijson.Field
+	Name        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *MessagesAssistantToolCallsFunction) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r messagesAssistantToolCallsFunctionJSON) RawJSON() string {
+	return r.raw
+}
+
+type MessagesAssistantToolCallsType string
+
+const (
+	MessagesAssistantToolCallsTypeFunction MessagesAssistantToolCallsType = "function"
+)
+
+func (r MessagesAssistantToolCallsType) IsKnown() bool {
+	switch r {
+	case MessagesAssistantToolCallsTypeFunction:
+		return true
+	}
+	return false
+}
+
+type MessagesTool struct {
+	Role       MessagesToolRole `json:"role,required"`
+	Content    string           `json:"content"`
+	ToolCallID string           `json:"tool_call_id"`
+	JSON       messagesToolJSON `json:"-"`
+}
+
+// messagesToolJSON contains the JSON metadata for the struct [MessagesTool]
+type messagesToolJSON struct {
+	Role        apijson.Field
+	Content     apijson.Field
+	ToolCallID  apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *MessagesTool) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r messagesToolJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r MessagesTool) implementsSharedMessages() {}
+
+type MessagesToolRole string
+
+const (
+	MessagesToolRoleTool MessagesToolRole = "tool"
+)
+
+func (r MessagesToolRole) IsKnown() bool {
+	switch r {
+	case MessagesToolRoleTool:
+		return true
+	}
+	return false
+}
+
+type MessagesFunction struct {
+	Name    string               `json:"name,required"`
+	Role    MessagesFunctionRole `json:"role,required"`
+	Content string               `json:"content"`
+	JSON    messagesFunctionJSON `json:"-"`
+}
+
+// messagesFunctionJSON contains the JSON metadata for the struct
+// [MessagesFunction]
+type messagesFunctionJSON struct {
+	Name        apijson.Field
+	Role        apijson.Field
+	Content     apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *MessagesFunction) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r messagesFunctionJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r MessagesFunction) implementsSharedMessages() {}
+
+type MessagesFunctionRole string
+
+const (
+	MessagesFunctionRoleFunction MessagesFunctionRole = "function"
+)
+
+func (r MessagesFunctionRole) IsKnown() bool {
+	switch r {
+	case MessagesFunctionRoleFunction:
+		return true
+	}
+	return false
+}
+
+type MessagesFallback struct {
+	Role    MessagesFallbackRole `json:"role,required"`
+	Content string               `json:"content,nullable"`
+	JSON    messagesFallbackJSON `json:"-"`
+}
+
+// messagesFallbackJSON contains the JSON metadata for the struct
+// [MessagesFallback]
+type messagesFallbackJSON struct {
+	Role        apijson.Field
+	Content     apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *MessagesFallback) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r messagesFallbackJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r MessagesFallback) implementsSharedMessages() {}
+
+type MessagesFallbackRole string
+
+const (
+	MessagesFallbackRoleModel MessagesFallbackRole = "model"
+)
+
+func (r MessagesFallbackRole) IsKnown() bool {
+	switch r {
+	case MessagesFallbackRoleModel:
+		return true
+	}
+	return false
+}
+
+type MessagesRole string
+
+const (
+	MessagesRoleSystem    MessagesRole = "system"
+	MessagesRoleUser      MessagesRole = "user"
+	MessagesRoleAssistant MessagesRole = "assistant"
+	MessagesRoleTool      MessagesRole = "tool"
+	MessagesRoleFunction  MessagesRole = "function"
+	MessagesRoleModel     MessagesRole = "model"
+)
+
+func (r MessagesRole) IsKnown() bool {
+	switch r {
+	case MessagesRoleSystem, MessagesRoleUser, MessagesRoleAssistant, MessagesRoleTool, MessagesRoleFunction, MessagesRoleModel:
+		return true
+	}
+	return false
+}
+
+type MessagesParam struct {
+	Content      param.Field[interface{}]  `json:"content,required"`
+	Role         param.Field[MessagesRole] `json:"role,required"`
+	Name         param.Field[string]       `json:"name"`
+	FunctionCall param.Field[interface{}]  `json:"function_call,required"`
+	ToolCalls    param.Field[interface{}]  `json:"tool_calls,required"`
+	ToolCallID   param.Field[string]       `json:"tool_call_id"`
+}
+
+func (r MessagesParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r MessagesParam) implementsSharedMessagesUnionParam() {}
+
+// Satisfied by [shared.MessagesSystemParam], [shared.MessagesUserParam],
+// [shared.MessagesAssistantParam], [shared.MessagesToolParam],
+// [shared.MessagesFunctionParam], [shared.MessagesFallbackParam], [MessagesParam].
+type MessagesUnionParam interface {
+	implementsSharedMessagesUnionParam()
+}
+
+type MessagesSystemParam struct {
+	Role    param.Field[MessagesSystemRole] `json:"role,required"`
+	Content param.Field[string]             `json:"content"`
+	Name    param.Field[string]             `json:"name"`
+}
+
+func (r MessagesSystemParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r MessagesSystemParam) implementsSharedMessagesUnionParam() {}
+
+type MessagesUserParam struct {
+	Role param.Field[MessagesUserRole] `json:"role,required"`
+	Name param.Field[string]           `json:"name"`
+}
+
+func (r MessagesUserParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r MessagesUserParam) implementsSharedMessagesUnionParam() {}
+
+type MessagesAssistantParam struct {
+	Role         param.Field[MessagesAssistantRole]              `json:"role,required"`
+	Content      param.Field[string]                             `json:"content"`
+	FunctionCall param.Field[MessagesAssistantFunctionCallParam] `json:"function_call"`
+	Name         param.Field[string]                             `json:"name"`
+	ToolCalls    param.Field[[]MessagesAssistantToolCallParam]   `json:"tool_calls"`
+}
+
+func (r MessagesAssistantParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r MessagesAssistantParam) implementsSharedMessagesUnionParam() {}
+
+type MessagesAssistantFunctionCallParam struct {
+	Arguments param.Field[string] `json:"arguments,required"`
+	Name      param.Field[string] `json:"name,required"`
+}
+
+func (r MessagesAssistantFunctionCallParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type MessagesAssistantToolCallParam struct {
+	ID       param.Field[string]                                  `json:"id,required"`
+	Function param.Field[MessagesAssistantToolCallsFunctionParam] `json:"function,required"`
+	Type     param.Field[MessagesAssistantToolCallsType]          `json:"type,required"`
+}
+
+func (r MessagesAssistantToolCallParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type MessagesAssistantToolCallsFunctionParam struct {
+	Arguments param.Field[string] `json:"arguments,required"`
+	Name      param.Field[string] `json:"name,required"`
+}
+
+func (r MessagesAssistantToolCallsFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type MessagesToolParam struct {
+	Role       param.Field[MessagesToolRole] `json:"role,required"`
+	Content    param.Field[string]           `json:"content"`
+	ToolCallID param.Field[string]           `json:"tool_call_id"`
+}
+
+func (r MessagesToolParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r MessagesToolParam) implementsSharedMessagesUnionParam() {}
+
+type MessagesFunctionParam struct {
+	Name    param.Field[string]               `json:"name,required"`
+	Role    param.Field[MessagesFunctionRole] `json:"role,required"`
+	Content param.Field[string]               `json:"content"`
+}
+
+func (r MessagesFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r MessagesFunctionParam) implementsSharedMessagesUnionParam() {}
+
+type MessagesFallbackParam struct {
+	Role    param.Field[MessagesFallbackRole] `json:"role,required"`
+	Content param.Field[string]               `json:"content"`
+}
+
+func (r MessagesFallbackParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r MessagesFallbackParam) implementsSharedMessagesUnionParam() {}
+
 // Summary of a metric's performance
 type MetricSummary struct {
 	// Number of improvements in the metric
@@ -2671,137 +3433,6 @@ const (
 func (r PathLookupFilterType) IsKnown() bool {
 	switch r {
 	case PathLookupFilterTypePathLookup:
-		return true
-	}
-	return false
-}
-
-type Position struct {
-	Type  PositionType `json:"type,required"`
-	Index int64        `json:"index"`
-	JSON  positionJSON `json:"-"`
-	union PositionUnion
-}
-
-// positionJSON contains the JSON metadata for the struct [Position]
-type positionJSON struct {
-	Type        apijson.Field
-	Index       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r positionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *Position) UnmarshalJSON(data []byte) (err error) {
-	*r = Position{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [PositionUnion] interface which you can cast to the specific
-// types for more type safety.
-//
-// Possible runtime types of the union are [shared.PositionType],
-// [shared.PositionScorer].
-func (r Position) AsUnion() PositionUnion {
-	return r.union
-}
-
-// Union satisfied by [shared.PositionType] or [shared.PositionScorer].
-type PositionUnion interface {
-	implementsSharedPosition()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PositionUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PositionType{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PositionScorer{}),
-		},
-	)
-}
-
-type PositionType struct {
-	Type PositionTypeType `json:"type,required"`
-	JSON positionTypeJSON `json:"-"`
-}
-
-// positionTypeJSON contains the JSON metadata for the struct [PositionType]
-type positionTypeJSON struct {
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PositionType) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r positionTypeJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PositionType) implementsSharedPosition() {}
-
-type PositionTypeType string
-
-const (
-	PositionTypeTypeTask PositionTypeType = "task"
-)
-
-func (r PositionTypeType) IsKnown() bool {
-	switch r {
-	case PositionTypeTypeTask:
-		return true
-	}
-	return false
-}
-
-type PositionScorer struct {
-	Index int64              `json:"index,required"`
-	Type  PositionScorerType `json:"type,required"`
-	JSON  positionScorerJSON `json:"-"`
-}
-
-// positionScorerJSON contains the JSON metadata for the struct [PositionScorer]
-type positionScorerJSON struct {
-	Index       apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PositionScorer) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r positionScorerJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PositionScorer) implementsSharedPosition() {}
-
-type PositionScorerType string
-
-const (
-	PositionScorerTypeScorer PositionScorerType = "scorer"
-)
-
-func (r PositionScorerType) IsKnown() bool {
-	switch r {
-	case PositionScorerTypeScorer:
 		return true
 	}
 	return false
@@ -3961,9 +4592,9 @@ func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) implementsShared
 }
 
 type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction struct {
-	Function PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction `json:"function,required"`
-	Type     PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType     `json:"type,required"`
-	JSON     promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON     `json:"-"`
+	Function ToolChoiceFunction                                             `json:"function,required"`
+	Type     PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType `json:"type,required"`
+	JSON     promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON `json:"-"`
 }
 
 // promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON contains the JSON
@@ -3985,28 +4616,6 @@ func (r promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON) RawJSON(
 }
 
 func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction struct {
-	Name string                                                                 `json:"name,required"`
-	JSON promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON `json:"-"`
-}
-
-// promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON contains
-// the JSON metadata for the struct
-// [PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction]
-type promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON struct {
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON) RawJSON() string {
-	return r.raw
 }
 
 type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType string
@@ -4207,7 +4816,7 @@ func (r PromptDataParserType) IsKnown() bool {
 type PromptDataPrompt struct {
 	Type    PromptDataPromptType `json:"type"`
 	Content string               `json:"content"`
-	// This field can have the runtime type of [[]PromptDataPromptChatMessage].
+	// This field can have the runtime type of [[]Messages].
 	Messages interface{}          `json:"messages,required"`
 	Tools    string               `json:"tools"`
 	JSON     promptDataPromptJSON `json:"-"`
@@ -4312,10 +4921,10 @@ func (r PromptDataPromptCompletionType) IsKnown() bool {
 }
 
 type PromptDataPromptChat struct {
-	Messages []PromptDataPromptChatMessage `json:"messages,required"`
-	Type     PromptDataPromptChatType      `json:"type,required"`
-	Tools    string                        `json:"tools"`
-	JSON     promptDataPromptChatJSON      `json:"-"`
+	Messages []Messages               `json:"messages,required"`
+	Type     PromptDataPromptChatType `json:"type,required"`
+	Tools    string                   `json:"tools"`
+	JSON     promptDataPromptChatJSON `json:"-"`
 }
 
 // promptDataPromptChatJSON contains the JSON metadata for the struct
@@ -4337,681 +4946,6 @@ func (r promptDataPromptChatJSON) RawJSON() string {
 }
 
 func (r PromptDataPromptChat) implementsSharedPromptDataPrompt() {}
-
-type PromptDataPromptChatMessage struct {
-	// This field can have the runtime type of [string],
-	// [PromptDataPromptChatMessagesUserContentUnion].
-	Content interface{}                      `json:"content,required"`
-	Role    PromptDataPromptChatMessagesRole `json:"role,required"`
-	Name    string                           `json:"name"`
-	// This field can have the runtime type of
-	// [PromptDataPromptChatMessagesAssistantFunctionCall].
-	FunctionCall interface{} `json:"function_call,required"`
-	// This field can have the runtime type of
-	// [[]PromptDataPromptChatMessagesAssistantToolCall].
-	ToolCalls  interface{}                     `json:"tool_calls,required"`
-	ToolCallID string                          `json:"tool_call_id"`
-	JSON       promptDataPromptChatMessageJSON `json:"-"`
-	union      PromptDataPromptChatMessagesUnion
-}
-
-// promptDataPromptChatMessageJSON contains the JSON metadata for the struct
-// [PromptDataPromptChatMessage]
-type promptDataPromptChatMessageJSON struct {
-	Content      apijson.Field
-	Role         apijson.Field
-	Name         apijson.Field
-	FunctionCall apijson.Field
-	ToolCalls    apijson.Field
-	ToolCallID   apijson.Field
-	raw          string
-	ExtraFields  map[string]apijson.Field
-}
-
-func (r promptDataPromptChatMessageJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *PromptDataPromptChatMessage) UnmarshalJSON(data []byte) (err error) {
-	*r = PromptDataPromptChatMessage{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [PromptDataPromptChatMessagesUnion] interface which you can
-// cast to the specific types for more type safety.
-//
-// Possible runtime types of the union are
-// [shared.PromptDataPromptChatMessagesSystem],
-// [shared.PromptDataPromptChatMessagesUser],
-// [shared.PromptDataPromptChatMessagesAssistant],
-// [shared.PromptDataPromptChatMessagesTool],
-// [shared.PromptDataPromptChatMessagesFunction],
-// [shared.PromptDataPromptChatMessagesFallback].
-func (r PromptDataPromptChatMessage) AsUnion() PromptDataPromptChatMessagesUnion {
-	return r.union
-}
-
-// Union satisfied by [shared.PromptDataPromptChatMessagesSystem],
-// [shared.PromptDataPromptChatMessagesUser],
-// [shared.PromptDataPromptChatMessagesAssistant],
-// [shared.PromptDataPromptChatMessagesTool],
-// [shared.PromptDataPromptChatMessagesFunction] or
-// [shared.PromptDataPromptChatMessagesFallback].
-type PromptDataPromptChatMessagesUnion interface {
-	implementsSharedPromptDataPromptChatMessage()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptDataPromptChatMessagesUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesSystem{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesUser{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesAssistant{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesTool{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesFunction{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesFallback{}),
-		},
-	)
-}
-
-type PromptDataPromptChatMessagesSystem struct {
-	Role    PromptDataPromptChatMessagesSystemRole `json:"role,required"`
-	Content string                                 `json:"content"`
-	Name    string                                 `json:"name"`
-	JSON    promptDataPromptChatMessagesSystemJSON `json:"-"`
-}
-
-// promptDataPromptChatMessagesSystemJSON contains the JSON metadata for the struct
-// [PromptDataPromptChatMessagesSystem]
-type promptDataPromptChatMessagesSystemJSON struct {
-	Role        apijson.Field
-	Content     apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesSystem) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesSystemJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptChatMessagesSystem) implementsSharedPromptDataPromptChatMessage() {}
-
-type PromptDataPromptChatMessagesSystemRole string
-
-const (
-	PromptDataPromptChatMessagesSystemRoleSystem PromptDataPromptChatMessagesSystemRole = "system"
-)
-
-func (r PromptDataPromptChatMessagesSystemRole) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesSystemRoleSystem:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatMessagesUser struct {
-	Role    PromptDataPromptChatMessagesUserRole         `json:"role,required"`
-	Content PromptDataPromptChatMessagesUserContentUnion `json:"content"`
-	Name    string                                       `json:"name"`
-	JSON    promptDataPromptChatMessagesUserJSON         `json:"-"`
-}
-
-// promptDataPromptChatMessagesUserJSON contains the JSON metadata for the struct
-// [PromptDataPromptChatMessagesUser]
-type promptDataPromptChatMessagesUserJSON struct {
-	Role        apijson.Field
-	Content     apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesUser) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesUserJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptChatMessagesUser) implementsSharedPromptDataPromptChatMessage() {}
-
-type PromptDataPromptChatMessagesUserRole string
-
-const (
-	PromptDataPromptChatMessagesUserRoleUser PromptDataPromptChatMessagesUserRole = "user"
-)
-
-func (r PromptDataPromptChatMessagesUserRole) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesUserRoleUser:
-		return true
-	}
-	return false
-}
-
-// Union satisfied by [shared.UnionString] or
-// [shared.PromptDataPromptChatMessagesUserContentArray].
-type PromptDataPromptChatMessagesUserContentUnion interface {
-	ImplementsSharedPromptDataPromptChatMessagesUserContentUnion()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptDataPromptChatMessagesUserContentUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(UnionString("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesUserContentArray{}),
-		},
-	)
-}
-
-type PromptDataPromptChatMessagesUserContentArray []PromptDataPromptChatMessagesUserContentArrayItem
-
-func (r PromptDataPromptChatMessagesUserContentArray) ImplementsSharedPromptDataPromptChatMessagesUserContentUnion() {
-}
-
-type PromptDataPromptChatMessagesUserContentArrayItem struct {
-	Text string                                           `json:"text"`
-	Type PromptDataPromptChatMessagesUserContentArrayType `json:"type,required"`
-	// This field can have the runtime type of
-	// [PromptDataPromptChatMessagesUserContentArrayImageURLImageURL].
-	ImageURL interface{}                                          `json:"image_url,required"`
-	JSON     promptDataPromptChatMessagesUserContentArrayItemJSON `json:"-"`
-	union    PromptDataPromptChatMessagesUserContentArrayUnionItem
-}
-
-// promptDataPromptChatMessagesUserContentArrayItemJSON contains the JSON metadata
-// for the struct [PromptDataPromptChatMessagesUserContentArrayItem]
-type promptDataPromptChatMessagesUserContentArrayItemJSON struct {
-	Text        apijson.Field
-	Type        apijson.Field
-	ImageURL    apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r promptDataPromptChatMessagesUserContentArrayItemJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *PromptDataPromptChatMessagesUserContentArrayItem) UnmarshalJSON(data []byte) (err error) {
-	*r = PromptDataPromptChatMessagesUserContentArrayItem{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [PromptDataPromptChatMessagesUserContentArrayUnionItem]
-// interface which you can cast to the specific types for more type safety.
-//
-// Possible runtime types of the union are
-// [shared.PromptDataPromptChatMessagesUserContentArrayText],
-// [shared.PromptDataPromptChatMessagesUserContentArrayImageURL].
-func (r PromptDataPromptChatMessagesUserContentArrayItem) AsUnion() PromptDataPromptChatMessagesUserContentArrayUnionItem {
-	return r.union
-}
-
-// Union satisfied by [shared.PromptDataPromptChatMessagesUserContentArrayText] or
-// [shared.PromptDataPromptChatMessagesUserContentArrayImageURL].
-type PromptDataPromptChatMessagesUserContentArrayUnionItem interface {
-	implementsSharedPromptDataPromptChatMessagesUserContentArrayItem()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptDataPromptChatMessagesUserContentArrayUnionItem)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesUserContentArrayText{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesUserContentArrayImageURL{}),
-		},
-	)
-}
-
-type PromptDataPromptChatMessagesUserContentArrayText struct {
-	Type PromptDataPromptChatMessagesUserContentArrayTextType `json:"type,required"`
-	Text string                                               `json:"text"`
-	JSON promptDataPromptChatMessagesUserContentArrayTextJSON `json:"-"`
-}
-
-// promptDataPromptChatMessagesUserContentArrayTextJSON contains the JSON metadata
-// for the struct [PromptDataPromptChatMessagesUserContentArrayText]
-type promptDataPromptChatMessagesUserContentArrayTextJSON struct {
-	Type        apijson.Field
-	Text        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesUserContentArrayText) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesUserContentArrayTextJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptChatMessagesUserContentArrayText) implementsSharedPromptDataPromptChatMessagesUserContentArrayItem() {
-}
-
-type PromptDataPromptChatMessagesUserContentArrayTextType string
-
-const (
-	PromptDataPromptChatMessagesUserContentArrayTextTypeText PromptDataPromptChatMessagesUserContentArrayTextType = "text"
-)
-
-func (r PromptDataPromptChatMessagesUserContentArrayTextType) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesUserContentArrayTextTypeText:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatMessagesUserContentArrayImageURL struct {
-	ImageURL PromptDataPromptChatMessagesUserContentArrayImageURLImageURL `json:"image_url,required"`
-	Type     PromptDataPromptChatMessagesUserContentArrayImageURLType     `json:"type,required"`
-	JSON     promptDataPromptChatMessagesUserContentArrayImageURLJSON     `json:"-"`
-}
-
-// promptDataPromptChatMessagesUserContentArrayImageURLJSON contains the JSON
-// metadata for the struct [PromptDataPromptChatMessagesUserContentArrayImageURL]
-type promptDataPromptChatMessagesUserContentArrayImageURLJSON struct {
-	ImageURL    apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesUserContentArrayImageURL) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesUserContentArrayImageURLJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptChatMessagesUserContentArrayImageURL) implementsSharedPromptDataPromptChatMessagesUserContentArrayItem() {
-}
-
-type PromptDataPromptChatMessagesUserContentArrayImageURLImageURL struct {
-	URL    string                                                             `json:"url,required"`
-	Detail PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail `json:"detail"`
-	JSON   promptDataPromptChatMessagesUserContentArrayImageURLImageURLJSON   `json:"-"`
-}
-
-// promptDataPromptChatMessagesUserContentArrayImageURLImageURLJSON contains the
-// JSON metadata for the struct
-// [PromptDataPromptChatMessagesUserContentArrayImageURLImageURL]
-type promptDataPromptChatMessagesUserContentArrayImageURLImageURLJSON struct {
-	URL         apijson.Field
-	Detail      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesUserContentArrayImageURLImageURL) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesUserContentArrayImageURLImageURLJSON) RawJSON() string {
-	return r.raw
-}
-
-type PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail string
-
-const (
-	PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailAuto PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "auto"
-	PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailLow  PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "low"
-	PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailHigh PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail = "high"
-)
-
-func (r PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailAuto, PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailLow, PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetailHigh:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatMessagesUserContentArrayImageURLType string
-
-const (
-	PromptDataPromptChatMessagesUserContentArrayImageURLTypeImageURL PromptDataPromptChatMessagesUserContentArrayImageURLType = "image_url"
-)
-
-func (r PromptDataPromptChatMessagesUserContentArrayImageURLType) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesUserContentArrayImageURLTypeImageURL:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatMessagesUserContentArrayType string
-
-const (
-	PromptDataPromptChatMessagesUserContentArrayTypeText     PromptDataPromptChatMessagesUserContentArrayType = "text"
-	PromptDataPromptChatMessagesUserContentArrayTypeImageURL PromptDataPromptChatMessagesUserContentArrayType = "image_url"
-)
-
-func (r PromptDataPromptChatMessagesUserContentArrayType) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesUserContentArrayTypeText, PromptDataPromptChatMessagesUserContentArrayTypeImageURL:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatMessagesAssistant struct {
-	Role         PromptDataPromptChatMessagesAssistantRole         `json:"role,required"`
-	Content      string                                            `json:"content,nullable"`
-	FunctionCall PromptDataPromptChatMessagesAssistantFunctionCall `json:"function_call,nullable"`
-	Name         string                                            `json:"name,nullable"`
-	ToolCalls    []PromptDataPromptChatMessagesAssistantToolCall   `json:"tool_calls,nullable"`
-	JSON         promptDataPromptChatMessagesAssistantJSON         `json:"-"`
-}
-
-// promptDataPromptChatMessagesAssistantJSON contains the JSON metadata for the
-// struct [PromptDataPromptChatMessagesAssistant]
-type promptDataPromptChatMessagesAssistantJSON struct {
-	Role         apijson.Field
-	Content      apijson.Field
-	FunctionCall apijson.Field
-	Name         apijson.Field
-	ToolCalls    apijson.Field
-	raw          string
-	ExtraFields  map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesAssistant) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesAssistantJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptChatMessagesAssistant) implementsSharedPromptDataPromptChatMessage() {}
-
-type PromptDataPromptChatMessagesAssistantRole string
-
-const (
-	PromptDataPromptChatMessagesAssistantRoleAssistant PromptDataPromptChatMessagesAssistantRole = "assistant"
-)
-
-func (r PromptDataPromptChatMessagesAssistantRole) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesAssistantRoleAssistant:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatMessagesAssistantFunctionCall struct {
-	Arguments string                                                `json:"arguments,required"`
-	Name      string                                                `json:"name,required"`
-	JSON      promptDataPromptChatMessagesAssistantFunctionCallJSON `json:"-"`
-}
-
-// promptDataPromptChatMessagesAssistantFunctionCallJSON contains the JSON metadata
-// for the struct [PromptDataPromptChatMessagesAssistantFunctionCall]
-type promptDataPromptChatMessagesAssistantFunctionCallJSON struct {
-	Arguments   apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesAssistantFunctionCall) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesAssistantFunctionCallJSON) RawJSON() string {
-	return r.raw
-}
-
-type PromptDataPromptChatMessagesAssistantToolCall struct {
-	ID       string                                                 `json:"id,required"`
-	Function PromptDataPromptChatMessagesAssistantToolCallsFunction `json:"function,required"`
-	Type     PromptDataPromptChatMessagesAssistantToolCallsType     `json:"type,required"`
-	JSON     promptDataPromptChatMessagesAssistantToolCallJSON      `json:"-"`
-}
-
-// promptDataPromptChatMessagesAssistantToolCallJSON contains the JSON metadata for
-// the struct [PromptDataPromptChatMessagesAssistantToolCall]
-type promptDataPromptChatMessagesAssistantToolCallJSON struct {
-	ID          apijson.Field
-	Function    apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesAssistantToolCall) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesAssistantToolCallJSON) RawJSON() string {
-	return r.raw
-}
-
-type PromptDataPromptChatMessagesAssistantToolCallsFunction struct {
-	Arguments string                                                     `json:"arguments,required"`
-	Name      string                                                     `json:"name,required"`
-	JSON      promptDataPromptChatMessagesAssistantToolCallsFunctionJSON `json:"-"`
-}
-
-// promptDataPromptChatMessagesAssistantToolCallsFunctionJSON contains the JSON
-// metadata for the struct [PromptDataPromptChatMessagesAssistantToolCallsFunction]
-type promptDataPromptChatMessagesAssistantToolCallsFunctionJSON struct {
-	Arguments   apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesAssistantToolCallsFunction) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesAssistantToolCallsFunctionJSON) RawJSON() string {
-	return r.raw
-}
-
-type PromptDataPromptChatMessagesAssistantToolCallsType string
-
-const (
-	PromptDataPromptChatMessagesAssistantToolCallsTypeFunction PromptDataPromptChatMessagesAssistantToolCallsType = "function"
-)
-
-func (r PromptDataPromptChatMessagesAssistantToolCallsType) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesAssistantToolCallsTypeFunction:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatMessagesTool struct {
-	Role       PromptDataPromptChatMessagesToolRole `json:"role,required"`
-	Content    string                               `json:"content"`
-	ToolCallID string                               `json:"tool_call_id"`
-	JSON       promptDataPromptChatMessagesToolJSON `json:"-"`
-}
-
-// promptDataPromptChatMessagesToolJSON contains the JSON metadata for the struct
-// [PromptDataPromptChatMessagesTool]
-type promptDataPromptChatMessagesToolJSON struct {
-	Role        apijson.Field
-	Content     apijson.Field
-	ToolCallID  apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesTool) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesToolJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptChatMessagesTool) implementsSharedPromptDataPromptChatMessage() {}
-
-type PromptDataPromptChatMessagesToolRole string
-
-const (
-	PromptDataPromptChatMessagesToolRoleTool PromptDataPromptChatMessagesToolRole = "tool"
-)
-
-func (r PromptDataPromptChatMessagesToolRole) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesToolRoleTool:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatMessagesFunction struct {
-	Name    string                                   `json:"name,required"`
-	Role    PromptDataPromptChatMessagesFunctionRole `json:"role,required"`
-	Content string                                   `json:"content"`
-	JSON    promptDataPromptChatMessagesFunctionJSON `json:"-"`
-}
-
-// promptDataPromptChatMessagesFunctionJSON contains the JSON metadata for the
-// struct [PromptDataPromptChatMessagesFunction]
-type promptDataPromptChatMessagesFunctionJSON struct {
-	Name        apijson.Field
-	Role        apijson.Field
-	Content     apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesFunction) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesFunctionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptChatMessagesFunction) implementsSharedPromptDataPromptChatMessage() {}
-
-type PromptDataPromptChatMessagesFunctionRole string
-
-const (
-	PromptDataPromptChatMessagesFunctionRoleFunction PromptDataPromptChatMessagesFunctionRole = "function"
-)
-
-func (r PromptDataPromptChatMessagesFunctionRole) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesFunctionRoleFunction:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatMessagesFallback struct {
-	Role    PromptDataPromptChatMessagesFallbackRole `json:"role,required"`
-	Content string                                   `json:"content,nullable"`
-	JSON    promptDataPromptChatMessagesFallbackJSON `json:"-"`
-}
-
-// promptDataPromptChatMessagesFallbackJSON contains the JSON metadata for the
-// struct [PromptDataPromptChatMessagesFallback]
-type promptDataPromptChatMessagesFallbackJSON struct {
-	Role        apijson.Field
-	Content     apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesFallback) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesFallbackJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptChatMessagesFallback) implementsSharedPromptDataPromptChatMessage() {}
-
-type PromptDataPromptChatMessagesFallbackRole string
-
-const (
-	PromptDataPromptChatMessagesFallbackRoleModel PromptDataPromptChatMessagesFallbackRole = "model"
-)
-
-func (r PromptDataPromptChatMessagesFallbackRole) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesFallbackRoleModel:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatMessagesRole string
-
-const (
-	PromptDataPromptChatMessagesRoleSystem    PromptDataPromptChatMessagesRole = "system"
-	PromptDataPromptChatMessagesRoleUser      PromptDataPromptChatMessagesRole = "user"
-	PromptDataPromptChatMessagesRoleAssistant PromptDataPromptChatMessagesRole = "assistant"
-	PromptDataPromptChatMessagesRoleTool      PromptDataPromptChatMessagesRole = "tool"
-	PromptDataPromptChatMessagesRoleFunction  PromptDataPromptChatMessagesRole = "function"
-	PromptDataPromptChatMessagesRoleModel     PromptDataPromptChatMessagesRole = "model"
-)
-
-func (r PromptDataPromptChatMessagesRole) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesRoleSystem, PromptDataPromptChatMessagesRoleUser, PromptDataPromptChatMessagesRoleAssistant, PromptDataPromptChatMessagesRoleTool, PromptDataPromptChatMessagesRoleFunction, PromptDataPromptChatMessagesRoleModel:
-		return true
-	}
-	return false
-}
 
 type PromptDataPromptChatType string
 
@@ -5305,8 +5239,8 @@ type PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam interface {
 }
 
 type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam struct {
-	Function param.Field[PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam] `json:"function,required"`
-	Type     param.Field[PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType]          `json:"type,required"`
+	Function param.Field[ToolChoiceFunctionParam]                                        `json:"function,required"`
+	Type     param.Field[PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType] `json:"type,required"`
 }
 
 func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) MarshalJSON() (data []byte, err error) {
@@ -5314,14 +5248,6 @@ func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) Marshal
 }
 
 func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam struct {
-	Name param.Field[string] `json:"name,required"`
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
 }
 
 type PromptDataOptionsParamsAnthropicModelParamsParam struct {
@@ -5433,9 +5359,9 @@ func (r PromptDataPromptCompletionParam) MarshalJSON() (data []byte, err error) 
 func (r PromptDataPromptCompletionParam) implementsSharedPromptDataPromptUnionParam() {}
 
 type PromptDataPromptChatParam struct {
-	Messages param.Field[[]PromptDataPromptChatMessagesUnionParam] `json:"messages,required"`
-	Type     param.Field[PromptDataPromptChatType]                 `json:"type,required"`
-	Tools    param.Field[string]                                   `json:"tools"`
+	Messages param.Field[[]MessagesUnionParam]     `json:"messages,required"`
+	Type     param.Field[PromptDataPromptChatType] `json:"type,required"`
+	Tools    param.Field[string]                   `json:"tools"`
 }
 
 func (r PromptDataPromptChatParam) MarshalJSON() (data []byte, err error) {
@@ -5443,203 +5369,6 @@ func (r PromptDataPromptChatParam) MarshalJSON() (data []byte, err error) {
 }
 
 func (r PromptDataPromptChatParam) implementsSharedPromptDataPromptUnionParam() {}
-
-type PromptDataPromptChatMessageParam struct {
-	Content      param.Field[interface{}]                      `json:"content,required"`
-	Role         param.Field[PromptDataPromptChatMessagesRole] `json:"role,required"`
-	Name         param.Field[string]                           `json:"name"`
-	FunctionCall param.Field[interface{}]                      `json:"function_call,required"`
-	ToolCalls    param.Field[interface{}]                      `json:"tool_calls,required"`
-	ToolCallID   param.Field[string]                           `json:"tool_call_id"`
-}
-
-func (r PromptDataPromptChatMessageParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataPromptChatMessageParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {}
-
-// Satisfied by [shared.PromptDataPromptChatMessagesSystemParam],
-// [shared.PromptDataPromptChatMessagesUserParam],
-// [shared.PromptDataPromptChatMessagesAssistantParam],
-// [shared.PromptDataPromptChatMessagesToolParam],
-// [shared.PromptDataPromptChatMessagesFunctionParam],
-// [shared.PromptDataPromptChatMessagesFallbackParam],
-// [PromptDataPromptChatMessageParam].
-type PromptDataPromptChatMessagesUnionParam interface {
-	implementsSharedPromptDataPromptChatMessagesUnionParam()
-}
-
-type PromptDataPromptChatMessagesSystemParam struct {
-	Role    param.Field[PromptDataPromptChatMessagesSystemRole] `json:"role,required"`
-	Content param.Field[string]                                 `json:"content"`
-	Name    param.Field[string]                                 `json:"name"`
-}
-
-func (r PromptDataPromptChatMessagesSystemParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataPromptChatMessagesSystemParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
-}
-
-type PromptDataPromptChatMessagesUserParam struct {
-	Role    param.Field[PromptDataPromptChatMessagesUserRole]              `json:"role,required"`
-	Content param.Field[PromptDataPromptChatMessagesUserContentUnionParam] `json:"content"`
-	Name    param.Field[string]                                            `json:"name"`
-}
-
-func (r PromptDataPromptChatMessagesUserParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataPromptChatMessagesUserParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
-}
-
-// Satisfied by [shared.UnionString],
-// [shared.PromptDataPromptChatMessagesUserContentArrayParam].
-type PromptDataPromptChatMessagesUserContentUnionParam interface {
-	ImplementsSharedPromptDataPromptChatMessagesUserContentUnionParam()
-}
-
-type PromptDataPromptChatMessagesUserContentArrayParam []PromptDataPromptChatMessagesUserContentArrayUnionItemParam
-
-func (r PromptDataPromptChatMessagesUserContentArrayParam) ImplementsSharedPromptDataPromptChatMessagesUserContentUnionParam() {
-}
-
-type PromptDataPromptChatMessagesUserContentArrayItemParam struct {
-	Text     param.Field[string]                                           `json:"text"`
-	Type     param.Field[PromptDataPromptChatMessagesUserContentArrayType] `json:"type,required"`
-	ImageURL param.Field[interface{}]                                      `json:"image_url,required"`
-}
-
-func (r PromptDataPromptChatMessagesUserContentArrayItemParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataPromptChatMessagesUserContentArrayItemParam) implementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
-}
-
-// Satisfied by [shared.PromptDataPromptChatMessagesUserContentArrayTextParam],
-// [shared.PromptDataPromptChatMessagesUserContentArrayImageURLParam],
-// [PromptDataPromptChatMessagesUserContentArrayItemParam].
-type PromptDataPromptChatMessagesUserContentArrayUnionItemParam interface {
-	implementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItemParam()
-}
-
-type PromptDataPromptChatMessagesUserContentArrayTextParam struct {
-	Type param.Field[PromptDataPromptChatMessagesUserContentArrayTextType] `json:"type,required"`
-	Text param.Field[string]                                               `json:"text"`
-}
-
-func (r PromptDataPromptChatMessagesUserContentArrayTextParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataPromptChatMessagesUserContentArrayTextParam) implementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
-}
-
-type PromptDataPromptChatMessagesUserContentArrayImageURLParam struct {
-	ImageURL param.Field[PromptDataPromptChatMessagesUserContentArrayImageURLImageURLParam] `json:"image_url,required"`
-	Type     param.Field[PromptDataPromptChatMessagesUserContentArrayImageURLType]          `json:"type,required"`
-}
-
-func (r PromptDataPromptChatMessagesUserContentArrayImageURLParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataPromptChatMessagesUserContentArrayImageURLParam) implementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
-}
-
-type PromptDataPromptChatMessagesUserContentArrayImageURLImageURLParam struct {
-	URL    param.Field[string]                                                             `json:"url,required"`
-	Detail param.Field[PromptDataPromptChatMessagesUserContentArrayImageURLImageURLDetail] `json:"detail"`
-}
-
-func (r PromptDataPromptChatMessagesUserContentArrayImageURLImageURLParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptDataPromptChatMessagesAssistantParam struct {
-	Role         param.Field[PromptDataPromptChatMessagesAssistantRole]              `json:"role,required"`
-	Content      param.Field[string]                                                 `json:"content"`
-	FunctionCall param.Field[PromptDataPromptChatMessagesAssistantFunctionCallParam] `json:"function_call"`
-	Name         param.Field[string]                                                 `json:"name"`
-	ToolCalls    param.Field[[]PromptDataPromptChatMessagesAssistantToolCallParam]   `json:"tool_calls"`
-}
-
-func (r PromptDataPromptChatMessagesAssistantParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataPromptChatMessagesAssistantParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
-}
-
-type PromptDataPromptChatMessagesAssistantFunctionCallParam struct {
-	Arguments param.Field[string] `json:"arguments,required"`
-	Name      param.Field[string] `json:"name,required"`
-}
-
-func (r PromptDataPromptChatMessagesAssistantFunctionCallParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptDataPromptChatMessagesAssistantToolCallParam struct {
-	ID       param.Field[string]                                                      `json:"id,required"`
-	Function param.Field[PromptDataPromptChatMessagesAssistantToolCallsFunctionParam] `json:"function,required"`
-	Type     param.Field[PromptDataPromptChatMessagesAssistantToolCallsType]          `json:"type,required"`
-}
-
-func (r PromptDataPromptChatMessagesAssistantToolCallParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptDataPromptChatMessagesAssistantToolCallsFunctionParam struct {
-	Arguments param.Field[string] `json:"arguments,required"`
-	Name      param.Field[string] `json:"name,required"`
-}
-
-func (r PromptDataPromptChatMessagesAssistantToolCallsFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptDataPromptChatMessagesToolParam struct {
-	Role       param.Field[PromptDataPromptChatMessagesToolRole] `json:"role,required"`
-	Content    param.Field[string]                               `json:"content"`
-	ToolCallID param.Field[string]                               `json:"tool_call_id"`
-}
-
-func (r PromptDataPromptChatMessagesToolParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataPromptChatMessagesToolParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
-}
-
-type PromptDataPromptChatMessagesFunctionParam struct {
-	Name    param.Field[string]                                   `json:"name,required"`
-	Role    param.Field[PromptDataPromptChatMessagesFunctionRole] `json:"role,required"`
-	Content param.Field[string]                                   `json:"content"`
-}
-
-func (r PromptDataPromptChatMessagesFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataPromptChatMessagesFunctionParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
-}
-
-type PromptDataPromptChatMessagesFallbackParam struct {
-	Role    param.Field[PromptDataPromptChatMessagesFallbackRole] `json:"role,required"`
-	Content param.Field[string]                                   `json:"content"`
-}
-
-func (r PromptDataPromptChatMessagesFallbackParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataPromptChatMessagesFallbackParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
-}
 
 type PromptDataPromptNullableVariantParam struct {
 }
@@ -5689,6 +5418,53 @@ func (r PromptDataToolFunctionsGlobalParam) MarshalJSON() (data []byte, err erro
 }
 
 func (r PromptDataToolFunctionsGlobalParam) implementsSharedPromptDataToolFunctionsUnionParam() {}
+
+type PromptImageURL struct {
+	URL    string               `json:"url,required"`
+	Detail PromptImageURLDetail `json:"detail"`
+	JSON   promptImageURLJSON   `json:"-"`
+}
+
+// promptImageURLJSON contains the JSON metadata for the struct [PromptImageURL]
+type promptImageURLJSON struct {
+	URL         apijson.Field
+	Detail      apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptImageURL) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptImageURLJSON) RawJSON() string {
+	return r.raw
+}
+
+type PromptImageURLDetail string
+
+const (
+	PromptImageURLDetailAuto PromptImageURLDetail = "auto"
+	PromptImageURLDetailLow  PromptImageURLDetail = "low"
+	PromptImageURLDetailHigh PromptImageURLDetail = "high"
+)
+
+func (r PromptImageURLDetail) IsKnown() bool {
+	switch r {
+	case PromptImageURLDetailAuto, PromptImageURLDetailLow, PromptImageURLDetailHigh:
+		return true
+	}
+	return false
+}
+
+type PromptImageURLParam struct {
+	URL    param.Field[string]               `json:"url,required"`
+	Detail param.Field[PromptImageURLDetail] `json:"detail"`
+}
+
+func (r PromptImageURLParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
 
 // Metadata about the state of the repo when the experiment was created
 type RepoInfo struct {
@@ -5933,6 +5709,44 @@ func (r scoreSummaryJSON) RawJSON() string {
 	return r.raw
 }
 
+type Scorer struct {
+	Index int64      `json:"index,required"`
+	Type  ScorerType `json:"type,required"`
+	JSON  scorerJSON `json:"-"`
+}
+
+// scorerJSON contains the JSON metadata for the struct [Scorer]
+type scorerJSON struct {
+	Index       apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *Scorer) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r scorerJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r Scorer) ImplementsSharedCodeDataBundleLocationExperimentPosition() {}
+
+type ScorerType string
+
+const (
+	ScorerTypeScorer ScorerType = "scorer"
+)
+
+func (r ScorerType) IsKnown() bool {
+	switch r {
+	case ScorerTypeScorer:
+		return true
+	}
+	return false
+}
+
 // Summary of a dataset
 type SummarizeDatasetResponse struct {
 	// Name of the dataset
@@ -6007,6 +5821,71 @@ func (r *SummarizeExperimentResponse) UnmarshalJSON(data []byte) (err error) {
 
 func (r summarizeExperimentResponseJSON) RawJSON() string {
 	return r.raw
+}
+
+type Task struct {
+	Type TaskType `json:"type,required"`
+	JSON taskJSON `json:"-"`
+}
+
+// taskJSON contains the JSON metadata for the struct [Task]
+type taskJSON struct {
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *Task) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r taskJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r Task) ImplementsSharedCodeDataBundleLocationExperimentPosition() {}
+
+type TaskType string
+
+const (
+	TaskTypeTask TaskType = "task"
+)
+
+func (r TaskType) IsKnown() bool {
+	switch r {
+	case TaskTypeTask:
+		return true
+	}
+	return false
+}
+
+type ToolChoiceFunction struct {
+	Name string                 `json:"name,required"`
+	JSON toolChoiceFunctionJSON `json:"-"`
+}
+
+// toolChoiceFunctionJSON contains the JSON metadata for the struct
+// [ToolChoiceFunction]
+type toolChoiceFunctionJSON struct {
+	Name        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *ToolChoiceFunction) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r toolChoiceFunctionJSON) RawJSON() string {
+	return r.raw
+}
+
+type ToolChoiceFunctionParam struct {
+	Name param.Field[string] `json:"name,required"`
+}
+
+func (r ToolChoiceFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }
 
 type User struct {
