@@ -10,6 +10,7 @@ import (
 	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
+	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 // OrganizationMemberService contains methods and other services that help with
@@ -32,50 +33,11 @@ func NewOrganizationMemberService(opts ...option.RequestOption) (r *Organization
 }
 
 // Modify organization membership
-func (r *OrganizationMemberService) Update(ctx context.Context, body OrganizationMemberUpdateParams, opts ...option.RequestOption) (res *OrganizationMemberUpdateResponse, err error) {
+func (r *OrganizationMemberService) Update(ctx context.Context, body OrganizationMemberUpdateParams, opts ...option.RequestOption) (res *shared.PatchOrganizationMembersOutput, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/organization/members"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
 	return
-}
-
-type OrganizationMemberUpdateResponse struct {
-	Status OrganizationMemberUpdateResponseStatus `json:"status,required"`
-	// If invite emails failed to send for some reason, the patch operation will still
-	// complete, but we will return an error message here
-	SendEmailError string                               `json:"send_email_error,nullable"`
-	JSON           organizationMemberUpdateResponseJSON `json:"-"`
-}
-
-// organizationMemberUpdateResponseJSON contains the JSON metadata for the struct
-// [OrganizationMemberUpdateResponse]
-type organizationMemberUpdateResponseJSON struct {
-	Status         apijson.Field
-	SendEmailError apijson.Field
-	raw            string
-	ExtraFields    map[string]apijson.Field
-}
-
-func (r *OrganizationMemberUpdateResponse) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r organizationMemberUpdateResponseJSON) RawJSON() string {
-	return r.raw
-}
-
-type OrganizationMemberUpdateResponseStatus string
-
-const (
-	OrganizationMemberUpdateResponseStatusSuccess OrganizationMemberUpdateResponseStatus = "success"
-)
-
-func (r OrganizationMemberUpdateResponseStatus) IsKnown() bool {
-	switch r {
-	case OrganizationMemberUpdateResponseStatusSuccess:
-		return true
-	}
-	return false
 }
 
 type OrganizationMemberUpdateParams struct {

@@ -1,6 +1,9 @@
 # Shared Params Types
 
-- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#CodeParam">CodeParam</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ChatCompletionContentPartImageParam">ChatCompletionContentPartImageParam</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ChatCompletionContentPartTextParam">ChatCompletionContentPartTextParam</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ChatCompletionMessageToolCallParam">ChatCompletionMessageToolCallParam</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#CodeBundleParam">CodeBundleParam</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#FeedbackDatasetItemParam">FeedbackDatasetItemParam</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#FeedbackExperimentItemParam">FeedbackExperimentItemParam</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#FeedbackProjectLogsItemParam">FeedbackProjectLogsItemParam</a>
@@ -10,13 +13,11 @@
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#InsertExperimentEventReplaceParam">InsertExperimentEventReplaceParam</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#InsertProjectLogsEventMergeParam">InsertProjectLogsEventMergeParam</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#InsertProjectLogsEventReplaceParam">InsertProjectLogsEventReplaceParam</a>
-- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#MessagesUnionParam">MessagesUnionParam</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#PathLookupFilterParam">PathLookupFilterParam</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ProjectScoreCategoryParam">ProjectScoreCategoryParam</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ProjectSettingsParam">ProjectSettingsParam</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#PromptDataParam">PromptDataParam</a>
-- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#PromptImageURLParam">PromptImageURLParam</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#RepoInfoParam">RepoInfoParam</a>
-- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ToolChoiceFunctionParam">ToolChoiceFunctionParam</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ViewDataParam">ViewDataParam</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ViewDataSearchParam">ViewDataSearchParam</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ViewOptionsParam">ViewOptionsParam</a>
@@ -25,8 +26,12 @@
 
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#AISecret">AISecret</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ACL">ACL</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ACLBatchUpdateResponse">ACLBatchUpdateResponse</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#APIKey">APIKey</a>
-- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#Code">Code</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ChatCompletionContentPartImage">ChatCompletionContentPartImage</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ChatCompletionContentPartText">ChatCompletionContentPartText</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ChatCompletionMessageToolCall">ChatCompletionMessageToolCall</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#CodeBundle">CodeBundle</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#CreateAPIKeyOutput">CreateAPIKeyOutput</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#DataSummary">DataSummary</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#Dataset">Dataset</a>
@@ -40,25 +45,23 @@
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#Function">Function</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#Group">Group</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#InsertEventsResponse">InsertEventsResponse</a>
-- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#Messages">Messages</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#MetricSummary">MetricSummary</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#OnlineScoreConfig">OnlineScoreConfig</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#Organization">Organization</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#PatchOrganizationMembersOutput">PatchOrganizationMembersOutput</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#Project">Project</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ProjectLogsEvent">ProjectLogsEvent</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ProjectScore">ProjectScore</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ProjectScoreCategory">ProjectScoreCategory</a>
+- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ProjectSettings">ProjectSettings</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ProjectTag">ProjectTag</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#Prompt">Prompt</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#PromptData">PromptData</a>
-- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#PromptImageURL">PromptImageURL</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#RepoInfo">RepoInfo</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#Role">Role</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ScoreSummary">ScoreSummary</a>
-- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#Scorer">Scorer</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#SummarizeDatasetResponse">SummarizeDatasetResponse</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#SummarizeExperimentResponse">SummarizeExperimentResponse</a>
-- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#Task">Task</a>
-- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ToolChoiceFunction">ToolChoiceFunction</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#User">User</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#View">View</a>
 - <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ViewData">ViewData</a>
@@ -155,17 +158,13 @@ Methods:
 
 # ACLs
 
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ACLBatchUpdateResponse">ACLBatchUpdateResponse</a>
-
 Methods:
 
 - <code title="post /v1/acl">client.ACLs.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ACLService.New">New</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ACLNewParams">ACLNewParams</a>) (<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ACL">ACL</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /v1/acl/{acl_id}">client.ACLs.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ACLService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, aclID <a href="https://pkg.go.dev/builtin#string">string</a>) (<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ACL">ACL</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /v1/acl">client.ACLs.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ACLService.List">List</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ACLListParams">ACLListParams</a>) (<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/internal/pagination">pagination</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/internal/pagination#ListObjects">ListObjects</a>[<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ACL">ACL</a>], <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="delete /v1/acl/{acl_id}">client.ACLs.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ACLService.Delete">Delete</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, aclID <a href="https://pkg.go.dev/builtin#string">string</a>) (<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ACL">ACL</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="post /v1/acl/batch-update">client.ACLs.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ACLService.BatchUpdate">BatchUpdate</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ACLBatchUpdateParams">ACLBatchUpdateParams</a>) (<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ACLBatchUpdateResponse">ACLBatchUpdateResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="post /v1/acl/batch-update">client.ACLs.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ACLService.BatchUpdate">BatchUpdate</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ACLBatchUpdateParams">ACLBatchUpdateParams</a>) (<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ACLBatchUpdateResponse">ACLBatchUpdateResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="delete /v1/acl">client.ACLs.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ACLService.FindAndDelete">FindAndDelete</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#ACLFindAndDeleteParams">ACLFindAndDeleteParams</a>) (<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#ACL">ACL</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 # Users
@@ -235,13 +234,9 @@ Methods:
 
 ## Members
 
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#OrganizationMemberUpdateResponse">OrganizationMemberUpdateResponse</a>
-
 Methods:
 
-- <code title="patch /v1/organization/members">client.Organizations.Members.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#OrganizationMemberService.Update">Update</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#OrganizationMemberUpdateParams">OrganizationMemberUpdateParams</a>) (<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#OrganizationMemberUpdateResponse">OrganizationMemberUpdateResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="patch /v1/organization/members">client.Organizations.Members.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#OrganizationMemberService.Update">Update</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go">braintrust</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go#OrganizationMemberUpdateParams">OrganizationMemberUpdateParams</a>) (<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go/shared#PatchOrganizationMembersOutput">PatchOrganizationMembersOutput</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 # APIKeys
 

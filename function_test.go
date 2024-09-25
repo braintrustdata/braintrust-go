@@ -276,16 +276,16 @@ func TestFunctionInvokeWithOptionalParams(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.FunctionInvokeParams{
 			Input: braintrust.F[any](map[string]interface{}{}),
-			Messages: braintrust.F([]shared.MessagesUnionParam{shared.MessagesSystemParam{
-				Role:    braintrust.F(shared.MessagesSystemRoleSystem),
+			Messages: braintrust.F([]braintrust.FunctionInvokeParamsMessageUnion{braintrust.FunctionInvokeParamsMessagesSystem{
+				Role:    braintrust.F(braintrust.FunctionInvokeParamsMessagesSystemRoleSystem),
 				Content: braintrust.F("content"),
 				Name:    braintrust.F("name"),
-			}, shared.MessagesSystemParam{
-				Role:    braintrust.F(shared.MessagesSystemRoleSystem),
+			}, braintrust.FunctionInvokeParamsMessagesSystem{
+				Role:    braintrust.F(braintrust.FunctionInvokeParamsMessagesSystemRoleSystem),
 				Content: braintrust.F("content"),
 				Name:    braintrust.F("name"),
-			}, shared.MessagesSystemParam{
-				Role:    braintrust.F(shared.MessagesSystemRoleSystem),
+			}, braintrust.FunctionInvokeParamsMessagesSystem{
+				Role:    braintrust.F(braintrust.FunctionInvokeParamsMessagesSystemRoleSystem),
 				Content: braintrust.F("content"),
 				Name:    braintrust.F("name"),
 			}}),
