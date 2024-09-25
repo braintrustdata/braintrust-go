@@ -78,7 +78,7 @@ func TestProjectUpdateWithOptionalParams(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectUpdateParams{
 			Name: braintrust.F("name"),
-			Settings: braintrust.F(braintrust.ProjectUpdateParamsSettings{
+			Settings: braintrust.F(shared.ProjectSettingsParam{
 				ComparisonKey: braintrust.F("comparison_key"),
 			}),
 		},
