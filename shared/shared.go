@@ -287,7 +287,7 @@ func (r chatCompletionContentPartImageJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r ChatCompletionContentPartImage) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayItem() {
+func (r ChatCompletionContentPartImage) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItem() {
 }
 
 type ChatCompletionContentPartImageImageURL struct {
@@ -390,7 +390,7 @@ func (r chatCompletionContentPartTextJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r ChatCompletionContentPartText) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayItem() {
+func (r ChatCompletionContentPartText) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItem() {
 }
 
 type ChatCompletionContentPartTextType string
@@ -4997,57 +4997,15 @@ func init() {
 	)
 }
 
-type PromptDataPromptChatMessagesUserContentArray []PromptDataPromptChatMessagesUserContentArrayItem
+type PromptDataPromptChatMessagesUserContentArray []PromptDataPromptChatMessagesUserContentArrayUnionItem
 
 func (r PromptDataPromptChatMessagesUserContentArray) ImplementsSharedPromptDataPromptChatMessagesUserContentUnion() {
-}
-
-type PromptDataPromptChatMessagesUserContentArrayItem struct {
-	Text string                                           `json:"text"`
-	Type PromptDataPromptChatMessagesUserContentArrayType `json:"type,required"`
-	// This field can have the runtime type of
-	// [ChatCompletionContentPartImageImageURL].
-	ImageURL interface{}                                          `json:"image_url,required"`
-	JSON     promptDataPromptChatMessagesUserContentArrayItemJSON `json:"-"`
-	union    PromptDataPromptChatMessagesUserContentArrayUnionItem
-}
-
-// promptDataPromptChatMessagesUserContentArrayItemJSON contains the JSON metadata
-// for the struct [PromptDataPromptChatMessagesUserContentArrayItem]
-type promptDataPromptChatMessagesUserContentArrayItemJSON struct {
-	Text        apijson.Field
-	Type        apijson.Field
-	ImageURL    apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r promptDataPromptChatMessagesUserContentArrayItemJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *PromptDataPromptChatMessagesUserContentArrayItem) UnmarshalJSON(data []byte) (err error) {
-	*r = PromptDataPromptChatMessagesUserContentArrayItem{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [PromptDataPromptChatMessagesUserContentArrayUnionItem]
-// interface which you can cast to the specific types for more type safety.
-//
-// Possible runtime types of the union are [shared.ChatCompletionContentPartText],
-// [shared.ChatCompletionContentPartImage].
-func (r PromptDataPromptChatMessagesUserContentArrayItem) AsUnion() PromptDataPromptChatMessagesUserContentArrayUnionItem {
-	return r.union
 }
 
 // Union satisfied by [shared.ChatCompletionContentPartText] or
 // [shared.ChatCompletionContentPartImage].
 type PromptDataPromptChatMessagesUserContentArrayUnionItem interface {
-	ImplementsSharedPromptDataPromptChatMessagesUserContentArrayItem()
+	ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItem()
 }
 
 func init() {
@@ -5063,21 +5021,6 @@ func init() {
 			Type:       reflect.TypeOf(ChatCompletionContentPartImage{}),
 		},
 	)
-}
-
-type PromptDataPromptChatMessagesUserContentArrayType string
-
-const (
-	PromptDataPromptChatMessagesUserContentArrayTypeText     PromptDataPromptChatMessagesUserContentArrayType = "text"
-	PromptDataPromptChatMessagesUserContentArrayTypeImageURL PromptDataPromptChatMessagesUserContentArrayType = "image_url"
-)
-
-func (r PromptDataPromptChatMessagesUserContentArrayType) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesUserContentArrayTypeText, PromptDataPromptChatMessagesUserContentArrayTypeImageURL:
-		return true
-	}
-	return false
 }
 
 type PromptDataPromptChatMessagesAssistant struct {
@@ -5782,22 +5725,8 @@ type PromptDataPromptChatMessagesUserContentArrayParam []PromptDataPromptChatMes
 func (r PromptDataPromptChatMessagesUserContentArrayParam) ImplementsSharedPromptDataPromptChatMessagesUserContentUnionParam() {
 }
 
-type PromptDataPromptChatMessagesUserContentArrayItemParam struct {
-	Text     param.Field[string]                                           `json:"text"`
-	Type     param.Field[PromptDataPromptChatMessagesUserContentArrayType] `json:"type,required"`
-	ImageURL param.Field[interface{}]                                      `json:"image_url,required"`
-}
-
-func (r PromptDataPromptChatMessagesUserContentArrayItemParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataPromptChatMessagesUserContentArrayItemParam) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
-}
-
 // Satisfied by [shared.ChatCompletionContentPartTextParam],
-// [shared.ChatCompletionContentPartImageParam],
-// [PromptDataPromptChatMessagesUserContentArrayItemParam].
+// [shared.ChatCompletionContentPartImageParam].
 type PromptDataPromptChatMessagesUserContentArrayUnionItemParam interface {
 	ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItemParam()
 }
