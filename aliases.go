@@ -1138,16 +1138,7 @@ type PromptDataPromptChatMessagesUserContentUnion = shared.PromptDataPromptChatM
 type PromptDataPromptChatMessagesUserContentArray = shared.PromptDataPromptChatMessagesUserContentArray
 
 // This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayItem = shared.PromptDataPromptChatMessagesUserContentArrayItem
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayType = shared.PromptDataPromptChatMessagesUserContentArrayType
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesUserContentArrayTypeText = shared.PromptDataPromptChatMessagesUserContentArrayTypeText
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesUserContentArrayTypeImageURL = shared.PromptDataPromptChatMessagesUserContentArrayTypeImageURL
+type PromptDataPromptChatMessagesUserContentArrayUnionItem = shared.PromptDataPromptChatMessagesUserContentArrayUnionItem
 
 // This is an alias to an internal type.
 type PromptDataPromptChatMessagesAssistant = shared.PromptDataPromptChatMessagesAssistant
