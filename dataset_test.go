@@ -29,8 +29,8 @@ func TestDatasetNewWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.Datasets.New(context.TODO(), braintrust.DatasetNewParams{
 		Name:        braintrust.F("name"),
-		Description: braintrust.F("description"),
 		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		Description: braintrust.F("description"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
