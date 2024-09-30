@@ -305,6 +305,23 @@ type Dataset = shared.Dataset
 type DatasetEvent = shared.DatasetEvent
 
 // This is an alias to an internal type.
+type EnvVar = shared.EnvVar
+
+// The type of the object the environment variable is scoped for
+//
+// This is an alias to an internal type.
+type EnvVarObjectType = shared.EnvVarObjectType
+
+// This is an alias to an internal value.
+const EnvVarObjectTypeOrganization = shared.EnvVarObjectTypeOrganization
+
+// This is an alias to an internal value.
+const EnvVarObjectTypeProject = shared.EnvVarObjectTypeProject
+
+// This is an alias to an internal value.
+const EnvVarObjectTypeFunction = shared.EnvVarObjectTypeFunction
+
+// This is an alias to an internal type.
 type Experiment = shared.Experiment
 
 // This is an alias to an internal type.
@@ -818,6 +835,18 @@ const OnlineScoreConfigScorersTypeFunction = shared.OnlineScoreConfigScorersType
 const OnlineScoreConfigScorersTypeGlobal = shared.OnlineScoreConfigScorersTypeGlobal
 
 // This is an alias to an internal type.
+type OnlineScoreConfigParam = shared.OnlineScoreConfigParam
+
+// This is an alias to an internal type.
+type OnlineScoreConfigScorersUnionParam = shared.OnlineScoreConfigScorersUnionParam
+
+// This is an alias to an internal type.
+type OnlineScoreConfigScorersFunctionParam = shared.OnlineScoreConfigScorersFunctionParam
+
+// This is an alias to an internal type.
+type OnlineScoreConfigScorersGlobalParam = shared.OnlineScoreConfigScorersGlobalParam
+
+// This is an alias to an internal type.
 type Organization = shared.Organization
 
 // This is an alias to an internal type.
@@ -946,15 +975,6 @@ type ProjectScoreCategoriesMinimum = shared.ProjectScoreCategoriesMinimum
 // This is an alias to an internal type.
 type ProjectScoreCategoriesNullableVariant = shared.ProjectScoreCategoriesNullableVariant
 
-// This is an alias to an internal type.
-type ProjectScoreConfig = shared.ProjectScoreConfig
-
-// This is an alias to an internal type.
-type ProjectScoreConfigDestination = shared.ProjectScoreConfigDestination
-
-// This is an alias to an internal value.
-const ProjectScoreConfigDestinationExpected = shared.ProjectScoreConfigDestinationExpected
-
 // For categorical-type project scores, defines a single category
 //
 // This is an alias to an internal type.
@@ -964,6 +984,18 @@ type ProjectScoreCategory = shared.ProjectScoreCategory
 //
 // This is an alias to an internal type.
 type ProjectScoreCategoryParam = shared.ProjectScoreCategoryParam
+
+// This is an alias to an internal type.
+type ProjectScoreConfig = shared.ProjectScoreConfig
+
+// This is an alias to an internal type.
+type ProjectScoreConfigDestination = shared.ProjectScoreConfigDestination
+
+// This is an alias to an internal value.
+const ProjectScoreConfigDestinationExpected = shared.ProjectScoreConfigDestinationExpected
+
+// This is an alias to an internal type.
+type ProjectScoreConfigParam = shared.ProjectScoreConfigParam
 
 // This is an alias to an internal type.
 type ProjectSettings = shared.ProjectSettings
@@ -1138,7 +1170,16 @@ type PromptDataPromptChatMessagesUserContentUnion = shared.PromptDataPromptChatM
 type PromptDataPromptChatMessagesUserContentArray = shared.PromptDataPromptChatMessagesUserContentArray
 
 // This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayUnionItem = shared.PromptDataPromptChatMessagesUserContentArrayUnionItem
+type PromptDataPromptChatMessagesUserContentArrayItem = shared.PromptDataPromptChatMessagesUserContentArrayItem
+
+// This is an alias to an internal type.
+type PromptDataPromptChatMessagesUserContentArrayType = shared.PromptDataPromptChatMessagesUserContentArrayType
+
+// This is an alias to an internal value.
+const PromptDataPromptChatMessagesUserContentArrayTypeText = shared.PromptDataPromptChatMessagesUserContentArrayTypeText
+
+// This is an alias to an internal value.
+const PromptDataPromptChatMessagesUserContentArrayTypeImageURL = shared.PromptDataPromptChatMessagesUserContentArrayTypeImageURL
 
 // This is an alias to an internal type.
 type PromptDataPromptChatMessagesAssistant = shared.PromptDataPromptChatMessagesAssistant
