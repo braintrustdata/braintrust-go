@@ -75,9 +75,9 @@ type ACL struct {
 	//
 	// Permissions can be assigned to to objects on an individual basis, or grouped
 	// into roles
-	Permission ACLPermission `json:"permission"`
+	Permission ACLPermission `json:"permission,nullable"`
 	// The object type that the ACL applies to
-	RestrictObjectType ACLRestrictObjectType `json:"restrict_object_type"`
+	RestrictObjectType ACLRestrictObjectType `json:"restrict_object_type,nullable"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
 	RoleID string `json:"role_id,nullable" format:"uuid"`
@@ -287,7 +287,7 @@ func (r chatCompletionContentPartImageJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r ChatCompletionContentPartImage) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItem() {
+func (r ChatCompletionContentPartImage) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayItem() {
 }
 
 type ChatCompletionContentPartImageImageURL struct {
@@ -390,7 +390,7 @@ func (r chatCompletionContentPartTextJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r ChatCompletionContentPartText) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItem() {
+func (r ChatCompletionContentPartText) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayItem() {
 }
 
 type ChatCompletionContentPartTextType string
@@ -1036,6 +1036,8 @@ type Dataset struct {
 	ID string `json:"id,required" format:"uuid"`
 	// Name of the dataset. Within a project, dataset names are unique
 	Name string `json:"name,required"`
+	// Unique identifier for the project that the dataset belongs under
+	ProjectID string `json:"project_id,required" format:"uuid"`
 	// Date of dataset creation
 	Created time.Time `json:"created,nullable" format:"date-time"`
 	// Date of dataset deletion, or null if the dataset is still active
@@ -1044,8 +1046,6 @@ type Dataset struct {
 	Description string `json:"description,nullable"`
 	// User-controlled metadata about the dataset
 	Metadata map[string]interface{} `json:"metadata,nullable"`
-	// Unique identifier for the project that the dataset belongs under
-	ProjectID string `json:"project_id,nullable" format:"uuid"`
 	// Identifies the user who created the dataset
 	UserID string      `json:"user_id,nullable" format:"uuid"`
 	JSON   datasetJSON `json:"-"`
@@ -1055,11 +1055,11 @@ type Dataset struct {
 type datasetJSON struct {
 	ID          apijson.Field
 	Name        apijson.Field
+	ProjectID   apijson.Field
 	Created     apijson.Field
 	DeletedAt   apijson.Field
 	Description apijson.Field
 	Metadata    apijson.Field
-	ProjectID   apijson.Field
 	UserID      apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
@@ -1086,6 +1086,8 @@ type DatasetEvent struct {
 	Created time.Time `json:"created,required" format:"date-time"`
 	// Unique identifier for the dataset
 	DatasetID string `json:"dataset_id,required" format:"uuid"`
+	// Unique identifier for the project that the dataset belongs under
+	ProjectID string `json:"project_id,required" format:"uuid"`
 	// The `span_id` of the root of the trace this dataset event belongs to
 	RootSpanID string `json:"root_span_id,required"`
 	// A unique identifier used to link different dataset events together as part of a
@@ -1095,18 +1097,16 @@ type DatasetEvent struct {
 	SpanID string `json:"span_id,required"`
 	// The output of your application, including post-processing (an arbitrary, JSON
 	// serializable object)
-	Expected interface{} `json:"expected"`
+	Expected interface{} `json:"expected,nullable"`
 	// The argument that uniquely define an input case (an arbitrary, JSON serializable
 	// object)
-	Input interface{} `json:"input"`
+	Input interface{} `json:"input,nullable"`
 	// A dictionary with additional data about the test example, model outputs, or just
 	// about anything else that's relevant, that you can use to help find and analyze
 	// examples later. For example, you could log the `prompt`, example's `id`, or
 	// anything else that would be useful to slice/dice later. The values in `metadata`
 	// can be any JSON-serializable type, but its keys must be strings
 	Metadata map[string]interface{} `json:"metadata,nullable"`
-	// Unique identifier for the project that the dataset belongs under
-	ProjectID string `json:"project_id,nullable" format:"uuid"`
 	// A list of tags to log
 	Tags []string         `json:"tags,nullable"`
 	JSON datasetEventJSON `json:"-"`
@@ -1118,12 +1118,12 @@ type datasetEventJSON struct {
 	XactID      apijson.Field
 	Created     apijson.Field
 	DatasetID   apijson.Field
+	ProjectID   apijson.Field
 	RootSpanID  apijson.Field
 	SpanID      apijson.Field
 	Expected    apijson.Field
 	Input       apijson.Field
 	Metadata    apijson.Field
-	ProjectID   apijson.Field
 	Tags        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
@@ -1135,6 +1135,59 @@ func (r *DatasetEvent) UnmarshalJSON(data []byte) (err error) {
 
 func (r datasetEventJSON) RawJSON() string {
 	return r.raw
+}
+
+type EnvVar struct {
+	// Unique identifier for the environment variable
+	ID string `json:"id,required" format:"uuid"`
+	// The name of the environment variable
+	Name string `json:"name,required"`
+	// The id of the object the environment variable is scoped for
+	ObjectID string `json:"object_id,required" format:"uuid"`
+	// The type of the object the environment variable is scoped for
+	ObjectType EnvVarObjectType `json:"object_type,required"`
+	// Date of environment variable creation
+	Created time.Time `json:"created,nullable" format:"date-time"`
+	// Date the environment variable was last used
+	Used time.Time  `json:"used,nullable" format:"date-time"`
+	JSON envVarJSON `json:"-"`
+}
+
+// envVarJSON contains the JSON metadata for the struct [EnvVar]
+type envVarJSON struct {
+	ID          apijson.Field
+	Name        apijson.Field
+	ObjectID    apijson.Field
+	ObjectType  apijson.Field
+	Created     apijson.Field
+	Used        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *EnvVar) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r envVarJSON) RawJSON() string {
+	return r.raw
+}
+
+// The type of the object the environment variable is scoped for
+type EnvVarObjectType string
+
+const (
+	EnvVarObjectTypeOrganization EnvVarObjectType = "organization"
+	EnvVarObjectTypeProject      EnvVarObjectType = "project"
+	EnvVarObjectTypeFunction     EnvVarObjectType = "function"
+)
+
+func (r EnvVarObjectType) IsKnown() bool {
+	switch r {
+	case EnvVarObjectTypeOrganization, EnvVarObjectTypeProject, EnvVarObjectTypeFunction:
+		return true
+	}
+	return false
 }
 
 type Experiment struct {
@@ -1231,7 +1284,7 @@ type ExperimentEvent struct {
 	// this experiment event is tied to
 	DatasetRecordID string `json:"dataset_record_id,nullable"`
 	// The error that occurred, if any.
-	Error interface{} `json:"error"`
+	Error interface{} `json:"error,nullable"`
 	// The ground truth value (an arbitrary, JSON serializable object) that you'd
 	// compare to `output` to determine if your `output` value is correct or not.
 	// Braintrust currently does not compare `output` to `expected` for you, since
@@ -1239,13 +1292,13 @@ type ExperimentEvent struct {
 	// just used to help you navigate your experiments while digging into analyses.
 	// However, we may later use these values to re-score outputs or fine-tune your
 	// models
-	Expected interface{} `json:"expected"`
+	Expected interface{} `json:"expected,nullable"`
 	// The arguments that uniquely define a test case (an arbitrary, JSON serializable
 	// object). Later on, Braintrust will use the `input` to know whether two test
 	// cases are the same between experiments, so they should not contain
 	// experiment-specific state. A simple rule of thumb is that if you run the same
 	// experiment twice, the `input` should be identical
-	Input interface{} `json:"input"`
+	Input interface{} `json:"input,nullable"`
 	// A dictionary with additional data about the test example, model outputs, or just
 	// about anything else that's relevant, that you can use to help find and analyze
 	// examples later. For example, you could log the `prompt`, example's `id`, or
@@ -1261,7 +1314,7 @@ type ExperimentEvent struct {
 	// or not. For example, in an app that generates SQL queries, the `output` should
 	// be the _result_ of the SQL query generated by the model, not the query itself,
 	// because there may be multiple valid queries that answer a single question
-	Output interface{} `json:"output"`
+	Output interface{} `json:"output,nullable"`
 	// A dictionary of numeric values (between 0 and 1) to log. The scores should give
 	// you a variety of signals that help you determine how accurate the outputs are
 	// compared to what you expect and diagnose failures. For example, a summarization
@@ -2154,8 +2207,8 @@ func (r FunctionLogID) IsKnown() bool {
 
 // JSON schema for the function's parameters and return type
 type FunctionFunctionSchema struct {
-	Parameters interface{}                `json:"parameters"`
-	Returns    interface{}                `json:"returns"`
+	Parameters interface{}                `json:"parameters,nullable"`
+	Returns    interface{}                `json:"returns,nullable"`
 	JSON       functionFunctionSchemaJSON `json:"-"`
 }
 
@@ -3331,6 +3384,61 @@ func (r OnlineScoreConfigScorersType) IsKnown() bool {
 	return false
 }
 
+type OnlineScoreConfigParam struct {
+	// The sampling rate for online scoring
+	SamplingRate param.Field[float64] `json:"sampling_rate,required"`
+	// The list of scorers to use for online scoring
+	Scorers param.Field[[]OnlineScoreConfigScorersUnionParam] `json:"scorers,required"`
+	// Whether to trigger online scoring on the root span of each trace
+	ApplyToRootSpan param.Field[bool] `json:"apply_to_root_span"`
+	// Trigger online scoring on any spans with a name in this list
+	ApplyToSpanNames param.Field[[]string] `json:"apply_to_span_names"`
+}
+
+func (r OnlineScoreConfigParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type OnlineScoreConfigScorerParam struct {
+	Type param.Field[OnlineScoreConfigScorersType] `json:"type,required"`
+	ID   param.Field[string]                       `json:"id"`
+	Name param.Field[string]                       `json:"name"`
+}
+
+func (r OnlineScoreConfigScorerParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r OnlineScoreConfigScorerParam) implementsSharedOnlineScoreConfigScorersUnionParam() {}
+
+// Satisfied by [shared.OnlineScoreConfigScorersFunctionParam],
+// [shared.OnlineScoreConfigScorersGlobalParam], [OnlineScoreConfigScorerParam].
+type OnlineScoreConfigScorersUnionParam interface {
+	implementsSharedOnlineScoreConfigScorersUnionParam()
+}
+
+type OnlineScoreConfigScorersFunctionParam struct {
+	ID   param.Field[string]                               `json:"id,required"`
+	Type param.Field[OnlineScoreConfigScorersFunctionType] `json:"type,required"`
+}
+
+func (r OnlineScoreConfigScorersFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r OnlineScoreConfigScorersFunctionParam) implementsSharedOnlineScoreConfigScorersUnionParam() {}
+
+type OnlineScoreConfigScorersGlobalParam struct {
+	Name param.Field[string]                             `json:"name,required"`
+	Type param.Field[OnlineScoreConfigScorersGlobalType] `json:"type,required"`
+}
+
+func (r OnlineScoreConfigScorersGlobalParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r OnlineScoreConfigScorersGlobalParam) implementsSharedOnlineScoreConfigScorersUnionParam() {}
+
 type Organization struct {
 	// Unique identifier for the organization
 	ID string `json:"id,required" format:"uuid"`
@@ -3511,17 +3619,17 @@ type ProjectLogsEvent struct {
 	// logs event
 	Context ProjectLogsEventContext `json:"context,nullable"`
 	// The error that occurred, if any.
-	Error interface{} `json:"error"`
+	Error interface{} `json:"error,nullable"`
 	// The ground truth value (an arbitrary, JSON serializable object) that you'd
 	// compare to `output` to determine if your `output` value is correct or not.
 	// Braintrust currently does not compare `output` to `expected` for you, since
 	// there are so many different ways to do that correctly. Instead, these values are
 	// just used to help you navigate while digging into analyses. However, we may
 	// later use these values to re-score outputs or fine-tune your models.
-	Expected interface{} `json:"expected"`
+	Expected interface{} `json:"expected,nullable"`
 	// The arguments that uniquely define a user input (an arbitrary, JSON serializable
 	// object).
-	Input interface{} `json:"input"`
+	Input interface{} `json:"input,nullable"`
 	// A dictionary with additional data about the test example, model outputs, or just
 	// about anything else that's relevant, that you can use to help find and analyze
 	// examples later. For example, you could log the `prompt`, example's `id`, or
@@ -3537,7 +3645,7 @@ type ProjectLogsEvent struct {
 	// or not. For example, in an app that generates SQL queries, the `output` should
 	// be the _result_ of the SQL query generated by the model, not the query itself,
 	// because there may be multiple valid queries that answer a single question.
-	Output interface{} `json:"output"`
+	Output interface{} `json:"output,nullable"`
 	// A dictionary of numeric values (between 0 and 1) to log. The scores should give
 	// you a variety of signals that help you determine how accurate the outputs are
 	// compared to what you expect and diagnose failures. For example, a summarization
@@ -3854,6 +3962,44 @@ func (r projectScoreCategoriesNullableVariantJSON) RawJSON() string {
 
 func (r ProjectScoreCategoriesNullableVariant) implementsSharedProjectScoreCategoriesUnion() {}
 
+// For categorical-type project scores, defines a single category
+type ProjectScoreCategory struct {
+	// Name of the category
+	Name string `json:"name,required"`
+	// Numerical value of the category. Must be between 0 and 1, inclusive
+	Value float64                  `json:"value,required"`
+	JSON  projectScoreCategoryJSON `json:"-"`
+}
+
+// projectScoreCategoryJSON contains the JSON metadata for the struct
+// [ProjectScoreCategory]
+type projectScoreCategoryJSON struct {
+	Name        apijson.Field
+	Value       apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *ProjectScoreCategory) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r projectScoreCategoryJSON) RawJSON() string {
+	return r.raw
+}
+
+// For categorical-type project scores, defines a single category
+type ProjectScoreCategoryParam struct {
+	// Name of the category
+	Name param.Field[string] `json:"name,required"`
+	// Numerical value of the category. Must be between 0 and 1, inclusive
+	Value param.Field[float64] `json:"value,required"`
+}
+
+func (r ProjectScoreCategoryParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
 type ProjectScoreConfig struct {
 	Destination ProjectScoreConfigDestination `json:"destination,nullable"`
 	MultiSelect bool                          `json:"multi_select,nullable"`
@@ -3893,41 +4039,13 @@ func (r ProjectScoreConfigDestination) IsKnown() bool {
 	return false
 }
 
-// For categorical-type project scores, defines a single category
-type ProjectScoreCategory struct {
-	// Name of the category
-	Name string `json:"name,required"`
-	// Numerical value of the category. Must be between 0 and 1, inclusive
-	Value float64                  `json:"value,required"`
-	JSON  projectScoreCategoryJSON `json:"-"`
+type ProjectScoreConfigParam struct {
+	Destination param.Field[ProjectScoreConfigDestination] `json:"destination"`
+	MultiSelect param.Field[bool]                          `json:"multi_select"`
+	Online      param.Field[OnlineScoreConfigParam]        `json:"online"`
 }
 
-// projectScoreCategoryJSON contains the JSON metadata for the struct
-// [ProjectScoreCategory]
-type projectScoreCategoryJSON struct {
-	Name        apijson.Field
-	Value       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ProjectScoreCategory) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectScoreCategoryJSON) RawJSON() string {
-	return r.raw
-}
-
-// For categorical-type project scores, defines a single category
-type ProjectScoreCategoryParam struct {
-	// Name of the category
-	Name param.Field[string] `json:"name,required"`
-	// Numerical value of the category. Must be between 0 and 1, inclusive
-	Value param.Field[float64] `json:"value,required"`
-}
-
-func (r ProjectScoreCategoryParam) MarshalJSON() (data []byte, err error) {
+func (r ProjectScoreConfigParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
@@ -4997,15 +5115,57 @@ func init() {
 	)
 }
 
-type PromptDataPromptChatMessagesUserContentArray []PromptDataPromptChatMessagesUserContentArrayUnionItem
+type PromptDataPromptChatMessagesUserContentArray []PromptDataPromptChatMessagesUserContentArrayItem
 
 func (r PromptDataPromptChatMessagesUserContentArray) ImplementsSharedPromptDataPromptChatMessagesUserContentUnion() {
+}
+
+type PromptDataPromptChatMessagesUserContentArrayItem struct {
+	Text string                                           `json:"text"`
+	Type PromptDataPromptChatMessagesUserContentArrayType `json:"type,required"`
+	// This field can have the runtime type of
+	// [ChatCompletionContentPartImageImageURL].
+	ImageURL interface{}                                          `json:"image_url,required"`
+	JSON     promptDataPromptChatMessagesUserContentArrayItemJSON `json:"-"`
+	union    PromptDataPromptChatMessagesUserContentArrayUnionItem
+}
+
+// promptDataPromptChatMessagesUserContentArrayItemJSON contains the JSON metadata
+// for the struct [PromptDataPromptChatMessagesUserContentArrayItem]
+type promptDataPromptChatMessagesUserContentArrayItemJSON struct {
+	Text        apijson.Field
+	Type        apijson.Field
+	ImageURL    apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r promptDataPromptChatMessagesUserContentArrayItemJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r *PromptDataPromptChatMessagesUserContentArrayItem) UnmarshalJSON(data []byte) (err error) {
+	*r = PromptDataPromptChatMessagesUserContentArrayItem{}
+	err = apijson.UnmarshalRoot(data, &r.union)
+	if err != nil {
+		return err
+	}
+	return apijson.Port(r.union, &r)
+}
+
+// AsUnion returns a [PromptDataPromptChatMessagesUserContentArrayUnionItem]
+// interface which you can cast to the specific types for more type safety.
+//
+// Possible runtime types of the union are [shared.ChatCompletionContentPartText],
+// [shared.ChatCompletionContentPartImage].
+func (r PromptDataPromptChatMessagesUserContentArrayItem) AsUnion() PromptDataPromptChatMessagesUserContentArrayUnionItem {
+	return r.union
 }
 
 // Union satisfied by [shared.ChatCompletionContentPartText] or
 // [shared.ChatCompletionContentPartImage].
 type PromptDataPromptChatMessagesUserContentArrayUnionItem interface {
-	ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItem()
+	ImplementsSharedPromptDataPromptChatMessagesUserContentArrayItem()
 }
 
 func init() {
@@ -5021,6 +5181,21 @@ func init() {
 			Type:       reflect.TypeOf(ChatCompletionContentPartImage{}),
 		},
 	)
+}
+
+type PromptDataPromptChatMessagesUserContentArrayType string
+
+const (
+	PromptDataPromptChatMessagesUserContentArrayTypeText     PromptDataPromptChatMessagesUserContentArrayType = "text"
+	PromptDataPromptChatMessagesUserContentArrayTypeImageURL PromptDataPromptChatMessagesUserContentArrayType = "image_url"
+)
+
+func (r PromptDataPromptChatMessagesUserContentArrayType) IsKnown() bool {
+	switch r {
+	case PromptDataPromptChatMessagesUserContentArrayTypeText, PromptDataPromptChatMessagesUserContentArrayTypeImageURL:
+		return true
+	}
+	return false
 }
 
 type PromptDataPromptChatMessagesAssistant struct {
@@ -5725,8 +5900,22 @@ type PromptDataPromptChatMessagesUserContentArrayParam []PromptDataPromptChatMes
 func (r PromptDataPromptChatMessagesUserContentArrayParam) ImplementsSharedPromptDataPromptChatMessagesUserContentUnionParam() {
 }
 
+type PromptDataPromptChatMessagesUserContentArrayItemParam struct {
+	Text     param.Field[string]                                           `json:"text"`
+	Type     param.Field[PromptDataPromptChatMessagesUserContentArrayType] `json:"type,required"`
+	ImageURL param.Field[interface{}]                                      `json:"image_url,required"`
+}
+
+func (r PromptDataPromptChatMessagesUserContentArrayItemParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesUserContentArrayItemParam) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
+}
+
 // Satisfied by [shared.ChatCompletionContentPartTextParam],
-// [shared.ChatCompletionContentPartImageParam].
+// [shared.ChatCompletionContentPartImageParam],
+// [PromptDataPromptChatMessagesUserContentArrayItemParam].
 type PromptDataPromptChatMessagesUserContentArrayUnionItemParam interface {
 	ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItemParam()
 }
@@ -5980,7 +6169,7 @@ type RoleMemberPermission struct {
 	// into roles
 	Permission RoleMemberPermissionsPermission `json:"permission,required"`
 	// The object type that the ACL applies to
-	RestrictObjectType RoleMemberPermissionsRestrictObjectType `json:"restrict_object_type"`
+	RestrictObjectType RoleMemberPermissionsRestrictObjectType `json:"restrict_object_type,nullable"`
 	JSON               roleMemberPermissionJSON                `json:"-"`
 }
 

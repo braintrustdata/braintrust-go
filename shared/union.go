@@ -27,3 +27,4 @@ func (UnionString) ImplementsOrganizationListParamsIDsUnion()                   
 func (UnionString) ImplementsAPIKeyListParamsIDsUnion()                                {}
 func (UnionString) ImplementsAISecretListParamsAISecretTypeUnion()                     {}
 func (UnionString) ImplementsAISecretListParamsIDsUnion()                              {}
+func (UnionString) ImplementsEnvVarListParamsIDsUnion()                                {}
