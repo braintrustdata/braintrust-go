@@ -176,10 +176,10 @@ func (r *DatasetService) Summarize(ctx context.Context, datasetID string, query 
 type DatasetNewParams struct {
 	// Name of the dataset. Within a project, dataset names are unique
 	Name param.Field[string] `json:"name,required"`
+	// Unique identifier for the project that the dataset belongs under
+	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
 	// Textual description of the dataset
 	Description param.Field[string] `json:"description"`
-	// Unique identifier for the project that the dataset belongs under
-	ProjectID param.Field[string] `json:"project_id" format:"uuid"`
 }
 
 func (r DatasetNewParams) MarshalJSON() (data []byte, err error) {

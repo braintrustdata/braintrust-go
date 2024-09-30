@@ -129,6 +129,7 @@ type ProjectScoreNewParams struct {
 	ScoreType param.Field[ProjectScoreNewParamsScoreType] `json:"score_type,required"`
 	// For categorical-type project scores, the list of all categories
 	Categories param.Field[ProjectScoreNewParamsCategoriesUnion] `json:"categories"`
+	Config     param.Field[shared.ProjectScoreConfigParam]       `json:"config"`
 	// Textual description of the project score
 	Description param.Field[string] `json:"description"`
 }
@@ -187,6 +188,7 @@ func (r ProjectScoreNewParamsCategoriesNullableVariant) implementsProjectScoreNe
 type ProjectScoreUpdateParams struct {
 	// For categorical-type project scores, the list of all categories
 	Categories param.Field[ProjectScoreUpdateParamsCategoriesUnion] `json:"categories"`
+	Config     param.Field[shared.ProjectScoreConfigParam]          `json:"config"`
 	// Textual description of the project score
 	Description param.Field[string] `json:"description"`
 	// Name of the project score
@@ -340,6 +342,7 @@ type ProjectScoreReplaceParams struct {
 	ScoreType param.Field[ProjectScoreReplaceParamsScoreType] `json:"score_type,required"`
 	// For categorical-type project scores, the list of all categories
 	Categories param.Field[ProjectScoreReplaceParamsCategoriesUnion] `json:"categories"`
+	Config     param.Field[shared.ProjectScoreConfigParam]           `json:"config"`
 	// Textual description of the project score
 	Description param.Field[string] `json:"description"`
 }

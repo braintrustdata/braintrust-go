@@ -40,6 +40,25 @@ func TestProjectScoreNewWithOptionalParams(t *testing.T) {
 			Name:  braintrust.F("name"),
 			Value: braintrust.F(0.000000),
 		}})),
+		Config: braintrust.F(shared.ProjectScoreConfigParam{
+			Destination: braintrust.F(shared.ProjectScoreConfigDestinationExpected),
+			MultiSelect: braintrust.F(true),
+			Online: braintrust.F(shared.OnlineScoreConfigParam{
+				SamplingRate: braintrust.F(0.000000),
+				Scorers: braintrust.F([]shared.OnlineScoreConfigScorersUnionParam{shared.OnlineScoreConfigScorersFunctionParam{
+					ID:   braintrust.F("id"),
+					Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
+				}, shared.OnlineScoreConfigScorersFunctionParam{
+					ID:   braintrust.F("id"),
+					Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
+				}, shared.OnlineScoreConfigScorersFunctionParam{
+					ID:   braintrust.F("id"),
+					Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
+				}}),
+				ApplyToRootSpan:  braintrust.F(true),
+				ApplyToSpanNames: braintrust.F([]string{"string", "string", "string"}),
+			}),
+		}),
 		Description: braintrust.F("description"),
 	})
 	if err != nil {
@@ -99,6 +118,25 @@ func TestProjectScoreUpdateWithOptionalParams(t *testing.T) {
 				Name:  braintrust.F("name"),
 				Value: braintrust.F(0.000000),
 			}})),
+			Config: braintrust.F(shared.ProjectScoreConfigParam{
+				Destination: braintrust.F(shared.ProjectScoreConfigDestinationExpected),
+				MultiSelect: braintrust.F(true),
+				Online: braintrust.F(shared.OnlineScoreConfigParam{
+					SamplingRate: braintrust.F(0.000000),
+					Scorers: braintrust.F([]shared.OnlineScoreConfigScorersUnionParam{shared.OnlineScoreConfigScorersFunctionParam{
+						ID:   braintrust.F("id"),
+						Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
+					}, shared.OnlineScoreConfigScorersFunctionParam{
+						ID:   braintrust.F("id"),
+						Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
+					}, shared.OnlineScoreConfigScorersFunctionParam{
+						ID:   braintrust.F("id"),
+						Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
+					}}),
+					ApplyToRootSpan:  braintrust.F(true),
+					ApplyToSpanNames: braintrust.F([]string{"string", "string", "string"}),
+				}),
+			}),
 			Description: braintrust.F("description"),
 			Name:        braintrust.F("name"),
 			ScoreType:   braintrust.F(braintrust.ProjectScoreUpdateParamsScoreTypeSlider),
@@ -193,6 +231,25 @@ func TestProjectScoreReplaceWithOptionalParams(t *testing.T) {
 			Name:  braintrust.F("name"),
 			Value: braintrust.F(0.000000),
 		}})),
+		Config: braintrust.F(shared.ProjectScoreConfigParam{
+			Destination: braintrust.F(shared.ProjectScoreConfigDestinationExpected),
+			MultiSelect: braintrust.F(true),
+			Online: braintrust.F(shared.OnlineScoreConfigParam{
+				SamplingRate: braintrust.F(0.000000),
+				Scorers: braintrust.F([]shared.OnlineScoreConfigScorersUnionParam{shared.OnlineScoreConfigScorersFunctionParam{
+					ID:   braintrust.F("id"),
+					Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
+				}, shared.OnlineScoreConfigScorersFunctionParam{
+					ID:   braintrust.F("id"),
+					Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
+				}, shared.OnlineScoreConfigScorersFunctionParam{
+					ID:   braintrust.F("id"),
+					Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
+				}}),
+				ApplyToRootSpan:  braintrust.F(true),
+				ApplyToSpanNames: braintrust.F([]string{"string", "string", "string"}),
+			}),
+		}),
 		Description: braintrust.F("description"),
 	})
 	if err != nil {
