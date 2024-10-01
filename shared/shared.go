@@ -653,17 +653,14 @@ func (r *CodeBundleLocationExperimentPosition) UnmarshalJSON(data []byte) (err e
 // AsUnion returns a [CodeBundleLocationExperimentPositionUnion] interface which
 // you can cast to the specific types for more type safety.
 //
-// Possible runtime types of the union are
-// [shared.CodeBundleLocationExperimentPositionType],
-// [shared.CodeBundleLocationExperimentPositionScorer].
+// Possible runtime types of the union are [shared.Task], [shared.Scorer].
 func (r CodeBundleLocationExperimentPosition) AsUnion() CodeBundleLocationExperimentPositionUnion {
 	return r.union
 }
 
-// Union satisfied by [shared.CodeBundleLocationExperimentPositionType] or
-// [shared.CodeBundleLocationExperimentPositionScorer].
+// Union satisfied by [shared.Task] or [shared.Scorer].
 type CodeBundleLocationExperimentPositionUnion interface {
-	implementsSharedCodeBundleLocationExperimentPosition()
+	ImplementsSharedCodeBundleLocationExperimentPosition()
 }
 
 func init() {
@@ -672,88 +669,25 @@ func init() {
 		"",
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(CodeBundleLocationExperimentPositionType{}),
+			Type:       reflect.TypeOf(Task{}),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(CodeBundleLocationExperimentPositionScorer{}),
+			Type:       reflect.TypeOf(Scorer{}),
 		},
 	)
 }
 
-type CodeBundleLocationExperimentPositionType struct {
-	Type CodeBundleLocationExperimentPositionTypeType `json:"type,required"`
-	JSON codeBundleLocationExperimentPositionTypeJSON `json:"-"`
-}
-
-// codeBundleLocationExperimentPositionTypeJSON contains the JSON metadata for the
-// struct [CodeBundleLocationExperimentPositionType]
-type codeBundleLocationExperimentPositionTypeJSON struct {
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *CodeBundleLocationExperimentPositionType) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r codeBundleLocationExperimentPositionTypeJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r CodeBundleLocationExperimentPositionType) implementsSharedCodeBundleLocationExperimentPosition() {
-}
-
-type CodeBundleLocationExperimentPositionTypeType string
+type CodeBundleLocationExperimentPositionType string
 
 const (
-	CodeBundleLocationExperimentPositionTypeTypeTask CodeBundleLocationExperimentPositionTypeType = "task"
+	CodeBundleLocationExperimentPositionTypeTask   CodeBundleLocationExperimentPositionType = "task"
+	CodeBundleLocationExperimentPositionTypeScorer CodeBundleLocationExperimentPositionType = "scorer"
 )
 
-func (r CodeBundleLocationExperimentPositionTypeType) IsKnown() bool {
+func (r CodeBundleLocationExperimentPositionType) IsKnown() bool {
 	switch r {
-	case CodeBundleLocationExperimentPositionTypeTypeTask:
-		return true
-	}
-	return false
-}
-
-type CodeBundleLocationExperimentPositionScorer struct {
-	Index int64                                          `json:"index,required"`
-	Type  CodeBundleLocationExperimentPositionScorerType `json:"type,required"`
-	JSON  codeBundleLocationExperimentPositionScorerJSON `json:"-"`
-}
-
-// codeBundleLocationExperimentPositionScorerJSON contains the JSON metadata for
-// the struct [CodeBundleLocationExperimentPositionScorer]
-type codeBundleLocationExperimentPositionScorerJSON struct {
-	Index       apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *CodeBundleLocationExperimentPositionScorer) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r codeBundleLocationExperimentPositionScorerJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r CodeBundleLocationExperimentPositionScorer) implementsSharedCodeBundleLocationExperimentPosition() {
-}
-
-type CodeBundleLocationExperimentPositionScorerType string
-
-const (
-	CodeBundleLocationExperimentPositionScorerTypeScorer CodeBundleLocationExperimentPositionScorerType = "scorer"
-)
-
-func (r CodeBundleLocationExperimentPositionScorerType) IsKnown() bool {
-	switch r {
-	case CodeBundleLocationExperimentPositionScorerTypeScorer:
+	case CodeBundleLocationExperimentPositionTypeTask, CodeBundleLocationExperimentPositionTypeScorer:
 		return true
 	}
 	return false
@@ -917,37 +851,13 @@ func (r CodeBundleLocationExperimentPositionParam) MarshalJSON() (data []byte, e
 	return apijson.MarshalRoot(r)
 }
 
-func (r CodeBundleLocationExperimentPositionParam) implementsSharedCodeBundleLocationExperimentPositionUnionParam() {
+func (r CodeBundleLocationExperimentPositionParam) ImplementsSharedCodeBundleLocationExperimentPositionUnionParam() {
 }
 
-// Satisfied by [shared.CodeBundleLocationExperimentPositionTypeParam],
-// [shared.CodeBundleLocationExperimentPositionScorerParam],
+// Satisfied by [shared.TaskParam], [shared.ScorerParam],
 // [CodeBundleLocationExperimentPositionParam].
 type CodeBundleLocationExperimentPositionUnionParam interface {
-	implementsSharedCodeBundleLocationExperimentPositionUnionParam()
-}
-
-type CodeBundleLocationExperimentPositionTypeParam struct {
-	Type param.Field[CodeBundleLocationExperimentPositionTypeType] `json:"type,required"`
-}
-
-func (r CodeBundleLocationExperimentPositionTypeParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r CodeBundleLocationExperimentPositionTypeParam) implementsSharedCodeBundleLocationExperimentPositionUnionParam() {
-}
-
-type CodeBundleLocationExperimentPositionScorerParam struct {
-	Index param.Field[int64]                                          `json:"index,required"`
-	Type  param.Field[CodeBundleLocationExperimentPositionScorerType] `json:"type,required"`
-}
-
-func (r CodeBundleLocationExperimentPositionScorerParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r CodeBundleLocationExperimentPositionScorerParam) implementsSharedCodeBundleLocationExperimentPositionUnionParam() {
+	ImplementsSharedCodeBundleLocationExperimentPositionUnionParam()
 }
 
 type CodeBundleLocationFunctionParam struct {
@@ -2297,6 +2207,35 @@ func (r FunctionOriginObjectType) IsKnown() bool {
 		return true
 	}
 	return false
+}
+
+type FunctionToolChoice struct {
+	Name string                 `json:"name,required"`
+	JSON functionToolChoiceJSON `json:"-"`
+}
+
+// functionToolChoiceJSON contains the JSON metadata for the struct
+// [FunctionToolChoice]
+type functionToolChoiceJSON struct {
+	Name        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *FunctionToolChoice) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r functionToolChoiceJSON) RawJSON() string {
+	return r.raw
+}
+
+type FunctionToolChoiceParam struct {
+	Name param.Field[string] `json:"name,required"`
+}
+
+func (r FunctionToolChoiceParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }
 
 // A group is a collection of users which can be assigned an ACL
@@ -3847,8 +3786,8 @@ type ProjectScore struct {
 	// Unique identifier for the project that the project score belongs under
 	ProjectID string `json:"project_id,required" format:"uuid"`
 	// The type of the configured score
-	ScoreType ProjectScoreScoreType `json:"score_type,required"`
-	UserID    string                `json:"user_id,required" format:"uuid"`
+	ScoreType ProjectScoreType `json:"score_type,required"`
+	UserID    string           `json:"user_id,required" format:"uuid"`
 	// For categorical-type project scores, the list of all categories
 	Categories ProjectScoreCategoriesUnion `json:"categories"`
 	Config     ProjectScoreConfig          `json:"config,nullable"`
@@ -3884,25 +3823,6 @@ func (r *ProjectScore) UnmarshalJSON(data []byte) (err error) {
 
 func (r projectScoreJSON) RawJSON() string {
 	return r.raw
-}
-
-// The type of the configured score
-type ProjectScoreScoreType string
-
-const (
-	ProjectScoreScoreTypeSlider      ProjectScoreScoreType = "slider"
-	ProjectScoreScoreTypeCategorical ProjectScoreScoreType = "categorical"
-	ProjectScoreScoreTypeWeighted    ProjectScoreScoreType = "weighted"
-	ProjectScoreScoreTypeMinimum     ProjectScoreScoreType = "minimum"
-	ProjectScoreScoreTypeOnline      ProjectScoreScoreType = "online"
-)
-
-func (r ProjectScoreScoreType) IsKnown() bool {
-	switch r {
-	case ProjectScoreScoreTypeSlider, ProjectScoreScoreTypeCategorical, ProjectScoreScoreTypeWeighted, ProjectScoreScoreTypeMinimum, ProjectScoreScoreTypeOnline:
-		return true
-	}
-	return false
 }
 
 // For categorical-type project scores, the list of all categories
@@ -4048,6 +3968,27 @@ type ProjectScoreConfigParam struct {
 func (r ProjectScoreConfigParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
+
+// The type of the configured score
+type ProjectScoreType string
+
+const (
+	ProjectScoreTypeSlider      ProjectScoreType = "slider"
+	ProjectScoreTypeCategorical ProjectScoreType = "categorical"
+	ProjectScoreTypeWeighted    ProjectScoreType = "weighted"
+	ProjectScoreTypeMinimum     ProjectScoreType = "minimum"
+	ProjectScoreTypeOnline      ProjectScoreType = "online"
+)
+
+func (r ProjectScoreType) IsKnown() bool {
+	switch r {
+	case ProjectScoreTypeSlider, ProjectScoreTypeCategorical, ProjectScoreTypeWeighted, ProjectScoreTypeMinimum, ProjectScoreTypeOnline:
+		return true
+	}
+	return false
+}
+
+func (r ProjectScoreType) ImplementsProjectScoreListParamsScoreTypeUnion() {}
 
 type ProjectSettings struct {
 	// The key used to join two experiments (defaults to `input`).
@@ -4309,7 +4250,7 @@ type PromptDataOptionsParamsOpenAIModelParams struct {
 	ResponseFormat   PromptDataOptionsParamsOpenAIModelParamsResponseFormat    `json:"response_format,nullable"`
 	Stop             []string                                                  `json:"stop"`
 	Temperature      float64                                                   `json:"temperature"`
-	ToolChoice       PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion   `json:"tool_choice"`
+	ToolChoice       ToolChoiceUnion                                           `json:"tool_choice"`
 	TopP             float64                                                   `json:"top_p"`
 	UseCache         bool                                                      `json:"use_cache"`
 	JSON             promptDataOptionsParamsOpenAIModelParamsJSON              `json:"-"`
@@ -4465,136 +4406,6 @@ const (
 func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatType) IsKnown() bool {
 	switch r {
 	case PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject:
-		return true
-	}
-	return false
-}
-
-// Union satisfied by
-// [shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone] or
-// [shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction].
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion interface {
-	implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction{}),
-		},
-	)
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto string
-
-const (
-	PromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto = "auto"
-)
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) IsKnown() bool {
-	switch r {
-	case PromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto:
-		return true
-	}
-	return false
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone string
-
-const (
-	PromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone = "none"
-)
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) IsKnown() bool {
-	switch r {
-	case PromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone:
-		return true
-	}
-	return false
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction struct {
-	Function PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction `json:"function,required"`
-	Type     PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType     `json:"type,required"`
-	JSON     promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON     `json:"-"`
-}
-
-// promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON contains the JSON
-// metadata for the struct
-// [PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction]
-type promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON struct {
-	Function    apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction struct {
-	Name string                                                                 `json:"name,required"`
-	JSON promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON `json:"-"`
-}
-
-// promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON contains
-// the JSON metadata for the struct
-// [PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction]
-type promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON struct {
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON) RawJSON() string {
-	return r.raw
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType string
-
-const (
-	PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType = "function"
-)
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType) IsKnown() bool {
-	switch r {
-	case PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction:
 		return true
 	}
 	return false
@@ -5652,7 +5463,7 @@ type PromptDataOptionsParamsOpenAIModelParamsParam struct {
 	ResponseFormat   param.Field[PromptDataOptionsParamsOpenAIModelParamsResponseFormatParam]    `json:"response_format"`
 	Stop             param.Field[[]string]                                                       `json:"stop"`
 	Temperature      param.Field[float64]                                                        `json:"temperature"`
-	ToolChoice       param.Field[PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam]   `json:"tool_choice"`
+	ToolChoice       param.Field[ToolChoiceUnionParam]                                           `json:"tool_choice"`
 	TopP             param.Field[float64]                                                        `json:"top_p"`
 	UseCache         param.Field[bool]                                                           `json:"use_cache"`
 }
@@ -5687,33 +5498,6 @@ type PromptDataOptionsParamsOpenAIModelParamsResponseFormatParam struct {
 }
 
 func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// Satisfied by [shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam].
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam interface {
-	implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam()
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam struct {
-	Function param.Field[PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam] `json:"function,required"`
-	Type     param.Field[PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType]          `json:"type,required"`
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam struct {
-	Name param.Field[string] `json:"name,required"`
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
@@ -6274,6 +6058,55 @@ func (r scoreSummaryJSON) RawJSON() string {
 	return r.raw
 }
 
+type Scorer struct {
+	Index int64      `json:"index,required"`
+	Type  ScorerType `json:"type,required"`
+	JSON  scorerJSON `json:"-"`
+}
+
+// scorerJSON contains the JSON metadata for the struct [Scorer]
+type scorerJSON struct {
+	Index       apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *Scorer) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r scorerJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r Scorer) ImplementsSharedCodeBundleLocationExperimentPosition() {}
+
+type ScorerType string
+
+const (
+	ScorerTypeScorer ScorerType = "scorer"
+)
+
+func (r ScorerType) IsKnown() bool {
+	switch r {
+	case ScorerTypeScorer:
+		return true
+	}
+	return false
+}
+
+type ScorerParam struct {
+	Index param.Field[int64]      `json:"index,required"`
+	Type  param.Field[ScorerType] `json:"type,required"`
+}
+
+func (r ScorerParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r ScorerParam) ImplementsSharedCodeBundleLocationExperimentPositionUnionParam() {}
+
 // Summary of a dataset
 type SummarizeDatasetResponse struct {
 	// Name of the dataset
@@ -6349,6 +6182,169 @@ func (r *SummarizeExperimentResponse) UnmarshalJSON(data []byte) (err error) {
 func (r summarizeExperimentResponseJSON) RawJSON() string {
 	return r.raw
 }
+
+type Task struct {
+	Type TaskType `json:"type,required"`
+	JSON taskJSON `json:"-"`
+}
+
+// taskJSON contains the JSON metadata for the struct [Task]
+type taskJSON struct {
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *Task) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r taskJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r Task) ImplementsSharedCodeBundleLocationExperimentPosition() {}
+
+type TaskType string
+
+const (
+	TaskTypeTask TaskType = "task"
+)
+
+func (r TaskType) IsKnown() bool {
+	switch r {
+	case TaskTypeTask:
+		return true
+	}
+	return false
+}
+
+type TaskParam struct {
+	Type param.Field[TaskType] `json:"type,required"`
+}
+
+func (r TaskParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r TaskParam) ImplementsSharedCodeBundleLocationExperimentPositionUnionParam() {}
+
+// Union satisfied by [shared.ToolChoiceAuto], [shared.ToolChoiceNone] or
+// [shared.ToolChoiceFunction].
+type ToolChoiceUnion interface {
+	implementsSharedToolChoiceUnion()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*ToolChoiceUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.String,
+			Type:       reflect.TypeOf(ToolChoiceAuto("")),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.String,
+			Type:       reflect.TypeOf(ToolChoiceNone("")),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(ToolChoiceFunction{}),
+		},
+	)
+}
+
+type ToolChoiceAuto string
+
+const (
+	ToolChoiceAutoAuto ToolChoiceAuto = "auto"
+)
+
+func (r ToolChoiceAuto) IsKnown() bool {
+	switch r {
+	case ToolChoiceAutoAuto:
+		return true
+	}
+	return false
+}
+
+func (r ToolChoiceAuto) implementsSharedToolChoiceUnion() {}
+
+func (r ToolChoiceAuto) implementsSharedToolChoiceUnionParam() {}
+
+type ToolChoiceNone string
+
+const (
+	ToolChoiceNoneNone ToolChoiceNone = "none"
+)
+
+func (r ToolChoiceNone) IsKnown() bool {
+	switch r {
+	case ToolChoiceNoneNone:
+		return true
+	}
+	return false
+}
+
+func (r ToolChoiceNone) implementsSharedToolChoiceUnion() {}
+
+func (r ToolChoiceNone) implementsSharedToolChoiceUnionParam() {}
+
+type ToolChoiceFunction struct {
+	Function FunctionToolChoice     `json:"function,required"`
+	Type     ToolChoiceFunctionType `json:"type,required"`
+	JSON     toolChoiceFunctionJSON `json:"-"`
+}
+
+// toolChoiceFunctionJSON contains the JSON metadata for the struct
+// [ToolChoiceFunction]
+type toolChoiceFunctionJSON struct {
+	Function    apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *ToolChoiceFunction) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r toolChoiceFunctionJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r ToolChoiceFunction) implementsSharedToolChoiceUnion() {}
+
+type ToolChoiceFunctionType string
+
+const (
+	ToolChoiceFunctionTypeFunction ToolChoiceFunctionType = "function"
+)
+
+func (r ToolChoiceFunctionType) IsKnown() bool {
+	switch r {
+	case ToolChoiceFunctionTypeFunction:
+		return true
+	}
+	return false
+}
+
+// Satisfied by [shared.ToolChoiceAuto], [shared.ToolChoiceNone],
+// [shared.ToolChoiceFunctionParam].
+type ToolChoiceUnionParam interface {
+	implementsSharedToolChoiceUnionParam()
+}
+
+type ToolChoiceFunctionParam struct {
+	Function param.Field[FunctionToolChoiceParam] `json:"function,required"`
+	Type     param.Field[ToolChoiceFunctionType]  `json:"type,required"`
+}
+
+func (r ToolChoiceFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r ToolChoiceFunctionParam) implementsSharedToolChoiceUnionParam() {}
 
 type User struct {
 	// Unique identifier for the user
