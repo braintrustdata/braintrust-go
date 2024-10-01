@@ -215,20 +215,11 @@ type CodeBundleLocationExperimentPosition = shared.CodeBundleLocationExperimentP
 // This is an alias to an internal type.
 type CodeBundleLocationExperimentPositionType = shared.CodeBundleLocationExperimentPositionType
 
-// This is an alias to an internal type.
-type CodeBundleLocationExperimentPositionTypeType = shared.CodeBundleLocationExperimentPositionTypeType
+// This is an alias to an internal value.
+const CodeBundleLocationExperimentPositionTypeTask = shared.CodeBundleLocationExperimentPositionTypeTask
 
 // This is an alias to an internal value.
-const CodeBundleLocationExperimentPositionTypeTypeTask = shared.CodeBundleLocationExperimentPositionTypeTypeTask
-
-// This is an alias to an internal type.
-type CodeBundleLocationExperimentPositionScorer = shared.CodeBundleLocationExperimentPositionScorer
-
-// This is an alias to an internal type.
-type CodeBundleLocationExperimentPositionScorerType = shared.CodeBundleLocationExperimentPositionScorerType
-
-// This is an alias to an internal value.
-const CodeBundleLocationExperimentPositionScorerTypeScorer = shared.CodeBundleLocationExperimentPositionScorerTypeScorer
+const CodeBundleLocationExperimentPositionTypeScorer = shared.CodeBundleLocationExperimentPositionTypeScorer
 
 // This is an alias to an internal type.
 type CodeBundleLocationExperimentType = shared.CodeBundleLocationExperimentType
@@ -277,12 +268,6 @@ type CodeBundleLocationExperimentParam = shared.CodeBundleLocationExperimentPara
 
 // This is an alias to an internal type.
 type CodeBundleLocationExperimentPositionUnionParam = shared.CodeBundleLocationExperimentPositionUnionParam
-
-// This is an alias to an internal type.
-type CodeBundleLocationExperimentPositionTypeParam = shared.CodeBundleLocationExperimentPositionTypeParam
-
-// This is an alias to an internal type.
-type CodeBundleLocationExperimentPositionScorerParam = shared.CodeBundleLocationExperimentPositionScorerParam
 
 // This is an alias to an internal type.
 type CodeBundleLocationFunctionParam = shared.CodeBundleLocationFunctionParam
@@ -594,6 +579,12 @@ const FunctionOriginObjectTypeProjectLog = shared.FunctionOriginObjectTypeProjec
 
 // This is an alias to an internal value.
 const FunctionOriginObjectTypeOrgProject = shared.FunctionOriginObjectTypeOrgProject
+
+// This is an alias to an internal type.
+type FunctionToolChoice = shared.FunctionToolChoice
+
+// This is an alias to an internal type.
+type FunctionToolChoiceParam = shared.FunctionToolChoiceParam
 
 // A group is a collection of users which can be assigned an ACL
 //
@@ -937,26 +928,6 @@ const ProjectLogsEventSpanAttributesTypeTool = shared.ProjectLogsEventSpanAttrib
 // This is an alias to an internal type.
 type ProjectScore = shared.ProjectScore
 
-// The type of the configured score
-//
-// This is an alias to an internal type.
-type ProjectScoreScoreType = shared.ProjectScoreScoreType
-
-// This is an alias to an internal value.
-const ProjectScoreScoreTypeSlider = shared.ProjectScoreScoreTypeSlider
-
-// This is an alias to an internal value.
-const ProjectScoreScoreTypeCategorical = shared.ProjectScoreScoreTypeCategorical
-
-// This is an alias to an internal value.
-const ProjectScoreScoreTypeWeighted = shared.ProjectScoreScoreTypeWeighted
-
-// This is an alias to an internal value.
-const ProjectScoreScoreTypeMinimum = shared.ProjectScoreScoreTypeMinimum
-
-// This is an alias to an internal value.
-const ProjectScoreScoreTypeOnline = shared.ProjectScoreScoreTypeOnline
-
 // For categorical-type project scores, the list of all categories
 //
 // This is an alias to an internal type.
@@ -996,6 +967,26 @@ const ProjectScoreConfigDestinationExpected = shared.ProjectScoreConfigDestinati
 
 // This is an alias to an internal type.
 type ProjectScoreConfigParam = shared.ProjectScoreConfigParam
+
+// The type of the configured score
+//
+// This is an alias to an internal type.
+type ProjectScoreType = shared.ProjectScoreType
+
+// This is an alias to an internal value.
+const ProjectScoreTypeSlider = shared.ProjectScoreTypeSlider
+
+// This is an alias to an internal value.
+const ProjectScoreTypeCategorical = shared.ProjectScoreTypeCategorical
+
+// This is an alias to an internal value.
+const ProjectScoreTypeWeighted = shared.ProjectScoreTypeWeighted
+
+// This is an alias to an internal value.
+const ProjectScoreTypeMinimum = shared.ProjectScoreTypeMinimum
+
+// This is an alias to an internal value.
+const ProjectScoreTypeOnline = shared.ProjectScoreTypeOnline
 
 // This is an alias to an internal type.
 type ProjectSettings = shared.ProjectSettings
@@ -1075,33 +1066,6 @@ type PromptDataOptionsParamsOpenAIModelParamsResponseFormatType = shared.PromptD
 
 // This is an alias to an internal value.
 const PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto
-
-// This is an alias to an internal value.
-const PromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone
-
-// This is an alias to an internal value.
-const PromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType
-
-// This is an alias to an internal value.
-const PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction
 
 // This is an alias to an internal type.
 type PromptDataOptionsParamsAnthropicModelParams = shared.PromptDataOptionsParamsAnthropicModelParams
@@ -1313,15 +1277,6 @@ type PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionParam = shared.
 type PromptDataOptionsParamsOpenAIModelParamsResponseFormatParam = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatParam
 
 // This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam
-
-// This is an alias to an internal type.
 type PromptDataOptionsParamsAnthropicModelParamsParam = shared.PromptDataOptionsParamsAnthropicModelParamsParam
 
 // This is an alias to an internal type.
@@ -1489,6 +1444,18 @@ const RoleMemberPermissionsRestrictObjectTypeOrgProject = shared.RoleMemberPermi
 // This is an alias to an internal type.
 type ScoreSummary = shared.ScoreSummary
 
+// This is an alias to an internal type.
+type Scorer = shared.Scorer
+
+// This is an alias to an internal type.
+type ScorerType = shared.ScorerType
+
+// This is an alias to an internal value.
+const ScorerTypeScorer = shared.ScorerTypeScorer
+
+// This is an alias to an internal type.
+type ScorerParam = shared.ScorerParam
+
 // Summary of a dataset
 //
 // This is an alias to an internal type.
@@ -1498,6 +1465,48 @@ type SummarizeDatasetResponse = shared.SummarizeDatasetResponse
 //
 // This is an alias to an internal type.
 type SummarizeExperimentResponse = shared.SummarizeExperimentResponse
+
+// This is an alias to an internal type.
+type Task = shared.Task
+
+// This is an alias to an internal type.
+type TaskType = shared.TaskType
+
+// This is an alias to an internal value.
+const TaskTypeTask = shared.TaskTypeTask
+
+// This is an alias to an internal type.
+type TaskParam = shared.TaskParam
+
+// This is an alias to an internal type.
+type ToolChoiceUnion = shared.ToolChoiceUnion
+
+// This is an alias to an internal type.
+type ToolChoiceAuto = shared.ToolChoiceAuto
+
+// This is an alias to an internal value.
+const ToolChoiceAutoAuto = shared.ToolChoiceAutoAuto
+
+// This is an alias to an internal type.
+type ToolChoiceNone = shared.ToolChoiceNone
+
+// This is an alias to an internal value.
+const ToolChoiceNoneNone = shared.ToolChoiceNoneNone
+
+// This is an alias to an internal type.
+type ToolChoiceFunction = shared.ToolChoiceFunction
+
+// This is an alias to an internal type.
+type ToolChoiceFunctionType = shared.ToolChoiceFunctionType
+
+// This is an alias to an internal value.
+const ToolChoiceFunctionTypeFunction = shared.ToolChoiceFunctionTypeFunction
+
+// This is an alias to an internal type.
+type ToolChoiceUnionParam = shared.ToolChoiceUnionParam
+
+// This is an alias to an internal type.
+type ToolChoiceFunctionParam = shared.ToolChoiceFunctionParam
 
 // This is an alias to an internal type.
 type User = shared.User
