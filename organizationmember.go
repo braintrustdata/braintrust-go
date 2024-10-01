@@ -10,6 +10,7 @@ import (
 	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
+	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 // OrganizationMemberService contains methods and other services that help with
@@ -32,50 +33,11 @@ func NewOrganizationMemberService(opts ...option.RequestOption) (r *Organization
 }
 
 // Modify organization membership
-func (r *OrganizationMemberService) Update(ctx context.Context, body OrganizationMemberUpdateParams, opts ...option.RequestOption) (res *OrganizationMemberUpdateResponse, err error) {
+func (r *OrganizationMemberService) Update(ctx context.Context, body OrganizationMemberUpdateParams, opts ...option.RequestOption) (res *shared.PatchOrganizationMembersOutput, err error) {
 	opts = append(r.Options[:], opts...)
 	path := "v1/organization/members"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
 	return
-}
-
-type OrganizationMemberUpdateResponse struct {
-	Status OrganizationMemberUpdateResponseStatus `json:"status,required"`
-	// If invite emails failed to send for some reason, the patch operation will still
-	// complete, but we will return an error message here
-	SendEmailError string                               `json:"send_email_error,nullable"`
-	JSON           organizationMemberUpdateResponseJSON `json:"-"`
-}
-
-// organizationMemberUpdateResponseJSON contains the JSON metadata for the struct
-// [OrganizationMemberUpdateResponse]
-type organizationMemberUpdateResponseJSON struct {
-	Status         apijson.Field
-	SendEmailError apijson.Field
-	raw            string
-	ExtraFields    map[string]apijson.Field
-}
-
-func (r *OrganizationMemberUpdateResponse) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r organizationMemberUpdateResponseJSON) RawJSON() string {
-	return r.raw
-}
-
-type OrganizationMemberUpdateResponseStatus string
-
-const (
-	OrganizationMemberUpdateResponseStatusSuccess OrganizationMemberUpdateResponseStatus = "success"
-)
-
-func (r OrganizationMemberUpdateResponseStatus) IsKnown() bool {
-	switch r {
-	case OrganizationMemberUpdateResponseStatusSuccess:
-		return true
-	}
-	return false
 }
 
 type OrganizationMemberUpdateParams struct {
@@ -103,12 +65,14 @@ func (r OrganizationMemberUpdateParams) MarshalJSON() (data []byte, err error) {
 type OrganizationMemberUpdateParamsInviteUsers struct {
 	// Emails of users to invite
 	Emails param.Field[[]string] `json:"emails"`
-	// Optional id of a group to add newly-invited users to. Cannot specify both a
-	// group id and a group name.
+	// Singular form of group_ids
 	GroupID param.Field[string] `json:"group_id" format:"uuid"`
-	// Optional name of a group to add newly-invited users to. Cannot specify both a
-	// group id and a group name.
+	// Optional list of group ids to add newly-invited users to.
+	GroupIDs param.Field[[]string] `json:"group_ids" format:"uuid"`
+	// Singular form of group_names
 	GroupName param.Field[string] `json:"group_name"`
+	// Optional list of group names to add newly-invited users to.
+	GroupNames param.Field[[]string] `json:"group_names"`
 	// Ids of existing users to invite
 	IDs param.Field[[]string] `json:"ids" format:"uuid"`
 	// If true, send invite emails to the users who wore actually added

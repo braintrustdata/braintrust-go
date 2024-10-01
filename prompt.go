@@ -128,7 +128,8 @@ type PromptNewParams struct {
 	// Unique identifier for the prompt
 	Slug param.Field[string] `json:"slug,required"`
 	// Textual description of the prompt
-	Description param.Field[string] `json:"description"`
+	Description  param.Field[string]                      `json:"description"`
+	FunctionType param.Field[PromptNewParamsFunctionType] `json:"function_type"`
 	// The prompt, model, and its parameters
 	PromptData param.Field[shared.PromptDataParam] `json:"prompt_data"`
 	// A list of tags for the prompt
@@ -139,6 +140,23 @@ func (r PromptNewParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
+type PromptNewParamsFunctionType string
+
+const (
+	PromptNewParamsFunctionTypeLlm    PromptNewParamsFunctionType = "llm"
+	PromptNewParamsFunctionTypeScorer PromptNewParamsFunctionType = "scorer"
+	PromptNewParamsFunctionTypeTask   PromptNewParamsFunctionType = "task"
+	PromptNewParamsFunctionTypeTool   PromptNewParamsFunctionType = "tool"
+)
+
+func (r PromptNewParamsFunctionType) IsKnown() bool {
+	switch r {
+	case PromptNewParamsFunctionTypeLlm, PromptNewParamsFunctionTypeScorer, PromptNewParamsFunctionTypeTask, PromptNewParamsFunctionTypeTool:
+		return true
+	}
+	return false
+}
+
 type PromptUpdateParams struct {
 	// Textual description of the prompt
 	Description param.Field[string] `json:"description"`
@@ -146,6 +164,8 @@ type PromptUpdateParams struct {
 	Name param.Field[string] `json:"name"`
 	// The prompt, model, and its parameters
 	PromptData param.Field[shared.PromptDataParam] `json:"prompt_data"`
+	// Unique identifier for the prompt
+	Slug param.Field[string] `json:"slug"`
 	// A list of tags for the prompt
 	Tags param.Field[[]string] `json:"tags"`
 }
@@ -217,7 +237,8 @@ type PromptReplaceParams struct {
 	// Unique identifier for the prompt
 	Slug param.Field[string] `json:"slug,required"`
 	// Textual description of the prompt
-	Description param.Field[string] `json:"description"`
+	Description  param.Field[string]                          `json:"description"`
+	FunctionType param.Field[PromptReplaceParamsFunctionType] `json:"function_type"`
 	// The prompt, model, and its parameters
 	PromptData param.Field[shared.PromptDataParam] `json:"prompt_data"`
 	// A list of tags for the prompt
@@ -226,4 +247,21 @@ type PromptReplaceParams struct {
 
 func (r PromptReplaceParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
+}
+
+type PromptReplaceParamsFunctionType string
+
+const (
+	PromptReplaceParamsFunctionTypeLlm    PromptReplaceParamsFunctionType = "llm"
+	PromptReplaceParamsFunctionTypeScorer PromptReplaceParamsFunctionType = "scorer"
+	PromptReplaceParamsFunctionTypeTask   PromptReplaceParamsFunctionType = "task"
+	PromptReplaceParamsFunctionTypeTool   PromptReplaceParamsFunctionType = "tool"
+)
+
+func (r PromptReplaceParamsFunctionType) IsKnown() bool {
+	switch r {
+	case PromptReplaceParamsFunctionTypeLlm, PromptReplaceParamsFunctionTypeScorer, PromptReplaceParamsFunctionTypeTask, PromptReplaceParamsFunctionTypeTool:
+		return true
+	}
+	return false
 }

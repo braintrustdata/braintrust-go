@@ -38,15 +38,14 @@ func NewProjectLogService(opts ...option.RequestOption) (r *ProjectLogService) {
 }
 
 // Log feedback for a set of project logs events
-func (r *ProjectLogService) Feedback(ctx context.Context, projectID string, body ProjectLogFeedbackParams, opts ...option.RequestOption) (err error) {
+func (r *ProjectLogService) Feedback(ctx context.Context, projectID string, body ProjectLogFeedbackParams, opts ...option.RequestOption) (res *shared.FeedbackResponseSchema, err error) {
 	opts = append(r.Options[:], opts...)
-	opts = append([]option.RequestOption{option.WithHeader("Accept", "")}, opts...)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
 		return
 	}
 	path := fmt.Sprintf("v1/project_logs/%s/feedback", projectID)
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, nil, opts...)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
 }
 
@@ -158,8 +157,12 @@ type ProjectLogFetchPostParams struct {
 	// The string can be obtained directly from the `cursor` property of the previous
 	// fetch query
 	Cursor param.Field[string] `json:"cursor"`
+	// NOTE: This parameter is deprecated and will be removed in a future revision.
+	// Consider using the `/btql` endpoint
+	// (https://www.braintrust.dev/docs/reference/btql) for more advanced filtering.
+	//
 	// A list of filters on the events to fetch. Currently, only path-lookup type
-	// filters are supported, but we may add more in the future
+	// filters are supported.
 	Filters param.Field[[]shared.PathLookupFilterParam] `json:"filters"`
 	// limit the number of traces fetched
 	//

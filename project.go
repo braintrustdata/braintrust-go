@@ -129,21 +129,10 @@ type ProjectUpdateParams struct {
 	Name param.Field[string] `json:"name"`
 	// Project settings. Patch operations replace all settings, so make sure you
 	// include all settings you want to keep.
-	Settings param.Field[ProjectUpdateParamsSettings] `json:"settings"`
+	Settings param.Field[shared.ProjectSettingsParam] `json:"settings"`
 }
 
 func (r ProjectUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// Project settings. Patch operations replace all settings, so make sure you
-// include all settings you want to keep.
-type ProjectUpdateParamsSettings struct {
-	// The key used to join two experiments (defaults to `input`).
-	ComparisonKey param.Field[string] `json:"comparison_key"`
-}
-
-func (r ProjectUpdateParamsSettings) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 

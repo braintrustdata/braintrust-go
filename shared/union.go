@@ -4,11 +4,11 @@ package shared
 
 type UnionString string
 
+func (UnionString) ImplementsSharedPromptDataPromptChatMessagesUserContentUnionParam() {}
+func (UnionString) ImplementsSharedPromptDataPromptChatMessagesUserContentUnion()      {}
 func (UnionString) ImplementsProjectListParamsIDsUnion()                               {}
 func (UnionString) ImplementsExperimentListParamsIDsUnion()                            {}
 func (UnionString) ImplementsDatasetListParamsIDsUnion()                               {}
-func (UnionString) ImplementsSharedPromptDataPromptChatMessagesUserContentUnionParam() {}
-func (UnionString) ImplementsSharedPromptDataPromptChatMessagesUserContentUnion()      {}
 func (UnionString) ImplementsPromptListParamsIDsUnion()                                {}
 func (UnionString) ImplementsRoleListParamsIDsUnion()                                  {}
 func (UnionString) ImplementsGroupListParamsIDsUnion()                                 {}
@@ -20,6 +20,11 @@ func (UnionString) ImplementsUserListParamsIDsUnion()                           
 func (UnionString) ImplementsProjectScoreListParamsIDsUnion()                          {}
 func (UnionString) ImplementsProjectTagListParamsIDsUnion()                            {}
 func (UnionString) ImplementsFunctionListParamsIDsUnion()                              {}
+func (UnionString) ImplementsFunctionInvokeParamsMessagesUserContentUnion()            {}
+func (UnionString) ImplementsFunctionInvokeParamsParentUnion()                         {}
 func (UnionString) ImplementsViewListParamsIDsUnion()                                  {}
 func (UnionString) ImplementsOrganizationListParamsIDsUnion()                          {}
 func (UnionString) ImplementsAPIKeyListParamsIDsUnion()                                {}
+func (UnionString) ImplementsAISecretListParamsAISecretTypeUnion()                     {}
+func (UnionString) ImplementsAISecretListParamsIDsUnion()                              {}
+func (UnionString) ImplementsEnvVarListParamsIDsUnion()                                {}
