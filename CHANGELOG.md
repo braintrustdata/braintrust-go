@@ -1,5 +1,41 @@
 # Changelog
 
+## 0.4.0 (2024-10-28)
+
+Full Changelog: [v0.3.0...v0.4.0](https://github.com/braintrustdata/braintrust-go/compare/v0.3.0...v0.4.0)
+
+### Features
+
+* **api:** api update ([#84](https://github.com/braintrustdata/braintrust-go/issues/84)) ([df1045e](https://github.com/braintrustdata/braintrust-go/commit/df1045efbcc599b0ae883736f2ea15f1a6aa8af4))
+* **api:** deduplication ([#79](https://github.com/braintrustdata/braintrust-go/issues/79)) ([5686ac7](https://github.com/braintrustdata/braintrust-go/commit/5686ac7a65d9c0e8bb72fcebfbc9aac3452c1d2e))
+* **api:** manual updates ([#80](https://github.com/braintrustdata/braintrust-go/issues/80)) ([e3165d0](https://github.com/braintrustdata/braintrust-go/commit/e3165d0c7b0c670a4f29c944174f87c9e47d4164))
+* **api:** manual updates ([#82](https://github.com/braintrustdata/braintrust-go/issues/82)) ([ba65282](https://github.com/braintrustdata/braintrust-go/commit/ba65282695f9e8a52aef0cb10c146929e3f973bd))
+* **api:** manual updates ([#83](https://github.com/braintrustdata/braintrust-go/issues/83)) ([10663e1](https://github.com/braintrustdata/braintrust-go/commit/10663e14b30b7ffaedb366ffe743579cb198f1db))
+* **api:** update via SDK Studio ([#64](https://github.com/braintrustdata/braintrust-go/issues/64)) ([5d94a4a](https://github.com/braintrustdata/braintrust-go/commit/5d94a4a13a1609d12f6d22dc1ed1822153fbaf55))
+* **api:** update via SDK Studio ([#67](https://github.com/braintrustdata/braintrust-go/issues/67)) ([8690ed8](https://github.com/braintrustdata/braintrust-go/commit/8690ed8502bdbaa75a564da00c9c33fb94a02b9e))
+* **api:** update via SDK Studio ([#68](https://github.com/braintrustdata/braintrust-go/issues/68)) ([2d4f632](https://github.com/braintrustdata/braintrust-go/commit/2d4f6323a6394d5416b8f02978c8b9354a53728b))
+* **api:** update via SDK Studio ([#69](https://github.com/braintrustdata/braintrust-go/issues/69)) ([a0f9c5b](https://github.com/braintrustdata/braintrust-go/commit/a0f9c5b0d822a67282fa874021f9dae9f92a1baf))
+* **api:** update via SDK Studio ([#70](https://github.com/braintrustdata/braintrust-go/issues/70)) ([3aef711](https://github.com/braintrustdata/braintrust-go/commit/3aef7112b35e37d846426c6772ddb45d68abeac8))
+* **api:** update via SDK Studio ([#71](https://github.com/braintrustdata/braintrust-go/issues/71)) ([12ff266](https://github.com/braintrustdata/braintrust-go/commit/12ff266ee7b8527a72d07ceebbc1b4f8be1c5d1c))
+* **api:** update via SDK Studio ([#72](https://github.com/braintrustdata/braintrust-go/issues/72)) ([374f708](https://github.com/braintrustdata/braintrust-go/commit/374f7088260e53044dc1a72bcf38f955792f82f8))
+* **api:** update via SDK Studio ([#73](https://github.com/braintrustdata/braintrust-go/issues/73)) ([2df3cf4](https://github.com/braintrustdata/braintrust-go/commit/2df3cf43958dbebd6504821150d94c1f97c2f32f))
+* **api:** update via SDK Studio ([#74](https://github.com/braintrustdata/braintrust-go/issues/74)) ([900928b](https://github.com/braintrustdata/braintrust-go/commit/900928bf8480236b28113e712abb6e0dd2c0a36e))
+* **api:** update via SDK Studio ([#75](https://github.com/braintrustdata/braintrust-go/issues/75)) ([9b6d29e](https://github.com/braintrustdata/braintrust-go/commit/9b6d29eed55d2aba4a283711b308e27508da3c5e))
+* **api:** update via SDK Studio ([#76](https://github.com/braintrustdata/braintrust-go/issues/76)) ([55bf0e9](https://github.com/braintrustdata/braintrust-go/commit/55bf0e9df88c59bc10f4b4dfee549c7307bea81a))
+
+
+### Bug Fixes
+
+* **api:** fix go build ([#78](https://github.com/braintrustdata/braintrust-go/issues/78)) ([0836190](https://github.com/braintrustdata/braintrust-go/commit/0836190bbc023d57751080d29b5d24cd9d54e6ab))
+* **api:** fix go unions ([#81](https://github.com/braintrustdata/braintrust-go/issues/81)) ([3407648](https://github.com/braintrustdata/braintrust-go/commit/3407648208167e78fe9e5179e551dd0626371c9c))
+
+
+### Chores
+
+* **api:** manual updates ([#85](https://github.com/braintrustdata/braintrust-go/issues/85)) ([277aa99](https://github.com/braintrustdata/braintrust-go/commit/277aa99a39816b54882e0f6fffb30ceab4f274c4))
+* **internal:** codegen related update ([#65](https://github.com/braintrustdata/braintrust-go/issues/65)) ([9a1b423](https://github.com/braintrustdata/braintrust-go/commit/9a1b4236981a93ef2ffa28441b7bebc2ca8cabc2))
+* **internal:** codegen related update ([#77](https://github.com/braintrustdata/braintrust-go/issues/77)) ([371af04](https://github.com/braintrustdata/braintrust-go/commit/371af04dce69372c9583f6aa0d3f88924189d14f))
+
 ## 0.3.0 (2024-08-09)
 
 Full Changelog: [v0.2.0...v0.3.0](https://github.com/braintrustdata/braintrust-go/compare/v0.2.0...v0.3.0)
