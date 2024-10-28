@@ -141,6 +141,21 @@ type ACLBatchUpdateResponse = shared.ACLBatchUpdateResponse
 type APIKey = shared.APIKey
 
 // This is an alias to an internal type.
+type ChatCompletionContentPart = shared.ChatCompletionContentPart
+
+// This is an alias to an internal type.
+type ChatCompletionContentPartType = shared.ChatCompletionContentPartType
+
+// This is an alias to an internal value.
+const ChatCompletionContentPartTypeText = shared.ChatCompletionContentPartTypeText
+
+// This is an alias to an internal value.
+const ChatCompletionContentPartTypeImageURL = shared.ChatCompletionContentPartTypeImageURL
+
+// This is an alias to an internal type.
+type ChatCompletionContentPartUnionParam = shared.ChatCompletionContentPartUnionParam
+
+// This is an alias to an internal type.
 type ChatCompletionContentPartImage = shared.ChatCompletionContentPartImage
 
 // This is an alias to an internal type.
@@ -1134,18 +1149,6 @@ type PromptDataPromptChatMessagesUserContentUnion = shared.PromptDataPromptChatM
 type PromptDataPromptChatMessagesUserContentArray = shared.PromptDataPromptChatMessagesUserContentArray
 
 // This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayItem = shared.PromptDataPromptChatMessagesUserContentArrayItem
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayType = shared.PromptDataPromptChatMessagesUserContentArrayType
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesUserContentArrayTypeText = shared.PromptDataPromptChatMessagesUserContentArrayTypeText
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesUserContentArrayTypeImageURL = shared.PromptDataPromptChatMessagesUserContentArrayTypeImageURL
-
-// This is an alias to an internal type.
 type PromptDataPromptChatMessagesAssistant = shared.PromptDataPromptChatMessagesAssistant
 
 // This is an alias to an internal type.
@@ -1317,9 +1320,6 @@ type PromptDataPromptChatMessagesUserContentUnionParam = shared.PromptDataPrompt
 
 // This is an alias to an internal type.
 type PromptDataPromptChatMessagesUserContentArrayParam = shared.PromptDataPromptChatMessagesUserContentArrayParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserContentArrayUnionItemParam = shared.PromptDataPromptChatMessagesUserContentArrayUnionItemParam
 
 // This is an alias to an internal type.
 type PromptDataPromptChatMessagesAssistantParam = shared.PromptDataPromptChatMessagesAssistantParam
