@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.1 (2024-11-01)
+
+Full Changelog: [v0.4.0...v0.4.1](https://github.com/braintrustdata/braintrust-go/compare/v0.4.0...v0.4.1)
+
+### Chores
+
+* rebuild project due to codegen change ([#87](https://github.com/braintrustdata/braintrust-go/issues/87)) ([8bebfe9](https://github.com/braintrustdata/braintrust-go/commit/8bebfe9470a2cf8afec8b24370b53163e985ce69))
+
 ## 0.4.0 (2024-10-28)
 
 Full Changelog: [v0.3.0...v0.4.0](https://github.com/braintrustdata/braintrust-go/compare/v0.3.0...v0.4.0)
