@@ -417,27 +417,20 @@ func (r ExperimentInsertParams) MarshalJSON() (data []byte, err error) {
 
 // An experiment event
 type ExperimentInsertParamsEvent struct {
-	Input          param.Field[interface{}] `json:"input,required"`
-	Output         param.Field[interface{}] `json:"output,required"`
-	Expected       param.Field[interface{}] `json:"expected,required"`
-	Error          param.Field[interface{}] `json:"error,required"`
-	Scores         param.Field[interface{}] `json:"scores,required"`
-	Metadata       param.Field[interface{}] `json:"metadata,required"`
-	Tags           param.Field[interface{}] `json:"tags,required"`
-	Metrics        param.Field[interface{}] `json:"metrics,required"`
+	MergePaths     param.Field[interface{}] `json:"_merge_paths,required"`
 	Context        param.Field[interface{}] `json:"context,required"`
+	Error          param.Field[interface{}] `json:"error,required"`
+	Expected       param.Field[interface{}] `json:"expected,required"`
+	Input          param.Field[interface{}] `json:"input,required"`
+	Metadata       param.Field[interface{}] `json:"metadata,required"`
+	Metrics        param.Field[interface{}] `json:"metrics,required"`
+	Output         param.Field[interface{}] `json:"output,required"`
+	Scores         param.Field[interface{}] `json:"scores,required"`
 	SpanAttributes param.Field[interface{}] `json:"span_attributes,required"`
+	Tags           param.Field[interface{}] `json:"tags,required"`
 	// A unique identifier for the experiment event. If you don't provide one,
 	// BrainTrust will generate one for you
 	ID param.Field[string] `json:"id"`
-	// If the experiment is associated to a dataset, this is the event-level dataset id
-	// this experiment event is tied to
-	DatasetRecordID param.Field[string] `json:"dataset_record_id"`
-	// The timestamp the experiment event was created
-	Created param.Field[time.Time] `json:"created" format:"date-time"`
-	// Pass `_object_delete=true` to mark the experiment event deleted. Deleted events
-	// will not show up in subsequent fetches for this experiment
-	ObjectDelete param.Field[bool] `json:"_object_delete"`
 	// The `_is_merge` field controls how the row is merged with any existing row with
 	// the same id in the DB. By default (or when set to `false`), the existing row is
 	// completely replaced by the new row. When set to `true`, the new row is
@@ -450,6 +443,9 @@ type ExperimentInsertParamsEvent struct {
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
 	IsMerge param.Field[bool] `json:"_is_merge"`
+	// Pass `_object_delete=true` to mark the experiment event deleted. Deleted events
+	// will not show up in subsequent fetches for this experiment
+	ObjectDelete param.Field[bool] `json:"_object_delete"`
 	// Use the `_parent_id` field to create this row as a subspan of an existing row.
 	// It cannot be specified alongside `_is_merge=true`. Tracking hierarchical
 	// relationships are important for tracing (see the
@@ -462,8 +458,12 @@ type ExperimentInsertParamsEvent struct {
 	// In the webapp, only the root span row `"abc"` will show up in the summary view.
 	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
 	// clicking on the "abc" row.
-	ParentID   param.Field[string]      `json:"_parent_id"`
-	MergePaths param.Field[interface{}] `json:"_merge_paths,required"`
+	ParentID param.Field[string] `json:"_parent_id"`
+	// The timestamp the experiment event was created
+	Created param.Field[time.Time] `json:"created" format:"date-time"`
+	// If the experiment is associated to a dataset, this is the event-level dataset id
+	// this experiment event is tied to
+	DatasetRecordID param.Field[string] `json:"dataset_record_id"`
 }
 
 func (r ExperimentInsertParamsEvent) MarshalJSON() (data []byte, err error) {
