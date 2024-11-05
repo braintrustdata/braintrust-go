@@ -73,8 +73,8 @@ func (r EvalNewParams) MarshalJSON() (data []byte, err error) {
 // The dataset to use
 type EvalNewParamsData struct {
 	DatasetID   param.Field[string] `json:"dataset_id"`
-	ProjectName param.Field[string] `json:"project_name"`
 	DatasetName param.Field[string] `json:"dataset_name"`
+	ProjectName param.Field[string] `json:"project_name"`
 }
 
 func (r EvalNewParamsData) MarshalJSON() (data []byte, err error) {
@@ -116,28 +116,28 @@ func (r EvalNewParamsDataProjectDatasetName) implementsEvalNewParamsDataUnion() 
 
 // The function to evaluate
 type EvalNewParamsScore struct {
+	InlineContext param.Field[interface{}] `json:"inline_context,required"`
+	// The inline code to execute
+	Code param.Field[string] `json:"code"`
 	// The ID of the function
 	FunctionID param.Field[string] `json:"function_id"`
-	// The version of the function
-	Version param.Field[string] `json:"version"`
-	// The name of the project containing the function
-	ProjectName param.Field[string] `json:"project_name"`
-	// The slug of the function
-	Slug param.Field[string] `json:"slug"`
 	// The name of the global function. Currently, the global namespace includes the
 	// functions in autoevals
 	GlobalFunction param.Field[string] `json:"global_function"`
-	// The ID of the prompt session
-	PromptSessionID param.Field[string] `json:"prompt_session_id"`
-	// The ID of the function in the prompt session
-	PromptSessionFunctionID param.Field[string]      `json:"prompt_session_function_id"`
-	InlineContext           param.Field[interface{}] `json:"inline_context,required"`
-	// The inline code to execute
-	Code param.Field[string] `json:"code"`
-	// The name of the inline code function
-	Name param.Field[string] `json:"name"`
 	// The prompt, model, and its parameters
 	InlinePrompt param.Field[shared.PromptDataParam] `json:"inline_prompt"`
+	// The name of the inline code function
+	Name param.Field[string] `json:"name"`
+	// The name of the project containing the function
+	ProjectName param.Field[string] `json:"project_name"`
+	// The ID of the function in the prompt session
+	PromptSessionFunctionID param.Field[string] `json:"prompt_session_function_id"`
+	// The ID of the prompt session
+	PromptSessionID param.Field[string] `json:"prompt_session_id"`
+	// The slug of the function
+	Slug param.Field[string] `json:"slug"`
+	// The version of the function
+	Version param.Field[string] `json:"version"`
 }
 
 func (r EvalNewParamsScore) MarshalJSON() (data []byte, err error) {
@@ -270,28 +270,28 @@ func (r EvalNewParamsScoresInlinePrompt) implementsEvalNewParamsScoreUnion() {}
 
 // The function to evaluate
 type EvalNewParamsTask struct {
+	InlineContext param.Field[interface{}] `json:"inline_context,required"`
+	// The inline code to execute
+	Code param.Field[string] `json:"code"`
 	// The ID of the function
 	FunctionID param.Field[string] `json:"function_id"`
-	// The version of the function
-	Version param.Field[string] `json:"version"`
-	// The name of the project containing the function
-	ProjectName param.Field[string] `json:"project_name"`
-	// The slug of the function
-	Slug param.Field[string] `json:"slug"`
 	// The name of the global function. Currently, the global namespace includes the
 	// functions in autoevals
 	GlobalFunction param.Field[string] `json:"global_function"`
-	// The ID of the prompt session
-	PromptSessionID param.Field[string] `json:"prompt_session_id"`
-	// The ID of the function in the prompt session
-	PromptSessionFunctionID param.Field[string]      `json:"prompt_session_function_id"`
-	InlineContext           param.Field[interface{}] `json:"inline_context,required"`
-	// The inline code to execute
-	Code param.Field[string] `json:"code"`
-	// The name of the inline code function
-	Name param.Field[string] `json:"name"`
 	// The prompt, model, and its parameters
 	InlinePrompt param.Field[shared.PromptDataParam] `json:"inline_prompt"`
+	// The name of the inline code function
+	Name param.Field[string] `json:"name"`
+	// The name of the project containing the function
+	ProjectName param.Field[string] `json:"project_name"`
+	// The ID of the function in the prompt session
+	PromptSessionFunctionID param.Field[string] `json:"prompt_session_function_id"`
+	// The ID of the prompt session
+	PromptSessionID param.Field[string] `json:"prompt_session_id"`
+	// The slug of the function
+	Slug param.Field[string] `json:"slug"`
+	// The version of the function
+	Version param.Field[string] `json:"version"`
 }
 
 func (r EvalNewParamsTask) MarshalJSON() (data []byte, err error) {
