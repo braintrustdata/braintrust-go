@@ -265,11 +265,11 @@ func (r apiKeyJSON) RawJSON() string {
 }
 
 type ChatCompletionContentPart struct {
-	Text string                        `json:"text"`
-	Type ChatCompletionContentPartType `json:"type,required"`
 	// This field can have the runtime type of
 	// [ChatCompletionContentPartImageImageURL].
 	ImageURL interface{}                   `json:"image_url,required"`
+	Type     ChatCompletionContentPartType `json:"type,required"`
+	Text     string                        `json:"text"`
 	JSON     chatCompletionContentPartJSON `json:"-"`
 	union    ChatCompletionContentPartUnion
 }
@@ -277,9 +277,9 @@ type ChatCompletionContentPart struct {
 // chatCompletionContentPartJSON contains the JSON metadata for the struct
 // [ChatCompletionContentPart]
 type chatCompletionContentPartJSON struct {
-	Text        apijson.Field
-	Type        apijson.Field
 	ImageURL    apijson.Field
+	Type        apijson.Field
+	Text        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
@@ -343,9 +343,9 @@ func (r ChatCompletionContentPartType) IsKnown() bool {
 }
 
 type ChatCompletionContentPartParam struct {
-	Text     param.Field[string]                        `json:"text"`
-	Type     param.Field[ChatCompletionContentPartType] `json:"type,required"`
 	ImageURL param.Field[interface{}]                   `json:"image_url,required"`
+	Type     param.Field[ChatCompletionContentPartType] `json:"type,required"`
+	Text     param.Field[string]                        `json:"text"`
 }
 
 func (r ChatCompletionContentPartParam) MarshalJSON() (data []byte, err error) {
@@ -617,10 +617,10 @@ func (r codeBundleJSON) RawJSON() string {
 }
 
 type CodeBundleLocation struct {
-	Type     CodeBundleLocationType `json:"type,required"`
-	EvalName string                 `json:"eval_name"`
 	// This field can have the runtime type of [CodeBundleLocationExperimentPosition].
 	Position interface{}            `json:"position,required"`
+	Type     CodeBundleLocationType `json:"type,required"`
+	EvalName string                 `json:"eval_name"`
 	Index    int64                  `json:"index"`
 	JSON     codeBundleLocationJSON `json:"-"`
 	union    CodeBundleLocationUnion
@@ -629,9 +629,9 @@ type CodeBundleLocation struct {
 // codeBundleLocationJSON contains the JSON metadata for the struct
 // [CodeBundleLocation]
 type codeBundleLocationJSON struct {
+	Position    apijson.Field
 	Type        apijson.Field
 	EvalName    apijson.Field
-	Position    apijson.Field
 	Index       apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
@@ -898,9 +898,9 @@ func (r CodeBundleParam) MarshalJSON() (data []byte, err error) {
 }
 
 type CodeBundleLocationParam struct {
+	Position param.Field[interface{}]            `json:"position,required"`
 	Type     param.Field[CodeBundleLocationType] `json:"type,required"`
 	EvalName param.Field[string]                 `json:"eval_name"`
-	Position param.Field[interface{}]            `json:"position,required"`
 	Index    param.Field[int64]                  `json:"index"`
 }
 
@@ -1786,9 +1786,9 @@ func (r functionJSON) RawJSON() string {
 }
 
 type FunctionFunctionData struct {
-	Type FunctionFunctionDataType `json:"type,required"`
 	// This field can have the runtime type of [FunctionFunctionDataCodeData].
 	Data  interface{}              `json:"data,required"`
+	Type  FunctionFunctionDataType `json:"type,required"`
 	Name  string                   `json:"name"`
 	JSON  functionFunctionDataJSON `json:"-"`
 	union FunctionFunctionDataUnion
@@ -1797,8 +1797,8 @@ type FunctionFunctionData struct {
 // functionFunctionDataJSON contains the JSON metadata for the struct
 // [FunctionFunctionData]
 type functionFunctionDataJSON struct {
-	Type        apijson.Field
 	Data        apijson.Field
+	Type        apijson.Field
 	Name        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
@@ -1914,16 +1914,16 @@ func (r functionFunctionDataCodeJSON) RawJSON() string {
 func (r FunctionFunctionDataCode) implementsSharedFunctionFunctionData() {}
 
 type FunctionFunctionDataCodeData struct {
+	// This field can have the runtime type of [CodeBundleLocation].
+	Location interface{} `json:"location,required"`
 	// This field can have the runtime type of [CodeBundleRuntimeContext],
 	// [FunctionFunctionDataCodeDataInlineRuntimeContext].
 	RuntimeContext interface{} `json:"runtime_context,required"`
-	// This field can have the runtime type of [CodeBundleLocation].
-	Location interface{} `json:"location,required"`
-	BundleID string      `json:"bundle_id"`
+	BundleID       string      `json:"bundle_id"`
+	Code           string      `json:"code"`
 	// A preview of the code
 	Preview string                           `json:"preview,nullable"`
 	Type    FunctionFunctionDataCodeDataType `json:"type"`
-	Code    string                           `json:"code"`
 	JSON    functionFunctionDataCodeDataJSON `json:"-"`
 	union   FunctionFunctionDataCodeDataUnion
 }
@@ -1931,12 +1931,12 @@ type FunctionFunctionDataCodeData struct {
 // functionFunctionDataCodeDataJSON contains the JSON metadata for the struct
 // [FunctionFunctionDataCodeData]
 type functionFunctionDataCodeDataJSON struct {
-	RuntimeContext apijson.Field
 	Location       apijson.Field
+	RuntimeContext apijson.Field
 	BundleID       apijson.Field
+	Code           apijson.Field
 	Preview        apijson.Field
 	Type           apijson.Field
-	Code           apijson.Field
 	raw            string
 	ExtraFields    map[string]apijson.Field
 }
@@ -4679,11 +4679,11 @@ func (r PromptDataParserType) IsKnown() bool {
 }
 
 type PromptDataPrompt struct {
-	Type    PromptDataPromptType `json:"type"`
-	Content string               `json:"content"`
 	// This field can have the runtime type of [[]PromptDataPromptChatMessage].
 	Messages interface{}          `json:"messages,required"`
+	Content  string               `json:"content"`
 	Tools    string               `json:"tools"`
+	Type     PromptDataPromptType `json:"type"`
 	JSON     promptDataPromptJSON `json:"-"`
 	union    PromptDataPromptUnion
 }
@@ -4691,10 +4691,10 @@ type PromptDataPrompt struct {
 // promptDataPromptJSON contains the JSON metadata for the struct
 // [PromptDataPrompt]
 type promptDataPromptJSON struct {
-	Type        apijson.Field
-	Content     apijson.Field
 	Messages    apijson.Field
+	Content     apijson.Field
 	Tools       apijson.Field
+	Type        apijson.Field
 	raw         string
 	ExtraFields map[string]apijson.Field
 }
@@ -4815,14 +4815,14 @@ func (r PromptDataPromptChat) implementsSharedPromptDataPrompt() {}
 type PromptDataPromptChatMessage struct {
 	// This field can have the runtime type of [string],
 	// [PromptDataPromptChatMessagesUserContentUnion].
-	Content interface{}                      `json:"content,required"`
-	Role    PromptDataPromptChatMessagesRole `json:"role,required"`
-	Name    string                           `json:"name"`
+	Content interface{} `json:"content,required"`
 	// This field can have the runtime type of
 	// [PromptDataPromptChatMessagesAssistantFunctionCall].
-	FunctionCall interface{} `json:"function_call,required"`
+	FunctionCall interface{}                      `json:"function_call,required"`
+	Role         PromptDataPromptChatMessagesRole `json:"role,required"`
 	// This field can have the runtime type of [[]ChatCompletionMessageToolCall].
 	ToolCalls  interface{}                     `json:"tool_calls,required"`
+	Name       string                          `json:"name"`
 	ToolCallID string                          `json:"tool_call_id"`
 	JSON       promptDataPromptChatMessageJSON `json:"-"`
 	union      PromptDataPromptChatMessagesUnion
@@ -4832,10 +4832,10 @@ type PromptDataPromptChatMessage struct {
 // [PromptDataPromptChatMessage]
 type promptDataPromptChatMessageJSON struct {
 	Content      apijson.Field
-	Role         apijson.Field
-	Name         apijson.Field
 	FunctionCall apijson.Field
+	Role         apijson.Field
 	ToolCalls    apijson.Field
+	Name         apijson.Field
 	ToolCallID   apijson.Field
 	raw          string
 	ExtraFields  map[string]apijson.Field
@@ -5587,10 +5587,10 @@ func (r PromptDataParserParam) MarshalJSON() (data []byte, err error) {
 }
 
 type PromptDataPromptParam struct {
-	Type     param.Field[PromptDataPromptType] `json:"type"`
-	Content  param.Field[string]               `json:"content"`
 	Messages param.Field[interface{}]          `json:"messages,required"`
+	Content  param.Field[string]               `json:"content"`
 	Tools    param.Field[string]               `json:"tools"`
+	Type     param.Field[PromptDataPromptType] `json:"type"`
 }
 
 func (r PromptDataPromptParam) MarshalJSON() (data []byte, err error) {
@@ -5631,10 +5631,10 @@ func (r PromptDataPromptChatParam) implementsSharedPromptDataPromptUnionParam() 
 
 type PromptDataPromptChatMessageParam struct {
 	Content      param.Field[interface{}]                      `json:"content,required"`
-	Role         param.Field[PromptDataPromptChatMessagesRole] `json:"role,required"`
-	Name         param.Field[string]                           `json:"name"`
 	FunctionCall param.Field[interface{}]                      `json:"function_call,required"`
+	Role         param.Field[PromptDataPromptChatMessagesRole] `json:"role,required"`
 	ToolCalls    param.Field[interface{}]                      `json:"tool_calls,required"`
+	Name         param.Field[string]                           `json:"name"`
 	ToolCallID   param.Field[string]                           `json:"tool_call_id"`
 }
 
