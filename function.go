@@ -159,8 +159,8 @@ func (r FunctionNewParams) MarshalJSON() (data []byte, err error) {
 }
 
 type FunctionNewParamsFunctionData struct {
-	Data param.Field[interface{}]                       `json:"data,required"`
 	Type param.Field[FunctionNewParamsFunctionDataType] `json:"type,required"`
+	Data param.Field[interface{}]                       `json:"data"`
 	Name param.Field[string]                            `json:"name"`
 }
 
@@ -448,7 +448,7 @@ func (r FunctionUpdateParams) MarshalJSON() (data []byte, err error) {
 }
 
 type FunctionUpdateParamsFunctionData struct {
-	Data param.Field[interface{}]                          `json:"data,required"`
+	Data param.Field[interface{}]                          `json:"data"`
 	Name param.Field[string]                               `json:"name"`
 	Type param.Field[FunctionUpdateParamsFunctionDataType] `json:"type"`
 }
@@ -742,12 +742,12 @@ func (r FunctionInvokeParams) MarshalJSON() (data []byte, err error) {
 }
 
 type FunctionInvokeParamsMessage struct {
-	Content      param.Field[interface{}]                      `json:"content,required"`
-	FunctionCall param.Field[interface{}]                      `json:"function_call,required"`
 	Role         param.Field[FunctionInvokeParamsMessagesRole] `json:"role,required"`
-	ToolCalls    param.Field[interface{}]                      `json:"tool_calls,required"`
+	Content      param.Field[interface{}]                      `json:"content"`
+	FunctionCall param.Field[interface{}]                      `json:"function_call"`
 	Name         param.Field[string]                           `json:"name"`
 	ToolCallID   param.Field[string]                           `json:"tool_call_id"`
+	ToolCalls    param.Field[interface{}]                      `json:"tool_calls"`
 }
 
 func (r FunctionInvokeParamsMessage) MarshalJSON() (data []byte, err error) {
@@ -1054,8 +1054,8 @@ func (r FunctionReplaceParams) MarshalJSON() (data []byte, err error) {
 }
 
 type FunctionReplaceParamsFunctionData struct {
-	Data param.Field[interface{}]                           `json:"data,required"`
 	Type param.Field[FunctionReplaceParamsFunctionDataType] `json:"type,required"`
+	Data param.Field[interface{}]                           `json:"data"`
 	Name param.Field[string]                                `json:"name"`
 }
 
