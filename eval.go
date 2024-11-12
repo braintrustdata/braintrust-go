@@ -116,14 +116,14 @@ func (r EvalNewParamsDataProjectDatasetName) implementsEvalNewParamsDataUnion() 
 
 // The function to evaluate
 type EvalNewParamsScore struct {
-	InlineContext param.Field[interface{}] `json:"inline_context,required"`
 	// The inline code to execute
 	Code param.Field[string] `json:"code"`
 	// The ID of the function
 	FunctionID param.Field[string] `json:"function_id"`
 	// The name of the global function. Currently, the global namespace includes the
 	// functions in autoevals
-	GlobalFunction param.Field[string] `json:"global_function"`
+	GlobalFunction param.Field[string]      `json:"global_function"`
+	InlineContext  param.Field[interface{}] `json:"inline_context"`
 	// The prompt, model, and its parameters
 	InlinePrompt param.Field[shared.PromptDataParam] `json:"inline_prompt"`
 	// The name of the inline code function
@@ -270,14 +270,14 @@ func (r EvalNewParamsScoresInlinePrompt) implementsEvalNewParamsScoreUnion() {}
 
 // The function to evaluate
 type EvalNewParamsTask struct {
-	InlineContext param.Field[interface{}] `json:"inline_context,required"`
 	// The inline code to execute
 	Code param.Field[string] `json:"code"`
 	// The ID of the function
 	FunctionID param.Field[string] `json:"function_id"`
 	// The name of the global function. Currently, the global namespace includes the
 	// functions in autoevals
-	GlobalFunction param.Field[string] `json:"global_function"`
+	GlobalFunction param.Field[string]      `json:"global_function"`
+	InlineContext  param.Field[interface{}] `json:"inline_context"`
 	// The prompt, model, and its parameters
 	InlinePrompt param.Field[shared.PromptDataParam] `json:"inline_prompt"`
 	// The name of the inline code function
