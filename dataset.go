@@ -384,11 +384,6 @@ func (r DatasetInsertParams) MarshalJSON() (data []byte, err error) {
 
 // A dataset event
 type DatasetInsertParamsEvent struct {
-	MergePaths param.Field[interface{}] `json:"_merge_paths,required"`
-	Expected   param.Field[interface{}] `json:"expected,required"`
-	Input      param.Field[interface{}] `json:"input,required"`
-	Metadata   param.Field[interface{}] `json:"metadata,required"`
-	Tags       param.Field[interface{}] `json:"tags,required"`
 	// A unique identifier for the dataset event. If you don't provide one, BrainTrust
 	// will generate one for you
 	ID param.Field[string] `json:"id"`
@@ -403,7 +398,8 @@ type DatasetInsertParamsEvent struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[bool] `json:"_is_merge"`
+	IsMerge    param.Field[bool]        `json:"_is_merge"`
+	MergePaths param.Field[interface{}] `json:"_merge_paths"`
 	// Pass `_object_delete=true` to mark the dataset event deleted. Deleted events
 	// will not show up in subsequent fetches for this dataset
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
@@ -421,7 +417,11 @@ type DatasetInsertParamsEvent struct {
 	// clicking on the "abc" row.
 	ParentID param.Field[string] `json:"_parent_id"`
 	// The timestamp the dataset event was created
-	Created param.Field[time.Time] `json:"created" format:"date-time"`
+	Created  param.Field[time.Time]   `json:"created" format:"date-time"`
+	Expected param.Field[interface{}] `json:"expected"`
+	Input    param.Field[interface{}] `json:"input"`
+	Metadata param.Field[interface{}] `json:"metadata"`
+	Tags     param.Field[interface{}] `json:"tags"`
 }
 
 func (r DatasetInsertParamsEvent) MarshalJSON() (data []byte, err error) {

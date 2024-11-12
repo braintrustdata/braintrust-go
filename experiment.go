@@ -417,17 +417,6 @@ func (r ExperimentInsertParams) MarshalJSON() (data []byte, err error) {
 
 // An experiment event
 type ExperimentInsertParamsEvent struct {
-	MergePaths     param.Field[interface{}] `json:"_merge_paths,required"`
-	Context        param.Field[interface{}] `json:"context,required"`
-	Error          param.Field[interface{}] `json:"error,required"`
-	Expected       param.Field[interface{}] `json:"expected,required"`
-	Input          param.Field[interface{}] `json:"input,required"`
-	Metadata       param.Field[interface{}] `json:"metadata,required"`
-	Metrics        param.Field[interface{}] `json:"metrics,required"`
-	Output         param.Field[interface{}] `json:"output,required"`
-	Scores         param.Field[interface{}] `json:"scores,required"`
-	SpanAttributes param.Field[interface{}] `json:"span_attributes,required"`
-	Tags           param.Field[interface{}] `json:"tags,required"`
 	// A unique identifier for the experiment event. If you don't provide one,
 	// BrainTrust will generate one for you
 	ID param.Field[string] `json:"id"`
@@ -442,7 +431,8 @@ type ExperimentInsertParamsEvent struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[bool] `json:"_is_merge"`
+	IsMerge    param.Field[bool]        `json:"_is_merge"`
+	MergePaths param.Field[interface{}] `json:"_merge_paths"`
 	// Pass `_object_delete=true` to mark the experiment event deleted. Deleted events
 	// will not show up in subsequent fetches for this experiment
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
@@ -458,12 +448,22 @@ type ExperimentInsertParamsEvent struct {
 	// In the webapp, only the root span row `"abc"` will show up in the summary view.
 	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
 	// clicking on the "abc" row.
-	ParentID param.Field[string] `json:"_parent_id"`
+	ParentID param.Field[string]      `json:"_parent_id"`
+	Context  param.Field[interface{}] `json:"context"`
 	// The timestamp the experiment event was created
 	Created param.Field[time.Time] `json:"created" format:"date-time"`
 	// If the experiment is associated to a dataset, this is the event-level dataset id
 	// this experiment event is tied to
-	DatasetRecordID param.Field[string] `json:"dataset_record_id"`
+	DatasetRecordID param.Field[string]      `json:"dataset_record_id"`
+	Error           param.Field[interface{}] `json:"error"`
+	Expected        param.Field[interface{}] `json:"expected"`
+	Input           param.Field[interface{}] `json:"input"`
+	Metadata        param.Field[interface{}] `json:"metadata"`
+	Metrics         param.Field[interface{}] `json:"metrics"`
+	Output          param.Field[interface{}] `json:"output"`
+	Scores          param.Field[interface{}] `json:"scores"`
+	SpanAttributes  param.Field[interface{}] `json:"span_attributes"`
+	Tags            param.Field[interface{}] `json:"tags"`
 }
 
 func (r ExperimentInsertParamsEvent) MarshalJSON() (data []byte, err error) {
