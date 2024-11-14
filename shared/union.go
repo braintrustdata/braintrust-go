@@ -19,6 +19,7 @@ func (UnionString) ImplementsUserListParamsGivenNameUnion()                     
 func (UnionString) ImplementsUserListParamsIDsUnion()                                  {}
 func (UnionString) ImplementsProjectScoreListParamsIDsUnion()                          {}
 func (UnionString) ImplementsProjectTagListParamsIDsUnion()                            {}
+func (UnionString) ImplementsSpanIframeListParamsIDsUnion()                            {}
 func (UnionString) ImplementsFunctionListParamsIDsUnion()                              {}
 func (UnionString) ImplementsFunctionInvokeParamsMessagesUserContentUnion()            {}
 func (UnionString) ImplementsFunctionInvokeParamsParentUnion()                         {}
