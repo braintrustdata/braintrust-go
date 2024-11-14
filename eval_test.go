@@ -11,6 +11,7 @@ import (
 	"github.com/braintrustdata/braintrust-go"
 	"github.com/braintrustdata/braintrust-go/internal/testutil"
 	"github.com/braintrustdata/braintrust-go/option"
+	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 func TestEvalNewWithOptionalParams(t *testing.T) {
@@ -44,11 +45,32 @@ func TestEvalNewWithOptionalParams(t *testing.T) {
 			FunctionID: braintrust.F("function_id"),
 			Version:    braintrust.F("version"),
 		}),
-		ExperimentName: braintrust.F("experiment_name"),
+		BaseExperimentID:   braintrust.F("base_experiment_id"),
+		BaseExperimentName: braintrust.F("base_experiment_name"),
+		ExperimentName:     braintrust.F("experiment_name"),
+		GitMetadataSettings: braintrust.F(braintrust.EvalNewParamsGitMetadataSettings{
+			Collect: braintrust.F(braintrust.EvalNewParamsGitMetadataSettingsCollectAll),
+			Fields:  braintrust.F([]braintrust.EvalNewParamsGitMetadataSettingsField{braintrust.EvalNewParamsGitMetadataSettingsFieldCommit, braintrust.EvalNewParamsGitMetadataSettingsFieldBranch, braintrust.EvalNewParamsGitMetadataSettingsFieldTag}),
+		}),
+		IsPublic:       braintrust.F(true),
+		MaxConcurrency: braintrust.F(0.000000),
 		Metadata: braintrust.F(map[string]interface{}{
 			"foo": "bar",
 		}),
-		Stream: braintrust.F(true),
+		RepoInfo: braintrust.F(shared.RepoInfoParam{
+			AuthorEmail:   braintrust.F("author_email"),
+			AuthorName:    braintrust.F("author_name"),
+			Branch:        braintrust.F("branch"),
+			Commit:        braintrust.F("commit"),
+			CommitMessage: braintrust.F("commit_message"),
+			CommitTime:    braintrust.F("commit_time"),
+			Dirty:         braintrust.F(true),
+			GitDiff:       braintrust.F("git_diff"),
+			Tag:           braintrust.F("tag"),
+		}),
+		Stream:     braintrust.F(true),
+		Timeout:    braintrust.F(0.000000),
+		TrialCount: braintrust.F(0.000000),
 	})
 	if err != nil {
 		var apierr *braintrust.Error

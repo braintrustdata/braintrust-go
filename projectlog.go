@@ -76,7 +76,7 @@ func (r *ProjectLogService) FetchPost(ctx context.Context, projectID string, bod
 }
 
 // Insert a set of events into the project logs
-func (r *ProjectLogService) Insert(ctx context.Context, projectID string, body ProjectLogInsertParams, opts ...option.RequestOption) (res *shared.InsertEventsResponse, err error) {
+func (r *ProjectLogService) Insert(ctx context.Context, projectID string, body ProjectLogInsertParams, opts ...option.RequestOption) (res *ProjectLogInsertResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
@@ -85,6 +85,30 @@ func (r *ProjectLogService) Insert(ctx context.Context, projectID string, body P
 	path := fmt.Sprintf("v1/project_logs/%s/insert", projectID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
+}
+
+type ProjectLogInsertResponse struct {
+	// String slugs which line up 1-1 with the row_ids. These slugs can be used as the
+	// 'parent' specifier to attach spans underneath the row
+	SerializedSpanSlugs []string                     `json:"serialized_span_slugs,required"`
+	JSON                projectLogInsertResponseJSON `json:"-"`
+	shared.InsertEventsResponse
+}
+
+// projectLogInsertResponseJSON contains the JSON metadata for the struct
+// [ProjectLogInsertResponse]
+type projectLogInsertResponseJSON struct {
+	SerializedSpanSlugs apijson.Field
+	raw                 string
+	ExtraFields         map[string]apijson.Field
+}
+
+func (r *ProjectLogInsertResponse) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r projectLogInsertResponseJSON) RawJSON() string {
+	return r.raw
 }
 
 type ProjectLogFeedbackParams struct {

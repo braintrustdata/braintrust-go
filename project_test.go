@@ -27,7 +27,7 @@ func TestProjectNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Projects.New(context.TODO(), braintrust.ProjectNewParams{
-		Name:    braintrust.F("name"),
+		Name:    braintrust.F("x"),
 		OrgName: braintrust.F("org_name"),
 	})
 	if err != nil {

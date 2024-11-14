@@ -54,16 +54,39 @@ type EvalNewParams struct {
 	Scores param.Field[[]EvalNewParamsScoreUnion] `json:"scores,required"`
 	// The function to evaluate
 	Task param.Field[EvalNewParamsTaskUnion] `json:"task,required"`
+	// An optional experiment id to use as a base. If specified, the new experiment
+	// will be summarized and compared to this experiment.
+	BaseExperimentID param.Field[string] `json:"base_experiment_id"`
+	// An optional experiment name to use as a base. If specified, the new experiment
+	// will be summarized and compared to this experiment.
+	BaseExperimentName param.Field[string] `json:"base_experiment_name"`
 	// An optional name for the experiment created by this eval. If it conflicts with
 	// an existing experiment, it will be suffixed with a unique identifier.
 	ExperimentName param.Field[string] `json:"experiment_name"`
+	// Optional settings for collecting git metadata. By default, will collect all git
+	// metadata fields allowed in org-level settings.
+	GitMetadataSettings param.Field[EvalNewParamsGitMetadataSettings] `json:"git_metadata_settings"`
+	// Whether the experiment should be public. Defaults to false.
+	IsPublic param.Field[bool] `json:"is_public"`
+	// The maximum number of tasks/scorers that will be run concurrently. Defaults to
+	// undefined, in which case there is no max concurrency.
+	MaxConcurrency param.Field[float64] `json:"max_concurrency"`
 	// Optional experiment-level metadata to store about the evaluation. You can later
 	// use this to slice & dice across experiments.
 	Metadata param.Field[map[string]interface{}] `json:"metadata"`
+	// Metadata about the state of the repo when the experiment was created
+	RepoInfo param.Field[shared.RepoInfoParam] `json:"repo_info"`
 	// Whether to stream the results of the eval. If true, the request will return two
 	// events: one to indicate the experiment has started, and another upon completion.
 	// If false, the request will return the evaluation's summary upon completion.
 	Stream param.Field[bool] `json:"stream"`
+	// The maximum duration, in milliseconds, to run the evaluation. Defaults to
+	// undefined, in which case there is no timeout.
+	Timeout param.Field[float64] `json:"timeout"`
+	// The number of times to run the evaluator per input. This is useful for
+	// evaluating applications that have non-deterministic behavior and gives you both
+	// a stronger aggregate measure and a sense of the variance in the results.
+	TrialCount param.Field[float64] `json:"trial_count"`
 }
 
 func (r EvalNewParams) MarshalJSON() (data []byte, err error) {
@@ -421,3 +444,52 @@ func (r EvalNewParamsTaskInlinePrompt) MarshalJSON() (data []byte, err error) {
 }
 
 func (r EvalNewParamsTaskInlinePrompt) implementsEvalNewParamsTaskUnion() {}
+
+// Optional settings for collecting git metadata. By default, will collect all git
+// metadata fields allowed in org-level settings.
+type EvalNewParamsGitMetadataSettings struct {
+	Collect param.Field[EvalNewParamsGitMetadataSettingsCollect] `json:"collect,required"`
+	Fields  param.Field[[]EvalNewParamsGitMetadataSettingsField] `json:"fields"`
+}
+
+func (r EvalNewParamsGitMetadataSettings) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type EvalNewParamsGitMetadataSettingsCollect string
+
+const (
+	EvalNewParamsGitMetadataSettingsCollectAll  EvalNewParamsGitMetadataSettingsCollect = "all"
+	EvalNewParamsGitMetadataSettingsCollectNone EvalNewParamsGitMetadataSettingsCollect = "none"
+	EvalNewParamsGitMetadataSettingsCollectSome EvalNewParamsGitMetadataSettingsCollect = "some"
+)
+
+func (r EvalNewParamsGitMetadataSettingsCollect) IsKnown() bool {
+	switch r {
+	case EvalNewParamsGitMetadataSettingsCollectAll, EvalNewParamsGitMetadataSettingsCollectNone, EvalNewParamsGitMetadataSettingsCollectSome:
+		return true
+	}
+	return false
+}
+
+type EvalNewParamsGitMetadataSettingsField string
+
+const (
+	EvalNewParamsGitMetadataSettingsFieldCommit        EvalNewParamsGitMetadataSettingsField = "commit"
+	EvalNewParamsGitMetadataSettingsFieldBranch        EvalNewParamsGitMetadataSettingsField = "branch"
+	EvalNewParamsGitMetadataSettingsFieldTag           EvalNewParamsGitMetadataSettingsField = "tag"
+	EvalNewParamsGitMetadataSettingsFieldDirty         EvalNewParamsGitMetadataSettingsField = "dirty"
+	EvalNewParamsGitMetadataSettingsFieldAuthorName    EvalNewParamsGitMetadataSettingsField = "author_name"
+	EvalNewParamsGitMetadataSettingsFieldAuthorEmail   EvalNewParamsGitMetadataSettingsField = "author_email"
+	EvalNewParamsGitMetadataSettingsFieldCommitMessage EvalNewParamsGitMetadataSettingsField = "commit_message"
+	EvalNewParamsGitMetadataSettingsFieldCommitTime    EvalNewParamsGitMetadataSettingsField = "commit_time"
+	EvalNewParamsGitMetadataSettingsFieldGitDiff       EvalNewParamsGitMetadataSettingsField = "git_diff"
+)
+
+func (r EvalNewParamsGitMetadataSettingsField) IsKnown() bool {
+	switch r {
+	case EvalNewParamsGitMetadataSettingsFieldCommit, EvalNewParamsGitMetadataSettingsFieldBranch, EvalNewParamsGitMetadataSettingsFieldTag, EvalNewParamsGitMetadataSettingsFieldDirty, EvalNewParamsGitMetadataSettingsFieldAuthorName, EvalNewParamsGitMetadataSettingsFieldAuthorEmail, EvalNewParamsGitMetadataSettingsFieldCommitMessage, EvalNewParamsGitMetadataSettingsFieldCommitTime, EvalNewParamsGitMetadataSettingsFieldGitDiff:
+		return true
+	}
+	return false
+}
