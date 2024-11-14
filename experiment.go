@@ -150,7 +150,7 @@ func (r *ExperimentService) FetchPost(ctx context.Context, experimentID string, 
 }
 
 // Insert a set of events into the experiment
-func (r *ExperimentService) Insert(ctx context.Context, experimentID string, body ExperimentInsertParams, opts ...option.RequestOption) (res *shared.InsertEventsResponse, err error) {
+func (r *ExperimentService) Insert(ctx context.Context, experimentID string, body ExperimentInsertParams, opts ...option.RequestOption) (res *ExperimentInsertResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
@@ -171,6 +171,30 @@ func (r *ExperimentService) Summarize(ctx context.Context, experimentID string, 
 	path := fmt.Sprintf("v1/experiment/%s/summarize", experimentID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
+}
+
+type ExperimentInsertResponse struct {
+	// String slugs which line up 1-1 with the row_ids. These slugs can be used as the
+	// 'parent' specifier to attach spans underneath the row
+	SerializedSpanSlugs []string                     `json:"serialized_span_slugs,required"`
+	JSON                experimentInsertResponseJSON `json:"-"`
+	shared.InsertEventsResponse
+}
+
+// experimentInsertResponseJSON contains the JSON metadata for the struct
+// [ExperimentInsertResponse]
+type experimentInsertResponseJSON struct {
+	SerializedSpanSlugs apijson.Field
+	raw                 string
+	ExtraFields         map[string]apijson.Field
+}
+
+func (r *ExperimentInsertResponse) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r experimentInsertResponseJSON) RawJSON() string {
+	return r.raw
 }
 
 type ExperimentNewParams struct {

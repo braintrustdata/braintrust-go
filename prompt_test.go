@@ -27,26 +27,30 @@ func TestPromptNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Prompts.New(context.TODO(), braintrust.PromptNewParams{
-		Name:         braintrust.F("name"),
+		Name:         braintrust.F("x"),
 		ProjectID:    braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Slug:         braintrust.F("slug"),
+		Slug:         braintrust.F("x"),
 		Description:  braintrust.F("description"),
 		FunctionType: braintrust.F(braintrust.PromptNewParamsFunctionTypeLlm),
 		PromptData: braintrust.F(shared.PromptDataParam{
 			Options: braintrust.F(shared.PromptDataOptionsParam{
 				Model: braintrust.F("model"),
-				Params: braintrust.F[shared.PromptDataOptionsParamsUnionParam](shared.PromptDataOptionsParamsOpenAIModelParamsParam{
-					FrequencyPenalty: braintrust.F(0.000000),
-					FunctionCall:     braintrust.F[shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam](shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto(shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto)),
+				Params: braintrust.F[shared.PromptDataOptionsParamsUnionParam](shared.PromptDataOptionsParamsAnthropicModelParamsParam{
+					FrequencyPenalty: int64(0),
+					FunctionCall:     "auto",
 					MaxTokens:        braintrust.F(0.000000),
-					N:                braintrust.F(0.000000),
-					PresencePenalty:  braintrust.F(0.000000),
-					ResponseFormat: braintrust.F(shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatParam{
-						Type: braintrust.F(shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject),
-					}),
-					Stop:        braintrust.F([]string{"string", "string", "string"}),
+					N:                int64(0),
+					PresencePenalty:  int64(0),
+					ResponseFormat: map[string]interface{}{
+						"type": "json_object",
+					},
+					Stop: map[string]interface{}{
+						"0": "string",
+						"1": "string",
+						"2": "string",
+					},
 					Temperature: braintrust.F(0.000000),
-					ToolChoice:  braintrust.F[shared.ToolChoiceUnionParam](shared.ToolChoiceAuto(shared.ToolChoiceAutoAuto)),
+					ToolChoice:  "auto",
 					TopP:        braintrust.F(0.000000),
 					UseCache:    braintrust.F(true),
 				}),
@@ -133,18 +137,22 @@ func TestPromptUpdateWithOptionalParams(t *testing.T) {
 			PromptData: braintrust.F(shared.PromptDataParam{
 				Options: braintrust.F(shared.PromptDataOptionsParam{
 					Model: braintrust.F("model"),
-					Params: braintrust.F[shared.PromptDataOptionsParamsUnionParam](shared.PromptDataOptionsParamsOpenAIModelParamsParam{
-						FrequencyPenalty: braintrust.F(0.000000),
-						FunctionCall:     braintrust.F[shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam](shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto(shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto)),
+					Params: braintrust.F[shared.PromptDataOptionsParamsUnionParam](shared.PromptDataOptionsParamsAnthropicModelParamsParam{
+						FrequencyPenalty: int64(0),
+						FunctionCall:     "auto",
 						MaxTokens:        braintrust.F(0.000000),
-						N:                braintrust.F(0.000000),
-						PresencePenalty:  braintrust.F(0.000000),
-						ResponseFormat: braintrust.F(shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatParam{
-							Type: braintrust.F(shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject),
-						}),
-						Stop:        braintrust.F([]string{"string", "string", "string"}),
+						N:                int64(0),
+						PresencePenalty:  int64(0),
+						ResponseFormat: map[string]interface{}{
+							"type": "json_object",
+						},
+						Stop: map[string]interface{}{
+							"0": "string",
+							"1": "string",
+							"2": "string",
+						},
 						Temperature: braintrust.F(0.000000),
-						ToolChoice:  braintrust.F[shared.ToolChoiceUnionParam](shared.ToolChoiceAuto(shared.ToolChoiceAutoAuto)),
+						ToolChoice:  "auto",
 						TopP:        braintrust.F(0.000000),
 						UseCache:    braintrust.F(true),
 					}),
@@ -258,26 +266,30 @@ func TestPromptReplaceWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Prompts.Replace(context.TODO(), braintrust.PromptReplaceParams{
-		Name:         braintrust.F("name"),
+		Name:         braintrust.F("x"),
 		ProjectID:    braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Slug:         braintrust.F("slug"),
+		Slug:         braintrust.F("x"),
 		Description:  braintrust.F("description"),
 		FunctionType: braintrust.F(braintrust.PromptReplaceParamsFunctionTypeLlm),
 		PromptData: braintrust.F(shared.PromptDataParam{
 			Options: braintrust.F(shared.PromptDataOptionsParam{
 				Model: braintrust.F("model"),
-				Params: braintrust.F[shared.PromptDataOptionsParamsUnionParam](shared.PromptDataOptionsParamsOpenAIModelParamsParam{
-					FrequencyPenalty: braintrust.F(0.000000),
-					FunctionCall:     braintrust.F[shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam](shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto(shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto)),
+				Params: braintrust.F[shared.PromptDataOptionsParamsUnionParam](shared.PromptDataOptionsParamsAnthropicModelParamsParam{
+					FrequencyPenalty: int64(0),
+					FunctionCall:     "auto",
 					MaxTokens:        braintrust.F(0.000000),
-					N:                braintrust.F(0.000000),
-					PresencePenalty:  braintrust.F(0.000000),
-					ResponseFormat: braintrust.F(shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatParam{
-						Type: braintrust.F(shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject),
-					}),
-					Stop:        braintrust.F([]string{"string", "string", "string"}),
+					N:                int64(0),
+					PresencePenalty:  int64(0),
+					ResponseFormat: map[string]interface{}{
+						"type": "json_object",
+					},
+					Stop: map[string]interface{}{
+						"0": "string",
+						"1": "string",
+						"2": "string",
+					},
 					Temperature: braintrust.F(0.000000),
-					ToolChoice:  braintrust.F[shared.ToolChoiceUnionParam](shared.ToolChoiceAuto(shared.ToolChoiceAutoAuto)),
+					ToolChoice:  "auto",
 					TopP:        braintrust.F(0.000000),
 					UseCache:    braintrust.F(true),
 				}),

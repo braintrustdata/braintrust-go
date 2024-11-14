@@ -28,9 +28,12 @@ func TestDatasetNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Datasets.New(context.TODO(), braintrust.DatasetNewParams{
-		Name:        braintrust.F("name"),
+		Name:        braintrust.F("x"),
 		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		Description: braintrust.F("description"),
+		Metadata: braintrust.F(map[string]interface{}{
+			"foo": "bar",
+		}),
 	})
 	if err != nil {
 		var apierr *braintrust.Error

@@ -121,12 +121,11 @@ type ACLNewParams struct {
 	// Id of the group the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
 	GroupID param.Field[string] `json:"group_id" format:"uuid"`
-	// Each permission permits a certain type of operation on an object in the system
-	//
-	// Permissions can be assigned to to objects on an individual basis, or grouped
-	// into roles
+	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
+	// provided
 	Permission param.Field[ACLNewParamsPermission] `json:"permission"`
-	// The object type that the ACL applies to
+	// When setting a permission directly, optionally restricts the permission grant to
+	// just the specified object type. Cannot be set alongside a `role_id`.
 	RestrictObjectType param.Field[ACLNewParamsRestrictObjectType] `json:"restrict_object_type"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
@@ -165,10 +164,8 @@ func (r ACLNewParamsObjectType) IsKnown() bool {
 	return false
 }
 
-// Each permission permits a certain type of operation on an object in the system
-//
-// Permissions can be assigned to to objects on an individual basis, or grouped
-// into roles
+// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
+// provided
 type ACLNewParamsPermission string
 
 const (
@@ -190,7 +187,8 @@ func (r ACLNewParamsPermission) IsKnown() bool {
 	return false
 }
 
-// The object type that the ACL applies to
+// When setting a permission directly, optionally restricts the permission grant to
+// just the specified object type. Cannot be set alongside a `role_id`.
 type ACLNewParamsRestrictObjectType string
 
 const (
@@ -331,12 +329,11 @@ type ACLBatchUpdateParamsAddACL struct {
 	// Id of the group the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
 	GroupID param.Field[string] `json:"group_id" format:"uuid"`
-	// Each permission permits a certain type of operation on an object in the system
-	//
-	// Permissions can be assigned to to objects on an individual basis, or grouped
-	// into roles
+	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
+	// provided
 	Permission param.Field[ACLBatchUpdateParamsAddACLsPermission] `json:"permission"`
-	// The object type that the ACL applies to
+	// When setting a permission directly, optionally restricts the permission grant to
+	// just the specified object type. Cannot be set alongside a `role_id`.
 	RestrictObjectType param.Field[ACLBatchUpdateParamsAddACLsRestrictObjectType] `json:"restrict_object_type"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
@@ -375,10 +372,8 @@ func (r ACLBatchUpdateParamsAddACLsObjectType) IsKnown() bool {
 	return false
 }
 
-// Each permission permits a certain type of operation on an object in the system
-//
-// Permissions can be assigned to to objects on an individual basis, or grouped
-// into roles
+// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
+// provided
 type ACLBatchUpdateParamsAddACLsPermission string
 
 const (
@@ -400,7 +395,8 @@ func (r ACLBatchUpdateParamsAddACLsPermission) IsKnown() bool {
 	return false
 }
 
-// The object type that the ACL applies to
+// When setting a permission directly, optionally restricts the permission grant to
+// just the specified object type. Cannot be set alongside a `role_id`.
 type ACLBatchUpdateParamsAddACLsRestrictObjectType string
 
 const (
@@ -443,12 +439,11 @@ type ACLBatchUpdateParamsRemoveACL struct {
 	// Id of the group the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
 	GroupID param.Field[string] `json:"group_id" format:"uuid"`
-	// Each permission permits a certain type of operation on an object in the system
-	//
-	// Permissions can be assigned to to objects on an individual basis, or grouped
-	// into roles
+	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
+	// provided
 	Permission param.Field[ACLBatchUpdateParamsRemoveACLsPermission] `json:"permission"`
-	// The object type that the ACL applies to
+	// When setting a permission directly, optionally restricts the permission grant to
+	// just the specified object type. Cannot be set alongside a `role_id`.
 	RestrictObjectType param.Field[ACLBatchUpdateParamsRemoveACLsRestrictObjectType] `json:"restrict_object_type"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
@@ -487,10 +482,8 @@ func (r ACLBatchUpdateParamsRemoveACLsObjectType) IsKnown() bool {
 	return false
 }
 
-// Each permission permits a certain type of operation on an object in the system
-//
-// Permissions can be assigned to to objects on an individual basis, or grouped
-// into roles
+// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
+// provided
 type ACLBatchUpdateParamsRemoveACLsPermission string
 
 const (
@@ -512,7 +505,8 @@ func (r ACLBatchUpdateParamsRemoveACLsPermission) IsKnown() bool {
 	return false
 }
 
-// The object type that the ACL applies to
+// When setting a permission directly, optionally restricts the permission grant to
+// just the specified object type. Cannot be set alongside a `role_id`.
 type ACLBatchUpdateParamsRemoveACLsRestrictObjectType string
 
 const (
@@ -545,12 +539,11 @@ type ACLFindAndDeleteParams struct {
 	// Id of the group the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
 	GroupID param.Field[string] `json:"group_id" format:"uuid"`
-	// Each permission permits a certain type of operation on an object in the system
-	//
-	// Permissions can be assigned to to objects on an individual basis, or grouped
-	// into roles
+	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
+	// provided
 	Permission param.Field[ACLFindAndDeleteParamsPermission] `json:"permission"`
-	// The object type that the ACL applies to
+	// When setting a permission directly, optionally restricts the permission grant to
+	// just the specified object type. Cannot be set alongside a `role_id`.
 	RestrictObjectType param.Field[ACLFindAndDeleteParamsRestrictObjectType] `json:"restrict_object_type"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
@@ -589,10 +582,8 @@ func (r ACLFindAndDeleteParamsObjectType) IsKnown() bool {
 	return false
 }
 
-// Each permission permits a certain type of operation on an object in the system
-//
-// Permissions can be assigned to to objects on an individual basis, or grouped
-// into roles
+// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
+// provided
 type ACLFindAndDeleteParamsPermission string
 
 const (
@@ -614,7 +605,8 @@ func (r ACLFindAndDeleteParamsPermission) IsKnown() bool {
 	return false
 }
 
-// The object type that the ACL applies to
+// When setting a permission directly, optionally restricts the permission grant to
+// just the specified object type. Cannot be set alongside a `role_id`.
 type ACLFindAndDeleteParamsRestrictObjectType string
 
 const (

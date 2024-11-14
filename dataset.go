@@ -180,6 +180,8 @@ type DatasetNewParams struct {
 	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
 	// Textual description of the dataset
 	Description param.Field[string] `json:"description"`
+	// User-controlled metadata about the dataset
+	Metadata param.Field[map[string]interface{}] `json:"metadata"`
 }
 
 func (r DatasetNewParams) MarshalJSON() (data []byte, err error) {

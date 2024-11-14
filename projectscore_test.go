@@ -29,7 +29,7 @@ func TestProjectScoreNewWithOptionalParams(t *testing.T) {
 	_, err := client.ProjectScores.New(context.TODO(), braintrust.ProjectScoreNewParams{
 		Name:      braintrust.F("name"),
 		ProjectID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ScoreType: braintrust.F(shared.ProjectScoreTypeSlider),
+		ScoreType: braintrust.F(braintrust.ProjectScoreNewParamsScoreTypeSlider),
 		Categories: braintrust.F[braintrust.ProjectScoreNewParamsCategoriesUnion](braintrust.ProjectScoreNewParamsCategoriesCategorical([]shared.ProjectScoreCategoryParam{{
 			Name:  braintrust.F("name"),
 			Value: braintrust.F(0.000000),
@@ -139,7 +139,7 @@ func TestProjectScoreUpdateWithOptionalParams(t *testing.T) {
 			}),
 			Description: braintrust.F("description"),
 			Name:        braintrust.F("name"),
-			ScoreType:   braintrust.F(shared.ProjectScoreTypeSlider),
+			ScoreType:   braintrust.F(braintrust.ProjectScoreUpdateParamsScoreTypeSlider),
 		},
 	)
 	if err != nil {
@@ -171,7 +171,7 @@ func TestProjectScoreListWithOptionalParams(t *testing.T) {
 		ProjectID:        braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ProjectName:      braintrust.F("project_name"),
 		ProjectScoreName: braintrust.F("project_score_name"),
-		ScoreType:        braintrust.F[braintrust.ProjectScoreListParamsScoreTypeUnion](shared.ProjectScoreType(shared.ProjectScoreTypeSlider)),
+		ScoreType:        braintrust.F[braintrust.ProjectScoreListParamsScoreTypeUnion](braintrust.ProjectScoreListParamsScoreTypeProjectScoreType(braintrust.ProjectScoreListParamsScoreTypeProjectScoreTypeSlider)),
 		StartingAfter:    braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
@@ -220,7 +220,7 @@ func TestProjectScoreReplaceWithOptionalParams(t *testing.T) {
 	_, err := client.ProjectScores.Replace(context.TODO(), braintrust.ProjectScoreReplaceParams{
 		Name:      braintrust.F("name"),
 		ProjectID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ScoreType: braintrust.F(shared.ProjectScoreTypeSlider),
+		ScoreType: braintrust.F(braintrust.ProjectScoreReplaceParamsScoreTypeSlider),
 		Categories: braintrust.F[braintrust.ProjectScoreReplaceParamsCategoriesUnion](braintrust.ProjectScoreReplaceParamsCategoriesCategorical([]shared.ProjectScoreCategoryParam{{
 			Name:  braintrust.F("name"),
 			Value: braintrust.F(0.000000),
