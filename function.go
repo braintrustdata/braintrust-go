@@ -822,9 +822,44 @@ type FunctionInvokeParamsMessagesUserContentUnion interface {
 	ImplementsFunctionInvokeParamsMessagesUserContentUnion()
 }
 
-type FunctionInvokeParamsMessagesUserContentArray []shared.ChatCompletionContentPartUnionParam
+type FunctionInvokeParamsMessagesUserContentArray []FunctionInvokeParamsMessagesUserContentArrayUnion
 
 func (r FunctionInvokeParamsMessagesUserContentArray) ImplementsFunctionInvokeParamsMessagesUserContentUnion() {
+}
+
+type FunctionInvokeParamsMessagesUserContentArray struct {
+	Type     param.Field[FunctionInvokeParamsMessagesUserContentArrayType] `json:"type,required"`
+	ImageURL param.Field[interface{}]                                      `json:"image_url"`
+	Text     param.Field[string]                                           `json:"text"`
+}
+
+func (r FunctionInvokeParamsMessagesUserContentArray) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessagesUserContentArray) ImplementsFunctionInvokeParamsMessagesUserContentArrayUnion() {
+}
+
+// Satisfied by [shared.ChatCompletionContentPartTextParam],
+// [shared.ChatCompletionContentPartImageParam],
+// [FunctionInvokeParamsMessagesUserContentArray].
+type FunctionInvokeParamsMessagesUserContentArrayUnion interface {
+	ImplementsFunctionInvokeParamsMessagesUserContentArrayUnion()
+}
+
+type FunctionInvokeParamsMessagesUserContentArrayType string
+
+const (
+	FunctionInvokeParamsMessagesUserContentArrayTypeText     FunctionInvokeParamsMessagesUserContentArrayType = "text"
+	FunctionInvokeParamsMessagesUserContentArrayTypeImageURL FunctionInvokeParamsMessagesUserContentArrayType = "image_url"
+)
+
+func (r FunctionInvokeParamsMessagesUserContentArrayType) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesUserContentArrayTypeText, FunctionInvokeParamsMessagesUserContentArrayTypeImageURL:
+		return true
+	}
+	return false
 }
 
 type FunctionInvokeParamsMessagesAssistant struct {

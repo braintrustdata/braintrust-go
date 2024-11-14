@@ -27,7 +27,7 @@ func TestRoleNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Roles.New(context.TODO(), braintrust.RoleNewParams{
-		Name:        braintrust.F("name"),
+		Name:        braintrust.F("x"),
 		Description: braintrust.F("description"),
 		MemberPermissions: braintrust.F([]braintrust.RoleNewParamsMemberPermission{{
 			Permission:         braintrust.F(braintrust.RoleNewParamsMemberPermissionsPermissionCreate),
@@ -101,7 +101,7 @@ func TestRoleUpdateWithOptionalParams(t *testing.T) {
 			}}),
 			AddMemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
 			Description:    braintrust.F("description"),
-			Name:           braintrust.F("name"),
+			Name:           braintrust.F("x"),
 			RemoveMemberPermissions: braintrust.F([]braintrust.RoleUpdateParamsRemoveMemberPermission{{
 				Permission:         braintrust.F(braintrust.RoleUpdateParamsRemoveMemberPermissionsPermissionCreate),
 				RestrictObjectType: braintrust.F(braintrust.RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeOrganization),
@@ -188,7 +188,7 @@ func TestRoleReplaceWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Roles.Replace(context.TODO(), braintrust.RoleReplaceParams{
-		Name:        braintrust.F("name"),
+		Name:        braintrust.F("x"),
 		Description: braintrust.F("description"),
 		MemberPermissions: braintrust.F([]braintrust.RoleReplaceParamsMemberPermission{{
 			Permission:         braintrust.F(braintrust.RoleReplaceParamsMemberPermissionsPermissionCreate),

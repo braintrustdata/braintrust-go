@@ -27,6 +27,7 @@ type Client struct {
 	Users         *UserService
 	ProjectScores *ProjectScoreService
 	ProjectTags   *ProjectTagService
+	SpanIframes   *SpanIframeService
 	Functions     *FunctionService
 	Views         *ViewService
 	Organizations *OrganizationService
@@ -60,6 +61,7 @@ func NewClient(opts ...option.RequestOption) (r *Client) {
 	r.Users = NewUserService(opts...)
 	r.ProjectScores = NewProjectScoreService(opts...)
 	r.ProjectTags = NewProjectTagService(opts...)
+	r.SpanIframes = NewSpanIframeService(opts...)
 	r.Functions = NewFunctionService(opts...)
 	r.Views = NewViewService(opts...)
 	r.Organizations = NewOrganizationService(opts...)
