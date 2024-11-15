@@ -397,34 +397,6 @@ const ExperimentEventOriginObjectTypePromptSession = shared.ExperimentEventOrigi
 // This is an alias to an internal value.
 const ExperimentEventOriginObjectTypeProjectLogs = shared.ExperimentEventOriginObjectTypeProjectLogs
 
-// Human-identifying attributes of the span, such as name, type, etc.
-//
-// This is an alias to an internal type.
-type ExperimentEventSpanAttributes = shared.ExperimentEventSpanAttributes
-
-// Type of the span, for display purposes only
-//
-// This is an alias to an internal type.
-type ExperimentEventSpanAttributesType = shared.ExperimentEventSpanAttributesType
-
-// This is an alias to an internal value.
-const ExperimentEventSpanAttributesTypeLlm = shared.ExperimentEventSpanAttributesTypeLlm
-
-// This is an alias to an internal value.
-const ExperimentEventSpanAttributesTypeScore = shared.ExperimentEventSpanAttributesTypeScore
-
-// This is an alias to an internal value.
-const ExperimentEventSpanAttributesTypeFunction = shared.ExperimentEventSpanAttributesTypeFunction
-
-// This is an alias to an internal value.
-const ExperimentEventSpanAttributesTypeEval = shared.ExperimentEventSpanAttributesTypeEval
-
-// This is an alias to an internal value.
-const ExperimentEventSpanAttributesTypeTask = shared.ExperimentEventSpanAttributesTypeTask
-
-// This is an alias to an internal value.
-const ExperimentEventSpanAttributesTypeTool = shared.ExperimentEventSpanAttributesTypeTool
-
 // This is an alias to an internal type.
 type FeedbackDatasetItemParam = shared.FeedbackDatasetItemParam
 
@@ -658,17 +630,18 @@ const FunctionOriginObjectTypeOrgProject = shared.FunctionOriginObjectTypeOrgPro
 // This is an alias to an internal type.
 type Group = shared.Group
 
+// A dataset event
+//
 // This is an alias to an internal type.
-type InsertDatasetEventMergeParam = shared.InsertDatasetEventMergeParam
-
-// This is an alias to an internal type.
-type InsertDatasetEventReplaceParam = shared.InsertDatasetEventReplaceParam
+type InsertDatasetEventParam = shared.InsertDatasetEventParam
 
 // This is an alias to an internal type.
 type InsertEventsResponse = shared.InsertEventsResponse
 
+// An experiment event
+//
 // This is an alias to an internal type.
-type InsertExperimentEventMergeParam = shared.InsertExperimentEventMergeParam
+type InsertExperimentEventParam = shared.InsertExperimentEventParam
 
 // Context is additional information about the code that produced the experiment
 // event. It is essentially the textual counterpart to `metrics`. Use the
@@ -676,91 +649,19 @@ type InsertExperimentEventMergeParam = shared.InsertExperimentEventMergeParam
 // experiment event
 //
 // This is an alias to an internal type.
-type InsertExperimentEventMergeContextParam = shared.InsertExperimentEventMergeContextParam
+type InsertExperimentEventContextParam = shared.InsertExperimentEventContextParam
 
 // Metrics are numerical measurements tracking the execution of the code that
 // produced the experiment event. Use "start" and "end" to track the time span over
 // which the experiment event was produced
 //
 // This is an alias to an internal type.
-type InsertExperimentEventMergeMetricsParam = shared.InsertExperimentEventMergeMetricsParam
+type InsertExperimentEventMetricsParam = shared.InsertExperimentEventMetricsParam
 
-// Human-identifying attributes of the span, such as name, type, etc.
+// A project logs event
 //
 // This is an alias to an internal type.
-type InsertExperimentEventMergeSpanAttributesParam = shared.InsertExperimentEventMergeSpanAttributesParam
-
-// Type of the span, for display purposes only
-//
-// This is an alias to an internal type.
-type InsertExperimentEventMergeSpanAttributesType = shared.InsertExperimentEventMergeSpanAttributesType
-
-// This is an alias to an internal value.
-const InsertExperimentEventMergeSpanAttributesTypeLlm = shared.InsertExperimentEventMergeSpanAttributesTypeLlm
-
-// This is an alias to an internal value.
-const InsertExperimentEventMergeSpanAttributesTypeScore = shared.InsertExperimentEventMergeSpanAttributesTypeScore
-
-// This is an alias to an internal value.
-const InsertExperimentEventMergeSpanAttributesTypeFunction = shared.InsertExperimentEventMergeSpanAttributesTypeFunction
-
-// This is an alias to an internal value.
-const InsertExperimentEventMergeSpanAttributesTypeEval = shared.InsertExperimentEventMergeSpanAttributesTypeEval
-
-// This is an alias to an internal value.
-const InsertExperimentEventMergeSpanAttributesTypeTask = shared.InsertExperimentEventMergeSpanAttributesTypeTask
-
-// This is an alias to an internal value.
-const InsertExperimentEventMergeSpanAttributesTypeTool = shared.InsertExperimentEventMergeSpanAttributesTypeTool
-
-// This is an alias to an internal type.
-type InsertExperimentEventReplaceParam = shared.InsertExperimentEventReplaceParam
-
-// Context is additional information about the code that produced the experiment
-// event. It is essentially the textual counterpart to `metrics`. Use the
-// `caller_*` attributes to track the location in code which produced the
-// experiment event
-//
-// This is an alias to an internal type.
-type InsertExperimentEventReplaceContextParam = shared.InsertExperimentEventReplaceContextParam
-
-// Metrics are numerical measurements tracking the execution of the code that
-// produced the experiment event. Use "start" and "end" to track the time span over
-// which the experiment event was produced
-//
-// This is an alias to an internal type.
-type InsertExperimentEventReplaceMetricsParam = shared.InsertExperimentEventReplaceMetricsParam
-
-// Human-identifying attributes of the span, such as name, type, etc.
-//
-// This is an alias to an internal type.
-type InsertExperimentEventReplaceSpanAttributesParam = shared.InsertExperimentEventReplaceSpanAttributesParam
-
-// Type of the span, for display purposes only
-//
-// This is an alias to an internal type.
-type InsertExperimentEventReplaceSpanAttributesType = shared.InsertExperimentEventReplaceSpanAttributesType
-
-// This is an alias to an internal value.
-const InsertExperimentEventReplaceSpanAttributesTypeLlm = shared.InsertExperimentEventReplaceSpanAttributesTypeLlm
-
-// This is an alias to an internal value.
-const InsertExperimentEventReplaceSpanAttributesTypeScore = shared.InsertExperimentEventReplaceSpanAttributesTypeScore
-
-// This is an alias to an internal value.
-const InsertExperimentEventReplaceSpanAttributesTypeFunction = shared.InsertExperimentEventReplaceSpanAttributesTypeFunction
-
-// This is an alias to an internal value.
-const InsertExperimentEventReplaceSpanAttributesTypeEval = shared.InsertExperimentEventReplaceSpanAttributesTypeEval
-
-// This is an alias to an internal value.
-const InsertExperimentEventReplaceSpanAttributesTypeTask = shared.InsertExperimentEventReplaceSpanAttributesTypeTask
-
-// This is an alias to an internal value.
-const InsertExperimentEventReplaceSpanAttributesTypeTool = shared.InsertExperimentEventReplaceSpanAttributesTypeTool
-
-// This is an alias to an internal type.
-type InsertProjectLogsEventMergeParam = shared.InsertProjectLogsEventMergeParam
+type InsertProjectLogsEventParam = shared.InsertProjectLogsEventParam
 
 // Context is additional information about the code that produced the project logs
 // event. It is essentially the textual counterpart to `metrics`. Use the
@@ -768,88 +669,14 @@ type InsertProjectLogsEventMergeParam = shared.InsertProjectLogsEventMergeParam
 // logs event
 //
 // This is an alias to an internal type.
-type InsertProjectLogsEventMergeContextParam = shared.InsertProjectLogsEventMergeContextParam
+type InsertProjectLogsEventContextParam = shared.InsertProjectLogsEventContextParam
 
 // Metrics are numerical measurements tracking the execution of the code that
 // produced the project logs event. Use "start" and "end" to track the time span
 // over which the project logs event was produced
 //
 // This is an alias to an internal type.
-type InsertProjectLogsEventMergeMetricsParam = shared.InsertProjectLogsEventMergeMetricsParam
-
-// Human-identifying attributes of the span, such as name, type, etc.
-//
-// This is an alias to an internal type.
-type InsertProjectLogsEventMergeSpanAttributesParam = shared.InsertProjectLogsEventMergeSpanAttributesParam
-
-// Type of the span, for display purposes only
-//
-// This is an alias to an internal type.
-type InsertProjectLogsEventMergeSpanAttributesType = shared.InsertProjectLogsEventMergeSpanAttributesType
-
-// This is an alias to an internal value.
-const InsertProjectLogsEventMergeSpanAttributesTypeLlm = shared.InsertProjectLogsEventMergeSpanAttributesTypeLlm
-
-// This is an alias to an internal value.
-const InsertProjectLogsEventMergeSpanAttributesTypeScore = shared.InsertProjectLogsEventMergeSpanAttributesTypeScore
-
-// This is an alias to an internal value.
-const InsertProjectLogsEventMergeSpanAttributesTypeFunction = shared.InsertProjectLogsEventMergeSpanAttributesTypeFunction
-
-// This is an alias to an internal value.
-const InsertProjectLogsEventMergeSpanAttributesTypeEval = shared.InsertProjectLogsEventMergeSpanAttributesTypeEval
-
-// This is an alias to an internal value.
-const InsertProjectLogsEventMergeSpanAttributesTypeTask = shared.InsertProjectLogsEventMergeSpanAttributesTypeTask
-
-// This is an alias to an internal value.
-const InsertProjectLogsEventMergeSpanAttributesTypeTool = shared.InsertProjectLogsEventMergeSpanAttributesTypeTool
-
-// This is an alias to an internal type.
-type InsertProjectLogsEventReplaceParam = shared.InsertProjectLogsEventReplaceParam
-
-// Context is additional information about the code that produced the project logs
-// event. It is essentially the textual counterpart to `metrics`. Use the
-// `caller_*` attributes to track the location in code which produced the project
-// logs event
-//
-// This is an alias to an internal type.
-type InsertProjectLogsEventReplaceContextParam = shared.InsertProjectLogsEventReplaceContextParam
-
-// Metrics are numerical measurements tracking the execution of the code that
-// produced the project logs event. Use "start" and "end" to track the time span
-// over which the project logs event was produced
-//
-// This is an alias to an internal type.
-type InsertProjectLogsEventReplaceMetricsParam = shared.InsertProjectLogsEventReplaceMetricsParam
-
-// Human-identifying attributes of the span, such as name, type, etc.
-//
-// This is an alias to an internal type.
-type InsertProjectLogsEventReplaceSpanAttributesParam = shared.InsertProjectLogsEventReplaceSpanAttributesParam
-
-// Type of the span, for display purposes only
-//
-// This is an alias to an internal type.
-type InsertProjectLogsEventReplaceSpanAttributesType = shared.InsertProjectLogsEventReplaceSpanAttributesType
-
-// This is an alias to an internal value.
-const InsertProjectLogsEventReplaceSpanAttributesTypeLlm = shared.InsertProjectLogsEventReplaceSpanAttributesTypeLlm
-
-// This is an alias to an internal value.
-const InsertProjectLogsEventReplaceSpanAttributesTypeScore = shared.InsertProjectLogsEventReplaceSpanAttributesTypeScore
-
-// This is an alias to an internal value.
-const InsertProjectLogsEventReplaceSpanAttributesTypeFunction = shared.InsertProjectLogsEventReplaceSpanAttributesTypeFunction
-
-// This is an alias to an internal value.
-const InsertProjectLogsEventReplaceSpanAttributesTypeEval = shared.InsertProjectLogsEventReplaceSpanAttributesTypeEval
-
-// This is an alias to an internal value.
-const InsertProjectLogsEventReplaceSpanAttributesTypeTask = shared.InsertProjectLogsEventReplaceSpanAttributesTypeTask
-
-// This is an alias to an internal value.
-const InsertProjectLogsEventReplaceSpanAttributesTypeTool = shared.InsertProjectLogsEventReplaceSpanAttributesTypeTool
+type InsertProjectLogsEventMetricsParam = shared.InsertProjectLogsEventMetricsParam
 
 // Summary of a metric's performance
 //
@@ -986,34 +813,6 @@ const ProjectLogsEventOriginObjectTypePromptSession = shared.ProjectLogsEventOri
 // This is an alias to an internal value.
 const ProjectLogsEventOriginObjectTypeProjectLogs = shared.ProjectLogsEventOriginObjectTypeProjectLogs
 
-// Human-identifying attributes of the span, such as name, type, etc.
-//
-// This is an alias to an internal type.
-type ProjectLogsEventSpanAttributes = shared.ProjectLogsEventSpanAttributes
-
-// Type of the span, for display purposes only
-//
-// This is an alias to an internal type.
-type ProjectLogsEventSpanAttributesType = shared.ProjectLogsEventSpanAttributesType
-
-// This is an alias to an internal value.
-const ProjectLogsEventSpanAttributesTypeLlm = shared.ProjectLogsEventSpanAttributesTypeLlm
-
-// This is an alias to an internal value.
-const ProjectLogsEventSpanAttributesTypeScore = shared.ProjectLogsEventSpanAttributesTypeScore
-
-// This is an alias to an internal value.
-const ProjectLogsEventSpanAttributesTypeFunction = shared.ProjectLogsEventSpanAttributesTypeFunction
-
-// This is an alias to an internal value.
-const ProjectLogsEventSpanAttributesTypeEval = shared.ProjectLogsEventSpanAttributesTypeEval
-
-// This is an alias to an internal value.
-const ProjectLogsEventSpanAttributesTypeTask = shared.ProjectLogsEventSpanAttributesTypeTask
-
-// This is an alias to an internal value.
-const ProjectLogsEventSpanAttributesTypeTool = shared.ProjectLogsEventSpanAttributesTypeTool
-
 // A project score is a user-configured score, which can be manually-labeled
 // through the UI
 //
@@ -1125,126 +924,6 @@ const PromptFunctionTypeTool = shared.PromptFunctionTypeTool
 //
 // This is an alias to an internal type.
 type PromptData = shared.PromptData
-
-// This is an alias to an internal type.
-type PromptDataOptions = shared.PromptDataOptions
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsUnion = shared.PromptDataOptionsParamsUnion
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParams = shared.PromptDataOptionsParamsOpenAIModelParams
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion = shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto = shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto
-
-// This is an alias to an internal value.
-const PromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto = shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone = shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone
-
-// This is an alias to an internal value.
-const PromptDataOptionsParamsOpenAIModelParamsFunctionCallNoneNone = shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallNoneNone
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction = shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormat = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormat
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObject = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObject
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType
-
-// This is an alias to an internal value.
-const PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchema = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchema
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType
-
-// This is an alias to an internal value.
-const PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaTypeJsonSchema = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaTypeJsonSchema
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatText = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatText
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextType = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextType
-
-// This is an alias to an internal value.
-const PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextTypeText = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextTypeText
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariant = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariant
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatType = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatType
-
-// This is an alias to an internal value.
-const PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject
-
-// This is an alias to an internal value.
-const PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonSchema = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonSchema
-
-// This is an alias to an internal value.
-const PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeText = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeText
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto
-
-// This is an alias to an internal value.
-const PromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone
-
-// This is an alias to an internal value.
-const PromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceRequired = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceRequired
-
-// This is an alias to an internal value.
-const PromptDataOptionsParamsOpenAIModelParamsToolChoiceRequiredRequired = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceRequiredRequired
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType
-
-// This is an alias to an internal value.
-const PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsAnthropicModelParams = shared.PromptDataOptionsParamsAnthropicModelParams
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsGoogleModelParams = shared.PromptDataOptionsParamsGoogleModelParams
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsWindowAIModelParams = shared.PromptDataOptionsParamsWindowAIModelParams
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsJsCompletionParams = shared.PromptDataOptionsParamsJsCompletionParams
 
 // This is an alias to an internal type.
 type PromptDataOrigin = shared.PromptDataOrigin
@@ -1426,60 +1105,6 @@ const PromptDataToolFunctionsTypeGlobal = shared.PromptDataToolFunctionsTypeGlob
 type PromptDataParam = shared.PromptDataParam
 
 // This is an alias to an internal type.
-type PromptDataOptionsParam = shared.PromptDataOptionsParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsUnionParam = shared.PromptDataOptionsParamsUnionParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsParam = shared.PromptDataOptionsParamsOpenAIModelParamsParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam = shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionParam = shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatUnionParam = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatUnionParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextParam = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam = shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam = shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsAnthropicModelParamsParam = shared.PromptDataOptionsParamsAnthropicModelParamsParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsGoogleModelParamsParam = shared.PromptDataOptionsParamsGoogleModelParamsParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsWindowAIModelParamsParam = shared.PromptDataOptionsParamsWindowAIModelParamsParam
-
-// This is an alias to an internal type.
-type PromptDataOptionsParamsJsCompletionParamsParam = shared.PromptDataOptionsParamsJsCompletionParamsParam
-
-// This is an alias to an internal type.
 type PromptDataOriginParam = shared.PromptDataOriginParam
 
 // This is an alias to an internal type.
@@ -1538,6 +1163,180 @@ type PromptDataToolFunctionsFunctionParam = shared.PromptDataToolFunctionsFuncti
 
 // This is an alias to an internal type.
 type PromptDataToolFunctionsGlobalParam = shared.PromptDataToolFunctionsGlobalParam
+
+// This is an alias to an internal type.
+type PromptOptions = shared.PromptOptions
+
+// This is an alias to an internal type.
+type PromptOptionsParams = shared.PromptOptionsParams
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParams = shared.PromptOptionsParamsOpenAIModelParams
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsFunctionCallUnion = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnion
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsFunctionCallAuto = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallAuto
+
+// This is an alias to an internal value.
+const PromptOptionsParamsOpenAIModelParamsFunctionCallAutoAuto = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallAutoAuto
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsFunctionCallNone = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallNone
+
+// This is an alias to an internal value.
+const PromptOptionsParamsOpenAIModelParamsFunctionCallNoneNone = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallNoneNone
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsFunctionCallFunction = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallFunction
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormat = shared.PromptOptionsParamsOpenAIModelParamsResponseFormat
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType
+
+// This is an alias to an internal value.
+const PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType
+
+// This is an alias to an internal value.
+const PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaTypeJsonSchema = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaTypeJsonSchema
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatText = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatText
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatTextType = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatTextType
+
+// This is an alias to an internal value.
+const PromptOptionsParamsOpenAIModelParamsResponseFormatTextTypeText = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatTextTypeText
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariant = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariant
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatType = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatType
+
+// This is an alias to an internal value.
+const PromptOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject
+
+// This is an alias to an internal value.
+const PromptOptionsParamsOpenAIModelParamsResponseFormatTypeJsonSchema = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatTypeJsonSchema
+
+// This is an alias to an internal value.
+const PromptOptionsParamsOpenAIModelParamsResponseFormatTypeText = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatTypeText
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsToolChoiceUnion = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceUnion
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsToolChoiceAuto = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceAuto
+
+// This is an alias to an internal value.
+const PromptOptionsParamsOpenAIModelParamsToolChoiceAutoAuto = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceAutoAuto
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsToolChoiceNone = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceNone
+
+// This is an alias to an internal value.
+const PromptOptionsParamsOpenAIModelParamsToolChoiceNoneNone = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceNoneNone
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsToolChoiceRequired = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceRequired
+
+// This is an alias to an internal value.
+const PromptOptionsParamsOpenAIModelParamsToolChoiceRequiredRequired = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceRequiredRequired
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsToolChoiceFunction = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunction
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionType = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionType
+
+// This is an alias to an internal value.
+const PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction
+
+// This is an alias to an internal type.
+type PromptOptionsParamsAnthropicModelParams = shared.PromptOptionsParamsAnthropicModelParams
+
+// This is an alias to an internal type.
+type PromptOptionsParamsGoogleModelParams = shared.PromptOptionsParamsGoogleModelParams
+
+// This is an alias to an internal type.
+type PromptOptionsParamsWindowAIModelParams = shared.PromptOptionsParamsWindowAIModelParams
+
+// This is an alias to an internal type.
+type PromptOptionsParamsJsCompletionParams = shared.PromptOptionsParamsJsCompletionParams
+
+// This is an alias to an internal type.
+type PromptOptionsParam = shared.PromptOptionsParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsUnionParam = shared.PromptOptionsParamsUnionParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsParam = shared.PromptOptionsParamsOpenAIModelParamsParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsAnthropicModelParamsParam = shared.PromptOptionsParamsAnthropicModelParamsParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsGoogleModelParamsParam = shared.PromptOptionsParamsGoogleModelParamsParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsWindowAIModelParamsParam = shared.PromptOptionsParamsWindowAIModelParamsParam
+
+// This is an alias to an internal type.
+type PromptOptionsParamsJsCompletionParamsParam = shared.PromptOptionsParamsJsCompletionParamsParam
 
 // Metadata about the state of the repo when the experiment was created
 //
@@ -1634,6 +1433,39 @@ const RoleMemberPermissionsRestrictObjectTypeOrgProject = shared.RoleMemberPermi
 //
 // This is an alias to an internal type.
 type ScoreSummary = shared.ScoreSummary
+
+// Human-identifying attributes of the span, such as name, type, etc.
+//
+// This is an alias to an internal type.
+type SpanAttributes = shared.SpanAttributes
+
+// Type of the span, for display purposes only
+//
+// This is an alias to an internal type.
+type SpanAttributesType = shared.SpanAttributesType
+
+// This is an alias to an internal value.
+const SpanAttributesTypeLlm = shared.SpanAttributesTypeLlm
+
+// This is an alias to an internal value.
+const SpanAttributesTypeScore = shared.SpanAttributesTypeScore
+
+// This is an alias to an internal value.
+const SpanAttributesTypeFunction = shared.SpanAttributesTypeFunction
+
+// This is an alias to an internal value.
+const SpanAttributesTypeEval = shared.SpanAttributesTypeEval
+
+// This is an alias to an internal value.
+const SpanAttributesTypeTask = shared.SpanAttributesTypeTask
+
+// This is an alias to an internal value.
+const SpanAttributesTypeTool = shared.SpanAttributesTypeTool
+
+// Human-identifying attributes of the span, such as name, type, etc.
+//
+// This is an alias to an internal type.
+type SpanAttributesParam = shared.SpanAttributesParam
 
 // This is an alias to an internal type.
 type SpanIFrame = shared.SpanIFrame

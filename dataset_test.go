@@ -292,9 +292,10 @@ func TestDatasetInsert(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.DatasetInsertParams{
-			Events: braintrust.F([]braintrust.DatasetInsertParamsEventUnion{shared.InsertDatasetEventReplaceParam{
+			Events: braintrust.F([]shared.InsertDatasetEventParam{{
 				ID:           braintrust.F("id"),
 				IsMerge:      braintrust.F(true),
+				MergePaths:   braintrust.F([][]string{{"string", "string", "string"}, {"string", "string", "string"}, {"string", "string", "string"}}),
 				ObjectDelete: braintrust.F(true),
 				ParentID:     braintrust.F("_parent_id"),
 				Created:      braintrust.F(time.Now()),
@@ -303,10 +304,14 @@ func TestDatasetInsert(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": "bar",
 				}),
-				Tags: braintrust.F([]string{"string", "string", "string"}),
-			}, shared.InsertDatasetEventReplaceParam{
+				RootSpanID:  braintrust.F("root_span_id"),
+				SpanID:      braintrust.F("span_id"),
+				SpanParents: braintrust.F([]string{"string", "string", "string"}),
+				Tags:        braintrust.F([]string{"string", "string", "string"}),
+			}, {
 				ID:           braintrust.F("id"),
 				IsMerge:      braintrust.F(true),
+				MergePaths:   braintrust.F([][]string{{"string", "string", "string"}, {"string", "string", "string"}, {"string", "string", "string"}}),
 				ObjectDelete: braintrust.F(true),
 				ParentID:     braintrust.F("_parent_id"),
 				Created:      braintrust.F(time.Now()),
@@ -315,10 +320,14 @@ func TestDatasetInsert(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": "bar",
 				}),
-				Tags: braintrust.F([]string{"string", "string", "string"}),
-			}, shared.InsertDatasetEventReplaceParam{
+				RootSpanID:  braintrust.F("root_span_id"),
+				SpanID:      braintrust.F("span_id"),
+				SpanParents: braintrust.F([]string{"string", "string", "string"}),
+				Tags:        braintrust.F([]string{"string", "string", "string"}),
+			}, {
 				ID:           braintrust.F("id"),
 				IsMerge:      braintrust.F(true),
+				MergePaths:   braintrust.F([][]string{{"string", "string", "string"}, {"string", "string", "string"}, {"string", "string", "string"}}),
 				ObjectDelete: braintrust.F(true),
 				ParentID:     braintrust.F("_parent_id"),
 				Created:      braintrust.F(time.Now()),
@@ -327,7 +336,10 @@ func TestDatasetInsert(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": "bar",
 				}),
-				Tags: braintrust.F([]string{"string", "string", "string"}),
+				RootSpanID:  braintrust.F("root_span_id"),
+				SpanID:      braintrust.F("span_id"),
+				SpanParents: braintrust.F([]string{"string", "string", "string"}),
+				Tags:        braintrust.F([]string{"string", "string", "string"}),
 			}}),
 		},
 	)
