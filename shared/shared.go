@@ -1086,7 +1086,7 @@ type DatasetEvent struct {
 	DatasetID string `json:"dataset_id,required" format:"uuid"`
 	// Unique identifier for the project that the dataset belongs under
 	ProjectID string `json:"project_id,required" format:"uuid"`
-	// The `span_id` of the root of the trace this dataset event belongs to
+	// A unique identifier for the trace this dataset event belongs to
 	RootSpanID string `json:"root_span_id,required"`
 	// A unique identifier used to link different dataset events together as part of a
 	// full trace. See the
@@ -1324,7 +1324,7 @@ type ExperimentEvent struct {
 	ExperimentID string `json:"experiment_id,required" format:"uuid"`
 	// Unique identifier for the project that the experiment belongs under
 	ProjectID string `json:"project_id,required" format:"uuid"`
-	// The `span_id` of the root of the trace this experiment event belongs to
+	// A unique identifier for the trace this experiment event belongs to
 	RootSpanID string `json:"root_span_id,required"`
 	// A unique identifier used to link different experiment events together as part of
 	// a full trace. See the
@@ -1385,7 +1385,7 @@ type ExperimentEvent struct {
 	// help you sort, filter, and compare experiments
 	Scores map[string]float64 `json:"scores,nullable"`
 	// Human-identifying attributes of the span, such as name, type, etc.
-	SpanAttributes ExperimentEventSpanAttributes `json:"span_attributes,nullable"`
+	SpanAttributes SpanAttributes `json:"span_attributes,nullable"`
 	// An array of the parent `span_ids` of this experiment event. This should be empty
 	// for the root span of a trace, and should most often contain just one parent
 	// element for subspans
@@ -1561,53 +1561,6 @@ const (
 func (r ExperimentEventOriginObjectType) IsKnown() bool {
 	switch r {
 	case ExperimentEventOriginObjectTypeExperiment, ExperimentEventOriginObjectTypeDataset, ExperimentEventOriginObjectTypePrompt, ExperimentEventOriginObjectTypeFunction, ExperimentEventOriginObjectTypePromptSession, ExperimentEventOriginObjectTypeProjectLogs:
-		return true
-	}
-	return false
-}
-
-// Human-identifying attributes of the span, such as name, type, etc.
-type ExperimentEventSpanAttributes struct {
-	// Name of the span, for display purposes only
-	Name string `json:"name,nullable"`
-	// Type of the span, for display purposes only
-	Type        ExperimentEventSpanAttributesType `json:"type,nullable"`
-	ExtraFields map[string]interface{}            `json:"-,extras"`
-	JSON        experimentEventSpanAttributesJSON `json:"-"`
-}
-
-// experimentEventSpanAttributesJSON contains the JSON metadata for the struct
-// [ExperimentEventSpanAttributes]
-type experimentEventSpanAttributesJSON struct {
-	Name        apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ExperimentEventSpanAttributes) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r experimentEventSpanAttributesJSON) RawJSON() string {
-	return r.raw
-}
-
-// Type of the span, for display purposes only
-type ExperimentEventSpanAttributesType string
-
-const (
-	ExperimentEventSpanAttributesTypeLlm      ExperimentEventSpanAttributesType = "llm"
-	ExperimentEventSpanAttributesTypeScore    ExperimentEventSpanAttributesType = "score"
-	ExperimentEventSpanAttributesTypeFunction ExperimentEventSpanAttributesType = "function"
-	ExperimentEventSpanAttributesTypeEval     ExperimentEventSpanAttributesType = "eval"
-	ExperimentEventSpanAttributesTypeTask     ExperimentEventSpanAttributesType = "task"
-	ExperimentEventSpanAttributesTypeTool     ExperimentEventSpanAttributesType = "tool"
-)
-
-func (r ExperimentEventSpanAttributesType) IsKnown() bool {
-	switch r {
-	case ExperimentEventSpanAttributesTypeLlm, ExperimentEventSpanAttributesTypeScore, ExperimentEventSpanAttributesTypeFunction, ExperimentEventSpanAttributesTypeEval, ExperimentEventSpanAttributesTypeTask, ExperimentEventSpanAttributesTypeTool:
 		return true
 	}
 	return false
@@ -2476,11 +2429,16 @@ func (r groupJSON) RawJSON() string {
 	return r.raw
 }
 
-type InsertDatasetEventMergeParam struct {
+// A dataset event
+type InsertDatasetEventParam struct {
+	// A unique identifier for the dataset event. If you don't provide one, BrainTrust
+	// will generate one for you
+	ID param.Field[string] `json:"id"`
 	// The `_is_merge` field controls how the row is merged with any existing row with
 	// the same id in the DB. By default (or when set to `false`), the existing row is
 	// completely replaced by the new row. When set to `true`, the new row is
-	// deep-merged into the existing row
+	// deep-merged into the existing row, if one is found. If no existing row is found,
+	// the new row is inserted as is.
 	//
 	// For example, say there is an existing row in the DB
 	// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
@@ -2488,14 +2446,11 @@ type InsertDatasetEventMergeParam struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[bool] `json:"_is_merge,required"`
-	// A unique identifier for the dataset event. If you don't provide one, BrainTrust
-	// will generate one for you
-	ID param.Field[string] `json:"id"`
-	// The `_merge_paths` field allows controlling the depth of the merge. It can only
-	// be specified alongside `_is_merge=true`. `_merge_paths` is a list of paths,
-	// where each path is a list of field names. The deep merge will not descend below
-	// any of the specified merge paths.
+	IsMerge param.Field[bool] `json:"_is_merge"`
+	// The `_merge_paths` field allows controlling the depth of the merge, when
+	// `_is_merge=true`. `_merge_paths` is a list of paths, where each path is a list
+	// of field names. The deep merge will not descend below any of the specified merge
+	// paths.
 	//
 	// For example, say there is an existing row in the DB
 	// `{"id": "foo", "input": {"a": {"b": 10}, "c": {"d": 20}}, "output": {"a": 20}}`.
@@ -2509,52 +2464,8 @@ type InsertDatasetEventMergeParam struct {
 	// Pass `_object_delete=true` to mark the dataset event deleted. Deleted events
 	// will not show up in subsequent fetches for this dataset
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
-	// The timestamp the dataset event was created
-	Created param.Field[time.Time] `json:"created" format:"date-time"`
-	// The output of your application, including post-processing (an arbitrary, JSON
-	// serializable object)
-	Expected param.Field[interface{}] `json:"expected"`
-	// The argument that uniquely define an input case (an arbitrary, JSON serializable
-	// object)
-	Input param.Field[interface{}] `json:"input"`
-	// A dictionary with additional data about the test example, model outputs, or just
-	// about anything else that's relevant, that you can use to help find and analyze
-	// examples later. For example, you could log the `prompt`, example's `id`, or
-	// anything else that would be useful to slice/dice later. The values in `metadata`
-	// can be any JSON-serializable type, but its keys must be strings
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
-	// A list of tags to log
-	Tags param.Field[[]string] `json:"tags"`
-}
-
-func (r InsertDatasetEventMergeParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r InsertDatasetEventMergeParam) ImplementsDatasetInsertParamsEventUnion() {}
-
-type InsertDatasetEventReplaceParam struct {
-	// A unique identifier for the dataset event. If you don't provide one, BrainTrust
-	// will generate one for you
-	ID param.Field[string] `json:"id"`
-	// The `_is_merge` field controls how the row is merged with any existing row with
-	// the same id in the DB. By default (or when set to `false`), the existing row is
-	// completely replaced by the new row. When set to `true`, the new row is
-	// deep-merged into the existing row
-	//
-	// For example, say there is an existing row in the DB
-	// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
-	// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
-	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
-	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
-	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[bool] `json:"_is_merge"`
-	// Pass `_object_delete=true` to mark the dataset event deleted. Deleted events
-	// will not show up in subsequent fetches for this dataset
-	ObjectDelete param.Field[bool] `json:"_object_delete"`
 	// Use the `_parent_id` field to create this row as a subspan of an existing row.
-	// It cannot be specified alongside `_is_merge=true`. Tracking hierarchical
-	// relationships are important for tracing (see the
+	// Tracking hierarchical relationships are important for tracing (see the
 	// [guide](https://www.braintrust.dev/docs/guides/tracing) for full details).
 	//
 	// For example, say we have logged a row
@@ -2564,6 +2475,8 @@ type InsertDatasetEventReplaceParam struct {
 	// In the webapp, only the root span row `"abc"` will show up in the summary view.
 	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
 	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
 	ParentID param.Field[string] `json:"_parent_id"`
 	// The timestamp the dataset event was created
 	Created param.Field[time.Time] `json:"created" format:"date-time"`
@@ -2579,15 +2492,61 @@ type InsertDatasetEventReplaceParam struct {
 	// anything else that would be useful to slice/dice later. The values in `metadata`
 	// can be any JSON-serializable type, but its keys must be strings
 	Metadata param.Field[map[string]interface{}] `json:"metadata"`
+	// Use span_id, root_span_id, and span_parents as a more explicit alternative to
+	// \_parent_id. The span_id is a unique identifier describing the row's place in
+	// the a trace, and the root_span_id is a unique identifier for the whole trace.
+	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
+	// details.
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
+	RootSpanID param.Field[string] `json:"root_span_id"`
+	// Use span_id, root_span_id, and span_parents as a more explicit alternative to
+	// \_parent_id. The span_id is a unique identifier describing the row's place in
+	// the a trace, and the root_span_id is a unique identifier for the whole trace.
+	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
+	// details.
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
+	SpanID param.Field[string] `json:"span_id"`
+	// Use span_id, root_span_id, and span_parents as a more explicit alternative to
+	// \_parent_id. The span_id is a unique identifier describing the row's place in
+	// the a trace, and the root_span_id is a unique identifier for the whole trace.
+	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
+	// details.
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
+	SpanParents param.Field[[]string] `json:"span_parents"`
 	// A list of tags to log
 	Tags param.Field[[]string] `json:"tags"`
 }
 
-func (r InsertDatasetEventReplaceParam) MarshalJSON() (data []byte, err error) {
+func (r InsertDatasetEventParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
-
-func (r InsertDatasetEventReplaceParam) ImplementsDatasetInsertParamsEventUnion() {}
 
 type InsertEventsResponse struct {
 	// The ids of all rows that were inserted, aligning one-to-one with the rows
@@ -2612,11 +2571,16 @@ func (r insertEventsResponseJSON) RawJSON() string {
 	return r.raw
 }
 
-type InsertExperimentEventMergeParam struct {
+// An experiment event
+type InsertExperimentEventParam struct {
+	// A unique identifier for the experiment event. If you don't provide one,
+	// BrainTrust will generate one for you
+	ID param.Field[string] `json:"id"`
 	// The `_is_merge` field controls how the row is merged with any existing row with
 	// the same id in the DB. By default (or when set to `false`), the existing row is
 	// completely replaced by the new row. When set to `true`, the new row is
-	// deep-merged into the existing row
+	// deep-merged into the existing row, if one is found. If no existing row is found,
+	// the new row is inserted as is.
 	//
 	// For example, say there is an existing row in the DB
 	// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
@@ -2624,14 +2588,11 @@ type InsertExperimentEventMergeParam struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[bool] `json:"_is_merge,required"`
-	// A unique identifier for the experiment event. If you don't provide one,
-	// BrainTrust will generate one for you
-	ID param.Field[string] `json:"id"`
-	// The `_merge_paths` field allows controlling the depth of the merge. It can only
-	// be specified alongside `_is_merge=true`. `_merge_paths` is a list of paths,
-	// where each path is a list of field names. The deep merge will not descend below
-	// any of the specified merge paths.
+	IsMerge param.Field[bool] `json:"_is_merge"`
+	// The `_merge_paths` field allows controlling the depth of the merge, when
+	// `_is_merge=true`. `_merge_paths` is a list of paths, where each path is a list
+	// of field names. The deep merge will not descend below any of the specified merge
+	// paths.
 	//
 	// For example, say there is an existing row in the DB
 	// `{"id": "foo", "input": {"a": {"b": 10}, "c": {"d": 20}}, "output": {"a": 20}}`.
@@ -2645,11 +2606,25 @@ type InsertExperimentEventMergeParam struct {
 	// Pass `_object_delete=true` to mark the experiment event deleted. Deleted events
 	// will not show up in subsequent fetches for this experiment
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
+	// Use the `_parent_id` field to create this row as a subspan of an existing row.
+	// Tracking hierarchical relationships are important for tracing (see the
+	// [guide](https://www.braintrust.dev/docs/guides/tracing) for full details).
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"_parent_id": "abc", "id": "llm_call", "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
+	ParentID param.Field[string] `json:"_parent_id"`
 	// Context is additional information about the code that produced the experiment
 	// event. It is essentially the textual counterpart to `metrics`. Use the
 	// `caller_*` attributes to track the location in code which produced the
 	// experiment event
-	Context param.Field[InsertExperimentEventMergeContextParam] `json:"context"`
+	Context param.Field[InsertExperimentEventContextParam] `json:"context"`
 	// The timestamp the experiment event was created
 	Created param.Field[time.Time] `json:"created" format:"date-time"`
 	// If the experiment is associated to a dataset, this is the event-level dataset id
@@ -2680,13 +2655,29 @@ type InsertExperimentEventMergeParam struct {
 	// Metrics are numerical measurements tracking the execution of the code that
 	// produced the experiment event. Use "start" and "end" to track the time span over
 	// which the experiment event was produced
-	Metrics param.Field[InsertExperimentEventMergeMetricsParam] `json:"metrics"`
+	Metrics param.Field[InsertExperimentEventMetricsParam] `json:"metrics"`
 	// The output of your application, including post-processing (an arbitrary, JSON
 	// serializable object), that allows you to determine whether the result is correct
 	// or not. For example, in an app that generates SQL queries, the `output` should
 	// be the _result_ of the SQL query generated by the model, not the query itself,
 	// because there may be multiple valid queries that answer a single question
 	Output param.Field[interface{}] `json:"output"`
+	// Use span_id, root_span_id, and span_parents as a more explicit alternative to
+	// \_parent_id. The span_id is a unique identifier describing the row's place in
+	// the a trace, and the root_span_id is a unique identifier for the whole trace.
+	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
+	// details.
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
+	RootSpanID param.Field[string] `json:"root_span_id"`
 	// A dictionary of numeric values (between 0 and 1) to log. The scores should give
 	// you a variety of signals that help you determine how accurate the outputs are
 	// compared to what you expect and diagnose failures. For example, a summarization
@@ -2697,22 +2688,52 @@ type InsertExperimentEventMergeParam struct {
 	// help you sort, filter, and compare experiments
 	Scores param.Field[map[string]float64] `json:"scores"`
 	// Human-identifying attributes of the span, such as name, type, etc.
-	SpanAttributes param.Field[InsertExperimentEventMergeSpanAttributesParam] `json:"span_attributes"`
+	SpanAttributes param.Field[SpanAttributesParam] `json:"span_attributes"`
+	// Use span_id, root_span_id, and span_parents as a more explicit alternative to
+	// \_parent_id. The span_id is a unique identifier describing the row's place in
+	// the a trace, and the root_span_id is a unique identifier for the whole trace.
+	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
+	// details.
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
+	SpanID param.Field[string] `json:"span_id"`
+	// Use span_id, root_span_id, and span_parents as a more explicit alternative to
+	// \_parent_id. The span_id is a unique identifier describing the row's place in
+	// the a trace, and the root_span_id is a unique identifier for the whole trace.
+	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
+	// details.
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
+	SpanParents param.Field[[]string] `json:"span_parents"`
 	// A list of tags to log
 	Tags param.Field[[]string] `json:"tags"`
 }
 
-func (r InsertExperimentEventMergeParam) MarshalJSON() (data []byte, err error) {
+func (r InsertExperimentEventParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
-
-func (r InsertExperimentEventMergeParam) ImplementsExperimentInsertParamsEventUnion() {}
 
 // Context is additional information about the code that produced the experiment
 // event. It is essentially the textual counterpart to `metrics`. Use the
 // `caller_*` attributes to track the location in code which produced the
 // experiment event
-type InsertExperimentEventMergeContextParam struct {
+type InsertExperimentEventContextParam struct {
 	// Name of the file in code where the experiment event was created
 	CallerFilename param.Field[string] `json:"caller_filename"`
 	// The function in code which created the experiment event
@@ -2722,14 +2743,14 @@ type InsertExperimentEventMergeContextParam struct {
 	ExtraFields  map[string]interface{} `json:"-,extras"`
 }
 
-func (r InsertExperimentEventMergeContextParam) MarshalJSON() (data []byte, err error) {
+func (r InsertExperimentEventContextParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
 // Metrics are numerical measurements tracking the execution of the code that
 // produced the experiment event. Use "start" and "end" to track the time span over
 // which the experiment event was produced
-type InsertExperimentEventMergeMetricsParam struct {
+type InsertExperimentEventMetricsParam struct {
 	// This metric is deprecated
 	CallerFilename param.Field[interface{}] `json:"caller_filename"`
 	// This metric is deprecated
@@ -2753,51 +2774,20 @@ type InsertExperimentEventMergeMetricsParam struct {
 	ExtraFields map[string]float64 `json:"-,extras"`
 }
 
-func (r InsertExperimentEventMergeMetricsParam) MarshalJSON() (data []byte, err error) {
+func (r InsertExperimentEventMetricsParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-// Human-identifying attributes of the span, such as name, type, etc.
-type InsertExperimentEventMergeSpanAttributesParam struct {
-	// Name of the span, for display purposes only
-	Name param.Field[string] `json:"name"`
-	// Type of the span, for display purposes only
-	Type        param.Field[InsertExperimentEventMergeSpanAttributesType] `json:"type"`
-	ExtraFields map[string]interface{}                                    `json:"-,extras"`
-}
-
-func (r InsertExperimentEventMergeSpanAttributesParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// Type of the span, for display purposes only
-type InsertExperimentEventMergeSpanAttributesType string
-
-const (
-	InsertExperimentEventMergeSpanAttributesTypeLlm      InsertExperimentEventMergeSpanAttributesType = "llm"
-	InsertExperimentEventMergeSpanAttributesTypeScore    InsertExperimentEventMergeSpanAttributesType = "score"
-	InsertExperimentEventMergeSpanAttributesTypeFunction InsertExperimentEventMergeSpanAttributesType = "function"
-	InsertExperimentEventMergeSpanAttributesTypeEval     InsertExperimentEventMergeSpanAttributesType = "eval"
-	InsertExperimentEventMergeSpanAttributesTypeTask     InsertExperimentEventMergeSpanAttributesType = "task"
-	InsertExperimentEventMergeSpanAttributesTypeTool     InsertExperimentEventMergeSpanAttributesType = "tool"
-)
-
-func (r InsertExperimentEventMergeSpanAttributesType) IsKnown() bool {
-	switch r {
-	case InsertExperimentEventMergeSpanAttributesTypeLlm, InsertExperimentEventMergeSpanAttributesTypeScore, InsertExperimentEventMergeSpanAttributesTypeFunction, InsertExperimentEventMergeSpanAttributesTypeEval, InsertExperimentEventMergeSpanAttributesTypeTask, InsertExperimentEventMergeSpanAttributesTypeTool:
-		return true
-	}
-	return false
-}
-
-type InsertExperimentEventReplaceParam struct {
-	// A unique identifier for the experiment event. If you don't provide one,
+// A project logs event
+type InsertProjectLogsEventParam struct {
+	// A unique identifier for the project logs event. If you don't provide one,
 	// BrainTrust will generate one for you
 	ID param.Field[string] `json:"id"`
 	// The `_is_merge` field controls how the row is merged with any existing row with
 	// the same id in the DB. By default (or when set to `false`), the existing row is
 	// completely replaced by the new row. When set to `true`, the new row is
-	// deep-merged into the existing row
+	// deep-merged into the existing row, if one is found. If no existing row is found,
+	// the new row is inserted as is.
 	//
 	// For example, say there is an existing row in the DB
 	// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
@@ -2806,187 +2796,10 @@ type InsertExperimentEventReplaceParam struct {
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
 	IsMerge param.Field[bool] `json:"_is_merge"`
-	// Pass `_object_delete=true` to mark the experiment event deleted. Deleted events
-	// will not show up in subsequent fetches for this experiment
-	ObjectDelete param.Field[bool] `json:"_object_delete"`
-	// Use the `_parent_id` field to create this row as a subspan of an existing row.
-	// It cannot be specified alongside `_is_merge=true`. Tracking hierarchical
-	// relationships are important for tracing (see the
-	// [guide](https://www.braintrust.dev/docs/guides/tracing) for full details).
-	//
-	// For example, say we have logged a row
-	// `{"id": "abc", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
-	// We can create a sub-span of the parent row by logging
-	// `{"_parent_id": "abc", "id": "llm_call", "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
-	// In the webapp, only the root span row `"abc"` will show up in the summary view.
-	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
-	// clicking on the "abc" row.
-	ParentID param.Field[string] `json:"_parent_id"`
-	// Context is additional information about the code that produced the experiment
-	// event. It is essentially the textual counterpart to `metrics`. Use the
-	// `caller_*` attributes to track the location in code which produced the
-	// experiment event
-	Context param.Field[InsertExperimentEventReplaceContextParam] `json:"context"`
-	// The timestamp the experiment event was created
-	Created param.Field[time.Time] `json:"created" format:"date-time"`
-	// If the experiment is associated to a dataset, this is the event-level dataset id
-	// this experiment event is tied to
-	DatasetRecordID param.Field[string] `json:"dataset_record_id"`
-	// The error that occurred, if any.
-	Error param.Field[interface{}] `json:"error"`
-	// The ground truth value (an arbitrary, JSON serializable object) that you'd
-	// compare to `output` to determine if your `output` value is correct or not.
-	// Braintrust currently does not compare `output` to `expected` for you, since
-	// there are so many different ways to do that correctly. Instead, these values are
-	// just used to help you navigate your experiments while digging into analyses.
-	// However, we may later use these values to re-score outputs or fine-tune your
-	// models
-	Expected param.Field[interface{}] `json:"expected"`
-	// The arguments that uniquely define a test case (an arbitrary, JSON serializable
-	// object). Later on, Braintrust will use the `input` to know whether two test
-	// cases are the same between experiments, so they should not contain
-	// experiment-specific state. A simple rule of thumb is that if you run the same
-	// experiment twice, the `input` should be identical
-	Input param.Field[interface{}] `json:"input"`
-	// A dictionary with additional data about the test example, model outputs, or just
-	// about anything else that's relevant, that you can use to help find and analyze
-	// examples later. For example, you could log the `prompt`, example's `id`, or
-	// anything else that would be useful to slice/dice later. The values in `metadata`
-	// can be any JSON-serializable type, but its keys must be strings
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
-	// Metrics are numerical measurements tracking the execution of the code that
-	// produced the experiment event. Use "start" and "end" to track the time span over
-	// which the experiment event was produced
-	Metrics param.Field[InsertExperimentEventReplaceMetricsParam] `json:"metrics"`
-	// The output of your application, including post-processing (an arbitrary, JSON
-	// serializable object), that allows you to determine whether the result is correct
-	// or not. For example, in an app that generates SQL queries, the `output` should
-	// be the _result_ of the SQL query generated by the model, not the query itself,
-	// because there may be multiple valid queries that answer a single question
-	Output param.Field[interface{}] `json:"output"`
-	// A dictionary of numeric values (between 0 and 1) to log. The scores should give
-	// you a variety of signals that help you determine how accurate the outputs are
-	// compared to what you expect and diagnose failures. For example, a summarization
-	// app might have one score that tells you how accurate the summary is, and another
-	// that measures the word similarity between the generated and grouth truth
-	// summary. The word similarity score could help you determine whether the
-	// summarization was covering similar concepts or not. You can use these scores to
-	// help you sort, filter, and compare experiments
-	Scores param.Field[map[string]float64] `json:"scores"`
-	// Human-identifying attributes of the span, such as name, type, etc.
-	SpanAttributes param.Field[InsertExperimentEventReplaceSpanAttributesParam] `json:"span_attributes"`
-	// A list of tags to log
-	Tags param.Field[[]string] `json:"tags"`
-}
-
-func (r InsertExperimentEventReplaceParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r InsertExperimentEventReplaceParam) ImplementsExperimentInsertParamsEventUnion() {}
-
-// Context is additional information about the code that produced the experiment
-// event. It is essentially the textual counterpart to `metrics`. Use the
-// `caller_*` attributes to track the location in code which produced the
-// experiment event
-type InsertExperimentEventReplaceContextParam struct {
-	// Name of the file in code where the experiment event was created
-	CallerFilename param.Field[string] `json:"caller_filename"`
-	// The function in code which created the experiment event
-	CallerFunctionname param.Field[string] `json:"caller_functionname"`
-	// Line of code where the experiment event was created
-	CallerLineno param.Field[int64]     `json:"caller_lineno"`
-	ExtraFields  map[string]interface{} `json:"-,extras"`
-}
-
-func (r InsertExperimentEventReplaceContextParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// Metrics are numerical measurements tracking the execution of the code that
-// produced the experiment event. Use "start" and "end" to track the time span over
-// which the experiment event was produced
-type InsertExperimentEventReplaceMetricsParam struct {
-	// This metric is deprecated
-	CallerFilename param.Field[interface{}] `json:"caller_filename"`
-	// This metric is deprecated
-	CallerFunctionname param.Field[interface{}] `json:"caller_functionname"`
-	// This metric is deprecated
-	CallerLineno param.Field[interface{}] `json:"caller_lineno"`
-	// The number of tokens in the completion generated by the model (only set if this
-	// is an LLM span)
-	CompletionTokens param.Field[int64] `json:"completion_tokens"`
-	// A unix timestamp recording when the section of code which produced the
-	// experiment event finished
-	End param.Field[float64] `json:"end"`
-	// The number of tokens in the prompt used to generate the experiment event (only
-	// set if this is an LLM span)
-	PromptTokens param.Field[int64] `json:"prompt_tokens"`
-	// A unix timestamp recording when the section of code which produced the
-	// experiment event started
-	Start param.Field[float64] `json:"start"`
-	// The total number of tokens in the input and output of the experiment event.
-	Tokens      param.Field[int64] `json:"tokens"`
-	ExtraFields map[string]float64 `json:"-,extras"`
-}
-
-func (r InsertExperimentEventReplaceMetricsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// Human-identifying attributes of the span, such as name, type, etc.
-type InsertExperimentEventReplaceSpanAttributesParam struct {
-	// Name of the span, for display purposes only
-	Name param.Field[string] `json:"name"`
-	// Type of the span, for display purposes only
-	Type        param.Field[InsertExperimentEventReplaceSpanAttributesType] `json:"type"`
-	ExtraFields map[string]interface{}                                      `json:"-,extras"`
-}
-
-func (r InsertExperimentEventReplaceSpanAttributesParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// Type of the span, for display purposes only
-type InsertExperimentEventReplaceSpanAttributesType string
-
-const (
-	InsertExperimentEventReplaceSpanAttributesTypeLlm      InsertExperimentEventReplaceSpanAttributesType = "llm"
-	InsertExperimentEventReplaceSpanAttributesTypeScore    InsertExperimentEventReplaceSpanAttributesType = "score"
-	InsertExperimentEventReplaceSpanAttributesTypeFunction InsertExperimentEventReplaceSpanAttributesType = "function"
-	InsertExperimentEventReplaceSpanAttributesTypeEval     InsertExperimentEventReplaceSpanAttributesType = "eval"
-	InsertExperimentEventReplaceSpanAttributesTypeTask     InsertExperimentEventReplaceSpanAttributesType = "task"
-	InsertExperimentEventReplaceSpanAttributesTypeTool     InsertExperimentEventReplaceSpanAttributesType = "tool"
-)
-
-func (r InsertExperimentEventReplaceSpanAttributesType) IsKnown() bool {
-	switch r {
-	case InsertExperimentEventReplaceSpanAttributesTypeLlm, InsertExperimentEventReplaceSpanAttributesTypeScore, InsertExperimentEventReplaceSpanAttributesTypeFunction, InsertExperimentEventReplaceSpanAttributesTypeEval, InsertExperimentEventReplaceSpanAttributesTypeTask, InsertExperimentEventReplaceSpanAttributesTypeTool:
-		return true
-	}
-	return false
-}
-
-type InsertProjectLogsEventMergeParam struct {
-	// The `_is_merge` field controls how the row is merged with any existing row with
-	// the same id in the DB. By default (or when set to `false`), the existing row is
-	// completely replaced by the new row. When set to `true`, the new row is
-	// deep-merged into the existing row
-	//
-	// For example, say there is an existing row in the DB
-	// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
-	// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
-	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
-	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
-	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[bool] `json:"_is_merge,required"`
-	// A unique identifier for the project logs event. If you don't provide one,
-	// BrainTrust will generate one for you
-	ID param.Field[string] `json:"id"`
-	// The `_merge_paths` field allows controlling the depth of the merge. It can only
-	// be specified alongside `_is_merge=true`. `_merge_paths` is a list of paths,
-	// where each path is a list of field names. The deep merge will not descend below
-	// any of the specified merge paths.
+	// The `_merge_paths` field allows controlling the depth of the merge, when
+	// `_is_merge=true`. `_merge_paths` is a list of paths, where each path is a list
+	// of field names. The deep merge will not descend below any of the specified merge
+	// paths.
 	//
 	// For example, say there is an existing row in the DB
 	// `{"id": "foo", "input": {"a": {"b": 10}, "c": {"d": 20}}, "output": {"a": 20}}`.
@@ -3000,166 +2813,8 @@ type InsertProjectLogsEventMergeParam struct {
 	// Pass `_object_delete=true` to mark the project logs event deleted. Deleted
 	// events will not show up in subsequent fetches for this project logs
 	ObjectDelete param.Field[bool] `json:"_object_delete"`
-	// Context is additional information about the code that produced the project logs
-	// event. It is essentially the textual counterpart to `metrics`. Use the
-	// `caller_*` attributes to track the location in code which produced the project
-	// logs event
-	Context param.Field[InsertProjectLogsEventMergeContextParam] `json:"context"`
-	// The timestamp the project logs event was created
-	Created param.Field[time.Time] `json:"created" format:"date-time"`
-	// The error that occurred, if any.
-	Error param.Field[interface{}] `json:"error"`
-	// The ground truth value (an arbitrary, JSON serializable object) that you'd
-	// compare to `output` to determine if your `output` value is correct or not.
-	// Braintrust currently does not compare `output` to `expected` for you, since
-	// there are so many different ways to do that correctly. Instead, these values are
-	// just used to help you navigate while digging into analyses. However, we may
-	// later use these values to re-score outputs or fine-tune your models.
-	Expected param.Field[interface{}] `json:"expected"`
-	// The arguments that uniquely define a user input (an arbitrary, JSON serializable
-	// object).
-	Input param.Field[interface{}] `json:"input"`
-	// A dictionary with additional data about the test example, model outputs, or just
-	// about anything else that's relevant, that you can use to help find and analyze
-	// examples later. For example, you could log the `prompt`, example's `id`, or
-	// anything else that would be useful to slice/dice later. The values in `metadata`
-	// can be any JSON-serializable type, but its keys must be strings
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
-	// Metrics are numerical measurements tracking the execution of the code that
-	// produced the project logs event. Use "start" and "end" to track the time span
-	// over which the project logs event was produced
-	Metrics param.Field[InsertProjectLogsEventMergeMetricsParam] `json:"metrics"`
-	// The output of your application, including post-processing (an arbitrary, JSON
-	// serializable object), that allows you to determine whether the result is correct
-	// or not. For example, in an app that generates SQL queries, the `output` should
-	// be the _result_ of the SQL query generated by the model, not the query itself,
-	// because there may be multiple valid queries that answer a single question.
-	Output param.Field[interface{}] `json:"output"`
-	// A dictionary of numeric values (between 0 and 1) to log. The scores should give
-	// you a variety of signals that help you determine how accurate the outputs are
-	// compared to what you expect and diagnose failures. For example, a summarization
-	// app might have one score that tells you how accurate the summary is, and another
-	// that measures the word similarity between the generated and grouth truth
-	// summary. The word similarity score could help you determine whether the
-	// summarization was covering similar concepts or not. You can use these scores to
-	// help you sort, filter, and compare logs.
-	Scores param.Field[map[string]float64] `json:"scores"`
-	// Human-identifying attributes of the span, such as name, type, etc.
-	SpanAttributes param.Field[InsertProjectLogsEventMergeSpanAttributesParam] `json:"span_attributes"`
-	// A list of tags to log
-	Tags param.Field[[]string] `json:"tags"`
-}
-
-func (r InsertProjectLogsEventMergeParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r InsertProjectLogsEventMergeParam) ImplementsProjectLogInsertParamsEventUnion() {}
-
-// Context is additional information about the code that produced the project logs
-// event. It is essentially the textual counterpart to `metrics`. Use the
-// `caller_*` attributes to track the location in code which produced the project
-// logs event
-type InsertProjectLogsEventMergeContextParam struct {
-	// Name of the file in code where the project logs event was created
-	CallerFilename param.Field[string] `json:"caller_filename"`
-	// The function in code which created the project logs event
-	CallerFunctionname param.Field[string] `json:"caller_functionname"`
-	// Line of code where the project logs event was created
-	CallerLineno param.Field[int64]     `json:"caller_lineno"`
-	ExtraFields  map[string]interface{} `json:"-,extras"`
-}
-
-func (r InsertProjectLogsEventMergeContextParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// Metrics are numerical measurements tracking the execution of the code that
-// produced the project logs event. Use "start" and "end" to track the time span
-// over which the project logs event was produced
-type InsertProjectLogsEventMergeMetricsParam struct {
-	// This metric is deprecated
-	CallerFilename param.Field[interface{}] `json:"caller_filename"`
-	// This metric is deprecated
-	CallerFunctionname param.Field[interface{}] `json:"caller_functionname"`
-	// This metric is deprecated
-	CallerLineno param.Field[interface{}] `json:"caller_lineno"`
-	// The number of tokens in the completion generated by the model (only set if this
-	// is an LLM span)
-	CompletionTokens param.Field[int64] `json:"completion_tokens"`
-	// A unix timestamp recording when the section of code which produced the project
-	// logs event finished
-	End param.Field[float64] `json:"end"`
-	// The number of tokens in the prompt used to generate the project logs event (only
-	// set if this is an LLM span)
-	PromptTokens param.Field[int64] `json:"prompt_tokens"`
-	// A unix timestamp recording when the section of code which produced the project
-	// logs event started
-	Start param.Field[float64] `json:"start"`
-	// The total number of tokens in the input and output of the project logs event.
-	Tokens      param.Field[int64] `json:"tokens"`
-	ExtraFields map[string]float64 `json:"-,extras"`
-}
-
-func (r InsertProjectLogsEventMergeMetricsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// Human-identifying attributes of the span, such as name, type, etc.
-type InsertProjectLogsEventMergeSpanAttributesParam struct {
-	// Name of the span, for display purposes only
-	Name param.Field[string] `json:"name"`
-	// Type of the span, for display purposes only
-	Type        param.Field[InsertProjectLogsEventMergeSpanAttributesType] `json:"type"`
-	ExtraFields map[string]interface{}                                     `json:"-,extras"`
-}
-
-func (r InsertProjectLogsEventMergeSpanAttributesParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// Type of the span, for display purposes only
-type InsertProjectLogsEventMergeSpanAttributesType string
-
-const (
-	InsertProjectLogsEventMergeSpanAttributesTypeLlm      InsertProjectLogsEventMergeSpanAttributesType = "llm"
-	InsertProjectLogsEventMergeSpanAttributesTypeScore    InsertProjectLogsEventMergeSpanAttributesType = "score"
-	InsertProjectLogsEventMergeSpanAttributesTypeFunction InsertProjectLogsEventMergeSpanAttributesType = "function"
-	InsertProjectLogsEventMergeSpanAttributesTypeEval     InsertProjectLogsEventMergeSpanAttributesType = "eval"
-	InsertProjectLogsEventMergeSpanAttributesTypeTask     InsertProjectLogsEventMergeSpanAttributesType = "task"
-	InsertProjectLogsEventMergeSpanAttributesTypeTool     InsertProjectLogsEventMergeSpanAttributesType = "tool"
-)
-
-func (r InsertProjectLogsEventMergeSpanAttributesType) IsKnown() bool {
-	switch r {
-	case InsertProjectLogsEventMergeSpanAttributesTypeLlm, InsertProjectLogsEventMergeSpanAttributesTypeScore, InsertProjectLogsEventMergeSpanAttributesTypeFunction, InsertProjectLogsEventMergeSpanAttributesTypeEval, InsertProjectLogsEventMergeSpanAttributesTypeTask, InsertProjectLogsEventMergeSpanAttributesTypeTool:
-		return true
-	}
-	return false
-}
-
-type InsertProjectLogsEventReplaceParam struct {
-	// A unique identifier for the project logs event. If you don't provide one,
-	// BrainTrust will generate one for you
-	ID param.Field[string] `json:"id"`
-	// The `_is_merge` field controls how the row is merged with any existing row with
-	// the same id in the DB. By default (or when set to `false`), the existing row is
-	// completely replaced by the new row. When set to `true`, the new row is
-	// deep-merged into the existing row
-	//
-	// For example, say there is an existing row in the DB
-	// `{"id": "foo", "input": {"a": 5, "b": 10}}`. If we merge a new row as
-	// `{"_is_merge": true, "id": "foo", "input": {"b": 11, "c": 20}}`, the new row
-	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
-	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
-	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[bool] `json:"_is_merge"`
-	// Pass `_object_delete=true` to mark the project logs event deleted. Deleted
-	// events will not show up in subsequent fetches for this project logs
-	ObjectDelete param.Field[bool] `json:"_object_delete"`
 	// Use the `_parent_id` field to create this row as a subspan of an existing row.
-	// It cannot be specified alongside `_is_merge=true`. Tracking hierarchical
-	// relationships are important for tracing (see the
+	// Tracking hierarchical relationships are important for tracing (see the
 	// [guide](https://www.braintrust.dev/docs/guides/tracing) for full details).
 	//
 	// For example, say we have logged a row
@@ -3169,12 +2824,14 @@ type InsertProjectLogsEventReplaceParam struct {
 	// In the webapp, only the root span row `"abc"` will show up in the summary view.
 	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
 	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
 	ParentID param.Field[string] `json:"_parent_id"`
 	// Context is additional information about the code that produced the project logs
 	// event. It is essentially the textual counterpart to `metrics`. Use the
 	// `caller_*` attributes to track the location in code which produced the project
 	// logs event
-	Context param.Field[InsertProjectLogsEventReplaceContextParam] `json:"context"`
+	Context param.Field[InsertProjectLogsEventContextParam] `json:"context"`
 	// The timestamp the project logs event was created
 	Created param.Field[time.Time] `json:"created" format:"date-time"`
 	// The error that occurred, if any.
@@ -3198,13 +2855,29 @@ type InsertProjectLogsEventReplaceParam struct {
 	// Metrics are numerical measurements tracking the execution of the code that
 	// produced the project logs event. Use "start" and "end" to track the time span
 	// over which the project logs event was produced
-	Metrics param.Field[InsertProjectLogsEventReplaceMetricsParam] `json:"metrics"`
+	Metrics param.Field[InsertProjectLogsEventMetricsParam] `json:"metrics"`
 	// The output of your application, including post-processing (an arbitrary, JSON
 	// serializable object), that allows you to determine whether the result is correct
 	// or not. For example, in an app that generates SQL queries, the `output` should
 	// be the _result_ of the SQL query generated by the model, not the query itself,
 	// because there may be multiple valid queries that answer a single question.
 	Output param.Field[interface{}] `json:"output"`
+	// Use span_id, root_span_id, and span_parents as a more explicit alternative to
+	// \_parent_id. The span_id is a unique identifier describing the row's place in
+	// the a trace, and the root_span_id is a unique identifier for the whole trace.
+	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
+	// details.
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
+	RootSpanID param.Field[string] `json:"root_span_id"`
 	// A dictionary of numeric values (between 0 and 1) to log. The scores should give
 	// you a variety of signals that help you determine how accurate the outputs are
 	// compared to what you expect and diagnose failures. For example, a summarization
@@ -3215,22 +2888,52 @@ type InsertProjectLogsEventReplaceParam struct {
 	// help you sort, filter, and compare logs.
 	Scores param.Field[map[string]float64] `json:"scores"`
 	// Human-identifying attributes of the span, such as name, type, etc.
-	SpanAttributes param.Field[InsertProjectLogsEventReplaceSpanAttributesParam] `json:"span_attributes"`
+	SpanAttributes param.Field[SpanAttributesParam] `json:"span_attributes"`
+	// Use span_id, root_span_id, and span_parents as a more explicit alternative to
+	// \_parent_id. The span_id is a unique identifier describing the row's place in
+	// the a trace, and the root_span_id is a unique identifier for the whole trace.
+	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
+	// details.
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
+	SpanID param.Field[string] `json:"span_id"`
+	// Use span_id, root_span_id, and span_parents as a more explicit alternative to
+	// \_parent_id. The span_id is a unique identifier describing the row's place in
+	// the a trace, and the root_span_id is a unique identifier for the whole trace.
+	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
+	// details.
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
+	SpanParents param.Field[[]string] `json:"span_parents"`
 	// A list of tags to log
 	Tags param.Field[[]string] `json:"tags"`
 }
 
-func (r InsertProjectLogsEventReplaceParam) MarshalJSON() (data []byte, err error) {
+func (r InsertProjectLogsEventParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
-
-func (r InsertProjectLogsEventReplaceParam) ImplementsProjectLogInsertParamsEventUnion() {}
 
 // Context is additional information about the code that produced the project logs
 // event. It is essentially the textual counterpart to `metrics`. Use the
 // `caller_*` attributes to track the location in code which produced the project
 // logs event
-type InsertProjectLogsEventReplaceContextParam struct {
+type InsertProjectLogsEventContextParam struct {
 	// Name of the file in code where the project logs event was created
 	CallerFilename param.Field[string] `json:"caller_filename"`
 	// The function in code which created the project logs event
@@ -3240,14 +2943,14 @@ type InsertProjectLogsEventReplaceContextParam struct {
 	ExtraFields  map[string]interface{} `json:"-,extras"`
 }
 
-func (r InsertProjectLogsEventReplaceContextParam) MarshalJSON() (data []byte, err error) {
+func (r InsertProjectLogsEventContextParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
 // Metrics are numerical measurements tracking the execution of the code that
 // produced the project logs event. Use "start" and "end" to track the time span
 // over which the project logs event was produced
-type InsertProjectLogsEventReplaceMetricsParam struct {
+type InsertProjectLogsEventMetricsParam struct {
 	// This metric is deprecated
 	CallerFilename param.Field[interface{}] `json:"caller_filename"`
 	// This metric is deprecated
@@ -3271,41 +2974,8 @@ type InsertProjectLogsEventReplaceMetricsParam struct {
 	ExtraFields map[string]float64 `json:"-,extras"`
 }
 
-func (r InsertProjectLogsEventReplaceMetricsParam) MarshalJSON() (data []byte, err error) {
+func (r InsertProjectLogsEventMetricsParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
-}
-
-// Human-identifying attributes of the span, such as name, type, etc.
-type InsertProjectLogsEventReplaceSpanAttributesParam struct {
-	// Name of the span, for display purposes only
-	Name param.Field[string] `json:"name"`
-	// Type of the span, for display purposes only
-	Type        param.Field[InsertProjectLogsEventReplaceSpanAttributesType] `json:"type"`
-	ExtraFields map[string]interface{}                                       `json:"-,extras"`
-}
-
-func (r InsertProjectLogsEventReplaceSpanAttributesParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// Type of the span, for display purposes only
-type InsertProjectLogsEventReplaceSpanAttributesType string
-
-const (
-	InsertProjectLogsEventReplaceSpanAttributesTypeLlm      InsertProjectLogsEventReplaceSpanAttributesType = "llm"
-	InsertProjectLogsEventReplaceSpanAttributesTypeScore    InsertProjectLogsEventReplaceSpanAttributesType = "score"
-	InsertProjectLogsEventReplaceSpanAttributesTypeFunction InsertProjectLogsEventReplaceSpanAttributesType = "function"
-	InsertProjectLogsEventReplaceSpanAttributesTypeEval     InsertProjectLogsEventReplaceSpanAttributesType = "eval"
-	InsertProjectLogsEventReplaceSpanAttributesTypeTask     InsertProjectLogsEventReplaceSpanAttributesType = "task"
-	InsertProjectLogsEventReplaceSpanAttributesTypeTool     InsertProjectLogsEventReplaceSpanAttributesType = "tool"
-)
-
-func (r InsertProjectLogsEventReplaceSpanAttributesType) IsKnown() bool {
-	switch r {
-	case InsertProjectLogsEventReplaceSpanAttributesTypeLlm, InsertProjectLogsEventReplaceSpanAttributesTypeScore, InsertProjectLogsEventReplaceSpanAttributesTypeFunction, InsertProjectLogsEventReplaceSpanAttributesTypeEval, InsertProjectLogsEventReplaceSpanAttributesTypeTask, InsertProjectLogsEventReplaceSpanAttributesTypeTool:
-		return true
-	}
-	return false
 }
 
 // Summary of a metric's performance
@@ -3753,7 +3423,7 @@ type ProjectLogsEvent struct {
 	OrgID string `json:"org_id,required" format:"uuid"`
 	// Unique identifier for the project
 	ProjectID string `json:"project_id,required" format:"uuid"`
-	// The `span_id` of the root of the trace this project logs event belongs to
+	// A unique identifier for the trace this project logs event belongs to
 	RootSpanID string `json:"root_span_id,required"`
 	// A unique identifier used to link different project logs events together as part
 	// of a full trace. See the
@@ -3807,7 +3477,7 @@ type ProjectLogsEvent struct {
 	// help you sort, filter, and compare logs.
 	Scores map[string]float64 `json:"scores,nullable"`
 	// Human-identifying attributes of the span, such as name, type, etc.
-	SpanAttributes ProjectLogsEventSpanAttributes `json:"span_attributes,nullable"`
+	SpanAttributes SpanAttributes `json:"span_attributes,nullable"`
 	// An array of the parent `span_ids` of this project logs event. This should be
 	// empty for the root span of a trace, and should most often contain just one
 	// parent element for subspans
@@ -3999,53 +3669,6 @@ const (
 func (r ProjectLogsEventOriginObjectType) IsKnown() bool {
 	switch r {
 	case ProjectLogsEventOriginObjectTypeExperiment, ProjectLogsEventOriginObjectTypeDataset, ProjectLogsEventOriginObjectTypePrompt, ProjectLogsEventOriginObjectTypeFunction, ProjectLogsEventOriginObjectTypePromptSession, ProjectLogsEventOriginObjectTypeProjectLogs:
-		return true
-	}
-	return false
-}
-
-// Human-identifying attributes of the span, such as name, type, etc.
-type ProjectLogsEventSpanAttributes struct {
-	// Name of the span, for display purposes only
-	Name string `json:"name,nullable"`
-	// Type of the span, for display purposes only
-	Type        ProjectLogsEventSpanAttributesType `json:"type,nullable"`
-	ExtraFields map[string]interface{}             `json:"-,extras"`
-	JSON        projectLogsEventSpanAttributesJSON `json:"-"`
-}
-
-// projectLogsEventSpanAttributesJSON contains the JSON metadata for the struct
-// [ProjectLogsEventSpanAttributes]
-type projectLogsEventSpanAttributesJSON struct {
-	Name        apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ProjectLogsEventSpanAttributes) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectLogsEventSpanAttributesJSON) RawJSON() string {
-	return r.raw
-}
-
-// Type of the span, for display purposes only
-type ProjectLogsEventSpanAttributesType string
-
-const (
-	ProjectLogsEventSpanAttributesTypeLlm      ProjectLogsEventSpanAttributesType = "llm"
-	ProjectLogsEventSpanAttributesTypeScore    ProjectLogsEventSpanAttributesType = "score"
-	ProjectLogsEventSpanAttributesTypeFunction ProjectLogsEventSpanAttributesType = "function"
-	ProjectLogsEventSpanAttributesTypeEval     ProjectLogsEventSpanAttributesType = "eval"
-	ProjectLogsEventSpanAttributesTypeTask     ProjectLogsEventSpanAttributesType = "task"
-	ProjectLogsEventSpanAttributesTypeTool     ProjectLogsEventSpanAttributesType = "tool"
-)
-
-func (r ProjectLogsEventSpanAttributesType) IsKnown() bool {
-	switch r {
-	case ProjectLogsEventSpanAttributesTypeLlm, ProjectLogsEventSpanAttributesTypeScore, ProjectLogsEventSpanAttributesTypeFunction, ProjectLogsEventSpanAttributesTypeEval, ProjectLogsEventSpanAttributesTypeTask, ProjectLogsEventSpanAttributesTypeTool:
 		return true
 	}
 	return false
@@ -4427,7 +4050,7 @@ func (r PromptFunctionType) IsKnown() bool {
 
 // The prompt, model, and its parameters
 type PromptData struct {
-	Options       PromptDataOptions        `json:"options,nullable"`
+	Options       PromptOptions            `json:"options,nullable"`
 	Origin        PromptDataOrigin         `json:"origin,nullable"`
 	Parser        PromptDataParser         `json:"parser,nullable"`
 	Prompt        PromptDataPrompt         `json:"prompt"`
@@ -4453,735 +4076,6 @@ func (r *PromptData) UnmarshalJSON(data []byte) (err error) {
 func (r promptDataJSON) RawJSON() string {
 	return r.raw
 }
-
-type PromptDataOptions struct {
-	Model    string                       `json:"model"`
-	Params   PromptDataOptionsParamsUnion `json:"params"`
-	Position string                       `json:"position"`
-	JSON     promptDataOptionsJSON        `json:"-"`
-}
-
-// promptDataOptionsJSON contains the JSON metadata for the struct
-// [PromptDataOptions]
-type promptDataOptionsJSON struct {
-	Model       apijson.Field
-	Params      apijson.Field
-	Position    apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataOptions) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsJSON) RawJSON() string {
-	return r.raw
-}
-
-// Union satisfied by [shared.PromptDataOptionsParamsOpenAIModelParams],
-// [shared.PromptDataOptionsParamsAnthropicModelParams],
-// [shared.PromptDataOptionsParamsGoogleModelParams],
-// [shared.PromptDataOptionsParamsWindowAIModelParams] or
-// [shared.PromptDataOptionsParamsJsCompletionParams].
-type PromptDataOptionsParamsUnion interface {
-	implementsSharedPromptDataOptionsParamsUnion()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptDataOptionsParamsUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParams{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsAnthropicModelParams{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsGoogleModelParams{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsWindowAIModelParams{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsJsCompletionParams{}),
-		},
-	)
-}
-
-type PromptDataOptionsParamsOpenAIModelParams struct {
-	FrequencyPenalty float64                                                   `json:"frequency_penalty"`
-	FunctionCall     PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion `json:"function_call"`
-	MaxTokens        float64                                                   `json:"max_tokens"`
-	N                float64                                                   `json:"n"`
-	PresencePenalty  float64                                                   `json:"presence_penalty"`
-	ResponseFormat   PromptDataOptionsParamsOpenAIModelParamsResponseFormat    `json:"response_format"`
-	Stop             []string                                                  `json:"stop"`
-	Temperature      float64                                                   `json:"temperature"`
-	ToolChoice       PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion   `json:"tool_choice"`
-	TopP             float64                                                   `json:"top_p"`
-	UseCache         bool                                                      `json:"use_cache"`
-	JSON             promptDataOptionsParamsOpenAIModelParamsJSON              `json:"-"`
-}
-
-// promptDataOptionsParamsOpenAIModelParamsJSON contains the JSON metadata for the
-// struct [PromptDataOptionsParamsOpenAIModelParams]
-type promptDataOptionsParamsOpenAIModelParamsJSON struct {
-	FrequencyPenalty apijson.Field
-	FunctionCall     apijson.Field
-	MaxTokens        apijson.Field
-	N                apijson.Field
-	PresencePenalty  apijson.Field
-	ResponseFormat   apijson.Field
-	Stop             apijson.Field
-	Temperature      apijson.Field
-	ToolChoice       apijson.Field
-	TopP             apijson.Field
-	UseCache         apijson.Field
-	raw              string
-	ExtraFields      map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsOpenAIModelParams) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsOpenAIModelParamsJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParams) implementsSharedPromptDataOptionsParamsUnion() {}
-
-// Union satisfied by
-// [shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone] or
-// [shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction].
-type PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion interface {
-	implementsSharedPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction{}),
-		},
-	)
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto string
-
-const (
-	PromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto = "auto"
-)
-
-func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto) IsKnown() bool {
-	switch r {
-	case PromptDataOptionsParamsOpenAIModelParamsFunctionCallAutoAuto:
-		return true
-	}
-	return false
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto) implementsSharedPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto) implementsSharedPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone string
-
-const (
-	PromptDataOptionsParamsOpenAIModelParamsFunctionCallNoneNone PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone = "none"
-)
-
-func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone) IsKnown() bool {
-	switch r {
-	case PromptDataOptionsParamsOpenAIModelParamsFunctionCallNoneNone:
-		return true
-	}
-	return false
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone) implementsSharedPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone) implementsSharedPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction struct {
-	Name string                                                           `json:"name,required"`
-	JSON promptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON `json:"-"`
-}
-
-// promptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON contains the
-// JSON metadata for the struct
-// [PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction]
-type promptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON struct {
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunction) implementsSharedPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnion() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormat struct {
-	// This field can have the runtime type of
-	// [PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema].
-	JsonSchema interface{}                                                `json:"json_schema"`
-	Type       PromptDataOptionsParamsOpenAIModelParamsResponseFormatType `json:"type"`
-	JSON       promptDataOptionsParamsOpenAIModelParamsResponseFormatJSON `json:"-"`
-	union      PromptDataOptionsParamsOpenAIModelParamsResponseFormatUnion
-}
-
-// promptDataOptionsParamsOpenAIModelParamsResponseFormatJSON contains the JSON
-// metadata for the struct [PromptDataOptionsParamsOpenAIModelParamsResponseFormat]
-type promptDataOptionsParamsOpenAIModelParamsResponseFormatJSON struct {
-	JsonSchema  apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r promptDataOptionsParamsOpenAIModelParamsResponseFormatJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *PromptDataOptionsParamsOpenAIModelParamsResponseFormat) UnmarshalJSON(data []byte) (err error) {
-	*r = PromptDataOptionsParamsOpenAIModelParamsResponseFormat{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [PromptDataOptionsParamsOpenAIModelParamsResponseFormatUnion]
-// interface which you can cast to the specific types for more type safety.
-//
-// Possible runtime types of the union are
-// [shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObject],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchema],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatText],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariant].
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormat) AsUnion() PromptDataOptionsParamsOpenAIModelParamsResponseFormatUnion {
-	return r.union
-}
-
-// Union satisfied by
-// [shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObject],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchema],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatText] or
-// [shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariant].
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatUnion interface {
-	implementsSharedPromptDataOptionsParamsOpenAIModelParamsResponseFormat()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptDataOptionsParamsOpenAIModelParamsResponseFormatUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObject{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchema{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsResponseFormatText{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariant{}),
-		},
-	)
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObject struct {
-	Type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType `json:"type,required"`
-	JSON promptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectJSON `json:"-"`
-}
-
-// promptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectJSON contains
-// the JSON metadata for the struct
-// [PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObject]
-type promptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectJSON struct {
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObject) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObject) implementsSharedPromptDataOptionsParamsOpenAIModelParamsResponseFormat() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType string
-
-const (
-	PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType = "json_object"
-)
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType) IsKnown() bool {
-	switch r {
-	case PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject:
-		return true
-	}
-	return false
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchema struct {
-	JsonSchema PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema `json:"json_schema,required"`
-	Type       PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType       `json:"type,required"`
-	JSON       promptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJSON       `json:"-"`
-}
-
-// promptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJSON contains
-// the JSON metadata for the struct
-// [PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchema]
-type promptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJSON struct {
-	JsonSchema  apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchema) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchema) implementsSharedPromptDataOptionsParamsOpenAIModelParamsResponseFormat() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema struct {
-	Name        string                                                                         `json:"name,required"`
-	Description string                                                                         `json:"description"`
-	Schema      map[string]interface{}                                                         `json:"schema"`
-	Strict      bool                                                                           `json:"strict,nullable"`
-	JSON        promptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaJSON `json:"-"`
-}
-
-// promptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaJSON
-// contains the JSON metadata for the struct
-// [PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema]
-type promptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaJSON struct {
-	Name        apijson.Field
-	Description apijson.Field
-	Schema      apijson.Field
-	Strict      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaJSON) RawJSON() string {
-	return r.raw
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType string
-
-const (
-	PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaTypeJsonSchema PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType = "json_schema"
-)
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType) IsKnown() bool {
-	switch r {
-	case PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaTypeJsonSchema:
-		return true
-	}
-	return false
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatText struct {
-	Type PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextType `json:"type,required"`
-	JSON promptDataOptionsParamsOpenAIModelParamsResponseFormatTextJSON `json:"-"`
-}
-
-// promptDataOptionsParamsOpenAIModelParamsResponseFormatTextJSON contains the JSON
-// metadata for the struct
-// [PromptDataOptionsParamsOpenAIModelParamsResponseFormatText]
-type promptDataOptionsParamsOpenAIModelParamsResponseFormatTextJSON struct {
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsOpenAIModelParamsResponseFormatText) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsOpenAIModelParamsResponseFormatTextJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatText) implementsSharedPromptDataOptionsParamsOpenAIModelParamsResponseFormat() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextType string
-
-const (
-	PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextTypeText PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextType = "text"
-)
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextType) IsKnown() bool {
-	switch r {
-	case PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextTypeText:
-		return true
-	}
-	return false
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariant struct {
-	JSON promptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariantJSON `json:"-"`
-}
-
-// promptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariantJSON
-// contains the JSON metadata for the struct
-// [PromptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariant]
-type promptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariantJSON struct {
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariant) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariantJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariant) implementsSharedPromptDataOptionsParamsOpenAIModelParamsResponseFormat() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatType string
-
-const (
-	PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject PromptDataOptionsParamsOpenAIModelParamsResponseFormatType = "json_object"
-	PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonSchema PromptDataOptionsParamsOpenAIModelParamsResponseFormatType = "json_schema"
-	PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeText       PromptDataOptionsParamsOpenAIModelParamsResponseFormatType = "text"
-)
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatType) IsKnown() bool {
-	switch r {
-	case PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject, PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeJsonSchema, PromptDataOptionsParamsOpenAIModelParamsResponseFormatTypeText:
-		return true
-	}
-	return false
-}
-
-// Union satisfied by
-// [shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceRequired] or
-// [shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction].
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion interface {
-	implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsToolChoiceRequired("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction{}),
-		},
-	)
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto string
-
-const (
-	PromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto = "auto"
-)
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) IsKnown() bool {
-	switch r {
-	case PromptDataOptionsParamsOpenAIModelParamsToolChoiceAutoAuto:
-		return true
-	}
-	return false
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone string
-
-const (
-	PromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone = "none"
-)
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) IsKnown() bool {
-	switch r {
-	case PromptDataOptionsParamsOpenAIModelParamsToolChoiceNoneNone:
-		return true
-	}
-	return false
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceRequired string
-
-const (
-	PromptDataOptionsParamsOpenAIModelParamsToolChoiceRequiredRequired PromptDataOptionsParamsOpenAIModelParamsToolChoiceRequired = "required"
-)
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceRequired) IsKnown() bool {
-	switch r {
-	case PromptDataOptionsParamsOpenAIModelParamsToolChoiceRequiredRequired:
-		return true
-	}
-	return false
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceRequired) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceRequired) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction struct {
-	Function PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction `json:"function,required"`
-	Type     PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType     `json:"type,required"`
-	JSON     promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON     `json:"-"`
-}
-
-// promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON contains the JSON
-// metadata for the struct
-// [PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction]
-type promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON struct {
-	Function    apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunction) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction struct {
-	Name string                                                                 `json:"name,required"`
-	JSON promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON `json:"-"`
-}
-
-// promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON contains
-// the JSON metadata for the struct
-// [PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction]
-type promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON struct {
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON) RawJSON() string {
-	return r.raw
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType string
-
-const (
-	PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType = "function"
-)
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType) IsKnown() bool {
-	switch r {
-	case PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction:
-		return true
-	}
-	return false
-}
-
-type PromptDataOptionsParamsAnthropicModelParams struct {
-	MaxTokens   float64 `json:"max_tokens,required"`
-	Temperature float64 `json:"temperature,required"`
-	// This is a legacy parameter that should not be used.
-	MaxTokensToSample float64                                         `json:"max_tokens_to_sample"`
-	StopSequences     []string                                        `json:"stop_sequences"`
-	TopK              float64                                         `json:"top_k"`
-	TopP              float64                                         `json:"top_p"`
-	UseCache          bool                                            `json:"use_cache"`
-	JSON              promptDataOptionsParamsAnthropicModelParamsJSON `json:"-"`
-}
-
-// promptDataOptionsParamsAnthropicModelParamsJSON contains the JSON metadata for
-// the struct [PromptDataOptionsParamsAnthropicModelParams]
-type promptDataOptionsParamsAnthropicModelParamsJSON struct {
-	MaxTokens         apijson.Field
-	Temperature       apijson.Field
-	MaxTokensToSample apijson.Field
-	StopSequences     apijson.Field
-	TopK              apijson.Field
-	TopP              apijson.Field
-	UseCache          apijson.Field
-	raw               string
-	ExtraFields       map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsAnthropicModelParams) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsAnthropicModelParamsJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataOptionsParamsAnthropicModelParams) implementsSharedPromptDataOptionsParamsUnion() {}
-
-type PromptDataOptionsParamsGoogleModelParams struct {
-	MaxOutputTokens float64                                      `json:"maxOutputTokens"`
-	Temperature     float64                                      `json:"temperature"`
-	TopK            float64                                      `json:"topK"`
-	TopP            float64                                      `json:"topP"`
-	UseCache        bool                                         `json:"use_cache"`
-	JSON            promptDataOptionsParamsGoogleModelParamsJSON `json:"-"`
-}
-
-// promptDataOptionsParamsGoogleModelParamsJSON contains the JSON metadata for the
-// struct [PromptDataOptionsParamsGoogleModelParams]
-type promptDataOptionsParamsGoogleModelParamsJSON struct {
-	MaxOutputTokens apijson.Field
-	Temperature     apijson.Field
-	TopK            apijson.Field
-	TopP            apijson.Field
-	UseCache        apijson.Field
-	raw             string
-	ExtraFields     map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsGoogleModelParams) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsGoogleModelParamsJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataOptionsParamsGoogleModelParams) implementsSharedPromptDataOptionsParamsUnion() {}
-
-type PromptDataOptionsParamsWindowAIModelParams struct {
-	Temperature float64                                        `json:"temperature"`
-	TopK        float64                                        `json:"topK"`
-	UseCache    bool                                           `json:"use_cache"`
-	JSON        promptDataOptionsParamsWindowAIModelParamsJSON `json:"-"`
-}
-
-// promptDataOptionsParamsWindowAIModelParamsJSON contains the JSON metadata for
-// the struct [PromptDataOptionsParamsWindowAIModelParams]
-type promptDataOptionsParamsWindowAIModelParamsJSON struct {
-	Temperature apijson.Field
-	TopK        apijson.Field
-	UseCache    apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsWindowAIModelParams) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsWindowAIModelParamsJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataOptionsParamsWindowAIModelParams) implementsSharedPromptDataOptionsParamsUnion() {}
-
-type PromptDataOptionsParamsJsCompletionParams struct {
-	UseCache bool                                          `json:"use_cache"`
-	JSON     promptDataOptionsParamsJsCompletionParamsJSON `json:"-"`
-}
-
-// promptDataOptionsParamsJsCompletionParamsJSON contains the JSON metadata for the
-// struct [PromptDataOptionsParamsJsCompletionParams]
-type promptDataOptionsParamsJsCompletionParamsJSON struct {
-	UseCache    apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataOptionsParamsJsCompletionParams) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOptionsParamsJsCompletionParamsJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataOptionsParamsJsCompletionParams) implementsSharedPromptDataOptionsParamsUnion() {}
 
 type PromptDataOrigin struct {
 	ProjectID     string               `json:"project_id"`
@@ -6079,7 +4973,7 @@ func (r PromptDataToolFunctionsType) IsKnown() bool {
 
 // The prompt, model, and its parameters
 type PromptDataParam struct {
-	Options       param.Field[PromptDataOptionsParam]              `json:"options"`
+	Options       param.Field[PromptOptionsParam]                  `json:"options"`
 	Origin        param.Field[PromptDataOriginParam]               `json:"origin"`
 	Parser        param.Field[PromptDataParserParam]               `json:"parser"`
 	Prompt        param.Field[PromptDataPromptUnionParam]          `json:"prompt"`
@@ -6088,226 +4982,6 @@ type PromptDataParam struct {
 
 func (r PromptDataParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
-}
-
-type PromptDataOptionsParam struct {
-	Model    param.Field[string]                            `json:"model"`
-	Params   param.Field[PromptDataOptionsParamsUnionParam] `json:"params"`
-	Position param.Field[string]                            `json:"position"`
-}
-
-func (r PromptDataOptionsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-// Satisfied by [shared.PromptDataOptionsParamsOpenAIModelParamsParam],
-// [shared.PromptDataOptionsParamsAnthropicModelParamsParam],
-// [shared.PromptDataOptionsParamsGoogleModelParamsParam],
-// [shared.PromptDataOptionsParamsWindowAIModelParamsParam],
-// [shared.PromptDataOptionsParamsJsCompletionParamsParam].
-type PromptDataOptionsParamsUnionParam interface {
-	implementsSharedPromptDataOptionsParamsUnionParam()
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsParam struct {
-	FrequencyPenalty param.Field[float64]                                                          `json:"frequency_penalty"`
-	FunctionCall     param.Field[PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam]   `json:"function_call"`
-	MaxTokens        param.Field[float64]                                                          `json:"max_tokens"`
-	N                param.Field[float64]                                                          `json:"n"`
-	PresencePenalty  param.Field[float64]                                                          `json:"presence_penalty"`
-	ResponseFormat   param.Field[PromptDataOptionsParamsOpenAIModelParamsResponseFormatUnionParam] `json:"response_format"`
-	Stop             param.Field[[]string]                                                         `json:"stop"`
-	Temperature      param.Field[float64]                                                          `json:"temperature"`
-	ToolChoice       param.Field[PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam]     `json:"tool_choice"`
-	TopP             param.Field[float64]                                                          `json:"top_p"`
-	UseCache         param.Field[bool]                                                             `json:"use_cache"`
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsParam) implementsSharedPromptDataOptionsParamsUnionParam() {
-}
-
-// Satisfied by [shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallAuto],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallNone],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionParam].
-type PromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam interface {
-	implementsSharedPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam()
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionParam struct {
-	Name param.Field[string] `json:"name,required"`
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) implementsSharedPromptDataOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatParam struct {
-	JsonSchema param.Field[interface{}]                                                `json:"json_schema"`
-	Type       param.Field[PromptDataOptionsParamsOpenAIModelParamsResponseFormatType] `json:"type"`
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatParam) implementsSharedPromptDataOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
-}
-
-// Satisfied by
-// [shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextParam],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam],
-// [PromptDataOptionsParamsOpenAIModelParamsResponseFormatParam].
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatUnionParam interface {
-	implementsSharedPromptDataOptionsParamsOpenAIModelParamsResponseFormatUnionParam()
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam struct {
-	Type param.Field[PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType] `json:"type,required"`
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam) implementsSharedPromptDataOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam struct {
-	JsonSchema param.Field[PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam] `json:"json_schema,required"`
-	Type       param.Field[PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType]            `json:"type,required"`
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam) implementsSharedPromptDataOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam struct {
-	Name        param.Field[string]                 `json:"name,required"`
-	Description param.Field[string]                 `json:"description"`
-	Schema      param.Field[map[string]interface{}] `json:"schema"`
-	Strict      param.Field[bool]                   `json:"strict"`
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextParam struct {
-	Type param.Field[PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextType] `json:"type,required"`
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatTextParam) implementsSharedPromptDataOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam struct {
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam) implementsSharedPromptDataOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
-}
-
-// Satisfied by [shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceAuto],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceNone],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceRequired],
-// [shared.PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam].
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam interface {
-	implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam()
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam struct {
-	Function param.Field[PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam] `json:"function,required"`
-	Type     param.Field[PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionType]          `json:"type,required"`
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) implementsSharedPromptDataOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
-}
-
-type PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam struct {
-	Name param.Field[string] `json:"name,required"`
-}
-
-func (r PromptDataOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type PromptDataOptionsParamsAnthropicModelParamsParam struct {
-	MaxTokens   param.Field[float64] `json:"max_tokens,required"`
-	Temperature param.Field[float64] `json:"temperature,required"`
-	// This is a legacy parameter that should not be used.
-	MaxTokensToSample param.Field[float64]  `json:"max_tokens_to_sample"`
-	StopSequences     param.Field[[]string] `json:"stop_sequences"`
-	TopK              param.Field[float64]  `json:"top_k"`
-	TopP              param.Field[float64]  `json:"top_p"`
-	UseCache          param.Field[bool]     `json:"use_cache"`
-}
-
-func (r PromptDataOptionsParamsAnthropicModelParamsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataOptionsParamsAnthropicModelParamsParam) implementsSharedPromptDataOptionsParamsUnionParam() {
-}
-
-type PromptDataOptionsParamsGoogleModelParamsParam struct {
-	MaxOutputTokens param.Field[float64] `json:"maxOutputTokens"`
-	Temperature     param.Field[float64] `json:"temperature"`
-	TopK            param.Field[float64] `json:"topK"`
-	TopP            param.Field[float64] `json:"topP"`
-	UseCache        param.Field[bool]    `json:"use_cache"`
-}
-
-func (r PromptDataOptionsParamsGoogleModelParamsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataOptionsParamsGoogleModelParamsParam) implementsSharedPromptDataOptionsParamsUnionParam() {
-}
-
-type PromptDataOptionsParamsWindowAIModelParamsParam struct {
-	Temperature param.Field[float64] `json:"temperature"`
-	TopK        param.Field[float64] `json:"topK"`
-	UseCache    param.Field[bool]    `json:"use_cache"`
-}
-
-func (r PromptDataOptionsParamsWindowAIModelParamsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataOptionsParamsWindowAIModelParamsParam) implementsSharedPromptDataOptionsParamsUnionParam() {
-}
-
-type PromptDataOptionsParamsJsCompletionParamsParam struct {
-	UseCache param.Field[bool] `json:"use_cache"`
-}
-
-func (r PromptDataOptionsParamsJsCompletionParamsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptDataOptionsParamsJsCompletionParamsParam) implementsSharedPromptDataOptionsParamsUnionParam() {
 }
 
 type PromptDataOriginParam struct {
@@ -6567,6 +5241,1056 @@ func (r PromptDataToolFunctionsGlobalParam) MarshalJSON() (data []byte, err erro
 
 func (r PromptDataToolFunctionsGlobalParam) implementsSharedPromptDataToolFunctionsUnionParam() {}
 
+type PromptOptions struct {
+	Model    string              `json:"model"`
+	Params   PromptOptionsParams `json:"params"`
+	Position string              `json:"position"`
+	JSON     promptOptionsJSON   `json:"-"`
+}
+
+// promptOptionsJSON contains the JSON metadata for the struct [PromptOptions]
+type promptOptionsJSON struct {
+	Model       apijson.Field
+	Params      apijson.Field
+	Position    apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptOptions) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptOptionsJSON) RawJSON() string {
+	return r.raw
+}
+
+type PromptOptionsParams struct {
+	FrequencyPenalty float64 `json:"frequency_penalty"`
+	// This field can have the runtime type of
+	// [PromptOptionsParamsOpenAIModelParamsFunctionCallUnion].
+	FunctionCall interface{} `json:"function_call"`
+	MaxTokens    float64     `json:"max_tokens"`
+	// This is a legacy parameter that should not be used.
+	MaxTokensToSample float64 `json:"max_tokens_to_sample"`
+	MaxOutputTokens   float64 `json:"maxOutputTokens"`
+	N                 float64 `json:"n"`
+	PresencePenalty   float64 `json:"presence_penalty"`
+	// This field can have the runtime type of
+	// [PromptOptionsParamsOpenAIModelParamsResponseFormat].
+	ResponseFormat interface{} `json:"response_format"`
+	// This field can have the runtime type of [[]string].
+	Stop interface{} `json:"stop"`
+	// This field can have the runtime type of [[]string].
+	StopSequences interface{} `json:"stop_sequences"`
+	Temperature   float64     `json:"temperature"`
+	// This field can have the runtime type of
+	// [PromptOptionsParamsOpenAIModelParamsToolChoiceUnion].
+	ToolChoice interface{}             `json:"tool_choice"`
+	TopK       float64                 `json:"top_k"`
+	TopP       float64                 `json:"top_p"`
+	TopK       float64                 `json:"topK"`
+	TopP       float64                 `json:"topP"`
+	UseCache   bool                    `json:"use_cache"`
+	JSON       promptOptionsParamsJSON `json:"-"`
+	union      PromptOptionsParamsUnion
+}
+
+// promptOptionsParamsJSON contains the JSON metadata for the struct
+// [PromptOptionsParams]
+type promptOptionsParamsJSON struct {
+	FrequencyPenalty  apijson.Field
+	FunctionCall      apijson.Field
+	MaxTokens         apijson.Field
+	MaxTokensToSample apijson.Field
+	MaxOutputTokens   apijson.Field
+	N                 apijson.Field
+	PresencePenalty   apijson.Field
+	ResponseFormat    apijson.Field
+	Stop              apijson.Field
+	StopSequences     apijson.Field
+	Temperature       apijson.Field
+	ToolChoice        apijson.Field
+	TopK              apijson.Field
+	TopP              apijson.Field
+	TopK              apijson.Field
+	TopP              apijson.Field
+	UseCache          apijson.Field
+	raw               string
+	ExtraFields       map[string]apijson.Field
+}
+
+func (r promptOptionsParamsJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r *PromptOptionsParams) UnmarshalJSON(data []byte) (err error) {
+	*r = PromptOptionsParams{}
+	err = apijson.UnmarshalRoot(data, &r.union)
+	if err != nil {
+		return err
+	}
+	return apijson.Port(r.union, &r)
+}
+
+// AsUnion returns a [PromptOptionsParamsUnion] interface which you can cast to the
+// specific types for more type safety.
+//
+// Possible runtime types of the union are
+// [shared.PromptOptionsParamsOpenAIModelParams],
+// [shared.PromptOptionsParamsAnthropicModelParams],
+// [shared.PromptOptionsParamsGoogleModelParams],
+// [shared.PromptOptionsParamsWindowAIModelParams],
+// [shared.PromptOptionsParamsJsCompletionParams].
+func (r PromptOptionsParams) AsUnion() PromptOptionsParamsUnion {
+	return r.union
+}
+
+// Union satisfied by [shared.PromptOptionsParamsOpenAIModelParams],
+// [shared.PromptOptionsParamsAnthropicModelParams],
+// [shared.PromptOptionsParamsGoogleModelParams],
+// [shared.PromptOptionsParamsWindowAIModelParams] or
+// [shared.PromptOptionsParamsJsCompletionParams].
+type PromptOptionsParamsUnion interface {
+	implementsSharedPromptOptionsParams()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*PromptOptionsParamsUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParams{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptOptionsParamsAnthropicModelParams{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptOptionsParamsGoogleModelParams{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptOptionsParamsWindowAIModelParams{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptOptionsParamsJsCompletionParams{}),
+		},
+	)
+}
+
+type PromptOptionsParamsOpenAIModelParams struct {
+	FrequencyPenalty float64                                               `json:"frequency_penalty"`
+	FunctionCall     PromptOptionsParamsOpenAIModelParamsFunctionCallUnion `json:"function_call"`
+	MaxTokens        float64                                               `json:"max_tokens"`
+	N                float64                                               `json:"n"`
+	PresencePenalty  float64                                               `json:"presence_penalty"`
+	ResponseFormat   PromptOptionsParamsOpenAIModelParamsResponseFormat    `json:"response_format"`
+	Stop             []string                                              `json:"stop"`
+	Temperature      float64                                               `json:"temperature"`
+	ToolChoice       PromptOptionsParamsOpenAIModelParamsToolChoiceUnion   `json:"tool_choice"`
+	TopP             float64                                               `json:"top_p"`
+	UseCache         bool                                                  `json:"use_cache"`
+	JSON             promptOptionsParamsOpenAIModelParamsJSON              `json:"-"`
+}
+
+// promptOptionsParamsOpenAIModelParamsJSON contains the JSON metadata for the
+// struct [PromptOptionsParamsOpenAIModelParams]
+type promptOptionsParamsOpenAIModelParamsJSON struct {
+	FrequencyPenalty apijson.Field
+	FunctionCall     apijson.Field
+	MaxTokens        apijson.Field
+	N                apijson.Field
+	PresencePenalty  apijson.Field
+	ResponseFormat   apijson.Field
+	Stop             apijson.Field
+	Temperature      apijson.Field
+	ToolChoice       apijson.Field
+	TopP             apijson.Field
+	UseCache         apijson.Field
+	raw              string
+	ExtraFields      map[string]apijson.Field
+}
+
+func (r *PromptOptionsParamsOpenAIModelParams) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptOptionsParamsOpenAIModelParamsJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptOptionsParamsOpenAIModelParams) implementsSharedPromptOptionsParams() {}
+
+// Union satisfied by
+// [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallAuto],
+// [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallNone] or
+// [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallFunction].
+type PromptOptionsParamsOpenAIModelParamsFunctionCallUnion interface {
+	implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnion()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*PromptOptionsParamsOpenAIModelParamsFunctionCallUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.String,
+			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsFunctionCallAuto("")),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.String,
+			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsFunctionCallNone("")),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsFunctionCallFunction{}),
+		},
+	)
+}
+
+type PromptOptionsParamsOpenAIModelParamsFunctionCallAuto string
+
+const (
+	PromptOptionsParamsOpenAIModelParamsFunctionCallAutoAuto PromptOptionsParamsOpenAIModelParamsFunctionCallAuto = "auto"
+)
+
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallAuto) IsKnown() bool {
+	switch r {
+	case PromptOptionsParamsOpenAIModelParamsFunctionCallAutoAuto:
+		return true
+	}
+	return false
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallAuto) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnion() {
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallAuto) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsFunctionCallNone string
+
+const (
+	PromptOptionsParamsOpenAIModelParamsFunctionCallNoneNone PromptOptionsParamsOpenAIModelParamsFunctionCallNone = "none"
+)
+
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallNone) IsKnown() bool {
+	switch r {
+	case PromptOptionsParamsOpenAIModelParamsFunctionCallNoneNone:
+		return true
+	}
+	return false
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallNone) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnion() {
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallNone) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsFunctionCallFunction struct {
+	Name string                                                       `json:"name,required"`
+	JSON promptOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON `json:"-"`
+}
+
+// promptOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON contains the JSON
+// metadata for the struct
+// [PromptOptionsParamsOpenAIModelParamsFunctionCallFunction]
+type promptOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON struct {
+	Name        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptOptionsParamsOpenAIModelParamsFunctionCallFunction) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallFunction) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnion() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormat struct {
+	// This field can have the runtime type of
+	// [PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema].
+	JsonSchema interface{}                                            `json:"json_schema"`
+	Type       PromptOptionsParamsOpenAIModelParamsResponseFormatType `json:"type"`
+	JSON       promptOptionsParamsOpenAIModelParamsResponseFormatJSON `json:"-"`
+	union      PromptOptionsParamsOpenAIModelParamsResponseFormatUnion
+}
+
+// promptOptionsParamsOpenAIModelParamsResponseFormatJSON contains the JSON
+// metadata for the struct [PromptOptionsParamsOpenAIModelParamsResponseFormat]
+type promptOptionsParamsOpenAIModelParamsResponseFormatJSON struct {
+	JsonSchema  apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r promptOptionsParamsOpenAIModelParamsResponseFormatJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormat) UnmarshalJSON(data []byte) (err error) {
+	*r = PromptOptionsParamsOpenAIModelParamsResponseFormat{}
+	err = apijson.UnmarshalRoot(data, &r.union)
+	if err != nil {
+		return err
+	}
+	return apijson.Port(r.union, &r)
+}
+
+// AsUnion returns a [PromptOptionsParamsOpenAIModelParamsResponseFormatUnion]
+// interface which you can cast to the specific types for more type safety.
+//
+// Possible runtime types of the union are
+// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject],
+// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema],
+// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatText],
+// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariant].
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormat) AsUnion() PromptOptionsParamsOpenAIModelParamsResponseFormatUnion {
+	return r.union
+}
+
+// Union satisfied by
+// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject],
+// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema],
+// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatText] or
+// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariant].
+type PromptOptionsParamsOpenAIModelParamsResponseFormatUnion interface {
+	implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormat()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*PromptOptionsParamsOpenAIModelParamsResponseFormatUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsResponseFormatText{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariant{}),
+		},
+	)
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject struct {
+	Type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType `json:"type,required"`
+	JSON promptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectJSON `json:"-"`
+}
+
+// promptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectJSON contains the
+// JSON metadata for the struct
+// [PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject]
+type promptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectJSON struct {
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormat() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType string
+
+const (
+	PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType = "json_object"
+)
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType) IsKnown() bool {
+	switch r {
+	case PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject:
+		return true
+	}
+	return false
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema struct {
+	JsonSchema PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema `json:"json_schema,required"`
+	Type       PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType       `json:"type,required"`
+	JSON       promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJSON       `json:"-"`
+}
+
+// promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJSON contains the
+// JSON metadata for the struct
+// [PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema]
+type promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJSON struct {
+	JsonSchema  apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormat() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema struct {
+	Name        string                                                                     `json:"name,required"`
+	Description string                                                                     `json:"description"`
+	Schema      map[string]interface{}                                                     `json:"schema"`
+	Strict      bool                                                                       `json:"strict,nullable"`
+	JSON        promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaJSON `json:"-"`
+}
+
+// promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaJSON
+// contains the JSON metadata for the struct
+// [PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema]
+type promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaJSON struct {
+	Name        apijson.Field
+	Description apijson.Field
+	Schema      apijson.Field
+	Strict      apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaJSON) RawJSON() string {
+	return r.raw
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType string
+
+const (
+	PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaTypeJsonSchema PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType = "json_schema"
+)
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType) IsKnown() bool {
+	switch r {
+	case PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaTypeJsonSchema:
+		return true
+	}
+	return false
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormatText struct {
+	Type PromptOptionsParamsOpenAIModelParamsResponseFormatTextType `json:"type,required"`
+	JSON promptOptionsParamsOpenAIModelParamsResponseFormatTextJSON `json:"-"`
+}
+
+// promptOptionsParamsOpenAIModelParamsResponseFormatTextJSON contains the JSON
+// metadata for the struct [PromptOptionsParamsOpenAIModelParamsResponseFormatText]
+type promptOptionsParamsOpenAIModelParamsResponseFormatTextJSON struct {
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatText) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptOptionsParamsOpenAIModelParamsResponseFormatTextJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatText) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormat() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormatTextType string
+
+const (
+	PromptOptionsParamsOpenAIModelParamsResponseFormatTextTypeText PromptOptionsParamsOpenAIModelParamsResponseFormatTextType = "text"
+)
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatTextType) IsKnown() bool {
+	switch r {
+	case PromptOptionsParamsOpenAIModelParamsResponseFormatTextTypeText:
+		return true
+	}
+	return false
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariant struct {
+	JSON promptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantJSON `json:"-"`
+}
+
+// promptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantJSON contains
+// the JSON metadata for the struct
+// [PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariant]
+type promptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantJSON struct {
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariant) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariant) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormat() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormatType string
+
+const (
+	PromptOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject PromptOptionsParamsOpenAIModelParamsResponseFormatType = "json_object"
+	PromptOptionsParamsOpenAIModelParamsResponseFormatTypeJsonSchema PromptOptionsParamsOpenAIModelParamsResponseFormatType = "json_schema"
+	PromptOptionsParamsOpenAIModelParamsResponseFormatTypeText       PromptOptionsParamsOpenAIModelParamsResponseFormatType = "text"
+)
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatType) IsKnown() bool {
+	switch r {
+	case PromptOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject, PromptOptionsParamsOpenAIModelParamsResponseFormatTypeJsonSchema, PromptOptionsParamsOpenAIModelParamsResponseFormatTypeText:
+		return true
+	}
+	return false
+}
+
+// Union satisfied by [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceAuto],
+// [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceNone],
+// [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceRequired] or
+// [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunction].
+type PromptOptionsParamsOpenAIModelParamsToolChoiceUnion interface {
+	implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnion()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*PromptOptionsParamsOpenAIModelParamsToolChoiceUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.String,
+			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsToolChoiceAuto("")),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.String,
+			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsToolChoiceNone("")),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.String,
+			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsToolChoiceRequired("")),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsToolChoiceFunction{}),
+		},
+	)
+}
+
+type PromptOptionsParamsOpenAIModelParamsToolChoiceAuto string
+
+const (
+	PromptOptionsParamsOpenAIModelParamsToolChoiceAutoAuto PromptOptionsParamsOpenAIModelParamsToolChoiceAuto = "auto"
+)
+
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceAuto) IsKnown() bool {
+	switch r {
+	case PromptOptionsParamsOpenAIModelParamsToolChoiceAutoAuto:
+		return true
+	}
+	return false
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceAuto) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnion() {
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceAuto) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsToolChoiceNone string
+
+const (
+	PromptOptionsParamsOpenAIModelParamsToolChoiceNoneNone PromptOptionsParamsOpenAIModelParamsToolChoiceNone = "none"
+)
+
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceNone) IsKnown() bool {
+	switch r {
+	case PromptOptionsParamsOpenAIModelParamsToolChoiceNoneNone:
+		return true
+	}
+	return false
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceNone) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnion() {
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceNone) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsToolChoiceRequired string
+
+const (
+	PromptOptionsParamsOpenAIModelParamsToolChoiceRequiredRequired PromptOptionsParamsOpenAIModelParamsToolChoiceRequired = "required"
+)
+
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceRequired) IsKnown() bool {
+	switch r {
+	case PromptOptionsParamsOpenAIModelParamsToolChoiceRequiredRequired:
+		return true
+	}
+	return false
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceRequired) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnion() {
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceRequired) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsToolChoiceFunction struct {
+	Function PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction `json:"function,required"`
+	Type     PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionType     `json:"type,required"`
+	JSON     promptOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON     `json:"-"`
+}
+
+// promptOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON contains the JSON
+// metadata for the struct [PromptOptionsParamsOpenAIModelParamsToolChoiceFunction]
+type promptOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON struct {
+	Function    apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptOptionsParamsOpenAIModelParamsToolChoiceFunction) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunction) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnion() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction struct {
+	Name string                                                             `json:"name,required"`
+	JSON promptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON `json:"-"`
+}
+
+// promptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON contains the
+// JSON metadata for the struct
+// [PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction]
+type promptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON struct {
+	Name        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON) RawJSON() string {
+	return r.raw
+}
+
+type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionType string
+
+const (
+	PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionType = "function"
+)
+
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionType) IsKnown() bool {
+	switch r {
+	case PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction:
+		return true
+	}
+	return false
+}
+
+type PromptOptionsParamsAnthropicModelParams struct {
+	MaxTokens   float64 `json:"max_tokens,required"`
+	Temperature float64 `json:"temperature,required"`
+	// This is a legacy parameter that should not be used.
+	MaxTokensToSample float64                                     `json:"max_tokens_to_sample"`
+	StopSequences     []string                                    `json:"stop_sequences"`
+	TopK              float64                                     `json:"top_k"`
+	TopP              float64                                     `json:"top_p"`
+	UseCache          bool                                        `json:"use_cache"`
+	JSON              promptOptionsParamsAnthropicModelParamsJSON `json:"-"`
+}
+
+// promptOptionsParamsAnthropicModelParamsJSON contains the JSON metadata for the
+// struct [PromptOptionsParamsAnthropicModelParams]
+type promptOptionsParamsAnthropicModelParamsJSON struct {
+	MaxTokens         apijson.Field
+	Temperature       apijson.Field
+	MaxTokensToSample apijson.Field
+	StopSequences     apijson.Field
+	TopK              apijson.Field
+	TopP              apijson.Field
+	UseCache          apijson.Field
+	raw               string
+	ExtraFields       map[string]apijson.Field
+}
+
+func (r *PromptOptionsParamsAnthropicModelParams) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptOptionsParamsAnthropicModelParamsJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptOptionsParamsAnthropicModelParams) implementsSharedPromptOptionsParams() {}
+
+type PromptOptionsParamsGoogleModelParams struct {
+	MaxOutputTokens float64                                  `json:"maxOutputTokens"`
+	Temperature     float64                                  `json:"temperature"`
+	TopK            float64                                  `json:"topK"`
+	TopP            float64                                  `json:"topP"`
+	UseCache        bool                                     `json:"use_cache"`
+	JSON            promptOptionsParamsGoogleModelParamsJSON `json:"-"`
+}
+
+// promptOptionsParamsGoogleModelParamsJSON contains the JSON metadata for the
+// struct [PromptOptionsParamsGoogleModelParams]
+type promptOptionsParamsGoogleModelParamsJSON struct {
+	MaxOutputTokens apijson.Field
+	Temperature     apijson.Field
+	TopK            apijson.Field
+	TopP            apijson.Field
+	UseCache        apijson.Field
+	raw             string
+	ExtraFields     map[string]apijson.Field
+}
+
+func (r *PromptOptionsParamsGoogleModelParams) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptOptionsParamsGoogleModelParamsJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptOptionsParamsGoogleModelParams) implementsSharedPromptOptionsParams() {}
+
+type PromptOptionsParamsWindowAIModelParams struct {
+	Temperature float64                                    `json:"temperature"`
+	TopK        float64                                    `json:"topK"`
+	UseCache    bool                                       `json:"use_cache"`
+	JSON        promptOptionsParamsWindowAIModelParamsJSON `json:"-"`
+}
+
+// promptOptionsParamsWindowAIModelParamsJSON contains the JSON metadata for the
+// struct [PromptOptionsParamsWindowAIModelParams]
+type promptOptionsParamsWindowAIModelParamsJSON struct {
+	Temperature apijson.Field
+	TopK        apijson.Field
+	UseCache    apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptOptionsParamsWindowAIModelParams) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptOptionsParamsWindowAIModelParamsJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptOptionsParamsWindowAIModelParams) implementsSharedPromptOptionsParams() {}
+
+type PromptOptionsParamsJsCompletionParams struct {
+	UseCache bool                                      `json:"use_cache"`
+	JSON     promptOptionsParamsJsCompletionParamsJSON `json:"-"`
+}
+
+// promptOptionsParamsJsCompletionParamsJSON contains the JSON metadata for the
+// struct [PromptOptionsParamsJsCompletionParams]
+type promptOptionsParamsJsCompletionParamsJSON struct {
+	UseCache    apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptOptionsParamsJsCompletionParams) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptOptionsParamsJsCompletionParamsJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptOptionsParamsJsCompletionParams) implementsSharedPromptOptionsParams() {}
+
+type PromptOptionsParam struct {
+	Model    param.Field[string]                        `json:"model"`
+	Params   param.Field[PromptOptionsParamsUnionParam] `json:"params"`
+	Position param.Field[string]                        `json:"position"`
+}
+
+func (r PromptOptionsParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type PromptOptionsParamsParam struct {
+	FrequencyPenalty param.Field[float64]     `json:"frequency_penalty"`
+	FunctionCall     param.Field[interface{}] `json:"function_call"`
+	MaxTokens        param.Field[float64]     `json:"max_tokens"`
+	// This is a legacy parameter that should not be used.
+	MaxTokensToSample param.Field[float64]     `json:"max_tokens_to_sample"`
+	MaxOutputTokens   param.Field[float64]     `json:"maxOutputTokens"`
+	N                 param.Field[float64]     `json:"n"`
+	PresencePenalty   param.Field[float64]     `json:"presence_penalty"`
+	ResponseFormat    param.Field[interface{}] `json:"response_format"`
+	Stop              param.Field[interface{}] `json:"stop"`
+	StopSequences     param.Field[interface{}] `json:"stop_sequences"`
+	Temperature       param.Field[float64]     `json:"temperature"`
+	ToolChoice        param.Field[interface{}] `json:"tool_choice"`
+	TopK              param.Field[float64]     `json:"top_k"`
+	TopP              param.Field[float64]     `json:"top_p"`
+	TopK              param.Field[float64]     `json:"topK"`
+	TopP              param.Field[float64]     `json:"topP"`
+	UseCache          param.Field[bool]        `json:"use_cache"`
+}
+
+func (r PromptOptionsParamsParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptOptionsParamsParam) implementsSharedPromptOptionsParamsUnionParam() {}
+
+// Satisfied by [shared.PromptOptionsParamsOpenAIModelParamsParam],
+// [shared.PromptOptionsParamsAnthropicModelParamsParam],
+// [shared.PromptOptionsParamsGoogleModelParamsParam],
+// [shared.PromptOptionsParamsWindowAIModelParamsParam],
+// [shared.PromptOptionsParamsJsCompletionParamsParam], [PromptOptionsParamsParam].
+type PromptOptionsParamsUnionParam interface {
+	implementsSharedPromptOptionsParamsUnionParam()
+}
+
+type PromptOptionsParamsOpenAIModelParamsParam struct {
+	FrequencyPenalty param.Field[float64]                                                      `json:"frequency_penalty"`
+	FunctionCall     param.Field[PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam]   `json:"function_call"`
+	MaxTokens        param.Field[float64]                                                      `json:"max_tokens"`
+	N                param.Field[float64]                                                      `json:"n"`
+	PresencePenalty  param.Field[float64]                                                      `json:"presence_penalty"`
+	ResponseFormat   param.Field[PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam] `json:"response_format"`
+	Stop             param.Field[[]string]                                                     `json:"stop"`
+	Temperature      param.Field[float64]                                                      `json:"temperature"`
+	ToolChoice       param.Field[PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam]     `json:"tool_choice"`
+	TopP             param.Field[float64]                                                      `json:"top_p"`
+	UseCache         param.Field[bool]                                                         `json:"use_cache"`
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsParam) implementsSharedPromptOptionsParamsUnionParam() {}
+
+// Satisfied by [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallAuto],
+// [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallNone],
+// [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam].
+type PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam interface {
+	implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam()
+}
+
+type PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam struct {
+	Name param.Field[string] `json:"name,required"`
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormatParam struct {
+	JsonSchema param.Field[interface{}]                                            `json:"json_schema"`
+	Type       param.Field[PromptOptionsParamsOpenAIModelParamsResponseFormatType] `json:"type"`
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatParam) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
+}
+
+// Satisfied by
+// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam],
+// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam],
+// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam],
+// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam],
+// [PromptOptionsParamsOpenAIModelParamsResponseFormatParam].
+type PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam interface {
+	implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam()
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam struct {
+	Type param.Field[PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType] `json:"type,required"`
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam struct {
+	JsonSchema param.Field[PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam] `json:"json_schema,required"`
+	Type       param.Field[PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType]            `json:"type,required"`
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam struct {
+	Name        param.Field[string]                 `json:"name,required"`
+	Description param.Field[string]                 `json:"description"`
+	Schema      param.Field[map[string]interface{}] `json:"schema"`
+	Strict      param.Field[bool]                   `json:"strict"`
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam struct {
+	Type param.Field[PromptOptionsParamsOpenAIModelParamsResponseFormatTextType] `json:"type,required"`
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam struct {
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
+}
+
+// Satisfied by [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceAuto],
+// [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceNone],
+// [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceRequired],
+// [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam].
+type PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam interface {
+	implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam()
+}
+
+type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam struct {
+	Function param.Field[PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam] `json:"function,required"`
+	Type     param.Field[PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionType]          `json:"type,required"`
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
+}
+
+type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam struct {
+	Name param.Field[string] `json:"name,required"`
+}
+
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type PromptOptionsParamsAnthropicModelParamsParam struct {
+	MaxTokens   param.Field[float64] `json:"max_tokens,required"`
+	Temperature param.Field[float64] `json:"temperature,required"`
+	// This is a legacy parameter that should not be used.
+	MaxTokensToSample param.Field[float64]  `json:"max_tokens_to_sample"`
+	StopSequences     param.Field[[]string] `json:"stop_sequences"`
+	TopK              param.Field[float64]  `json:"top_k"`
+	TopP              param.Field[float64]  `json:"top_p"`
+	UseCache          param.Field[bool]     `json:"use_cache"`
+}
+
+func (r PromptOptionsParamsAnthropicModelParamsParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptOptionsParamsAnthropicModelParamsParam) implementsSharedPromptOptionsParamsUnionParam() {
+}
+
+type PromptOptionsParamsGoogleModelParamsParam struct {
+	MaxOutputTokens param.Field[float64] `json:"maxOutputTokens"`
+	Temperature     param.Field[float64] `json:"temperature"`
+	TopK            param.Field[float64] `json:"topK"`
+	TopP            param.Field[float64] `json:"topP"`
+	UseCache        param.Field[bool]    `json:"use_cache"`
+}
+
+func (r PromptOptionsParamsGoogleModelParamsParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptOptionsParamsGoogleModelParamsParam) implementsSharedPromptOptionsParamsUnionParam() {}
+
+type PromptOptionsParamsWindowAIModelParamsParam struct {
+	Temperature param.Field[float64] `json:"temperature"`
+	TopK        param.Field[float64] `json:"topK"`
+	UseCache    param.Field[bool]    `json:"use_cache"`
+}
+
+func (r PromptOptionsParamsWindowAIModelParamsParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptOptionsParamsWindowAIModelParamsParam) implementsSharedPromptOptionsParamsUnionParam() {
+}
+
+type PromptOptionsParamsJsCompletionParamsParam struct {
+	UseCache param.Field[bool] `json:"use_cache"`
+}
+
+func (r PromptOptionsParamsJsCompletionParamsParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptOptionsParamsJsCompletionParamsParam) implementsSharedPromptOptionsParamsUnionParam() {}
+
 // Metadata about the state of the repo when the experiment was created
 type RepoInfo struct {
 	// Email of the author of the most recent commit
@@ -6808,6 +6532,65 @@ func (r *ScoreSummary) UnmarshalJSON(data []byte) (err error) {
 
 func (r scoreSummaryJSON) RawJSON() string {
 	return r.raw
+}
+
+// Human-identifying attributes of the span, such as name, type, etc.
+type SpanAttributes struct {
+	// Name of the span, for display purposes only
+	Name string `json:"name,nullable"`
+	// Type of the span, for display purposes only
+	Type        SpanAttributesType     `json:"type,nullable"`
+	ExtraFields map[string]interface{} `json:"-,extras"`
+	JSON        spanAttributesJSON     `json:"-"`
+}
+
+// spanAttributesJSON contains the JSON metadata for the struct [SpanAttributes]
+type spanAttributesJSON struct {
+	Name        apijson.Field
+	Type        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *SpanAttributes) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r spanAttributesJSON) RawJSON() string {
+	return r.raw
+}
+
+// Type of the span, for display purposes only
+type SpanAttributesType string
+
+const (
+	SpanAttributesTypeLlm      SpanAttributesType = "llm"
+	SpanAttributesTypeScore    SpanAttributesType = "score"
+	SpanAttributesTypeFunction SpanAttributesType = "function"
+	SpanAttributesTypeEval     SpanAttributesType = "eval"
+	SpanAttributesTypeTask     SpanAttributesType = "task"
+	SpanAttributesTypeTool     SpanAttributesType = "tool"
+)
+
+func (r SpanAttributesType) IsKnown() bool {
+	switch r {
+	case SpanAttributesTypeLlm, SpanAttributesTypeScore, SpanAttributesTypeFunction, SpanAttributesTypeEval, SpanAttributesTypeTask, SpanAttributesTypeTool:
+		return true
+	}
+	return false
+}
+
+// Human-identifying attributes of the span, such as name, type, etc.
+type SpanAttributesParam struct {
+	// Name of the span, for display purposes only
+	Name param.Field[string] `json:"name"`
+	// Type of the span, for display purposes only
+	Type        param.Field[SpanAttributesType] `json:"type"`
+	ExtraFields map[string]interface{}          `json:"-,extras"`
+}
+
+func (r SpanAttributesParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }
 
 type SpanIFrame struct {

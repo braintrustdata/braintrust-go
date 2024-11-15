@@ -33,9 +33,9 @@ func TestPromptNewWithOptionalParams(t *testing.T) {
 		Description:  braintrust.F("description"),
 		FunctionType: braintrust.F(braintrust.PromptNewParamsFunctionTypeLlm),
 		PromptData: braintrust.F(shared.PromptDataParam{
-			Options: braintrust.F(shared.PromptDataOptionsParam{
+			Options: braintrust.F(shared.PromptOptionsParam{
 				Model: braintrust.F("model"),
-				Params: braintrust.F[shared.PromptDataOptionsParamsUnionParam](shared.PromptDataOptionsParamsAnthropicModelParamsParam{
+				Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsAnthropicModelParamsParam{
 					FrequencyPenalty: int64(0),
 					FunctionCall:     "auto",
 					MaxTokens:        braintrust.F(0.000000),
@@ -135,9 +135,9 @@ func TestPromptUpdateWithOptionalParams(t *testing.T) {
 			Description: braintrust.F("description"),
 			Name:        braintrust.F("name"),
 			PromptData: braintrust.F(shared.PromptDataParam{
-				Options: braintrust.F(shared.PromptDataOptionsParam{
+				Options: braintrust.F(shared.PromptOptionsParam{
 					Model: braintrust.F("model"),
-					Params: braintrust.F[shared.PromptDataOptionsParamsUnionParam](shared.PromptDataOptionsParamsAnthropicModelParamsParam{
+					Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsAnthropicModelParamsParam{
 						FrequencyPenalty: int64(0),
 						FunctionCall:     "auto",
 						MaxTokens:        braintrust.F(0.000000),
@@ -272,9 +272,9 @@ func TestPromptReplaceWithOptionalParams(t *testing.T) {
 		Description:  braintrust.F("description"),
 		FunctionType: braintrust.F(braintrust.PromptReplaceParamsFunctionTypeLlm),
 		PromptData: braintrust.F(shared.PromptDataParam{
-			Options: braintrust.F(shared.PromptDataOptionsParam{
+			Options: braintrust.F(shared.PromptOptionsParam{
 				Model: braintrust.F("model"),
-				Params: braintrust.F[shared.PromptDataOptionsParamsUnionParam](shared.PromptDataOptionsParamsAnthropicModelParamsParam{
+				Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsAnthropicModelParamsParam{
 					FrequencyPenalty: int64(0),
 					FunctionCall:     "auto",
 					MaxTokens:        braintrust.F(0.000000),
