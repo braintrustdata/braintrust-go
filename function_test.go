@@ -45,9 +45,9 @@ func TestFunctionNewWithOptionalParams(t *testing.T) {
 			Internal:   braintrust.F(true),
 		}),
 		PromptData: braintrust.F(shared.PromptDataParam{
-			Options: braintrust.F(shared.PromptDataOptionsParam{
+			Options: braintrust.F(shared.PromptOptionsParam{
 				Model: braintrust.F("model"),
-				Params: braintrust.F[shared.PromptDataOptionsParamsUnionParam](shared.PromptDataOptionsParamsAnthropicModelParamsParam{
+				Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsAnthropicModelParamsParam{
 					FrequencyPenalty: int64(0),
 					FunctionCall:     "auto",
 					MaxTokens:        braintrust.F(0.000000),
@@ -150,9 +150,9 @@ func TestFunctionUpdateWithOptionalParams(t *testing.T) {
 			}),
 			Name: braintrust.F("name"),
 			PromptData: braintrust.F(shared.PromptDataParam{
-				Options: braintrust.F(shared.PromptDataOptionsParam{
+				Options: braintrust.F(shared.PromptOptionsParam{
 					Model: braintrust.F("model"),
-					Params: braintrust.F[shared.PromptDataOptionsParamsUnionParam](shared.PromptDataOptionsParamsAnthropicModelParamsParam{
+					Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsAnthropicModelParamsParam{
 						FrequencyPenalty: int64(0),
 						FunctionCall:     "auto",
 						MaxTokens:        braintrust.F(0.000000),
@@ -354,9 +354,9 @@ func TestFunctionReplaceWithOptionalParams(t *testing.T) {
 			Internal:   braintrust.F(true),
 		}),
 		PromptData: braintrust.F(shared.PromptDataParam{
-			Options: braintrust.F(shared.PromptDataOptionsParam{
+			Options: braintrust.F(shared.PromptOptionsParam{
 				Model: braintrust.F("model"),
-				Params: braintrust.F[shared.PromptDataOptionsParamsUnionParam](shared.PromptDataOptionsParamsAnthropicModelParamsParam{
+				Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsAnthropicModelParamsParam{
 					FrequencyPenalty: int64(0),
 					FunctionCall:     "auto",
 					MaxTokens:        braintrust.F(0.000000),
