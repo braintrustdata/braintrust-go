@@ -1168,7 +1168,7 @@ type PromptDataToolFunctionsGlobalParam = shared.PromptDataToolFunctionsGlobalPa
 type PromptOptions = shared.PromptOptions
 
 // This is an alias to an internal type.
-type PromptOptionsParams = shared.PromptOptionsParams
+type PromptOptionsParamsUnion = shared.PromptOptionsParamsUnion
 
 // This is an alias to an internal type.
 type PromptOptionsParamsOpenAIModelParams = shared.PromptOptionsParamsOpenAIModelParams
