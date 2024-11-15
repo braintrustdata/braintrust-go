@@ -5242,10 +5242,10 @@ func (r PromptDataToolFunctionsGlobalParam) MarshalJSON() (data []byte, err erro
 func (r PromptDataToolFunctionsGlobalParam) implementsSharedPromptDataToolFunctionsUnionParam() {}
 
 type PromptOptions struct {
-	Model    string              `json:"model"`
-	Params   PromptOptionsParams `json:"params"`
-	Position string              `json:"position"`
-	JSON     promptOptionsJSON   `json:"-"`
+	Model    string                   `json:"model"`
+	Params   PromptOptionsParamsUnion `json:"params"`
+	Position string                   `json:"position"`
+	JSON     promptOptionsJSON        `json:"-"`
 }
 
 // promptOptionsJSON contains the JSON metadata for the struct [PromptOptions]
@@ -5265,94 +5265,13 @@ func (r promptOptionsJSON) RawJSON() string {
 	return r.raw
 }
 
-type PromptOptionsParams struct {
-	FrequencyPenalty float64 `json:"frequency_penalty"`
-	// This field can have the runtime type of
-	// [PromptOptionsParamsOpenAIModelParamsFunctionCallUnion].
-	FunctionCall interface{} `json:"function_call"`
-	MaxTokens    float64     `json:"max_tokens"`
-	// This is a legacy parameter that should not be used.
-	MaxTokensToSample float64 `json:"max_tokens_to_sample"`
-	MaxOutputTokens   float64 `json:"maxOutputTokens"`
-	N                 float64 `json:"n"`
-	PresencePenalty   float64 `json:"presence_penalty"`
-	// This field can have the runtime type of
-	// [PromptOptionsParamsOpenAIModelParamsResponseFormat].
-	ResponseFormat interface{} `json:"response_format"`
-	// This field can have the runtime type of [[]string].
-	Stop interface{} `json:"stop"`
-	// This field can have the runtime type of [[]string].
-	StopSequences interface{} `json:"stop_sequences"`
-	Temperature   float64     `json:"temperature"`
-	// This field can have the runtime type of
-	// [PromptOptionsParamsOpenAIModelParamsToolChoiceUnion].
-	ToolChoice interface{}             `json:"tool_choice"`
-	TopK       float64                 `json:"top_k"`
-	TopP       float64                 `json:"top_p"`
-	TopK       float64                 `json:"topK"`
-	TopP       float64                 `json:"topP"`
-	UseCache   bool                    `json:"use_cache"`
-	JSON       promptOptionsParamsJSON `json:"-"`
-	union      PromptOptionsParamsUnion
-}
-
-// promptOptionsParamsJSON contains the JSON metadata for the struct
-// [PromptOptionsParams]
-type promptOptionsParamsJSON struct {
-	FrequencyPenalty  apijson.Field
-	FunctionCall      apijson.Field
-	MaxTokens         apijson.Field
-	MaxTokensToSample apijson.Field
-	MaxOutputTokens   apijson.Field
-	N                 apijson.Field
-	PresencePenalty   apijson.Field
-	ResponseFormat    apijson.Field
-	Stop              apijson.Field
-	StopSequences     apijson.Field
-	Temperature       apijson.Field
-	ToolChoice        apijson.Field
-	TopK              apijson.Field
-	TopP              apijson.Field
-	TopK              apijson.Field
-	TopP              apijson.Field
-	UseCache          apijson.Field
-	raw               string
-	ExtraFields       map[string]apijson.Field
-}
-
-func (r promptOptionsParamsJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *PromptOptionsParams) UnmarshalJSON(data []byte) (err error) {
-	*r = PromptOptionsParams{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [PromptOptionsParamsUnion] interface which you can cast to the
-// specific types for more type safety.
-//
-// Possible runtime types of the union are
-// [shared.PromptOptionsParamsOpenAIModelParams],
-// [shared.PromptOptionsParamsAnthropicModelParams],
-// [shared.PromptOptionsParamsGoogleModelParams],
-// [shared.PromptOptionsParamsWindowAIModelParams],
-// [shared.PromptOptionsParamsJsCompletionParams].
-func (r PromptOptionsParams) AsUnion() PromptOptionsParamsUnion {
-	return r.union
-}
-
 // Union satisfied by [shared.PromptOptionsParamsOpenAIModelParams],
 // [shared.PromptOptionsParamsAnthropicModelParams],
 // [shared.PromptOptionsParamsGoogleModelParams],
 // [shared.PromptOptionsParamsWindowAIModelParams] or
 // [shared.PromptOptionsParamsJsCompletionParams].
 type PromptOptionsParamsUnion interface {
-	implementsSharedPromptOptionsParams()
+	implementsSharedPromptOptionsParamsUnion()
 }
 
 func init() {
@@ -5423,7 +5342,7 @@ func (r promptOptionsParamsOpenAIModelParamsJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptOptionsParamsOpenAIModelParams) implementsSharedPromptOptionsParams() {}
+func (r PromptOptionsParamsOpenAIModelParams) implementsSharedPromptOptionsParamsUnion() {}
 
 // Union satisfied by
 // [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallAuto],
@@ -5964,7 +5883,7 @@ func (r promptOptionsParamsAnthropicModelParamsJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptOptionsParamsAnthropicModelParams) implementsSharedPromptOptionsParams() {}
+func (r PromptOptionsParamsAnthropicModelParams) implementsSharedPromptOptionsParamsUnion() {}
 
 type PromptOptionsParamsGoogleModelParams struct {
 	MaxOutputTokens float64                                  `json:"maxOutputTokens"`
@@ -5995,7 +5914,7 @@ func (r promptOptionsParamsGoogleModelParamsJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptOptionsParamsGoogleModelParams) implementsSharedPromptOptionsParams() {}
+func (r PromptOptionsParamsGoogleModelParams) implementsSharedPromptOptionsParamsUnion() {}
 
 type PromptOptionsParamsWindowAIModelParams struct {
 	Temperature float64                                    `json:"temperature"`
@@ -6022,7 +5941,7 @@ func (r promptOptionsParamsWindowAIModelParamsJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptOptionsParamsWindowAIModelParams) implementsSharedPromptOptionsParams() {}
+func (r PromptOptionsParamsWindowAIModelParams) implementsSharedPromptOptionsParamsUnion() {}
 
 type PromptOptionsParamsJsCompletionParams struct {
 	UseCache bool                                      `json:"use_cache"`
@@ -6045,7 +5964,7 @@ func (r promptOptionsParamsJsCompletionParamsJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptOptionsParamsJsCompletionParams) implementsSharedPromptOptionsParams() {}
+func (r PromptOptionsParamsJsCompletionParams) implementsSharedPromptOptionsParamsUnion() {}
 
 type PromptOptionsParam struct {
 	Model    param.Field[string]                        `json:"model"`
@@ -6057,38 +5976,11 @@ func (r PromptOptionsParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-type PromptOptionsParamsParam struct {
-	FrequencyPenalty param.Field[float64]     `json:"frequency_penalty"`
-	FunctionCall     param.Field[interface{}] `json:"function_call"`
-	MaxTokens        param.Field[float64]     `json:"max_tokens"`
-	// This is a legacy parameter that should not be used.
-	MaxTokensToSample param.Field[float64]     `json:"max_tokens_to_sample"`
-	MaxOutputTokens   param.Field[float64]     `json:"maxOutputTokens"`
-	N                 param.Field[float64]     `json:"n"`
-	PresencePenalty   param.Field[float64]     `json:"presence_penalty"`
-	ResponseFormat    param.Field[interface{}] `json:"response_format"`
-	Stop              param.Field[interface{}] `json:"stop"`
-	StopSequences     param.Field[interface{}] `json:"stop_sequences"`
-	Temperature       param.Field[float64]     `json:"temperature"`
-	ToolChoice        param.Field[interface{}] `json:"tool_choice"`
-	TopK              param.Field[float64]     `json:"top_k"`
-	TopP              param.Field[float64]     `json:"top_p"`
-	TopK              param.Field[float64]     `json:"topK"`
-	TopP              param.Field[float64]     `json:"topP"`
-	UseCache          param.Field[bool]        `json:"use_cache"`
-}
-
-func (r PromptOptionsParamsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r PromptOptionsParamsParam) implementsSharedPromptOptionsParamsUnionParam() {}
-
 // Satisfied by [shared.PromptOptionsParamsOpenAIModelParamsParam],
 // [shared.PromptOptionsParamsAnthropicModelParamsParam],
 // [shared.PromptOptionsParamsGoogleModelParamsParam],
 // [shared.PromptOptionsParamsWindowAIModelParamsParam],
-// [shared.PromptOptionsParamsJsCompletionParamsParam], [PromptOptionsParamsParam].
+// [shared.PromptOptionsParamsJsCompletionParamsParam].
 type PromptOptionsParamsUnionParam interface {
 	implementsSharedPromptOptionsParamsUnionParam()
 }
