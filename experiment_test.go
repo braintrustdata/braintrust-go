@@ -335,12 +335,13 @@ func TestExperimentInsert(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ExperimentInsertParams{
-			Events: braintrust.F([]braintrust.ExperimentInsertParamsEventUnion{shared.InsertExperimentEventReplaceParam{
+			Events: braintrust.F([]shared.InsertExperimentEventParam{{
 				ID:           braintrust.F("id"),
 				IsMerge:      braintrust.F(true),
+				MergePaths:   braintrust.F([][]string{{"string", "string", "string"}, {"string", "string", "string"}, {"string", "string", "string"}}),
 				ObjectDelete: braintrust.F(true),
 				ParentID:     braintrust.F("_parent_id"),
-				Context: braintrust.F(shared.InsertExperimentEventReplaceContextParam{
+				Context: braintrust.F(shared.InsertExperimentEventContextParam{
 					CallerFilename:     braintrust.F("caller_filename"),
 					CallerFunctionname: braintrust.F("caller_functionname"),
 					CallerLineno:       braintrust.F(int64(0)),
@@ -353,7 +354,7 @@ func TestExperimentInsert(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": "bar",
 				}),
-				Metrics: braintrust.F(shared.InsertExperimentEventReplaceMetricsParam{
+				Metrics: braintrust.F(shared.InsertExperimentEventMetricsParam{
 					CallerFilename:     braintrust.F[any](map[string]interface{}{}),
 					CallerFunctionname: braintrust.F[any](map[string]interface{}{}),
 					CallerLineno:       braintrust.F[any](map[string]interface{}{}),
@@ -363,21 +364,25 @@ func TestExperimentInsert(t *testing.T) {
 					Start:              braintrust.F(0.000000),
 					Tokens:             braintrust.F(int64(0)),
 				}),
-				Output: braintrust.F[any](map[string]interface{}{}),
+				Output:     braintrust.F[any](map[string]interface{}{}),
+				RootSpanID: braintrust.F("root_span_id"),
 				Scores: braintrust.F(map[string]float64{
 					"foo": 0.000000,
 				}),
-				SpanAttributes: braintrust.F(shared.InsertExperimentEventReplaceSpanAttributesParam{
+				SpanAttributes: braintrust.F(shared.SpanAttributesParam{
 					Name: braintrust.F("name"),
-					Type: braintrust.F(shared.InsertExperimentEventReplaceSpanAttributesTypeLlm),
+					Type: braintrust.F(shared.SpanAttributesTypeLlm),
 				}),
-				Tags: braintrust.F([]string{"string", "string", "string"}),
-			}, shared.InsertExperimentEventReplaceParam{
+				SpanID:      braintrust.F("span_id"),
+				SpanParents: braintrust.F([]string{"string", "string", "string"}),
+				Tags:        braintrust.F([]string{"string", "string", "string"}),
+			}, {
 				ID:           braintrust.F("id"),
 				IsMerge:      braintrust.F(true),
+				MergePaths:   braintrust.F([][]string{{"string", "string", "string"}, {"string", "string", "string"}, {"string", "string", "string"}}),
 				ObjectDelete: braintrust.F(true),
 				ParentID:     braintrust.F("_parent_id"),
-				Context: braintrust.F(shared.InsertExperimentEventReplaceContextParam{
+				Context: braintrust.F(shared.InsertExperimentEventContextParam{
 					CallerFilename:     braintrust.F("caller_filename"),
 					CallerFunctionname: braintrust.F("caller_functionname"),
 					CallerLineno:       braintrust.F(int64(0)),
@@ -390,7 +395,7 @@ func TestExperimentInsert(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": "bar",
 				}),
-				Metrics: braintrust.F(shared.InsertExperimentEventReplaceMetricsParam{
+				Metrics: braintrust.F(shared.InsertExperimentEventMetricsParam{
 					CallerFilename:     braintrust.F[any](map[string]interface{}{}),
 					CallerFunctionname: braintrust.F[any](map[string]interface{}{}),
 					CallerLineno:       braintrust.F[any](map[string]interface{}{}),
@@ -400,21 +405,25 @@ func TestExperimentInsert(t *testing.T) {
 					Start:              braintrust.F(0.000000),
 					Tokens:             braintrust.F(int64(0)),
 				}),
-				Output: braintrust.F[any](map[string]interface{}{}),
+				Output:     braintrust.F[any](map[string]interface{}{}),
+				RootSpanID: braintrust.F("root_span_id"),
 				Scores: braintrust.F(map[string]float64{
 					"foo": 0.000000,
 				}),
-				SpanAttributes: braintrust.F(shared.InsertExperimentEventReplaceSpanAttributesParam{
+				SpanAttributes: braintrust.F(shared.SpanAttributesParam{
 					Name: braintrust.F("name"),
-					Type: braintrust.F(shared.InsertExperimentEventReplaceSpanAttributesTypeLlm),
+					Type: braintrust.F(shared.SpanAttributesTypeLlm),
 				}),
-				Tags: braintrust.F([]string{"string", "string", "string"}),
-			}, shared.InsertExperimentEventReplaceParam{
+				SpanID:      braintrust.F("span_id"),
+				SpanParents: braintrust.F([]string{"string", "string", "string"}),
+				Tags:        braintrust.F([]string{"string", "string", "string"}),
+			}, {
 				ID:           braintrust.F("id"),
 				IsMerge:      braintrust.F(true),
+				MergePaths:   braintrust.F([][]string{{"string", "string", "string"}, {"string", "string", "string"}, {"string", "string", "string"}}),
 				ObjectDelete: braintrust.F(true),
 				ParentID:     braintrust.F("_parent_id"),
-				Context: braintrust.F(shared.InsertExperimentEventReplaceContextParam{
+				Context: braintrust.F(shared.InsertExperimentEventContextParam{
 					CallerFilename:     braintrust.F("caller_filename"),
 					CallerFunctionname: braintrust.F("caller_functionname"),
 					CallerLineno:       braintrust.F(int64(0)),
@@ -427,7 +436,7 @@ func TestExperimentInsert(t *testing.T) {
 				Metadata: braintrust.F(map[string]interface{}{
 					"foo": "bar",
 				}),
-				Metrics: braintrust.F(shared.InsertExperimentEventReplaceMetricsParam{
+				Metrics: braintrust.F(shared.InsertExperimentEventMetricsParam{
 					CallerFilename:     braintrust.F[any](map[string]interface{}{}),
 					CallerFunctionname: braintrust.F[any](map[string]interface{}{}),
 					CallerLineno:       braintrust.F[any](map[string]interface{}{}),
@@ -437,15 +446,18 @@ func TestExperimentInsert(t *testing.T) {
 					Start:              braintrust.F(0.000000),
 					Tokens:             braintrust.F(int64(0)),
 				}),
-				Output: braintrust.F[any](map[string]interface{}{}),
+				Output:     braintrust.F[any](map[string]interface{}{}),
+				RootSpanID: braintrust.F("root_span_id"),
 				Scores: braintrust.F(map[string]float64{
 					"foo": 0.000000,
 				}),
-				SpanAttributes: braintrust.F(shared.InsertExperimentEventReplaceSpanAttributesParam{
+				SpanAttributes: braintrust.F(shared.SpanAttributesParam{
 					Name: braintrust.F("name"),
-					Type: braintrust.F(shared.InsertExperimentEventReplaceSpanAttributesTypeLlm),
+					Type: braintrust.F(shared.SpanAttributesTypeLlm),
 				}),
-				Tags: braintrust.F([]string{"string", "string", "string"}),
+				SpanID:      braintrust.F("span_id"),
+				SpanParents: braintrust.F([]string{"string", "string", "string"}),
+				Tags:        braintrust.F([]string{"string", "string", "string"}),
 			}}),
 		},
 	)
