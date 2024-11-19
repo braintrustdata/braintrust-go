@@ -209,6 +209,111 @@ const ChatCompletionContentPartTextTypeText = shared.ChatCompletionContentPartTe
 type ChatCompletionContentPartTextParam = shared.ChatCompletionContentPartTextParam
 
 // This is an alias to an internal type.
+type ChatCompletionMessage = shared.ChatCompletionMessage
+
+// This is an alias to an internal type.
+type ChatCompletionMessageSystem = shared.ChatCompletionMessageSystem
+
+// This is an alias to an internal type.
+type ChatCompletionMessageSystemRole = shared.ChatCompletionMessageSystemRole
+
+// This is an alias to an internal value.
+const ChatCompletionMessageSystemRoleSystem = shared.ChatCompletionMessageSystemRoleSystem
+
+// This is an alias to an internal type.
+type ChatCompletionMessageUser = shared.ChatCompletionMessageUser
+
+// This is an alias to an internal type.
+type ChatCompletionMessageUserRole = shared.ChatCompletionMessageUserRole
+
+// This is an alias to an internal value.
+const ChatCompletionMessageUserRoleUser = shared.ChatCompletionMessageUserRoleUser
+
+// This is an alias to an internal type.
+type ChatCompletionMessageAssistant = shared.ChatCompletionMessageAssistant
+
+// This is an alias to an internal type.
+type ChatCompletionMessageAssistantRole = shared.ChatCompletionMessageAssistantRole
+
+// This is an alias to an internal value.
+const ChatCompletionMessageAssistantRoleAssistant = shared.ChatCompletionMessageAssistantRoleAssistant
+
+// This is an alias to an internal type.
+type ChatCompletionMessageAssistantFunctionCall = shared.ChatCompletionMessageAssistantFunctionCall
+
+// This is an alias to an internal type.
+type ChatCompletionMessageTool = shared.ChatCompletionMessageTool
+
+// This is an alias to an internal type.
+type ChatCompletionMessageToolRole = shared.ChatCompletionMessageToolRole
+
+// This is an alias to an internal value.
+const ChatCompletionMessageToolRoleTool = shared.ChatCompletionMessageToolRoleTool
+
+// This is an alias to an internal type.
+type ChatCompletionMessageFunction = shared.ChatCompletionMessageFunction
+
+// This is an alias to an internal type.
+type ChatCompletionMessageFunctionRole = shared.ChatCompletionMessageFunctionRole
+
+// This is an alias to an internal value.
+const ChatCompletionMessageFunctionRoleFunction = shared.ChatCompletionMessageFunctionRoleFunction
+
+// This is an alias to an internal type.
+type ChatCompletionMessageFallback = shared.ChatCompletionMessageFallback
+
+// This is an alias to an internal type.
+type ChatCompletionMessageFallbackRole = shared.ChatCompletionMessageFallbackRole
+
+// This is an alias to an internal value.
+const ChatCompletionMessageFallbackRoleModel = shared.ChatCompletionMessageFallbackRoleModel
+
+// This is an alias to an internal type.
+type ChatCompletionMessageRole = shared.ChatCompletionMessageRole
+
+// This is an alias to an internal value.
+const ChatCompletionMessageRoleSystem = shared.ChatCompletionMessageRoleSystem
+
+// This is an alias to an internal value.
+const ChatCompletionMessageRoleUser = shared.ChatCompletionMessageRoleUser
+
+// This is an alias to an internal value.
+const ChatCompletionMessageRoleAssistant = shared.ChatCompletionMessageRoleAssistant
+
+// This is an alias to an internal value.
+const ChatCompletionMessageRoleTool = shared.ChatCompletionMessageRoleTool
+
+// This is an alias to an internal value.
+const ChatCompletionMessageRoleFunction = shared.ChatCompletionMessageRoleFunction
+
+// This is an alias to an internal value.
+const ChatCompletionMessageRoleModel = shared.ChatCompletionMessageRoleModel
+
+// This is an alias to an internal type.
+type ChatCompletionMessageUnionParam = shared.ChatCompletionMessageUnionParam
+
+// This is an alias to an internal type.
+type ChatCompletionMessageSystemParam = shared.ChatCompletionMessageSystemParam
+
+// This is an alias to an internal type.
+type ChatCompletionMessageUserParam = shared.ChatCompletionMessageUserParam
+
+// This is an alias to an internal type.
+type ChatCompletionMessageAssistantParam = shared.ChatCompletionMessageAssistantParam
+
+// This is an alias to an internal type.
+type ChatCompletionMessageAssistantFunctionCallParam = shared.ChatCompletionMessageAssistantFunctionCallParam
+
+// This is an alias to an internal type.
+type ChatCompletionMessageToolParam = shared.ChatCompletionMessageToolParam
+
+// This is an alias to an internal type.
+type ChatCompletionMessageFunctionParam = shared.ChatCompletionMessageFunctionParam
+
+// This is an alias to an internal type.
+type ChatCompletionMessageFallbackParam = shared.ChatCompletionMessageFallbackParam
+
+// This is an alias to an internal type.
 type ChatCompletionMessageToolCall = shared.ChatCompletionMessageToolCall
 
 // This is an alias to an internal type.
@@ -980,87 +1085,6 @@ const PromptDataPromptCompletionTypeCompletion = shared.PromptDataPromptCompleti
 type PromptDataPromptChat = shared.PromptDataPromptChat
 
 // This is an alias to an internal type.
-type PromptDataPromptChatMessage = shared.PromptDataPromptChatMessage
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesSystem = shared.PromptDataPromptChatMessagesSystem
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesSystemRole = shared.PromptDataPromptChatMessagesSystemRole
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesSystemRoleSystem = shared.PromptDataPromptChatMessagesSystemRoleSystem
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUser = shared.PromptDataPromptChatMessagesUser
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserRole = shared.PromptDataPromptChatMessagesUserRole
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesUserRoleUser = shared.PromptDataPromptChatMessagesUserRoleUser
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesAssistant = shared.PromptDataPromptChatMessagesAssistant
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesAssistantRole = shared.PromptDataPromptChatMessagesAssistantRole
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesAssistantRoleAssistant = shared.PromptDataPromptChatMessagesAssistantRoleAssistant
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesAssistantFunctionCall = shared.PromptDataPromptChatMessagesAssistantFunctionCall
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesTool = shared.PromptDataPromptChatMessagesTool
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesToolRole = shared.PromptDataPromptChatMessagesToolRole
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesToolRoleTool = shared.PromptDataPromptChatMessagesToolRoleTool
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesFunction = shared.PromptDataPromptChatMessagesFunction
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesFunctionRole = shared.PromptDataPromptChatMessagesFunctionRole
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesFunctionRoleFunction = shared.PromptDataPromptChatMessagesFunctionRoleFunction
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesFallback = shared.PromptDataPromptChatMessagesFallback
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesFallbackRole = shared.PromptDataPromptChatMessagesFallbackRole
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesFallbackRoleModel = shared.PromptDataPromptChatMessagesFallbackRoleModel
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesRole = shared.PromptDataPromptChatMessagesRole
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesRoleSystem = shared.PromptDataPromptChatMessagesRoleSystem
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesRoleUser = shared.PromptDataPromptChatMessagesRoleUser
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesRoleAssistant = shared.PromptDataPromptChatMessagesRoleAssistant
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesRoleTool = shared.PromptDataPromptChatMessagesRoleTool
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesRoleFunction = shared.PromptDataPromptChatMessagesRoleFunction
-
-// This is an alias to an internal value.
-const PromptDataPromptChatMessagesRoleModel = shared.PromptDataPromptChatMessagesRoleModel
-
-// This is an alias to an internal type.
 type PromptDataPromptChatType = shared.PromptDataPromptChatType
 
 // This is an alias to an internal value.
@@ -1127,30 +1151,6 @@ type PromptDataPromptCompletionParam = shared.PromptDataPromptCompletionParam
 
 // This is an alias to an internal type.
 type PromptDataPromptChatParam = shared.PromptDataPromptChatParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUnionParam = shared.PromptDataPromptChatMessagesUnionParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesSystemParam = shared.PromptDataPromptChatMessagesSystemParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesUserParam = shared.PromptDataPromptChatMessagesUserParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesAssistantParam = shared.PromptDataPromptChatMessagesAssistantParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesAssistantFunctionCallParam = shared.PromptDataPromptChatMessagesAssistantFunctionCallParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesToolParam = shared.PromptDataPromptChatMessagesToolParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesFunctionParam = shared.PromptDataPromptChatMessagesFunctionParam
-
-// This is an alias to an internal type.
-type PromptDataPromptChatMessagesFallbackParam = shared.PromptDataPromptChatMessagesFallbackParam
 
 // This is an alias to an internal type.
 type PromptDataPromptNullableVariantParam = shared.PromptDataPromptNullableVariantParam

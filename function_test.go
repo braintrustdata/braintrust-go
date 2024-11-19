@@ -268,8 +268,8 @@ func TestFunctionInvokeWithOptionalParams(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.FunctionInvokeParams{
 			Input: braintrust.F[any](map[string]interface{}{}),
-			Messages: braintrust.F([]braintrust.FunctionInvokeParamsMessageUnion{braintrust.FunctionInvokeParamsMessagesSystem{
-				Role:    braintrust.F(braintrust.FunctionInvokeParamsMessagesSystemRoleSystem),
+			Messages: braintrust.F([]shared.ChatCompletionMessageUnionParam{shared.ChatCompletionMessageSystemParam{
+				Role:    braintrust.F(shared.ChatCompletionMessageSystemRoleSystem),
 				Content: braintrust.F("content"),
 				Name:    braintrust.F("name"),
 			}}),
