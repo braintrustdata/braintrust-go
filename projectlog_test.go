@@ -42,28 +42,6 @@ func TestProjectLogFeedback(t *testing.T) {
 					"foo": 0.000000,
 				}),
 				Source: braintrust.F(shared.FeedbackProjectLogsItemSourceApp),
-			}, {
-				ID:       braintrust.F("id"),
-				Comment:  braintrust.F("comment"),
-				Expected: braintrust.F[any](map[string]interface{}{}),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": "bar",
-				}),
-				Scores: braintrust.F(map[string]float64{
-					"foo": 0.000000,
-				}),
-				Source: braintrust.F(shared.FeedbackProjectLogsItemSourceApp),
-			}, {
-				ID:       braintrust.F("id"),
-				Comment:  braintrust.F("comment"),
-				Expected: braintrust.F[any](map[string]interface{}{}),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": "bar",
-				}),
-				Scores: braintrust.F(map[string]float64{
-					"foo": 0.000000,
-				}),
-				Source: braintrust.F(shared.FeedbackProjectLogsItemSourceApp),
 			}}),
 		},
 	)
@@ -125,15 +103,7 @@ func TestProjectLogFetchPostWithOptionalParams(t *testing.T) {
 		braintrust.ProjectLogFetchPostParams{
 			Cursor: braintrust.F("cursor"),
 			Filters: braintrust.F([]shared.PathLookupFilterParam{{
-				Path:  braintrust.F([]string{"string", "string", "string"}),
-				Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
-				Value: braintrust.F[any](map[string]interface{}{}),
-			}, {
-				Path:  braintrust.F([]string{"string", "string", "string"}),
-				Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
-				Value: braintrust.F[any](map[string]interface{}{}),
-			}, {
-				Path:  braintrust.F([]string{"string", "string", "string"}),
+				Path:  braintrust.F([]string{"string"}),
 				Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
 				Value: braintrust.F[any](map[string]interface{}{}),
 			}}),
@@ -171,7 +141,7 @@ func TestProjectLogInsert(t *testing.T) {
 			Events: braintrust.F([]shared.InsertProjectLogsEventParam{{
 				ID:           braintrust.F("id"),
 				IsMerge:      braintrust.F(true),
-				MergePaths:   braintrust.F([][]string{{"string", "string", "string"}, {"string", "string", "string"}, {"string", "string", "string"}}),
+				MergePaths:   braintrust.F([][]string{{"string"}}),
 				ObjectDelete: braintrust.F(true),
 				ParentID:     braintrust.F("_parent_id"),
 				Context: braintrust.F(shared.InsertProjectLogsEventContextParam{
@@ -206,88 +176,8 @@ func TestProjectLogInsert(t *testing.T) {
 					Type: braintrust.F(shared.SpanAttributesTypeLlm),
 				}),
 				SpanID:      braintrust.F("span_id"),
-				SpanParents: braintrust.F([]string{"string", "string", "string"}),
-				Tags:        braintrust.F([]string{"string", "string", "string"}),
-			}, {
-				ID:           braintrust.F("id"),
-				IsMerge:      braintrust.F(true),
-				MergePaths:   braintrust.F([][]string{{"string", "string", "string"}, {"string", "string", "string"}, {"string", "string", "string"}}),
-				ObjectDelete: braintrust.F(true),
-				ParentID:     braintrust.F("_parent_id"),
-				Context: braintrust.F(shared.InsertProjectLogsEventContextParam{
-					CallerFilename:     braintrust.F("caller_filename"),
-					CallerFunctionname: braintrust.F("caller_functionname"),
-					CallerLineno:       braintrust.F(int64(0)),
-				}),
-				Created:  braintrust.F(time.Now()),
-				Error:    braintrust.F[any](map[string]interface{}{}),
-				Expected: braintrust.F[any](map[string]interface{}{}),
-				Input:    braintrust.F[any](map[string]interface{}{}),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": "bar",
-				}),
-				Metrics: braintrust.F(shared.InsertProjectLogsEventMetricsParam{
-					CallerFilename:     braintrust.F[any](map[string]interface{}{}),
-					CallerFunctionname: braintrust.F[any](map[string]interface{}{}),
-					CallerLineno:       braintrust.F[any](map[string]interface{}{}),
-					CompletionTokens:   braintrust.F(int64(0)),
-					End:                braintrust.F(0.000000),
-					PromptTokens:       braintrust.F(int64(0)),
-					Start:              braintrust.F(0.000000),
-					Tokens:             braintrust.F(int64(0)),
-				}),
-				Output:     braintrust.F[any](map[string]interface{}{}),
-				RootSpanID: braintrust.F("root_span_id"),
-				Scores: braintrust.F(map[string]float64{
-					"foo": 0.000000,
-				}),
-				SpanAttributes: braintrust.F(shared.SpanAttributesParam{
-					Name: braintrust.F("name"),
-					Type: braintrust.F(shared.SpanAttributesTypeLlm),
-				}),
-				SpanID:      braintrust.F("span_id"),
-				SpanParents: braintrust.F([]string{"string", "string", "string"}),
-				Tags:        braintrust.F([]string{"string", "string", "string"}),
-			}, {
-				ID:           braintrust.F("id"),
-				IsMerge:      braintrust.F(true),
-				MergePaths:   braintrust.F([][]string{{"string", "string", "string"}, {"string", "string", "string"}, {"string", "string", "string"}}),
-				ObjectDelete: braintrust.F(true),
-				ParentID:     braintrust.F("_parent_id"),
-				Context: braintrust.F(shared.InsertProjectLogsEventContextParam{
-					CallerFilename:     braintrust.F("caller_filename"),
-					CallerFunctionname: braintrust.F("caller_functionname"),
-					CallerLineno:       braintrust.F(int64(0)),
-				}),
-				Created:  braintrust.F(time.Now()),
-				Error:    braintrust.F[any](map[string]interface{}{}),
-				Expected: braintrust.F[any](map[string]interface{}{}),
-				Input:    braintrust.F[any](map[string]interface{}{}),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": "bar",
-				}),
-				Metrics: braintrust.F(shared.InsertProjectLogsEventMetricsParam{
-					CallerFilename:     braintrust.F[any](map[string]interface{}{}),
-					CallerFunctionname: braintrust.F[any](map[string]interface{}{}),
-					CallerLineno:       braintrust.F[any](map[string]interface{}{}),
-					CompletionTokens:   braintrust.F(int64(0)),
-					End:                braintrust.F(0.000000),
-					PromptTokens:       braintrust.F(int64(0)),
-					Start:              braintrust.F(0.000000),
-					Tokens:             braintrust.F(int64(0)),
-				}),
-				Output:     braintrust.F[any](map[string]interface{}{}),
-				RootSpanID: braintrust.F("root_span_id"),
-				Scores: braintrust.F(map[string]float64{
-					"foo": 0.000000,
-				}),
-				SpanAttributes: braintrust.F(shared.SpanAttributesParam{
-					Name: braintrust.F("name"),
-					Type: braintrust.F(shared.SpanAttributesTypeLlm),
-				}),
-				SpanID:      braintrust.F("span_id"),
-				SpanParents: braintrust.F([]string{"string", "string", "string"}),
-				Tags:        braintrust.F([]string{"string", "string", "string"}),
+				SpanParents: braintrust.F([]string{"string"}),
+				Tags:        braintrust.F([]string{"string"}),
 			}}),
 		},
 	)

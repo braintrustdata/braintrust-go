@@ -32,14 +32,8 @@ func TestRoleNewWithOptionalParams(t *testing.T) {
 		MemberPermissions: braintrust.F([]braintrust.RoleNewParamsMemberPermission{{
 			Permission:         braintrust.F(braintrust.RoleNewParamsMemberPermissionsPermissionCreate),
 			RestrictObjectType: braintrust.F(braintrust.RoleNewParamsMemberPermissionsRestrictObjectTypeOrganization),
-		}, {
-			Permission:         braintrust.F(braintrust.RoleNewParamsMemberPermissionsPermissionCreate),
-			RestrictObjectType: braintrust.F(braintrust.RoleNewParamsMemberPermissionsRestrictObjectTypeOrganization),
-		}, {
-			Permission:         braintrust.F(braintrust.RoleNewParamsMemberPermissionsPermissionCreate),
-			RestrictObjectType: braintrust.F(braintrust.RoleNewParamsMemberPermissionsRestrictObjectTypeOrganization),
 		}}),
-		MemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
+		MemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
 		OrgName:     braintrust.F("org_name"),
 	})
 	if err != nil {
@@ -92,27 +86,15 @@ func TestRoleUpdateWithOptionalParams(t *testing.T) {
 			AddMemberPermissions: braintrust.F([]braintrust.RoleUpdateParamsAddMemberPermission{{
 				Permission:         braintrust.F(braintrust.RoleUpdateParamsAddMemberPermissionsPermissionCreate),
 				RestrictObjectType: braintrust.F(braintrust.RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeOrganization),
-			}, {
-				Permission:         braintrust.F(braintrust.RoleUpdateParamsAddMemberPermissionsPermissionCreate),
-				RestrictObjectType: braintrust.F(braintrust.RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeOrganization),
-			}, {
-				Permission:         braintrust.F(braintrust.RoleUpdateParamsAddMemberPermissionsPermissionCreate),
-				RestrictObjectType: braintrust.F(braintrust.RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeOrganization),
 			}}),
-			AddMemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
+			AddMemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
 			Description:    braintrust.F("description"),
 			Name:           braintrust.F("x"),
 			RemoveMemberPermissions: braintrust.F([]braintrust.RoleUpdateParamsRemoveMemberPermission{{
 				Permission:         braintrust.F(braintrust.RoleUpdateParamsRemoveMemberPermissionsPermissionCreate),
 				RestrictObjectType: braintrust.F(braintrust.RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeOrganization),
-			}, {
-				Permission:         braintrust.F(braintrust.RoleUpdateParamsRemoveMemberPermissionsPermissionCreate),
-				RestrictObjectType: braintrust.F(braintrust.RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeOrganization),
-			}, {
-				Permission:         braintrust.F(braintrust.RoleUpdateParamsRemoveMemberPermissionsPermissionCreate),
-				RestrictObjectType: braintrust.F(braintrust.RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeOrganization),
 			}}),
-			RemoveMemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
+			RemoveMemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
 		},
 	)
 	if err != nil {
@@ -193,14 +175,8 @@ func TestRoleReplaceWithOptionalParams(t *testing.T) {
 		MemberPermissions: braintrust.F([]braintrust.RoleReplaceParamsMemberPermission{{
 			Permission:         braintrust.F(braintrust.RoleReplaceParamsMemberPermissionsPermissionCreate),
 			RestrictObjectType: braintrust.F(braintrust.RoleReplaceParamsMemberPermissionsRestrictObjectTypeOrganization),
-		}, {
-			Permission:         braintrust.F(braintrust.RoleReplaceParamsMemberPermissionsPermissionCreate),
-			RestrictObjectType: braintrust.F(braintrust.RoleReplaceParamsMemberPermissionsRestrictObjectTypeOrganization),
-		}, {
-			Permission:         braintrust.F(braintrust.RoleReplaceParamsMemberPermissionsPermissionCreate),
-			RestrictObjectType: braintrust.F(braintrust.RoleReplaceParamsMemberPermissionsRestrictObjectTypeOrganization),
 		}}),
-		MemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
+		MemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
 		OrgName:     braintrust.F("org_name"),
 	})
 	if err != nil {

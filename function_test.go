@@ -58,8 +58,6 @@ func TestFunctionNewWithOptionalParams(t *testing.T) {
 					},
 					Stop: map[string]interface{}{
 						"0": "string",
-						"1": "string",
-						"2": "string",
 					},
 					Temperature: braintrust.F(0.000000),
 					ToolChoice:  "auto",
@@ -87,15 +85,9 @@ func TestFunctionNewWithOptionalParams(t *testing.T) {
 			ToolFunctions: braintrust.F([]shared.PromptDataToolFunctionsUnionParam{shared.PromptDataToolFunctionsFunctionParam{
 				ID:   braintrust.F("id"),
 				Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
-			}, shared.PromptDataToolFunctionsFunctionParam{
-				ID:   braintrust.F("id"),
-				Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
-			}, shared.PromptDataToolFunctionsFunctionParam{
-				ID:   braintrust.F("id"),
-				Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
 			}}),
 		}),
-		Tags: braintrust.F([]string{"string", "string", "string"}),
+		Tags: braintrust.F([]string{"string"}),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -163,8 +155,6 @@ func TestFunctionUpdateWithOptionalParams(t *testing.T) {
 						},
 						Stop: map[string]interface{}{
 							"0": "string",
-							"1": "string",
-							"2": "string",
 						},
 						Temperature: braintrust.F(0.000000),
 						ToolChoice:  "auto",
@@ -192,15 +182,9 @@ func TestFunctionUpdateWithOptionalParams(t *testing.T) {
 				ToolFunctions: braintrust.F([]shared.PromptDataToolFunctionsUnionParam{shared.PromptDataToolFunctionsFunctionParam{
 					ID:   braintrust.F("id"),
 					Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
-				}, shared.PromptDataToolFunctionsFunctionParam{
-					ID:   braintrust.F("id"),
-					Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
-				}, shared.PromptDataToolFunctionsFunctionParam{
-					ID:   braintrust.F("id"),
-					Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
 				}}),
 			}),
-			Tags: braintrust.F([]string{"string", "string", "string"}),
+			Tags: braintrust.F([]string{"string"}),
 		},
 	)
 	if err != nil {
@@ -288,14 +272,6 @@ func TestFunctionInvokeWithOptionalParams(t *testing.T) {
 				Role:    braintrust.F(braintrust.FunctionInvokeParamsMessagesSystemRoleSystem),
 				Content: braintrust.F("content"),
 				Name:    braintrust.F("name"),
-			}, braintrust.FunctionInvokeParamsMessagesSystem{
-				Role:    braintrust.F(braintrust.FunctionInvokeParamsMessagesSystemRoleSystem),
-				Content: braintrust.F("content"),
-				Name:    braintrust.F("name"),
-			}, braintrust.FunctionInvokeParamsMessagesSystem{
-				Role:    braintrust.F(braintrust.FunctionInvokeParamsMessagesSystemRoleSystem),
-				Content: braintrust.F("content"),
-				Name:    braintrust.F("name"),
 			}}),
 			Mode: braintrust.F(braintrust.FunctionInvokeParamsModeAuto),
 			Parent: braintrust.F[braintrust.FunctionInvokeParamsParentUnion](braintrust.FunctionInvokeParamsParentSpanParentStruct{
@@ -367,8 +343,6 @@ func TestFunctionReplaceWithOptionalParams(t *testing.T) {
 					},
 					Stop: map[string]interface{}{
 						"0": "string",
-						"1": "string",
-						"2": "string",
 					},
 					Temperature: braintrust.F(0.000000),
 					ToolChoice:  "auto",
@@ -396,15 +370,9 @@ func TestFunctionReplaceWithOptionalParams(t *testing.T) {
 			ToolFunctions: braintrust.F([]shared.PromptDataToolFunctionsUnionParam{shared.PromptDataToolFunctionsFunctionParam{
 				ID:   braintrust.F("id"),
 				Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
-			}, shared.PromptDataToolFunctionsFunctionParam{
-				ID:   braintrust.F("id"),
-				Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
-			}, shared.PromptDataToolFunctionsFunctionParam{
-				ID:   braintrust.F("id"),
-				Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
 			}}),
 		}),
-		Tags: braintrust.F([]string{"string", "string", "string"}),
+		Tags: braintrust.F([]string{"string"}),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
