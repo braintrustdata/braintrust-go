@@ -34,7 +34,7 @@ func TestViewNewWithOptionalParams(t *testing.T) {
 		ViewType:   braintrust.F(braintrust.ViewNewParamsViewTypeProjects),
 		DeletedAt:  braintrust.F(time.Now()),
 		Options: braintrust.F(shared.ViewOptionsParam{
-			ColumnOrder: braintrust.F([]string{"string", "string", "string"}),
+			ColumnOrder: braintrust.F([]string{"string"}),
 			ColumnSizing: braintrust.F(map[string]float64{
 				"foo": 0.000000,
 			}),
@@ -45,10 +45,10 @@ func TestViewNewWithOptionalParams(t *testing.T) {
 		UserID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ViewData: braintrust.F(shared.ViewDataParam{
 			Search: braintrust.F(shared.ViewDataSearchParam{
-				Filter: braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-				Match:  braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-				Sort:   braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-				Tag:    braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
+				Filter: braintrust.F([]interface{}{map[string]interface{}{}}),
+				Match:  braintrust.F([]interface{}{map[string]interface{}{}}),
+				Sort:   braintrust.F([]interface{}{map[string]interface{}{}}),
+				Tag:    braintrust.F([]interface{}{map[string]interface{}{}}),
 			}),
 		}),
 	})
@@ -110,7 +110,7 @@ func TestViewUpdateWithOptionalParams(t *testing.T) {
 			ObjectType: braintrust.F(braintrust.ViewUpdateParamsObjectTypeOrganization),
 			Name:       braintrust.F("name"),
 			Options: braintrust.F(shared.ViewOptionsParam{
-				ColumnOrder: braintrust.F([]string{"string", "string", "string"}),
+				ColumnOrder: braintrust.F([]string{"string"}),
 				ColumnSizing: braintrust.F(map[string]float64{
 					"foo": 0.000000,
 				}),
@@ -121,10 +121,10 @@ func TestViewUpdateWithOptionalParams(t *testing.T) {
 			UserID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 			ViewData: braintrust.F(shared.ViewDataParam{
 				Search: braintrust.F(shared.ViewDataSearchParam{
-					Filter: braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-					Match:  braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-					Sort:   braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-					Tag:    braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
+					Filter: braintrust.F([]interface{}{map[string]interface{}{}}),
+					Match:  braintrust.F([]interface{}{map[string]interface{}{}}),
+					Sort:   braintrust.F([]interface{}{map[string]interface{}{}}),
+					Tag:    braintrust.F([]interface{}{map[string]interface{}{}}),
 				}),
 			}),
 			ViewType: braintrust.F(braintrust.ViewUpdateParamsViewTypeProjects),
@@ -218,7 +218,7 @@ func TestViewReplaceWithOptionalParams(t *testing.T) {
 		ViewType:   braintrust.F(braintrust.ViewReplaceParamsViewTypeProjects),
 		DeletedAt:  braintrust.F(time.Now()),
 		Options: braintrust.F(shared.ViewOptionsParam{
-			ColumnOrder: braintrust.F([]string{"string", "string", "string"}),
+			ColumnOrder: braintrust.F([]string{"string"}),
 			ColumnSizing: braintrust.F(map[string]float64{
 				"foo": 0.000000,
 			}),
@@ -229,10 +229,10 @@ func TestViewReplaceWithOptionalParams(t *testing.T) {
 		UserID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ViewData: braintrust.F(shared.ViewDataParam{
 			Search: braintrust.F(shared.ViewDataSearchParam{
-				Filter: braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-				Match:  braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-				Sort:   braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
-				Tag:    braintrust.F([]interface{}{map[string]interface{}{}, map[string]interface{}{}, map[string]interface{}{}}),
+				Filter: braintrust.F([]interface{}{map[string]interface{}{}}),
+				Match:  braintrust.F([]interface{}{map[string]interface{}{}}),
+				Sort:   braintrust.F([]interface{}{map[string]interface{}{}}),
+				Tag:    braintrust.F([]interface{}{map[string]interface{}{}}),
 			}),
 		}),
 	})
