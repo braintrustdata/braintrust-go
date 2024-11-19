@@ -27,19 +27,19 @@ func TestOrganizationMemberUpdateWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.Organizations.Members.Update(context.TODO(), braintrust.OrganizationMemberUpdateParams{
 		InviteUsers: braintrust.F(braintrust.OrganizationMemberUpdateParamsInviteUsers{
-			Emails:           braintrust.F([]string{"string", "string", "string"}),
+			Emails:           braintrust.F([]string{"string"}),
 			GroupID:          braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			GroupIDs:         braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
+			GroupIDs:         braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
 			GroupName:        braintrust.F("group_name"),
-			GroupNames:       braintrust.F([]string{"string", "string", "string"}),
-			IDs:              braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
+			GroupNames:       braintrust.F([]string{"string"}),
+			IDs:              braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
 			SendInviteEmails: braintrust.F(true),
 		}),
 		OrgID:   braintrust.F("org_id"),
 		OrgName: braintrust.F("org_name"),
 		RemoveUsers: braintrust.F(braintrust.OrganizationMemberUpdateParamsRemoveUsers{
-			Emails: braintrust.F([]string{"string", "string", "string"}),
-			IDs:    braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
+			Emails: braintrust.F([]string{"string"}),
+			IDs:    braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
 		}),
 	})
 	if err != nil {

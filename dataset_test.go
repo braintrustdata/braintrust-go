@@ -174,20 +174,6 @@ func TestDatasetFeedback(t *testing.T) {
 					"foo": "bar",
 				}),
 				Source: braintrust.F(shared.FeedbackDatasetItemSourceApp),
-			}, {
-				ID:      braintrust.F("id"),
-				Comment: braintrust.F("comment"),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": "bar",
-				}),
-				Source: braintrust.F(shared.FeedbackDatasetItemSourceApp),
-			}, {
-				ID:      braintrust.F("id"),
-				Comment: braintrust.F("comment"),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": "bar",
-				}),
-				Source: braintrust.F(shared.FeedbackDatasetItemSourceApp),
 			}}),
 		},
 	)
@@ -249,15 +235,7 @@ func TestDatasetFetchPostWithOptionalParams(t *testing.T) {
 		braintrust.DatasetFetchPostParams{
 			Cursor: braintrust.F("cursor"),
 			Filters: braintrust.F([]shared.PathLookupFilterParam{{
-				Path:  braintrust.F([]string{"string", "string", "string"}),
-				Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
-				Value: braintrust.F[any](map[string]interface{}{}),
-			}, {
-				Path:  braintrust.F([]string{"string", "string", "string"}),
-				Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
-				Value: braintrust.F[any](map[string]interface{}{}),
-			}, {
-				Path:  braintrust.F([]string{"string", "string", "string"}),
+				Path:  braintrust.F([]string{"string"}),
 				Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
 				Value: braintrust.F[any](map[string]interface{}{}),
 			}}),
@@ -295,7 +273,7 @@ func TestDatasetInsert(t *testing.T) {
 			Events: braintrust.F([]shared.InsertDatasetEventParam{{
 				ID:           braintrust.F("id"),
 				IsMerge:      braintrust.F(true),
-				MergePaths:   braintrust.F([][]string{{"string", "string", "string"}, {"string", "string", "string"}, {"string", "string", "string"}}),
+				MergePaths:   braintrust.F([][]string{{"string"}}),
 				ObjectDelete: braintrust.F(true),
 				ParentID:     braintrust.F("_parent_id"),
 				Created:      braintrust.F(time.Now()),
@@ -306,40 +284,8 @@ func TestDatasetInsert(t *testing.T) {
 				}),
 				RootSpanID:  braintrust.F("root_span_id"),
 				SpanID:      braintrust.F("span_id"),
-				SpanParents: braintrust.F([]string{"string", "string", "string"}),
-				Tags:        braintrust.F([]string{"string", "string", "string"}),
-			}, {
-				ID:           braintrust.F("id"),
-				IsMerge:      braintrust.F(true),
-				MergePaths:   braintrust.F([][]string{{"string", "string", "string"}, {"string", "string", "string"}, {"string", "string", "string"}}),
-				ObjectDelete: braintrust.F(true),
-				ParentID:     braintrust.F("_parent_id"),
-				Created:      braintrust.F(time.Now()),
-				Expected:     braintrust.F[any](map[string]interface{}{}),
-				Input:        braintrust.F[any](map[string]interface{}{}),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": "bar",
-				}),
-				RootSpanID:  braintrust.F("root_span_id"),
-				SpanID:      braintrust.F("span_id"),
-				SpanParents: braintrust.F([]string{"string", "string", "string"}),
-				Tags:        braintrust.F([]string{"string", "string", "string"}),
-			}, {
-				ID:           braintrust.F("id"),
-				IsMerge:      braintrust.F(true),
-				MergePaths:   braintrust.F([][]string{{"string", "string", "string"}, {"string", "string", "string"}, {"string", "string", "string"}}),
-				ObjectDelete: braintrust.F(true),
-				ParentID:     braintrust.F("_parent_id"),
-				Created:      braintrust.F(time.Now()),
-				Expected:     braintrust.F[any](map[string]interface{}{}),
-				Input:        braintrust.F[any](map[string]interface{}{}),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": "bar",
-				}),
-				RootSpanID:  braintrust.F("root_span_id"),
-				SpanID:      braintrust.F("span_id"),
-				SpanParents: braintrust.F([]string{"string", "string", "string"}),
-				Tags:        braintrust.F([]string{"string", "string", "string"}),
+				SpanParents: braintrust.F([]string{"string"}),
+				Tags:        braintrust.F([]string{"string"}),
 			}}),
 		},
 	)

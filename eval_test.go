@@ -34,12 +34,6 @@ func TestEvalNewWithOptionalParams(t *testing.T) {
 		Scores: braintrust.F([]braintrust.EvalNewParamsScoreUnion{braintrust.EvalNewParamsScoresFunctionID{
 			FunctionID: braintrust.F("function_id"),
 			Version:    braintrust.F("version"),
-		}, braintrust.EvalNewParamsScoresFunctionID{
-			FunctionID: braintrust.F("function_id"),
-			Version:    braintrust.F("version"),
-		}, braintrust.EvalNewParamsScoresFunctionID{
-			FunctionID: braintrust.F("function_id"),
-			Version:    braintrust.F("version"),
 		}}),
 		Task: braintrust.F[braintrust.EvalNewParamsTaskUnion](braintrust.EvalNewParamsTaskFunctionID{
 			FunctionID: braintrust.F("function_id"),
@@ -50,7 +44,7 @@ func TestEvalNewWithOptionalParams(t *testing.T) {
 		ExperimentName:     braintrust.F("experiment_name"),
 		GitMetadataSettings: braintrust.F(braintrust.EvalNewParamsGitMetadataSettings{
 			Collect: braintrust.F(braintrust.EvalNewParamsGitMetadataSettingsCollectAll),
-			Fields:  braintrust.F([]braintrust.EvalNewParamsGitMetadataSettingsField{braintrust.EvalNewParamsGitMetadataSettingsFieldCommit, braintrust.EvalNewParamsGitMetadataSettingsFieldBranch, braintrust.EvalNewParamsGitMetadataSettingsFieldTag}),
+			Fields:  braintrust.F([]braintrust.EvalNewParamsGitMetadataSettingsField{braintrust.EvalNewParamsGitMetadataSettingsFieldCommit}),
 		}),
 		IsPublic:       braintrust.F(true),
 		MaxConcurrency: braintrust.F(0.000000),

@@ -33,12 +33,6 @@ func TestProjectScoreNewWithOptionalParams(t *testing.T) {
 		Categories: braintrust.F[braintrust.ProjectScoreNewParamsCategoriesUnion](braintrust.ProjectScoreNewParamsCategoriesCategorical([]shared.ProjectScoreCategoryParam{{
 			Name:  braintrust.F("name"),
 			Value: braintrust.F(0.000000),
-		}, {
-			Name:  braintrust.F("name"),
-			Value: braintrust.F(0.000000),
-		}, {
-			Name:  braintrust.F("name"),
-			Value: braintrust.F(0.000000),
 		}})),
 		Config: braintrust.F(shared.ProjectScoreConfigParam{
 			Destination: braintrust.F(shared.ProjectScoreConfigDestinationExpected),
@@ -48,15 +42,9 @@ func TestProjectScoreNewWithOptionalParams(t *testing.T) {
 				Scorers: braintrust.F([]shared.OnlineScoreConfigScorersUnionParam{shared.OnlineScoreConfigScorersFunctionParam{
 					ID:   braintrust.F("id"),
 					Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
-				}, shared.OnlineScoreConfigScorersFunctionParam{
-					ID:   braintrust.F("id"),
-					Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
-				}, shared.OnlineScoreConfigScorersFunctionParam{
-					ID:   braintrust.F("id"),
-					Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
 				}}),
 				ApplyToRootSpan:  braintrust.F(true),
-				ApplyToSpanNames: braintrust.F([]string{"string", "string", "string"}),
+				ApplyToSpanNames: braintrust.F([]string{"string"}),
 			}),
 		}),
 		Description: braintrust.F("description"),
@@ -111,12 +99,6 @@ func TestProjectScoreUpdateWithOptionalParams(t *testing.T) {
 			Categories: braintrust.F[braintrust.ProjectScoreUpdateParamsCategoriesUnion](braintrust.ProjectScoreUpdateParamsCategoriesCategorical([]shared.ProjectScoreCategoryParam{{
 				Name:  braintrust.F("name"),
 				Value: braintrust.F(0.000000),
-			}, {
-				Name:  braintrust.F("name"),
-				Value: braintrust.F(0.000000),
-			}, {
-				Name:  braintrust.F("name"),
-				Value: braintrust.F(0.000000),
 			}})),
 			Config: braintrust.F(shared.ProjectScoreConfigParam{
 				Destination: braintrust.F(shared.ProjectScoreConfigDestinationExpected),
@@ -126,15 +108,9 @@ func TestProjectScoreUpdateWithOptionalParams(t *testing.T) {
 					Scorers: braintrust.F([]shared.OnlineScoreConfigScorersUnionParam{shared.OnlineScoreConfigScorersFunctionParam{
 						ID:   braintrust.F("id"),
 						Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
-					}, shared.OnlineScoreConfigScorersFunctionParam{
-						ID:   braintrust.F("id"),
-						Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
-					}, shared.OnlineScoreConfigScorersFunctionParam{
-						ID:   braintrust.F("id"),
-						Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
 					}}),
 					ApplyToRootSpan:  braintrust.F(true),
-					ApplyToSpanNames: braintrust.F([]string{"string", "string", "string"}),
+					ApplyToSpanNames: braintrust.F([]string{"string"}),
 				}),
 			}),
 			Description: braintrust.F("description"),
@@ -224,12 +200,6 @@ func TestProjectScoreReplaceWithOptionalParams(t *testing.T) {
 		Categories: braintrust.F[braintrust.ProjectScoreReplaceParamsCategoriesUnion](braintrust.ProjectScoreReplaceParamsCategoriesCategorical([]shared.ProjectScoreCategoryParam{{
 			Name:  braintrust.F("name"),
 			Value: braintrust.F(0.000000),
-		}, {
-			Name:  braintrust.F("name"),
-			Value: braintrust.F(0.000000),
-		}, {
-			Name:  braintrust.F("name"),
-			Value: braintrust.F(0.000000),
 		}})),
 		Config: braintrust.F(shared.ProjectScoreConfigParam{
 			Destination: braintrust.F(shared.ProjectScoreConfigDestinationExpected),
@@ -239,15 +209,9 @@ func TestProjectScoreReplaceWithOptionalParams(t *testing.T) {
 				Scorers: braintrust.F([]shared.OnlineScoreConfigScorersUnionParam{shared.OnlineScoreConfigScorersFunctionParam{
 					ID:   braintrust.F("id"),
 					Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
-				}, shared.OnlineScoreConfigScorersFunctionParam{
-					ID:   braintrust.F("id"),
-					Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
-				}, shared.OnlineScoreConfigScorersFunctionParam{
-					ID:   braintrust.F("id"),
-					Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
 				}}),
 				ApplyToRootSpan:  braintrust.F(true),
-				ApplyToSpanNames: braintrust.F([]string{"string", "string", "string"}),
+				ApplyToSpanNames: braintrust.F([]string{"string"}),
 			}),
 		}),
 		Description: braintrust.F("description"),
