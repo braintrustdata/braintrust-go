@@ -282,70 +282,19 @@ func init() {
 	)
 }
 
-type ChatCompletionContentArray []ChatCompletionContentPart
+type ChatCompletionContentArray []ChatCompletionContentArrayUnionItem
 
 func (r ChatCompletionContentArray) ImplementsSharedChatCompletionContentUnion() {}
 
-// Satisfied by [shared.UnionString], [shared.ChatCompletionContentArrayParam].
-type ChatCompletionContentUnionParam interface {
-	ImplementsSharedChatCompletionContentUnionParam()
-}
-
-type ChatCompletionContentArrayParam []ChatCompletionContentPartUnionParam
-
-func (r ChatCompletionContentArrayParam) ImplementsSharedChatCompletionContentUnionParam() {}
-
-type ChatCompletionContentPart struct {
-	Type ChatCompletionContentPartType `json:"type,required"`
-	// This field can have the runtime type of
-	// [ChatCompletionContentPartImageImageURL].
-	ImageURL interface{}                   `json:"image_url"`
-	Text     string                        `json:"text"`
-	JSON     chatCompletionContentPartJSON `json:"-"`
-	union    ChatCompletionContentPartUnion
-}
-
-// chatCompletionContentPartJSON contains the JSON metadata for the struct
-// [ChatCompletionContentPart]
-type chatCompletionContentPartJSON struct {
-	Type        apijson.Field
-	ImageURL    apijson.Field
-	Text        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r chatCompletionContentPartJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *ChatCompletionContentPart) UnmarshalJSON(data []byte) (err error) {
-	*r = ChatCompletionContentPart{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [ChatCompletionContentPartUnion] interface which you can cast
-// to the specific types for more type safety.
-//
-// Possible runtime types of the union are [shared.ChatCompletionContentPartText],
-// [shared.ChatCompletionContentPartImage].
-func (r ChatCompletionContentPart) AsUnion() ChatCompletionContentPartUnion {
-	return r.union
-}
-
 // Union satisfied by [shared.ChatCompletionContentPartText] or
 // [shared.ChatCompletionContentPartImage].
-type ChatCompletionContentPartUnion interface {
-	ImplementsSharedChatCompletionContentPart()
+type ChatCompletionContentArrayUnionItem interface {
+	ImplementsSharedChatCompletionContentArrayUnionItem()
 }
 
 func init() {
 	apijson.RegisterUnion(
-		reflect.TypeOf((*ChatCompletionContentPartUnion)(nil)).Elem(),
+		reflect.TypeOf((*ChatCompletionContentArrayUnionItem)(nil)).Elem(),
 		"",
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
@@ -358,37 +307,19 @@ func init() {
 	)
 }
 
-type ChatCompletionContentPartType string
-
-const (
-	ChatCompletionContentPartTypeText     ChatCompletionContentPartType = "text"
-	ChatCompletionContentPartTypeImageURL ChatCompletionContentPartType = "image_url"
-)
-
-func (r ChatCompletionContentPartType) IsKnown() bool {
-	switch r {
-	case ChatCompletionContentPartTypeText, ChatCompletionContentPartTypeImageURL:
-		return true
-	}
-	return false
+// Satisfied by [shared.UnionString], [shared.ChatCompletionContentArrayParam].
+type ChatCompletionContentUnionParam interface {
+	ImplementsSharedChatCompletionContentUnionParam()
 }
 
-type ChatCompletionContentPartParam struct {
-	Type     param.Field[ChatCompletionContentPartType] `json:"type,required"`
-	ImageURL param.Field[interface{}]                   `json:"image_url"`
-	Text     param.Field[string]                        `json:"text"`
-}
+type ChatCompletionContentArrayParam []ChatCompletionContentArrayUnionItemParam
 
-func (r ChatCompletionContentPartParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ChatCompletionContentPartParam) ImplementsSharedChatCompletionContentPartUnionParam() {}
+func (r ChatCompletionContentArrayParam) ImplementsSharedChatCompletionContentUnionParam() {}
 
 // Satisfied by [shared.ChatCompletionContentPartTextParam],
-// [shared.ChatCompletionContentPartImageParam], [ChatCompletionContentPartParam].
-type ChatCompletionContentPartUnionParam interface {
-	ImplementsSharedChatCompletionContentPartUnionParam()
+// [shared.ChatCompletionContentPartImageParam].
+type ChatCompletionContentArrayUnionItemParam interface {
+	ImplementsSharedChatCompletionContentArrayUnionItemParam()
 }
 
 type ChatCompletionContentPartImage struct {
@@ -414,7 +345,7 @@ func (r chatCompletionContentPartImageJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r ChatCompletionContentPartImage) ImplementsSharedChatCompletionContentPart() {}
+func (r ChatCompletionContentPartImage) ImplementsSharedChatCompletionContentArrayUnionItem() {}
 
 type ChatCompletionContentPartImageImageURL struct {
 	URL    string                                       `json:"url,required"`
@@ -478,7 +409,8 @@ func (r ChatCompletionContentPartImageParam) MarshalJSON() (data []byte, err err
 	return apijson.MarshalRoot(r)
 }
 
-func (r ChatCompletionContentPartImageParam) ImplementsSharedChatCompletionContentPartUnionParam() {}
+func (r ChatCompletionContentPartImageParam) ImplementsSharedChatCompletionContentArrayUnionItemParam() {
+}
 
 type ChatCompletionContentPartImageImageURLParam struct {
 	URL    param.Field[string]                                       `json:"url,required"`
@@ -512,7 +444,7 @@ func (r chatCompletionContentPartTextJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r ChatCompletionContentPartText) ImplementsSharedChatCompletionContentPart() {}
+func (r ChatCompletionContentPartText) ImplementsSharedChatCompletionContentArrayUnionItem() {}
 
 type ChatCompletionContentPartTextType string
 
@@ -537,495 +469,8 @@ func (r ChatCompletionContentPartTextParam) MarshalJSON() (data []byte, err erro
 	return apijson.MarshalRoot(r)
 }
 
-func (r ChatCompletionContentPartTextParam) ImplementsSharedChatCompletionContentPartUnionParam() {}
-
-type ChatCompletionMessage struct {
-	Role ChatCompletionMessageRole `json:"role,required"`
-	// This field can have the runtime type of [string], [ChatCompletionContentUnion].
-	Content interface{} `json:"content"`
-	// This field can have the runtime type of
-	// [ChatCompletionMessageAssistantFunctionCall].
-	FunctionCall interface{} `json:"function_call"`
-	Name         string      `json:"name"`
-	ToolCallID   string      `json:"tool_call_id"`
-	// This field can have the runtime type of [[]ChatCompletionMessageToolCall].
-	ToolCalls interface{}               `json:"tool_calls"`
-	JSON      chatCompletionMessageJSON `json:"-"`
-	union     ChatCompletionMessageUnion
+func (r ChatCompletionContentPartTextParam) ImplementsSharedChatCompletionContentArrayUnionItemParam() {
 }
-
-// chatCompletionMessageJSON contains the JSON metadata for the struct
-// [ChatCompletionMessage]
-type chatCompletionMessageJSON struct {
-	Role         apijson.Field
-	Content      apijson.Field
-	FunctionCall apijson.Field
-	Name         apijson.Field
-	ToolCallID   apijson.Field
-	ToolCalls    apijson.Field
-	raw          string
-	ExtraFields  map[string]apijson.Field
-}
-
-func (r chatCompletionMessageJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *ChatCompletionMessage) UnmarshalJSON(data []byte) (err error) {
-	*r = ChatCompletionMessage{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [ChatCompletionMessageUnion] interface which you can cast to
-// the specific types for more type safety.
-//
-// Possible runtime types of the union are [shared.ChatCompletionMessageSystem],
-// [shared.ChatCompletionMessageUser], [shared.ChatCompletionMessageAssistant],
-// [shared.ChatCompletionMessageTool], [shared.ChatCompletionMessageFunction],
-// [shared.ChatCompletionMessageFallback].
-func (r ChatCompletionMessage) AsUnion() ChatCompletionMessageUnion {
-	return r.union
-}
-
-// Union satisfied by [shared.ChatCompletionMessageSystem],
-// [shared.ChatCompletionMessageUser], [shared.ChatCompletionMessageAssistant],
-// [shared.ChatCompletionMessageTool], [shared.ChatCompletionMessageFunction] or
-// [shared.ChatCompletionMessageFallback].
-type ChatCompletionMessageUnion interface {
-	implementsSharedChatCompletionMessage()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*ChatCompletionMessageUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ChatCompletionMessageSystem{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ChatCompletionMessageUser{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ChatCompletionMessageAssistant{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ChatCompletionMessageTool{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ChatCompletionMessageFunction{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ChatCompletionMessageFallback{}),
-		},
-	)
-}
-
-type ChatCompletionMessageSystem struct {
-	Role    ChatCompletionMessageSystemRole `json:"role,required"`
-	Content string                          `json:"content"`
-	Name    string                          `json:"name"`
-	JSON    chatCompletionMessageSystemJSON `json:"-"`
-}
-
-// chatCompletionMessageSystemJSON contains the JSON metadata for the struct
-// [ChatCompletionMessageSystem]
-type chatCompletionMessageSystemJSON struct {
-	Role        apijson.Field
-	Content     apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ChatCompletionMessageSystem) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r chatCompletionMessageSystemJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r ChatCompletionMessageSystem) implementsSharedChatCompletionMessage() {}
-
-type ChatCompletionMessageSystemRole string
-
-const (
-	ChatCompletionMessageSystemRoleSystem ChatCompletionMessageSystemRole = "system"
-)
-
-func (r ChatCompletionMessageSystemRole) IsKnown() bool {
-	switch r {
-	case ChatCompletionMessageSystemRoleSystem:
-		return true
-	}
-	return false
-}
-
-type ChatCompletionMessageUser struct {
-	Role    ChatCompletionMessageUserRole `json:"role,required"`
-	Content ChatCompletionContentUnion    `json:"content"`
-	Name    string                        `json:"name"`
-	JSON    chatCompletionMessageUserJSON `json:"-"`
-}
-
-// chatCompletionMessageUserJSON contains the JSON metadata for the struct
-// [ChatCompletionMessageUser]
-type chatCompletionMessageUserJSON struct {
-	Role        apijson.Field
-	Content     apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ChatCompletionMessageUser) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r chatCompletionMessageUserJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r ChatCompletionMessageUser) implementsSharedChatCompletionMessage() {}
-
-type ChatCompletionMessageUserRole string
-
-const (
-	ChatCompletionMessageUserRoleUser ChatCompletionMessageUserRole = "user"
-)
-
-func (r ChatCompletionMessageUserRole) IsKnown() bool {
-	switch r {
-	case ChatCompletionMessageUserRoleUser:
-		return true
-	}
-	return false
-}
-
-type ChatCompletionMessageAssistant struct {
-	Role         ChatCompletionMessageAssistantRole         `json:"role,required"`
-	Content      string                                     `json:"content,nullable"`
-	FunctionCall ChatCompletionMessageAssistantFunctionCall `json:"function_call,nullable"`
-	Name         string                                     `json:"name,nullable"`
-	ToolCalls    []ChatCompletionMessageToolCall            `json:"tool_calls,nullable"`
-	JSON         chatCompletionMessageAssistantJSON         `json:"-"`
-}
-
-// chatCompletionMessageAssistantJSON contains the JSON metadata for the struct
-// [ChatCompletionMessageAssistant]
-type chatCompletionMessageAssistantJSON struct {
-	Role         apijson.Field
-	Content      apijson.Field
-	FunctionCall apijson.Field
-	Name         apijson.Field
-	ToolCalls    apijson.Field
-	raw          string
-	ExtraFields  map[string]apijson.Field
-}
-
-func (r *ChatCompletionMessageAssistant) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r chatCompletionMessageAssistantJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r ChatCompletionMessageAssistant) implementsSharedChatCompletionMessage() {}
-
-type ChatCompletionMessageAssistantRole string
-
-const (
-	ChatCompletionMessageAssistantRoleAssistant ChatCompletionMessageAssistantRole = "assistant"
-)
-
-func (r ChatCompletionMessageAssistantRole) IsKnown() bool {
-	switch r {
-	case ChatCompletionMessageAssistantRoleAssistant:
-		return true
-	}
-	return false
-}
-
-type ChatCompletionMessageAssistantFunctionCall struct {
-	Arguments string                                         `json:"arguments,required"`
-	Name      string                                         `json:"name,required"`
-	JSON      chatCompletionMessageAssistantFunctionCallJSON `json:"-"`
-}
-
-// chatCompletionMessageAssistantFunctionCallJSON contains the JSON metadata for
-// the struct [ChatCompletionMessageAssistantFunctionCall]
-type chatCompletionMessageAssistantFunctionCallJSON struct {
-	Arguments   apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ChatCompletionMessageAssistantFunctionCall) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r chatCompletionMessageAssistantFunctionCallJSON) RawJSON() string {
-	return r.raw
-}
-
-type ChatCompletionMessageTool struct {
-	Role       ChatCompletionMessageToolRole `json:"role,required"`
-	Content    string                        `json:"content"`
-	ToolCallID string                        `json:"tool_call_id"`
-	JSON       chatCompletionMessageToolJSON `json:"-"`
-}
-
-// chatCompletionMessageToolJSON contains the JSON metadata for the struct
-// [ChatCompletionMessageTool]
-type chatCompletionMessageToolJSON struct {
-	Role        apijson.Field
-	Content     apijson.Field
-	ToolCallID  apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ChatCompletionMessageTool) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r chatCompletionMessageToolJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r ChatCompletionMessageTool) implementsSharedChatCompletionMessage() {}
-
-type ChatCompletionMessageToolRole string
-
-const (
-	ChatCompletionMessageToolRoleTool ChatCompletionMessageToolRole = "tool"
-)
-
-func (r ChatCompletionMessageToolRole) IsKnown() bool {
-	switch r {
-	case ChatCompletionMessageToolRoleTool:
-		return true
-	}
-	return false
-}
-
-type ChatCompletionMessageFunction struct {
-	Name    string                            `json:"name,required"`
-	Role    ChatCompletionMessageFunctionRole `json:"role,required"`
-	Content string                            `json:"content"`
-	JSON    chatCompletionMessageFunctionJSON `json:"-"`
-}
-
-// chatCompletionMessageFunctionJSON contains the JSON metadata for the struct
-// [ChatCompletionMessageFunction]
-type chatCompletionMessageFunctionJSON struct {
-	Name        apijson.Field
-	Role        apijson.Field
-	Content     apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ChatCompletionMessageFunction) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r chatCompletionMessageFunctionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r ChatCompletionMessageFunction) implementsSharedChatCompletionMessage() {}
-
-type ChatCompletionMessageFunctionRole string
-
-const (
-	ChatCompletionMessageFunctionRoleFunction ChatCompletionMessageFunctionRole = "function"
-)
-
-func (r ChatCompletionMessageFunctionRole) IsKnown() bool {
-	switch r {
-	case ChatCompletionMessageFunctionRoleFunction:
-		return true
-	}
-	return false
-}
-
-type ChatCompletionMessageFallback struct {
-	Role    ChatCompletionMessageFallbackRole `json:"role,required"`
-	Content string                            `json:"content,nullable"`
-	JSON    chatCompletionMessageFallbackJSON `json:"-"`
-}
-
-// chatCompletionMessageFallbackJSON contains the JSON metadata for the struct
-// [ChatCompletionMessageFallback]
-type chatCompletionMessageFallbackJSON struct {
-	Role        apijson.Field
-	Content     apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ChatCompletionMessageFallback) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r chatCompletionMessageFallbackJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r ChatCompletionMessageFallback) implementsSharedChatCompletionMessage() {}
-
-type ChatCompletionMessageFallbackRole string
-
-const (
-	ChatCompletionMessageFallbackRoleModel ChatCompletionMessageFallbackRole = "model"
-)
-
-func (r ChatCompletionMessageFallbackRole) IsKnown() bool {
-	switch r {
-	case ChatCompletionMessageFallbackRoleModel:
-		return true
-	}
-	return false
-}
-
-type ChatCompletionMessageRole string
-
-const (
-	ChatCompletionMessageRoleSystem    ChatCompletionMessageRole = "system"
-	ChatCompletionMessageRoleUser      ChatCompletionMessageRole = "user"
-	ChatCompletionMessageRoleAssistant ChatCompletionMessageRole = "assistant"
-	ChatCompletionMessageRoleTool      ChatCompletionMessageRole = "tool"
-	ChatCompletionMessageRoleFunction  ChatCompletionMessageRole = "function"
-	ChatCompletionMessageRoleModel     ChatCompletionMessageRole = "model"
-)
-
-func (r ChatCompletionMessageRole) IsKnown() bool {
-	switch r {
-	case ChatCompletionMessageRoleSystem, ChatCompletionMessageRoleUser, ChatCompletionMessageRoleAssistant, ChatCompletionMessageRoleTool, ChatCompletionMessageRoleFunction, ChatCompletionMessageRoleModel:
-		return true
-	}
-	return false
-}
-
-type ChatCompletionMessageParam struct {
-	Role         param.Field[ChatCompletionMessageRole] `json:"role,required"`
-	Content      param.Field[interface{}]               `json:"content"`
-	FunctionCall param.Field[interface{}]               `json:"function_call"`
-	Name         param.Field[string]                    `json:"name"`
-	ToolCallID   param.Field[string]                    `json:"tool_call_id"`
-	ToolCalls    param.Field[interface{}]               `json:"tool_calls"`
-}
-
-func (r ChatCompletionMessageParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ChatCompletionMessageParam) implementsSharedChatCompletionMessageUnionParam() {}
-
-// Satisfied by [shared.ChatCompletionMessageSystemParam],
-// [shared.ChatCompletionMessageUserParam],
-// [shared.ChatCompletionMessageAssistantParam],
-// [shared.ChatCompletionMessageToolParam],
-// [shared.ChatCompletionMessageFunctionParam],
-// [shared.ChatCompletionMessageFallbackParam], [ChatCompletionMessageParam].
-type ChatCompletionMessageUnionParam interface {
-	implementsSharedChatCompletionMessageUnionParam()
-}
-
-type ChatCompletionMessageSystemParam struct {
-	Role    param.Field[ChatCompletionMessageSystemRole] `json:"role,required"`
-	Content param.Field[string]                          `json:"content"`
-	Name    param.Field[string]                          `json:"name"`
-}
-
-func (r ChatCompletionMessageSystemParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ChatCompletionMessageSystemParam) implementsSharedChatCompletionMessageUnionParam() {}
-
-type ChatCompletionMessageUserParam struct {
-	Role    param.Field[ChatCompletionMessageUserRole]   `json:"role,required"`
-	Content param.Field[ChatCompletionContentUnionParam] `json:"content"`
-	Name    param.Field[string]                          `json:"name"`
-}
-
-func (r ChatCompletionMessageUserParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ChatCompletionMessageUserParam) implementsSharedChatCompletionMessageUnionParam() {}
-
-type ChatCompletionMessageAssistantParam struct {
-	Role         param.Field[ChatCompletionMessageAssistantRole]              `json:"role,required"`
-	Content      param.Field[string]                                          `json:"content"`
-	FunctionCall param.Field[ChatCompletionMessageAssistantFunctionCallParam] `json:"function_call"`
-	Name         param.Field[string]                                          `json:"name"`
-	ToolCalls    param.Field[[]ChatCompletionMessageToolCallParam]            `json:"tool_calls"`
-}
-
-func (r ChatCompletionMessageAssistantParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ChatCompletionMessageAssistantParam) implementsSharedChatCompletionMessageUnionParam() {}
-
-type ChatCompletionMessageAssistantFunctionCallParam struct {
-	Arguments param.Field[string] `json:"arguments,required"`
-	Name      param.Field[string] `json:"name,required"`
-}
-
-func (r ChatCompletionMessageAssistantFunctionCallParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type ChatCompletionMessageToolParam struct {
-	Role       param.Field[ChatCompletionMessageToolRole] `json:"role,required"`
-	Content    param.Field[string]                        `json:"content"`
-	ToolCallID param.Field[string]                        `json:"tool_call_id"`
-}
-
-func (r ChatCompletionMessageToolParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ChatCompletionMessageToolParam) implementsSharedChatCompletionMessageUnionParam() {}
-
-type ChatCompletionMessageFunctionParam struct {
-	Name    param.Field[string]                            `json:"name,required"`
-	Role    param.Field[ChatCompletionMessageFunctionRole] `json:"role,required"`
-	Content param.Field[string]                            `json:"content"`
-}
-
-func (r ChatCompletionMessageFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ChatCompletionMessageFunctionParam) implementsSharedChatCompletionMessageUnionParam() {}
-
-type ChatCompletionMessageFallbackParam struct {
-	Role    param.Field[ChatCompletionMessageFallbackRole] `json:"role,required"`
-	Content param.Field[string]                            `json:"content"`
-}
-
-func (r ChatCompletionMessageFallbackParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ChatCompletionMessageFallbackParam) implementsSharedChatCompletionMessageUnionParam() {}
 
 type ChatCompletionMessageToolCall struct {
 	ID       string                                `json:"id,required"`
@@ -4750,7 +4195,7 @@ func (r PromptDataParserType) IsKnown() bool {
 
 type PromptDataPrompt struct {
 	Content string `json:"content"`
-	// This field can have the runtime type of [[]ChatCompletionMessage].
+	// This field can have the runtime type of [[]PromptDataPromptChatMessage].
 	Messages interface{}          `json:"messages"`
 	Tools    string               `json:"tools"`
 	Type     PromptDataPromptType `json:"type"`
@@ -4856,10 +4301,10 @@ func (r PromptDataPromptCompletionType) IsKnown() bool {
 }
 
 type PromptDataPromptChat struct {
-	Messages []ChatCompletionMessage  `json:"messages,required"`
-	Type     PromptDataPromptChatType `json:"type,required"`
-	Tools    string                   `json:"tools"`
-	JSON     promptDataPromptChatJSON `json:"-"`
+	Messages []PromptDataPromptChatMessage `json:"messages,required"`
+	Type     PromptDataPromptChatType      `json:"type,required"`
+	Tools    string                        `json:"tools"`
+	JSON     promptDataPromptChatJSON      `json:"-"`
 }
 
 // promptDataPromptChatJSON contains the JSON metadata for the struct
@@ -4881,6 +4326,392 @@ func (r promptDataPromptChatJSON) RawJSON() string {
 }
 
 func (r PromptDataPromptChat) implementsSharedPromptDataPrompt() {}
+
+type PromptDataPromptChatMessage struct {
+	Role PromptDataPromptChatMessagesRole `json:"role,required"`
+	// This field can have the runtime type of [string], [ChatCompletionContentUnion].
+	Content interface{} `json:"content"`
+	// This field can have the runtime type of
+	// [PromptDataPromptChatMessagesAssistantFunctionCall].
+	FunctionCall interface{} `json:"function_call"`
+	Name         string      `json:"name"`
+	ToolCallID   string      `json:"tool_call_id"`
+	// This field can have the runtime type of [[]ChatCompletionMessageToolCall].
+	ToolCalls interface{}                     `json:"tool_calls"`
+	JSON      promptDataPromptChatMessageJSON `json:"-"`
+	union     PromptDataPromptChatMessagesUnion
+}
+
+// promptDataPromptChatMessageJSON contains the JSON metadata for the struct
+// [PromptDataPromptChatMessage]
+type promptDataPromptChatMessageJSON struct {
+	Role         apijson.Field
+	Content      apijson.Field
+	FunctionCall apijson.Field
+	Name         apijson.Field
+	ToolCallID   apijson.Field
+	ToolCalls    apijson.Field
+	raw          string
+	ExtraFields  map[string]apijson.Field
+}
+
+func (r promptDataPromptChatMessageJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r *PromptDataPromptChatMessage) UnmarshalJSON(data []byte) (err error) {
+	*r = PromptDataPromptChatMessage{}
+	err = apijson.UnmarshalRoot(data, &r.union)
+	if err != nil {
+		return err
+	}
+	return apijson.Port(r.union, &r)
+}
+
+// AsUnion returns a [PromptDataPromptChatMessagesUnion] interface which you can
+// cast to the specific types for more type safety.
+//
+// Possible runtime types of the union are
+// [shared.PromptDataPromptChatMessagesSystem],
+// [shared.PromptDataPromptChatMessagesUser],
+// [shared.PromptDataPromptChatMessagesAssistant],
+// [shared.PromptDataPromptChatMessagesTool],
+// [shared.PromptDataPromptChatMessagesFunction],
+// [shared.PromptDataPromptChatMessagesFallback].
+func (r PromptDataPromptChatMessage) AsUnion() PromptDataPromptChatMessagesUnion {
+	return r.union
+}
+
+// Union satisfied by [shared.PromptDataPromptChatMessagesSystem],
+// [shared.PromptDataPromptChatMessagesUser],
+// [shared.PromptDataPromptChatMessagesAssistant],
+// [shared.PromptDataPromptChatMessagesTool],
+// [shared.PromptDataPromptChatMessagesFunction] or
+// [shared.PromptDataPromptChatMessagesFallback].
+type PromptDataPromptChatMessagesUnion interface {
+	implementsSharedPromptDataPromptChatMessage()
+}
+
+func init() {
+	apijson.RegisterUnion(
+		reflect.TypeOf((*PromptDataPromptChatMessagesUnion)(nil)).Elem(),
+		"",
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptDataPromptChatMessagesSystem{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptDataPromptChatMessagesUser{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptDataPromptChatMessagesAssistant{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptDataPromptChatMessagesTool{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptDataPromptChatMessagesFunction{}),
+		},
+		apijson.UnionVariant{
+			TypeFilter: gjson.JSON,
+			Type:       reflect.TypeOf(PromptDataPromptChatMessagesFallback{}),
+		},
+	)
+}
+
+type PromptDataPromptChatMessagesSystem struct {
+	Role    PromptDataPromptChatMessagesSystemRole `json:"role,required"`
+	Content string                                 `json:"content"`
+	Name    string                                 `json:"name"`
+	JSON    promptDataPromptChatMessagesSystemJSON `json:"-"`
+}
+
+// promptDataPromptChatMessagesSystemJSON contains the JSON metadata for the struct
+// [PromptDataPromptChatMessagesSystem]
+type promptDataPromptChatMessagesSystemJSON struct {
+	Role        apijson.Field
+	Content     apijson.Field
+	Name        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptDataPromptChatMessagesSystem) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptDataPromptChatMessagesSystemJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptDataPromptChatMessagesSystem) implementsSharedPromptDataPromptChatMessage() {}
+
+type PromptDataPromptChatMessagesSystemRole string
+
+const (
+	PromptDataPromptChatMessagesSystemRoleSystem PromptDataPromptChatMessagesSystemRole = "system"
+)
+
+func (r PromptDataPromptChatMessagesSystemRole) IsKnown() bool {
+	switch r {
+	case PromptDataPromptChatMessagesSystemRoleSystem:
+		return true
+	}
+	return false
+}
+
+type PromptDataPromptChatMessagesUser struct {
+	Role    PromptDataPromptChatMessagesUserRole `json:"role,required"`
+	Content ChatCompletionContentUnion           `json:"content"`
+	Name    string                               `json:"name"`
+	JSON    promptDataPromptChatMessagesUserJSON `json:"-"`
+}
+
+// promptDataPromptChatMessagesUserJSON contains the JSON metadata for the struct
+// [PromptDataPromptChatMessagesUser]
+type promptDataPromptChatMessagesUserJSON struct {
+	Role        apijson.Field
+	Content     apijson.Field
+	Name        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptDataPromptChatMessagesUser) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptDataPromptChatMessagesUserJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptDataPromptChatMessagesUser) implementsSharedPromptDataPromptChatMessage() {}
+
+type PromptDataPromptChatMessagesUserRole string
+
+const (
+	PromptDataPromptChatMessagesUserRoleUser PromptDataPromptChatMessagesUserRole = "user"
+)
+
+func (r PromptDataPromptChatMessagesUserRole) IsKnown() bool {
+	switch r {
+	case PromptDataPromptChatMessagesUserRoleUser:
+		return true
+	}
+	return false
+}
+
+type PromptDataPromptChatMessagesAssistant struct {
+	Role         PromptDataPromptChatMessagesAssistantRole         `json:"role,required"`
+	Content      string                                            `json:"content,nullable"`
+	FunctionCall PromptDataPromptChatMessagesAssistantFunctionCall `json:"function_call,nullable"`
+	Name         string                                            `json:"name,nullable"`
+	ToolCalls    []ChatCompletionMessageToolCall                   `json:"tool_calls,nullable"`
+	JSON         promptDataPromptChatMessagesAssistantJSON         `json:"-"`
+}
+
+// promptDataPromptChatMessagesAssistantJSON contains the JSON metadata for the
+// struct [PromptDataPromptChatMessagesAssistant]
+type promptDataPromptChatMessagesAssistantJSON struct {
+	Role         apijson.Field
+	Content      apijson.Field
+	FunctionCall apijson.Field
+	Name         apijson.Field
+	ToolCalls    apijson.Field
+	raw          string
+	ExtraFields  map[string]apijson.Field
+}
+
+func (r *PromptDataPromptChatMessagesAssistant) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptDataPromptChatMessagesAssistantJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptDataPromptChatMessagesAssistant) implementsSharedPromptDataPromptChatMessage() {}
+
+type PromptDataPromptChatMessagesAssistantRole string
+
+const (
+	PromptDataPromptChatMessagesAssistantRoleAssistant PromptDataPromptChatMessagesAssistantRole = "assistant"
+)
+
+func (r PromptDataPromptChatMessagesAssistantRole) IsKnown() bool {
+	switch r {
+	case PromptDataPromptChatMessagesAssistantRoleAssistant:
+		return true
+	}
+	return false
+}
+
+type PromptDataPromptChatMessagesAssistantFunctionCall struct {
+	Arguments string                                                `json:"arguments,required"`
+	Name      string                                                `json:"name,required"`
+	JSON      promptDataPromptChatMessagesAssistantFunctionCallJSON `json:"-"`
+}
+
+// promptDataPromptChatMessagesAssistantFunctionCallJSON contains the JSON metadata
+// for the struct [PromptDataPromptChatMessagesAssistantFunctionCall]
+type promptDataPromptChatMessagesAssistantFunctionCallJSON struct {
+	Arguments   apijson.Field
+	Name        apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptDataPromptChatMessagesAssistantFunctionCall) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptDataPromptChatMessagesAssistantFunctionCallJSON) RawJSON() string {
+	return r.raw
+}
+
+type PromptDataPromptChatMessagesTool struct {
+	Role       PromptDataPromptChatMessagesToolRole `json:"role,required"`
+	Content    string                               `json:"content"`
+	ToolCallID string                               `json:"tool_call_id"`
+	JSON       promptDataPromptChatMessagesToolJSON `json:"-"`
+}
+
+// promptDataPromptChatMessagesToolJSON contains the JSON metadata for the struct
+// [PromptDataPromptChatMessagesTool]
+type promptDataPromptChatMessagesToolJSON struct {
+	Role        apijson.Field
+	Content     apijson.Field
+	ToolCallID  apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptDataPromptChatMessagesTool) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptDataPromptChatMessagesToolJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptDataPromptChatMessagesTool) implementsSharedPromptDataPromptChatMessage() {}
+
+type PromptDataPromptChatMessagesToolRole string
+
+const (
+	PromptDataPromptChatMessagesToolRoleTool PromptDataPromptChatMessagesToolRole = "tool"
+)
+
+func (r PromptDataPromptChatMessagesToolRole) IsKnown() bool {
+	switch r {
+	case PromptDataPromptChatMessagesToolRoleTool:
+		return true
+	}
+	return false
+}
+
+type PromptDataPromptChatMessagesFunction struct {
+	Name    string                                   `json:"name,required"`
+	Role    PromptDataPromptChatMessagesFunctionRole `json:"role,required"`
+	Content string                                   `json:"content"`
+	JSON    promptDataPromptChatMessagesFunctionJSON `json:"-"`
+}
+
+// promptDataPromptChatMessagesFunctionJSON contains the JSON metadata for the
+// struct [PromptDataPromptChatMessagesFunction]
+type promptDataPromptChatMessagesFunctionJSON struct {
+	Name        apijson.Field
+	Role        apijson.Field
+	Content     apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptDataPromptChatMessagesFunction) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptDataPromptChatMessagesFunctionJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptDataPromptChatMessagesFunction) implementsSharedPromptDataPromptChatMessage() {}
+
+type PromptDataPromptChatMessagesFunctionRole string
+
+const (
+	PromptDataPromptChatMessagesFunctionRoleFunction PromptDataPromptChatMessagesFunctionRole = "function"
+)
+
+func (r PromptDataPromptChatMessagesFunctionRole) IsKnown() bool {
+	switch r {
+	case PromptDataPromptChatMessagesFunctionRoleFunction:
+		return true
+	}
+	return false
+}
+
+type PromptDataPromptChatMessagesFallback struct {
+	Role    PromptDataPromptChatMessagesFallbackRole `json:"role,required"`
+	Content string                                   `json:"content,nullable"`
+	JSON    promptDataPromptChatMessagesFallbackJSON `json:"-"`
+}
+
+// promptDataPromptChatMessagesFallbackJSON contains the JSON metadata for the
+// struct [PromptDataPromptChatMessagesFallback]
+type promptDataPromptChatMessagesFallbackJSON struct {
+	Role        apijson.Field
+	Content     apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *PromptDataPromptChatMessagesFallback) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r promptDataPromptChatMessagesFallbackJSON) RawJSON() string {
+	return r.raw
+}
+
+func (r PromptDataPromptChatMessagesFallback) implementsSharedPromptDataPromptChatMessage() {}
+
+type PromptDataPromptChatMessagesFallbackRole string
+
+const (
+	PromptDataPromptChatMessagesFallbackRoleModel PromptDataPromptChatMessagesFallbackRole = "model"
+)
+
+func (r PromptDataPromptChatMessagesFallbackRole) IsKnown() bool {
+	switch r {
+	case PromptDataPromptChatMessagesFallbackRoleModel:
+		return true
+	}
+	return false
+}
+
+type PromptDataPromptChatMessagesRole string
+
+const (
+	PromptDataPromptChatMessagesRoleSystem    PromptDataPromptChatMessagesRole = "system"
+	PromptDataPromptChatMessagesRoleUser      PromptDataPromptChatMessagesRole = "user"
+	PromptDataPromptChatMessagesRoleAssistant PromptDataPromptChatMessagesRole = "assistant"
+	PromptDataPromptChatMessagesRoleTool      PromptDataPromptChatMessagesRole = "tool"
+	PromptDataPromptChatMessagesRoleFunction  PromptDataPromptChatMessagesRole = "function"
+	PromptDataPromptChatMessagesRoleModel     PromptDataPromptChatMessagesRole = "model"
+)
+
+func (r PromptDataPromptChatMessagesRole) IsKnown() bool {
+	switch r {
+	case PromptDataPromptChatMessagesRoleSystem, PromptDataPromptChatMessagesRoleUser, PromptDataPromptChatMessagesRoleAssistant, PromptDataPromptChatMessagesRoleTool, PromptDataPromptChatMessagesRoleFunction, PromptDataPromptChatMessagesRoleModel:
+		return true
+	}
+	return false
+}
 
 type PromptDataPromptChatType string
 
@@ -5152,9 +4983,9 @@ func (r PromptDataPromptCompletionParam) MarshalJSON() (data []byte, err error) 
 func (r PromptDataPromptCompletionParam) implementsSharedPromptDataPromptUnionParam() {}
 
 type PromptDataPromptChatParam struct {
-	Messages param.Field[[]ChatCompletionMessageUnionParam] `json:"messages,required"`
-	Type     param.Field[PromptDataPromptChatType]          `json:"type,required"`
-	Tools    param.Field[string]                            `json:"tools"`
+	Messages param.Field[[]PromptDataPromptChatMessagesUnionParam] `json:"messages,required"`
+	Type     param.Field[PromptDataPromptChatType]                 `json:"type,required"`
+	Tools    param.Field[string]                                   `json:"tools"`
 }
 
 func (r PromptDataPromptChatParam) MarshalJSON() (data []byte, err error) {
@@ -5162,6 +4993,120 @@ func (r PromptDataPromptChatParam) MarshalJSON() (data []byte, err error) {
 }
 
 func (r PromptDataPromptChatParam) implementsSharedPromptDataPromptUnionParam() {}
+
+type PromptDataPromptChatMessageParam struct {
+	Role         param.Field[PromptDataPromptChatMessagesRole] `json:"role,required"`
+	Content      param.Field[interface{}]                      `json:"content"`
+	FunctionCall param.Field[interface{}]                      `json:"function_call"`
+	Name         param.Field[string]                           `json:"name"`
+	ToolCallID   param.Field[string]                           `json:"tool_call_id"`
+	ToolCalls    param.Field[interface{}]                      `json:"tool_calls"`
+}
+
+func (r PromptDataPromptChatMessageParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessageParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {}
+
+// Satisfied by [shared.PromptDataPromptChatMessagesSystemParam],
+// [shared.PromptDataPromptChatMessagesUserParam],
+// [shared.PromptDataPromptChatMessagesAssistantParam],
+// [shared.PromptDataPromptChatMessagesToolParam],
+// [shared.PromptDataPromptChatMessagesFunctionParam],
+// [shared.PromptDataPromptChatMessagesFallbackParam],
+// [PromptDataPromptChatMessageParam].
+type PromptDataPromptChatMessagesUnionParam interface {
+	implementsSharedPromptDataPromptChatMessagesUnionParam()
+}
+
+type PromptDataPromptChatMessagesSystemParam struct {
+	Role    param.Field[PromptDataPromptChatMessagesSystemRole] `json:"role,required"`
+	Content param.Field[string]                                 `json:"content"`
+	Name    param.Field[string]                                 `json:"name"`
+}
+
+func (r PromptDataPromptChatMessagesSystemParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesSystemParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
+}
+
+type PromptDataPromptChatMessagesUserParam struct {
+	Role    param.Field[PromptDataPromptChatMessagesUserRole] `json:"role,required"`
+	Content param.Field[ChatCompletionContentUnionParam]      `json:"content"`
+	Name    param.Field[string]                               `json:"name"`
+}
+
+func (r PromptDataPromptChatMessagesUserParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesUserParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
+}
+
+type PromptDataPromptChatMessagesAssistantParam struct {
+	Role         param.Field[PromptDataPromptChatMessagesAssistantRole]              `json:"role,required"`
+	Content      param.Field[string]                                                 `json:"content"`
+	FunctionCall param.Field[PromptDataPromptChatMessagesAssistantFunctionCallParam] `json:"function_call"`
+	Name         param.Field[string]                                                 `json:"name"`
+	ToolCalls    param.Field[[]ChatCompletionMessageToolCallParam]                   `json:"tool_calls"`
+}
+
+func (r PromptDataPromptChatMessagesAssistantParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesAssistantParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
+}
+
+type PromptDataPromptChatMessagesAssistantFunctionCallParam struct {
+	Arguments param.Field[string] `json:"arguments,required"`
+	Name      param.Field[string] `json:"name,required"`
+}
+
+func (r PromptDataPromptChatMessagesAssistantFunctionCallParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type PromptDataPromptChatMessagesToolParam struct {
+	Role       param.Field[PromptDataPromptChatMessagesToolRole] `json:"role,required"`
+	Content    param.Field[string]                               `json:"content"`
+	ToolCallID param.Field[string]                               `json:"tool_call_id"`
+}
+
+func (r PromptDataPromptChatMessagesToolParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesToolParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
+}
+
+type PromptDataPromptChatMessagesFunctionParam struct {
+	Name    param.Field[string]                                   `json:"name,required"`
+	Role    param.Field[PromptDataPromptChatMessagesFunctionRole] `json:"role,required"`
+	Content param.Field[string]                                   `json:"content"`
+}
+
+func (r PromptDataPromptChatMessagesFunctionParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesFunctionParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
+}
+
+type PromptDataPromptChatMessagesFallbackParam struct {
+	Role    param.Field[PromptDataPromptChatMessagesFallbackRole] `json:"role,required"`
+	Content param.Field[string]                                   `json:"content"`
+}
+
+func (r PromptDataPromptChatMessagesFallbackParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PromptDataPromptChatMessagesFallbackParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
+}
 
 type PromptDataPromptNullableVariantParam struct {
 }
