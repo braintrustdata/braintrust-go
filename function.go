@@ -725,7 +725,7 @@ type FunctionInvokeParams struct {
 	// Argument to the function, which can be any JSON serializable value
 	Input param.Field[interface{}] `json:"input"`
 	// If the function is an LLM, additional messages to pass along to it
-	Messages param.Field[[]shared.ChatCompletionMessageUnionParam] `json:"messages"`
+	Messages param.Field[[]FunctionInvokeParamsMessageUnion] `json:"messages"`
 	// The mode format of the returned value (defaults to 'auto')
 	Mode param.Field[FunctionInvokeParamsMode] `json:"mode"`
 	// Options for tracing the function call
@@ -739,6 +739,214 @@ type FunctionInvokeParams struct {
 
 func (r FunctionInvokeParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
+}
+
+type FunctionInvokeParamsMessage struct {
+	Role         param.Field[FunctionInvokeParamsMessagesRole] `json:"role,required"`
+	Content      param.Field[interface{}]                      `json:"content"`
+	FunctionCall param.Field[interface{}]                      `json:"function_call"`
+	Name         param.Field[string]                           `json:"name"`
+	ToolCallID   param.Field[string]                           `json:"tool_call_id"`
+	ToolCalls    param.Field[interface{}]                      `json:"tool_calls"`
+}
+
+func (r FunctionInvokeParamsMessage) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessage) implementsFunctionInvokeParamsMessageUnion() {}
+
+// Satisfied by [FunctionInvokeParamsMessagesSystem],
+// [FunctionInvokeParamsMessagesUser], [FunctionInvokeParamsMessagesAssistant],
+// [FunctionInvokeParamsMessagesTool], [FunctionInvokeParamsMessagesFunction],
+// [FunctionInvokeParamsMessagesFallback], [FunctionInvokeParamsMessage].
+type FunctionInvokeParamsMessageUnion interface {
+	implementsFunctionInvokeParamsMessageUnion()
+}
+
+type FunctionInvokeParamsMessagesSystem struct {
+	Role    param.Field[FunctionInvokeParamsMessagesSystemRole] `json:"role,required"`
+	Content param.Field[string]                                 `json:"content"`
+	Name    param.Field[string]                                 `json:"name"`
+}
+
+func (r FunctionInvokeParamsMessagesSystem) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessagesSystem) implementsFunctionInvokeParamsMessageUnion() {}
+
+type FunctionInvokeParamsMessagesSystemRole string
+
+const (
+	FunctionInvokeParamsMessagesSystemRoleSystem FunctionInvokeParamsMessagesSystemRole = "system"
+)
+
+func (r FunctionInvokeParamsMessagesSystemRole) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesSystemRoleSystem:
+		return true
+	}
+	return false
+}
+
+type FunctionInvokeParamsMessagesUser struct {
+	Role    param.Field[FunctionInvokeParamsMessagesUserRole]   `json:"role,required"`
+	Content param.Field[shared.ChatCompletionContentUnionParam] `json:"content"`
+	Name    param.Field[string]                                 `json:"name"`
+}
+
+func (r FunctionInvokeParamsMessagesUser) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessagesUser) implementsFunctionInvokeParamsMessageUnion() {}
+
+type FunctionInvokeParamsMessagesUserRole string
+
+const (
+	FunctionInvokeParamsMessagesUserRoleUser FunctionInvokeParamsMessagesUserRole = "user"
+)
+
+func (r FunctionInvokeParamsMessagesUserRole) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesUserRoleUser:
+		return true
+	}
+	return false
+}
+
+type FunctionInvokeParamsMessagesAssistant struct {
+	Role         param.Field[FunctionInvokeParamsMessagesAssistantRole]         `json:"role,required"`
+	Content      param.Field[string]                                            `json:"content"`
+	FunctionCall param.Field[FunctionInvokeParamsMessagesAssistantFunctionCall] `json:"function_call"`
+	Name         param.Field[string]                                            `json:"name"`
+	ToolCalls    param.Field[[]shared.ChatCompletionMessageToolCallParam]       `json:"tool_calls"`
+}
+
+func (r FunctionInvokeParamsMessagesAssistant) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessagesAssistant) implementsFunctionInvokeParamsMessageUnion() {}
+
+type FunctionInvokeParamsMessagesAssistantRole string
+
+const (
+	FunctionInvokeParamsMessagesAssistantRoleAssistant FunctionInvokeParamsMessagesAssistantRole = "assistant"
+)
+
+func (r FunctionInvokeParamsMessagesAssistantRole) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesAssistantRoleAssistant:
+		return true
+	}
+	return false
+}
+
+type FunctionInvokeParamsMessagesAssistantFunctionCall struct {
+	Arguments param.Field[string] `json:"arguments,required"`
+	Name      param.Field[string] `json:"name,required"`
+}
+
+func (r FunctionInvokeParamsMessagesAssistantFunctionCall) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+type FunctionInvokeParamsMessagesTool struct {
+	Role       param.Field[FunctionInvokeParamsMessagesToolRole] `json:"role,required"`
+	Content    param.Field[string]                               `json:"content"`
+	ToolCallID param.Field[string]                               `json:"tool_call_id"`
+}
+
+func (r FunctionInvokeParamsMessagesTool) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessagesTool) implementsFunctionInvokeParamsMessageUnion() {}
+
+type FunctionInvokeParamsMessagesToolRole string
+
+const (
+	FunctionInvokeParamsMessagesToolRoleTool FunctionInvokeParamsMessagesToolRole = "tool"
+)
+
+func (r FunctionInvokeParamsMessagesToolRole) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesToolRoleTool:
+		return true
+	}
+	return false
+}
+
+type FunctionInvokeParamsMessagesFunction struct {
+	Name    param.Field[string]                                   `json:"name,required"`
+	Role    param.Field[FunctionInvokeParamsMessagesFunctionRole] `json:"role,required"`
+	Content param.Field[string]                                   `json:"content"`
+}
+
+func (r FunctionInvokeParamsMessagesFunction) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessagesFunction) implementsFunctionInvokeParamsMessageUnion() {}
+
+type FunctionInvokeParamsMessagesFunctionRole string
+
+const (
+	FunctionInvokeParamsMessagesFunctionRoleFunction FunctionInvokeParamsMessagesFunctionRole = "function"
+)
+
+func (r FunctionInvokeParamsMessagesFunctionRole) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesFunctionRoleFunction:
+		return true
+	}
+	return false
+}
+
+type FunctionInvokeParamsMessagesFallback struct {
+	Role    param.Field[FunctionInvokeParamsMessagesFallbackRole] `json:"role,required"`
+	Content param.Field[string]                                   `json:"content"`
+}
+
+func (r FunctionInvokeParamsMessagesFallback) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r FunctionInvokeParamsMessagesFallback) implementsFunctionInvokeParamsMessageUnion() {}
+
+type FunctionInvokeParamsMessagesFallbackRole string
+
+const (
+	FunctionInvokeParamsMessagesFallbackRoleModel FunctionInvokeParamsMessagesFallbackRole = "model"
+)
+
+func (r FunctionInvokeParamsMessagesFallbackRole) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesFallbackRoleModel:
+		return true
+	}
+	return false
+}
+
+type FunctionInvokeParamsMessagesRole string
+
+const (
+	FunctionInvokeParamsMessagesRoleSystem    FunctionInvokeParamsMessagesRole = "system"
+	FunctionInvokeParamsMessagesRoleUser      FunctionInvokeParamsMessagesRole = "user"
+	FunctionInvokeParamsMessagesRoleAssistant FunctionInvokeParamsMessagesRole = "assistant"
+	FunctionInvokeParamsMessagesRoleTool      FunctionInvokeParamsMessagesRole = "tool"
+	FunctionInvokeParamsMessagesRoleFunction  FunctionInvokeParamsMessagesRole = "function"
+	FunctionInvokeParamsMessagesRoleModel     FunctionInvokeParamsMessagesRole = "model"
+)
+
+func (r FunctionInvokeParamsMessagesRole) IsKnown() bool {
+	switch r {
+	case FunctionInvokeParamsMessagesRoleSystem, FunctionInvokeParamsMessagesRoleUser, FunctionInvokeParamsMessagesRoleAssistant, FunctionInvokeParamsMessagesRoleTool, FunctionInvokeParamsMessagesRoleFunction, FunctionInvokeParamsMessagesRoleModel:
+		return true
+	}
+	return false
 }
 
 // The mode format of the returned value (defaults to 'auto')
