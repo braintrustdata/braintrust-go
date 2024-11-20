@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.1 (2024-11-20)
+
+Full Changelog: [v0.5.0...v0.5.1](https://github.com/braintrustdata/braintrust-go/compare/v0.5.0...v0.5.1)
+
+### Chores
+
+* **internal:** version bump ([#103](https://github.com/braintrustdata/braintrust-go/issues/103)) ([b7b6ac8](https://github.com/braintrustdata/braintrust-go/commit/b7b6ac85800f427e9095ae80203bcb392b36a442))
+
 ## 0.5.0 (2024-11-20)
 
 Full Changelog: [v0.4.0...v0.5.0](https://github.com/braintrustdata/braintrust-go/compare/v0.4.0...v0.5.0)
