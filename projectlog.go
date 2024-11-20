@@ -49,8 +49,7 @@ func (r *ProjectLogService) Feedback(ctx context.Context, projectID string, body
 }
 
 // Fetch the events in a project logs. Equivalent to the POST form of the same
-// path, but with the parameters in the URL query rather than in the request body.
-// For more complex queries, use the `POST /btql` endpoint.
+// path, but with the parameters in the URL query rather than in the request body
 func (r *ProjectLogService) Fetch(ctx context.Context, projectID string, query ProjectLogFetchParams, opts ...option.RequestOption) (res *shared.FetchProjectLogsEventsResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
@@ -63,8 +62,7 @@ func (r *ProjectLogService) Fetch(ctx context.Context, projectID string, query P
 }
 
 // Fetch the events in a project logs. Equivalent to the GET form of the same path,
-// but with the parameters in the request body rather than in the URL query. For
-// more complex queries, use the `POST /btql` endpoint.
+// but with the parameters in the request body rather than in the URL query
 func (r *ProjectLogService) FetchPost(ctx context.Context, projectID string, body ProjectLogFetchPostParams, opts ...option.RequestOption) (res *shared.FetchProjectLogsEventsResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
@@ -77,7 +75,7 @@ func (r *ProjectLogService) FetchPost(ctx context.Context, projectID string, bod
 }
 
 // Insert a set of events into the project logs
-func (r *ProjectLogService) Insert(ctx context.Context, projectID string, body ProjectLogInsertParams, opts ...option.RequestOption) (res *shared.InsertEventsResponse, err error) {
+func (r *ProjectLogService) Insert(ctx context.Context, projectID string, body ProjectLogInsertParams, opts ...option.RequestOption) (res *ProjectLogInsertResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
@@ -86,6 +84,30 @@ func (r *ProjectLogService) Insert(ctx context.Context, projectID string, body P
 	path := fmt.Sprintf("v1/project_logs/%s/insert", projectID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
+}
+
+type ProjectLogInsertResponse struct {
+	// String slugs which line up 1-1 with the row_ids. These slugs can be used as the
+	// 'parent' specifier to attach spans underneath the row
+	SerializedSpanSlugs []string                     `json:"serialized_span_slugs,required"`
+	JSON                projectLogInsertResponseJSON `json:"-"`
+	shared.InsertEventsResponse
+}
+
+// projectLogInsertResponseJSON contains the JSON metadata for the struct
+// [ProjectLogInsertResponse]
+type projectLogInsertResponseJSON struct {
+	SerializedSpanSlugs apijson.Field
+	raw                 string
+	ExtraFields         map[string]apijson.Field
+}
+
+func (r *ProjectLogInsertResponse) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r projectLogInsertResponseJSON) RawJSON() string {
+	return r.raw
 }
 
 type ProjectLogFeedbackParams struct {
@@ -158,6 +180,13 @@ type ProjectLogFetchPostParams struct {
 	// The string can be obtained directly from the `cursor` property of the previous
 	// fetch query
 	Cursor param.Field[string] `json:"cursor"`
+	// NOTE: This parameter is deprecated and will be removed in a future revision.
+	// Consider using the `/btql` endpoint
+	// (https://www.braintrust.dev/docs/reference/btql) for more advanced filtering.
+	//
+	// A list of filters on the events to fetch. Currently, only path-lookup type
+	// filters are supported.
+	Filters param.Field[[]shared.PathLookupFilterParam] `json:"filters"`
 	// limit the number of traces fetched
 	//
 	// Fetch queries may be paginated if the total result size is expected to be large
