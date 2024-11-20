@@ -791,9 +791,9 @@ func (r FunctionInvokeParamsMessagesSystemRole) IsKnown() bool {
 }
 
 type FunctionInvokeParamsMessagesUser struct {
-	Role    param.Field[FunctionInvokeParamsMessagesUserRole]   `json:"role,required"`
-	Content param.Field[shared.ChatCompletionContentUnionParam] `json:"content"`
-	Name    param.Field[string]                                 `json:"name"`
+	Role    param.Field[FunctionInvokeParamsMessagesUserRole]         `json:"role,required"`
+	Content param.Field[FunctionInvokeParamsMessagesUserContentUnion] `json:"content"`
+	Name    param.Field[string]                                       `json:"name"`
 }
 
 func (r FunctionInvokeParamsMessagesUser) MarshalJSON() (data []byte, err error) {
@@ -814,6 +814,23 @@ func (r FunctionInvokeParamsMessagesUserRole) IsKnown() bool {
 		return true
 	}
 	return false
+}
+
+// Satisfied by [shared.UnionString],
+// [FunctionInvokeParamsMessagesUserContentArray].
+type FunctionInvokeParamsMessagesUserContentUnion interface {
+	ImplementsFunctionInvokeParamsMessagesUserContentUnion()
+}
+
+type FunctionInvokeParamsMessagesUserContentArray []FunctionInvokeParamsMessagesUserContentArrayUnion
+
+func (r FunctionInvokeParamsMessagesUserContentArray) ImplementsFunctionInvokeParamsMessagesUserContentUnion() {
+}
+
+// Satisfied by [shared.ChatCompletionContentPartTextParam],
+// [shared.ChatCompletionContentPartImageParam].
+type FunctionInvokeParamsMessagesUserContentArrayUnion interface {
+	ImplementsFunctionInvokeParamsMessagesUserContentArrayUnion()
 }
 
 type FunctionInvokeParamsMessagesAssistant struct {
