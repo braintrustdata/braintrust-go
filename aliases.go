@@ -140,24 +140,6 @@ type ACLBatchUpdateResponse = shared.ACLBatchUpdateResponse
 type APIKey = shared.APIKey
 
 // This is an alias to an internal type.
-type ChatCompletionContentUnion = shared.ChatCompletionContentUnion
-
-// This is an alias to an internal type.
-type ChatCompletionContentArray = shared.ChatCompletionContentArray
-
-// This is an alias to an internal type.
-type ChatCompletionContentArrayUnionItem = shared.ChatCompletionContentArrayUnionItem
-
-// This is an alias to an internal type.
-type ChatCompletionContentUnionParam = shared.ChatCompletionContentUnionParam
-
-// This is an alias to an internal type.
-type ChatCompletionContentArrayParam = shared.ChatCompletionContentArrayParam
-
-// This is an alias to an internal type.
-type ChatCompletionContentArrayUnionItemParam = shared.ChatCompletionContentArrayUnionItemParam
-
-// This is an alias to an internal type.
 type ChatCompletionContentPartImage = shared.ChatCompletionContentPartImage
 
 // This is an alias to an internal type.
@@ -758,22 +740,6 @@ type PatchOrganizationMembersOutputStatus = shared.PatchOrganizationMembersOutpu
 // This is an alias to an internal value.
 const PatchOrganizationMembersOutputStatusSuccess = shared.PatchOrganizationMembersOutputStatusSuccess
 
-// A path-lookup filter describes an equality comparison against a specific
-// sub-field in the event row. For instance, if you wish to filter on the value of
-// `c` in `{"input": {"a": {"b": {"c": "hello"}}}}`, pass
-// `path=["input", "a", "b", "c"]` and `value="hello"`
-//
-// This is an alias to an internal type.
-type PathLookupFilterParam = shared.PathLookupFilterParam
-
-// Denotes the type of filter as a path-lookup filter
-//
-// This is an alias to an internal type.
-type PathLookupFilterType = shared.PathLookupFilterType
-
-// This is an alias to an internal value.
-const PathLookupFilterTypePathLookup = shared.PathLookupFilterTypePathLookup
-
 // This is an alias to an internal type.
 type Project = shared.Project
 
@@ -992,6 +958,15 @@ type PromptDataPromptChatMessagesUserRole = shared.PromptDataPromptChatMessagesU
 const PromptDataPromptChatMessagesUserRoleUser = shared.PromptDataPromptChatMessagesUserRoleUser
 
 // This is an alias to an internal type.
+type PromptDataPromptChatMessagesUserContentUnion = shared.PromptDataPromptChatMessagesUserContentUnion
+
+// This is an alias to an internal type.
+type PromptDataPromptChatMessagesUserContentArray = shared.PromptDataPromptChatMessagesUserContentArray
+
+// This is an alias to an internal type.
+type PromptDataPromptChatMessagesUserContentArrayUnionItem = shared.PromptDataPromptChatMessagesUserContentArrayUnionItem
+
+// This is an alias to an internal type.
 type PromptDataPromptChatMessagesAssistant = shared.PromptDataPromptChatMessagesAssistant
 
 // This is an alias to an internal type.
@@ -1127,6 +1102,15 @@ type PromptDataPromptChatMessagesSystemParam = shared.PromptDataPromptChatMessag
 
 // This is an alias to an internal type.
 type PromptDataPromptChatMessagesUserParam = shared.PromptDataPromptChatMessagesUserParam
+
+// This is an alias to an internal type.
+type PromptDataPromptChatMessagesUserContentUnionParam = shared.PromptDataPromptChatMessagesUserContentUnionParam
+
+// This is an alias to an internal type.
+type PromptDataPromptChatMessagesUserContentArrayParam = shared.PromptDataPromptChatMessagesUserContentArrayParam
+
+// This is an alias to an internal type.
+type PromptDataPromptChatMessagesUserContentArrayUnionItemParam = shared.PromptDataPromptChatMessagesUserContentArrayUnionItemParam
 
 // This is an alias to an internal type.
 type PromptDataPromptChatMessagesAssistantParam = shared.PromptDataPromptChatMessagesAssistantParam
