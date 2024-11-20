@@ -123,7 +123,8 @@ func (r *DatasetService) Feedback(ctx context.Context, datasetID string, body Da
 }
 
 // Fetch the events in a dataset. Equivalent to the POST form of the same path, but
-// with the parameters in the URL query rather than in the request body
+// with the parameters in the URL query rather than in the request body. For more
+// complex queries, use the `POST /btql` endpoint.
 func (r *DatasetService) Fetch(ctx context.Context, datasetID string, query DatasetFetchParams, opts ...option.RequestOption) (res *shared.FetchDatasetEventsResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if datasetID == "" {
@@ -136,7 +137,8 @@ func (r *DatasetService) Fetch(ctx context.Context, datasetID string, query Data
 }
 
 // Fetch the events in a dataset. Equivalent to the GET form of the same path, but
-// with the parameters in the request body rather than in the URL query
+// with the parameters in the request body rather than in the URL query. For more
+// complex queries, use the `POST /btql` endpoint.
 func (r *DatasetService) FetchPost(ctx context.Context, datasetID string, body DatasetFetchPostParams, opts ...option.RequestOption) (res *shared.FetchDatasetEventsResponse, err error) {
 	opts = append(r.Options[:], opts...)
 	if datasetID == "" {
@@ -318,13 +320,6 @@ type DatasetFetchPostParams struct {
 	// The string can be obtained directly from the `cursor` property of the previous
 	// fetch query
 	Cursor param.Field[string] `json:"cursor"`
-	// NOTE: This parameter is deprecated and will be removed in a future revision.
-	// Consider using the `/btql` endpoint
-	// (https://www.braintrust.dev/docs/reference/btql) for more advanced filtering.
-	//
-	// A list of filters on the events to fetch. Currently, only path-lookup type
-	// filters are supported.
-	Filters param.Field[[]shared.PathLookupFilterParam] `json:"filters"`
 	// limit the number of traces fetched
 	//
 	// Fetch queries may be paginated if the total result size is expected to be large
