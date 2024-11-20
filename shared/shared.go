@@ -353,7 +353,7 @@ func (r ChatCompletionContentPartImageParam) MarshalJSON() (data []byte, err err
 func (r ChatCompletionContentPartImageParam) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
 }
 
-func (r ChatCompletionContentPartImageParam) ImplementsFunctionInvokeParamsMessagesUserContentArrayUnion() {
+func (r ChatCompletionContentPartImageParam) ImplementsFunctionInvokeParamsMessagesUserContentArrayItemUnion() {
 }
 
 type ChatCompletionContentPartImageImageURLParam struct {
@@ -417,7 +417,7 @@ func (r ChatCompletionContentPartTextParam) MarshalJSON() (data []byte, err erro
 func (r ChatCompletionContentPartTextParam) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
 }
 
-func (r ChatCompletionContentPartTextParam) ImplementsFunctionInvokeParamsMessagesUserContentArrayUnion() {
+func (r ChatCompletionContentPartTextParam) ImplementsFunctionInvokeParamsMessagesUserContentArrayItemUnion() {
 }
 
 type ChatCompletionMessageToolCall struct {
