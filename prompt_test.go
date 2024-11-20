@@ -36,19 +36,8 @@ func TestPromptNewWithOptionalParams(t *testing.T) {
 			Options: braintrust.F(shared.PromptOptionsParam{
 				Model: braintrust.F("model"),
 				Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsAnthropicModelParamsParam{
-					FrequencyPenalty: int64(0),
-					FunctionCall:     "auto",
-					MaxTokens:        braintrust.F(0.000000),
-					N:                int64(0),
-					PresencePenalty:  int64(0),
-					ResponseFormat: map[string]interface{}{
-						"type": "json_object",
-					},
-					Stop: map[string]interface{}{
-						"0": "string",
-					},
+					MaxTokens:   braintrust.F(0.000000),
 					Temperature: braintrust.F(0.000000),
-					ToolChoice:  "auto",
 					TopP:        braintrust.F(0.000000),
 					UseCache:    braintrust.F(true),
 				}),
@@ -130,19 +119,8 @@ func TestPromptUpdateWithOptionalParams(t *testing.T) {
 				Options: braintrust.F(shared.PromptOptionsParam{
 					Model: braintrust.F("model"),
 					Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsAnthropicModelParamsParam{
-						FrequencyPenalty: int64(0),
-						FunctionCall:     "auto",
-						MaxTokens:        braintrust.F(0.000000),
-						N:                int64(0),
-						PresencePenalty:  int64(0),
-						ResponseFormat: map[string]interface{}{
-							"type": "json_object",
-						},
-						Stop: map[string]interface{}{
-							"0": "string",
-						},
+						MaxTokens:   braintrust.F(0.000000),
 						Temperature: braintrust.F(0.000000),
-						ToolChoice:  "auto",
 						TopP:        braintrust.F(0.000000),
 						UseCache:    braintrust.F(true),
 					}),
@@ -259,19 +237,8 @@ func TestPromptReplaceWithOptionalParams(t *testing.T) {
 			Options: braintrust.F(shared.PromptOptionsParam{
 				Model: braintrust.F("model"),
 				Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsAnthropicModelParamsParam{
-					FrequencyPenalty: int64(0),
-					FunctionCall:     "auto",
-					MaxTokens:        braintrust.F(0.000000),
-					N:                int64(0),
-					PresencePenalty:  int64(0),
-					ResponseFormat: map[string]interface{}{
-						"type": "json_object",
-					},
-					Stop: map[string]interface{}{
-						"0": "string",
-					},
+					MaxTokens:   braintrust.F(0.000000),
 					Temperature: braintrust.F(0.000000),
-					ToolChoice:  "auto",
 					TopP:        braintrust.F(0.000000),
 					UseCache:    braintrust.F(true),
 				}),
