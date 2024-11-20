@@ -822,15 +822,15 @@ type FunctionInvokeParamsMessagesUserContentUnion interface {
 	ImplementsFunctionInvokeParamsMessagesUserContentUnion()
 }
 
-type FunctionInvokeParamsMessagesUserContentArray []FunctionInvokeParamsMessagesUserContentArrayUnion
+type FunctionInvokeParamsMessagesUserContentArray []FunctionInvokeParamsMessagesUserContentArrayItemUnion
 
 func (r FunctionInvokeParamsMessagesUserContentArray) ImplementsFunctionInvokeParamsMessagesUserContentUnion() {
 }
 
 // Satisfied by [shared.ChatCompletionContentPartTextParam],
 // [shared.ChatCompletionContentPartImageParam].
-type FunctionInvokeParamsMessagesUserContentArrayUnion interface {
-	ImplementsFunctionInvokeParamsMessagesUserContentArrayUnion()
+type FunctionInvokeParamsMessagesUserContentArrayItemUnion interface {
+	ImplementsFunctionInvokeParamsMessagesUserContentArrayItemUnion()
 }
 
 type FunctionInvokeParamsMessagesAssistant struct {
