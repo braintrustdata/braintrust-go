@@ -174,6 +174,7 @@ func TestDatasetFeedback(t *testing.T) {
 					"foo": "bar",
 				}),
 				Source: braintrust.F(shared.FeedbackDatasetItemSourceApp),
+				Tags:   braintrust.F([]string{"string"}),
 			}}),
 		},
 	)
@@ -233,12 +234,7 @@ func TestDatasetFetchPostWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.DatasetFetchPostParams{
-			Cursor: braintrust.F("cursor"),
-			Filters: braintrust.F([]shared.PathLookupFilterParam{{
-				Path:  braintrust.F([]string{"string"}),
-				Type:  braintrust.F(shared.PathLookupFilterTypePathLookup),
-				Value: braintrust.F[any](map[string]interface{}{}),
-			}}),
+			Cursor:        braintrust.F("cursor"),
 			Limit:         braintrust.F(int64(0)),
 			MaxRootSpanID: braintrust.F("max_root_span_id"),
 			MaxXactID:     braintrust.F("max_xact_id"),
