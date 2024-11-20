@@ -332,9 +332,29 @@ func (r ProjectScoreListParamsScoreTypeProjectScoreType) IsKnown() bool {
 func (r ProjectScoreListParamsScoreTypeProjectScoreType) implementsProjectScoreListParamsScoreTypeUnion() {
 }
 
-type ProjectScoreListParamsScoreTypeArray []ProjectScoreListParamsScoreTypeArray
+type ProjectScoreListParamsScoreTypeArray []ProjectScoreListParamsScoreTypeArrayItem
 
 func (r ProjectScoreListParamsScoreTypeArray) implementsProjectScoreListParamsScoreTypeUnion() {}
+
+// The type of the configured score
+type ProjectScoreListParamsScoreTypeArrayItem string
+
+const (
+	ProjectScoreListParamsScoreTypeArrayItemSlider      ProjectScoreListParamsScoreTypeArrayItem = "slider"
+	ProjectScoreListParamsScoreTypeArrayItemCategorical ProjectScoreListParamsScoreTypeArrayItem = "categorical"
+	ProjectScoreListParamsScoreTypeArrayItemWeighted    ProjectScoreListParamsScoreTypeArrayItem = "weighted"
+	ProjectScoreListParamsScoreTypeArrayItemMinimum     ProjectScoreListParamsScoreTypeArrayItem = "minimum"
+	ProjectScoreListParamsScoreTypeArrayItemMaximum     ProjectScoreListParamsScoreTypeArrayItem = "maximum"
+	ProjectScoreListParamsScoreTypeArrayItemOnline      ProjectScoreListParamsScoreTypeArrayItem = "online"
+)
+
+func (r ProjectScoreListParamsScoreTypeArrayItem) IsKnown() bool {
+	switch r {
+	case ProjectScoreListParamsScoreTypeArrayItemSlider, ProjectScoreListParamsScoreTypeArrayItemCategorical, ProjectScoreListParamsScoreTypeArrayItemWeighted, ProjectScoreListParamsScoreTypeArrayItemMinimum, ProjectScoreListParamsScoreTypeArrayItemMaximum, ProjectScoreListParamsScoreTypeArrayItemOnline:
+		return true
+	}
+	return false
+}
 
 type ProjectScoreReplaceParams struct {
 	// Name of the project score
