@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.5.0 (2024-11-20)
+
+Full Changelog: [v0.4.0...v0.5.0](https://github.com/braintrustdata/braintrust-go/compare/v0.4.0...v0.5.0)
+
+### Features
+
+* **api:** manual updates ([#100](https://github.com/braintrustdata/braintrust-go/issues/100)) ([7cc183a](https://github.com/braintrustdata/braintrust-go/commit/7cc183acd30fba1bcdff0f6e1357492d38183bc3))
+* **api:** manual updates ([#101](https://github.com/braintrustdata/braintrust-go/issues/101)) ([3c9419c](https://github.com/braintrustdata/braintrust-go/commit/3c9419c3b959a101a83ebdd255a10fb1d78552d5))
+* **api:** manual updates ([#92](https://github.com/braintrustdata/braintrust-go/issues/92)) ([e7dd050](https://github.com/braintrustdata/braintrust-go/commit/e7dd050272cfede0031c11dfcf8d18d0cecdbd0e))
+* **api:** manual updates ([#93](https://github.com/braintrustdata/braintrust-go/issues/93)) ([fe6e368](https://github.com/braintrustdata/braintrust-go/commit/fe6e36847f7e12d16fc0ba956de19b34f15a726e))
+* **api:** manual updates ([#94](https://github.com/braintrustdata/braintrust-go/issues/94)) ([b88818e](https://github.com/braintrustdata/braintrust-go/commit/b88818edf9a44eeae32c368242fc9dd1b88cd179))
+* **api:** manual updates ([#96](https://github.com/braintrustdata/braintrust-go/issues/96)) ([be7e542](https://github.com/braintrustdata/braintrust-go/commit/be7e542d6512f5d83c9cb5d4d48ebc91b95874fd))
+* **api:** manual updates ([#97](https://github.com/braintrustdata/braintrust-go/issues/97)) ([a954b64](https://github.com/braintrustdata/braintrust-go/commit/a954b641a274bfdec74acc36183c6ed440da6f7b))
+* **api:** manual updates ([#98](https://github.com/braintrustdata/braintrust-go/issues/98)) ([40d7dc7](https://github.com/braintrustdata/braintrust-go/commit/40d7dc715b459f8e78aa141fe22879f6a473b0c4))
+* **api:** manual updates ([#99](https://github.com/braintrustdata/braintrust-go/issues/99)) ([78c7f99](https://github.com/braintrustdata/braintrust-go/commit/78c7f99b766efbf8a342b98a6c84da38d2d22866))
+
+
+### Chores
+
+* rebuild project due to codegen change ([#87](https://github.com/braintrustdata/braintrust-go/issues/87)) ([8bebfe9](https://github.com/braintrustdata/braintrust-go/commit/8bebfe9470a2cf8afec8b24370b53163e985ce69))
+* rebuild project due to codegen change ([#89](https://github.com/braintrustdata/braintrust-go/issues/89)) ([aa4fc32](https://github.com/braintrustdata/braintrust-go/commit/aa4fc32785a306c6e57a8e6a4d2a857b36905cb5))
+* rebuild project due to codegen change ([#90](https://github.com/braintrustdata/braintrust-go/issues/90)) ([7118289](https://github.com/braintrustdata/braintrust-go/commit/7118289f424023992d87e42893675ff3fa3d4d81))
+* rebuild project due to codegen change ([#91](https://github.com/braintrustdata/braintrust-go/issues/91)) ([2053c0a](https://github.com/braintrustdata/braintrust-go/commit/2053c0ad42dbed139cf00ca10fd38e57174bec6c))
+* rebuild project due to codegen change ([#95](https://github.com/braintrustdata/braintrust-go/issues/95)) ([a0b6db1](https://github.com/braintrustdata/braintrust-go/commit/a0b6db132d720ed9942ffe9590905c28aca858f1))
+
 ## 0.4.0 (2024-10-28)
 
 Full Changelog: [v0.3.0...v0.4.0](https://github.com/braintrustdata/braintrust-go/compare/v0.3.0...v0.4.0)
