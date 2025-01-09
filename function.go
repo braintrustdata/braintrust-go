@@ -295,21 +295,6 @@ func (r FunctionNewParamsFunctionDataCodeDataInlineType) IsKnown() bool {
 	return false
 }
 
-type FunctionNewParamsFunctionDataCodeDataType string
-
-const (
-	FunctionNewParamsFunctionDataCodeDataTypeBundle FunctionNewParamsFunctionDataCodeDataType = "bundle"
-	FunctionNewParamsFunctionDataCodeDataTypeInline FunctionNewParamsFunctionDataCodeDataType = "inline"
-)
-
-func (r FunctionNewParamsFunctionDataCodeDataType) IsKnown() bool {
-	switch r {
-	case FunctionNewParamsFunctionDataCodeDataTypeBundle, FunctionNewParamsFunctionDataCodeDataTypeInline:
-		return true
-	}
-	return false
-}
-
 type FunctionNewParamsFunctionDataCodeType string
 
 const (
@@ -581,21 +566,6 @@ const (
 func (r FunctionUpdateParamsFunctionDataCodeDataInlineType) IsKnown() bool {
 	switch r {
 	case FunctionUpdateParamsFunctionDataCodeDataInlineTypeInline:
-		return true
-	}
-	return false
-}
-
-type FunctionUpdateParamsFunctionDataCodeDataType string
-
-const (
-	FunctionUpdateParamsFunctionDataCodeDataTypeBundle FunctionUpdateParamsFunctionDataCodeDataType = "bundle"
-	FunctionUpdateParamsFunctionDataCodeDataTypeInline FunctionUpdateParamsFunctionDataCodeDataType = "inline"
-)
-
-func (r FunctionUpdateParamsFunctionDataCodeDataType) IsKnown() bool {
-	switch r {
-	case FunctionUpdateParamsFunctionDataCodeDataTypeBundle, FunctionUpdateParamsFunctionDataCodeDataTypeInline:
 		return true
 	}
 	return false
@@ -1191,21 +1161,6 @@ const (
 func (r FunctionReplaceParamsFunctionDataCodeDataInlineType) IsKnown() bool {
 	switch r {
 	case FunctionReplaceParamsFunctionDataCodeDataInlineTypeInline:
-		return true
-	}
-	return false
-}
-
-type FunctionReplaceParamsFunctionDataCodeDataType string
-
-const (
-	FunctionReplaceParamsFunctionDataCodeDataTypeBundle FunctionReplaceParamsFunctionDataCodeDataType = "bundle"
-	FunctionReplaceParamsFunctionDataCodeDataTypeInline FunctionReplaceParamsFunctionDataCodeDataType = "inline"
-)
-
-func (r FunctionReplaceParamsFunctionDataCodeDataType) IsKnown() bool {
-	switch r {
-	case FunctionReplaceParamsFunctionDataCodeDataTypeBundle, FunctionReplaceParamsFunctionDataCodeDataTypeInline:
 		return true
 	}
 	return false
