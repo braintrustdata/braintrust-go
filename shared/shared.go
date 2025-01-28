@@ -5251,8 +5251,7 @@ func (r promptOptionsParamsOpenAIModelParamsJSON) RawJSON() string {
 func (r PromptOptionsParamsOpenAIModelParams) implementsSharedPromptOptionsParamsUnion() {}
 
 // Union satisfied by
-// [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallAuto],
-// [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallNone] or
+// [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString] or
 // [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallFunction].
 type PromptOptionsParamsOpenAIModelParamsFunctionCallUnion interface {
 	implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnion()
@@ -5264,11 +5263,7 @@ func init() {
 		"",
 		apijson.UnionVariant{
 			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsFunctionCallAuto("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsFunctionCallNone("")),
+			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsFunctionCallString("")),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
@@ -5277,44 +5272,25 @@ func init() {
 	)
 }
 
-type PromptOptionsParamsOpenAIModelParamsFunctionCallAuto string
+type PromptOptionsParamsOpenAIModelParamsFunctionCallString string
 
 const (
-	PromptOptionsParamsOpenAIModelParamsFunctionCallAutoAuto PromptOptionsParamsOpenAIModelParamsFunctionCallAuto = "auto"
+	PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto PromptOptionsParamsOpenAIModelParamsFunctionCallString = "auto"
+	PromptOptionsParamsOpenAIModelParamsFunctionCallStringNone PromptOptionsParamsOpenAIModelParamsFunctionCallString = "none"
 )
 
-func (r PromptOptionsParamsOpenAIModelParamsFunctionCallAuto) IsKnown() bool {
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallString) IsKnown() bool {
 	switch r {
-	case PromptOptionsParamsOpenAIModelParamsFunctionCallAutoAuto:
+	case PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto, PromptOptionsParamsOpenAIModelParamsFunctionCallStringNone:
 		return true
 	}
 	return false
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsFunctionCallAuto) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnion() {
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallString) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnion() {
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsFunctionCallAuto) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
-}
-
-type PromptOptionsParamsOpenAIModelParamsFunctionCallNone string
-
-const (
-	PromptOptionsParamsOpenAIModelParamsFunctionCallNoneNone PromptOptionsParamsOpenAIModelParamsFunctionCallNone = "none"
-)
-
-func (r PromptOptionsParamsOpenAIModelParamsFunctionCallNone) IsKnown() bool {
-	switch r {
-	case PromptOptionsParamsOpenAIModelParamsFunctionCallNoneNone:
-		return true
-	}
-	return false
-}
-
-func (r PromptOptionsParamsOpenAIModelParamsFunctionCallNone) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnion() {
-}
-
-func (r PromptOptionsParamsOpenAIModelParamsFunctionCallNone) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallString) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsFunctionCallFunction struct {
@@ -5602,10 +5578,8 @@ func (r PromptOptionsParamsOpenAIModelParamsResponseFormatType) IsKnown() bool {
 	return false
 }
 
-// Union satisfied by [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceAuto],
-// [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceNone],
-// [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceRequired] or
-// [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunction].
+// Union satisfied by [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceString]
+// or [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunction].
 type PromptOptionsParamsOpenAIModelParamsToolChoiceUnion interface {
 	implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnion()
 }
@@ -5616,15 +5590,7 @@ func init() {
 		"",
 		apijson.UnionVariant{
 			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsToolChoiceAuto("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsToolChoiceNone("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsToolChoiceRequired("")),
+			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsToolChoiceString("")),
 		},
 		apijson.UnionVariant{
 			TypeFilter: gjson.JSON,
@@ -5633,64 +5599,26 @@ func init() {
 	)
 }
 
-type PromptOptionsParamsOpenAIModelParamsToolChoiceAuto string
+type PromptOptionsParamsOpenAIModelParamsToolChoiceString string
 
 const (
-	PromptOptionsParamsOpenAIModelParamsToolChoiceAutoAuto PromptOptionsParamsOpenAIModelParamsToolChoiceAuto = "auto"
+	PromptOptionsParamsOpenAIModelParamsToolChoiceStringAuto     PromptOptionsParamsOpenAIModelParamsToolChoiceString = "auto"
+	PromptOptionsParamsOpenAIModelParamsToolChoiceStringNone     PromptOptionsParamsOpenAIModelParamsToolChoiceString = "none"
+	PromptOptionsParamsOpenAIModelParamsToolChoiceStringRequired PromptOptionsParamsOpenAIModelParamsToolChoiceString = "required"
 )
 
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceAuto) IsKnown() bool {
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceString) IsKnown() bool {
 	switch r {
-	case PromptOptionsParamsOpenAIModelParamsToolChoiceAutoAuto:
+	case PromptOptionsParamsOpenAIModelParamsToolChoiceStringAuto, PromptOptionsParamsOpenAIModelParamsToolChoiceStringNone, PromptOptionsParamsOpenAIModelParamsToolChoiceStringRequired:
 		return true
 	}
 	return false
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceAuto) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnion() {
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceString) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnion() {
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceAuto) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
-}
-
-type PromptOptionsParamsOpenAIModelParamsToolChoiceNone string
-
-const (
-	PromptOptionsParamsOpenAIModelParamsToolChoiceNoneNone PromptOptionsParamsOpenAIModelParamsToolChoiceNone = "none"
-)
-
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceNone) IsKnown() bool {
-	switch r {
-	case PromptOptionsParamsOpenAIModelParamsToolChoiceNoneNone:
-		return true
-	}
-	return false
-}
-
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceNone) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceNone) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
-}
-
-type PromptOptionsParamsOpenAIModelParamsToolChoiceRequired string
-
-const (
-	PromptOptionsParamsOpenAIModelParamsToolChoiceRequiredRequired PromptOptionsParamsOpenAIModelParamsToolChoiceRequired = "required"
-)
-
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceRequired) IsKnown() bool {
-	switch r {
-	case PromptOptionsParamsOpenAIModelParamsToolChoiceRequiredRequired:
-		return true
-	}
-	return false
-}
-
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceRequired) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceRequired) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceString) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsToolChoiceFunction struct {
@@ -5911,8 +5839,7 @@ func (r PromptOptionsParamsOpenAIModelParamsParam) MarshalJSON() (data []byte, e
 
 func (r PromptOptionsParamsOpenAIModelParamsParam) implementsSharedPromptOptionsParamsUnionParam() {}
 
-// Satisfied by [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallAuto],
-// [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallNone],
+// Satisfied by [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString],
 // [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam].
 type PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam interface {
 	implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam()
@@ -6006,9 +5933,7 @@ func (r PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam) 
 func (r PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
 }
 
-// Satisfied by [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceAuto],
-// [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceNone],
-// [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceRequired],
+// Satisfied by [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceString],
 // [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam].
 type PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam interface {
 	implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam()

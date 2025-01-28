@@ -1152,16 +1152,13 @@ type PromptOptionsParamsOpenAIModelParams = shared.PromptOptionsParamsOpenAIMode
 type PromptOptionsParamsOpenAIModelParamsFunctionCallUnion = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnion
 
 // This is an alias to an internal type.
-type PromptOptionsParamsOpenAIModelParamsFunctionCallAuto = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallAuto
+type PromptOptionsParamsOpenAIModelParamsFunctionCallString = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString
 
 // This is an alias to an internal value.
-const PromptOptionsParamsOpenAIModelParamsFunctionCallAutoAuto = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallAutoAuto
-
-// This is an alias to an internal type.
-type PromptOptionsParamsOpenAIModelParamsFunctionCallNone = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallNone
+const PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto
 
 // This is an alias to an internal value.
-const PromptOptionsParamsOpenAIModelParamsFunctionCallNoneNone = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallNoneNone
+const PromptOptionsParamsOpenAIModelParamsFunctionCallStringNone = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringNone
 
 // This is an alias to an internal type.
 type PromptOptionsParamsOpenAIModelParamsFunctionCallFunction = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallFunction
@@ -1218,22 +1215,16 @@ const PromptOptionsParamsOpenAIModelParamsResponseFormatTypeText = shared.Prompt
 type PromptOptionsParamsOpenAIModelParamsToolChoiceUnion = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceUnion
 
 // This is an alias to an internal type.
-type PromptOptionsParamsOpenAIModelParamsToolChoiceAuto = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceAuto
+type PromptOptionsParamsOpenAIModelParamsToolChoiceString = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceString
 
 // This is an alias to an internal value.
-const PromptOptionsParamsOpenAIModelParamsToolChoiceAutoAuto = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceAutoAuto
-
-// This is an alias to an internal type.
-type PromptOptionsParamsOpenAIModelParamsToolChoiceNone = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceNone
+const PromptOptionsParamsOpenAIModelParamsToolChoiceStringAuto = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceStringAuto
 
 // This is an alias to an internal value.
-const PromptOptionsParamsOpenAIModelParamsToolChoiceNoneNone = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceNoneNone
-
-// This is an alias to an internal type.
-type PromptOptionsParamsOpenAIModelParamsToolChoiceRequired = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceRequired
+const PromptOptionsParamsOpenAIModelParamsToolChoiceStringNone = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceStringNone
 
 // This is an alias to an internal value.
-const PromptOptionsParamsOpenAIModelParamsToolChoiceRequiredRequired = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceRequiredRequired
+const PromptOptionsParamsOpenAIModelParamsToolChoiceStringRequired = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceStringRequired
 
 // This is an alias to an internal type.
 type PromptOptionsParamsOpenAIModelParamsToolChoiceFunction = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunction
