@@ -285,7 +285,7 @@ func (r chatCompletionContentPartImageJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r ChatCompletionContentPartImage) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItem() {
+func (r ChatCompletionContentPartImage) ImplementsPromptDataPromptChatMessagesUserContentArrayUnionItem() {
 }
 
 type ChatCompletionContentPartImageImageURL struct {
@@ -350,7 +350,7 @@ func (r ChatCompletionContentPartImageParam) MarshalJSON() (data []byte, err err
 	return apijson.MarshalRoot(r)
 }
 
-func (r ChatCompletionContentPartImageParam) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
+func (r ChatCompletionContentPartImageParam) ImplementsPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
 }
 
 func (r ChatCompletionContentPartImageParam) ImplementsFunctionInvokeParamsMessagesUserContentArrayItemUnion() {
@@ -388,7 +388,7 @@ func (r chatCompletionContentPartTextJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r ChatCompletionContentPartText) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItem() {
+func (r ChatCompletionContentPartText) ImplementsPromptDataPromptChatMessagesUserContentArrayUnionItem() {
 }
 
 type ChatCompletionContentPartTextType string
@@ -414,7 +414,7 @@ func (r ChatCompletionContentPartTextParam) MarshalJSON() (data []byte, err erro
 	return apijson.MarshalRoot(r)
 }
 
-func (r ChatCompletionContentPartTextParam) ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
+func (r ChatCompletionContentPartTextParam) ImplementsPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
 }
 
 func (r ChatCompletionContentPartTextParam) ImplementsFunctionInvokeParamsMessagesUserContentArrayItemUnion() {
@@ -574,7 +574,7 @@ func (r CodeBundleLocation) AsUnion() CodeBundleLocationUnion {
 // Union satisfied by [shared.CodeBundleLocationExperiment] or
 // [shared.CodeBundleLocationFunction].
 type CodeBundleLocationUnion interface {
-	implementsSharedCodeBundleLocation()
+	implementsCodeBundleLocation()
 }
 
 func init() {
@@ -617,7 +617,7 @@ func (r codeBundleLocationExperimentJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r CodeBundleLocationExperiment) implementsSharedCodeBundleLocation() {}
+func (r CodeBundleLocationExperiment) implementsCodeBundleLocation() {}
 
 type CodeBundleLocationExperimentPosition struct {
 	Type  CodeBundleLocationExperimentPositionType `json:"type,required"`
@@ -661,7 +661,7 @@ func (r CodeBundleLocationExperimentPosition) AsUnion() CodeBundleLocationExperi
 // Union satisfied by [shared.CodeBundleLocationExperimentPositionType] or
 // [shared.CodeBundleLocationExperimentPositionScorer].
 type CodeBundleLocationExperimentPositionUnion interface {
-	implementsSharedCodeBundleLocationExperimentPosition()
+	implementsCodeBundleLocationExperimentPosition()
 }
 
 func init() {
@@ -700,8 +700,7 @@ func (r codeBundleLocationExperimentPositionTypeJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r CodeBundleLocationExperimentPositionType) implementsSharedCodeBundleLocationExperimentPosition() {
-}
+func (r CodeBundleLocationExperimentPositionType) implementsCodeBundleLocationExperimentPosition() {}
 
 type CodeBundleLocationExperimentPositionTypeType string
 
@@ -740,7 +739,7 @@ func (r codeBundleLocationExperimentPositionScorerJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r CodeBundleLocationExperimentPositionScorer) implementsSharedCodeBundleLocationExperimentPosition() {
+func (r CodeBundleLocationExperimentPositionScorer) implementsCodeBundleLocationExperimentPosition() {
 }
 
 type CodeBundleLocationExperimentPositionScorerType string
@@ -794,7 +793,7 @@ func (r codeBundleLocationFunctionJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r CodeBundleLocationFunction) implementsSharedCodeBundleLocation() {}
+func (r CodeBundleLocationFunction) implementsCodeBundleLocation() {}
 
 type CodeBundleLocationFunctionType string
 
@@ -886,12 +885,12 @@ func (r CodeBundleLocationParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r CodeBundleLocationParam) implementsSharedCodeBundleLocationUnionParam() {}
+func (r CodeBundleLocationParam) implementsCodeBundleLocationUnionParam() {}
 
 // Satisfied by [shared.CodeBundleLocationExperimentParam],
 // [shared.CodeBundleLocationFunctionParam], [CodeBundleLocationParam].
 type CodeBundleLocationUnionParam interface {
-	implementsSharedCodeBundleLocationUnionParam()
+	implementsCodeBundleLocationUnionParam()
 }
 
 type CodeBundleLocationExperimentParam struct {
@@ -904,7 +903,7 @@ func (r CodeBundleLocationExperimentParam) MarshalJSON() (data []byte, err error
 	return apijson.MarshalRoot(r)
 }
 
-func (r CodeBundleLocationExperimentParam) implementsSharedCodeBundleLocationUnionParam() {}
+func (r CodeBundleLocationExperimentParam) implementsCodeBundleLocationUnionParam() {}
 
 type CodeBundleLocationExperimentPositionParam struct {
 	Type  param.Field[CodeBundleLocationExperimentPositionType] `json:"type,required"`
@@ -915,14 +914,14 @@ func (r CodeBundleLocationExperimentPositionParam) MarshalJSON() (data []byte, e
 	return apijson.MarshalRoot(r)
 }
 
-func (r CodeBundleLocationExperimentPositionParam) implementsSharedCodeBundleLocationExperimentPositionUnionParam() {
+func (r CodeBundleLocationExperimentPositionParam) implementsCodeBundleLocationExperimentPositionUnionParam() {
 }
 
 // Satisfied by [shared.CodeBundleLocationExperimentPositionTypeParam],
 // [shared.CodeBundleLocationExperimentPositionScorerParam],
 // [CodeBundleLocationExperimentPositionParam].
 type CodeBundleLocationExperimentPositionUnionParam interface {
-	implementsSharedCodeBundleLocationExperimentPositionUnionParam()
+	implementsCodeBundleLocationExperimentPositionUnionParam()
 }
 
 type CodeBundleLocationExperimentPositionTypeParam struct {
@@ -933,7 +932,7 @@ func (r CodeBundleLocationExperimentPositionTypeParam) MarshalJSON() (data []byt
 	return apijson.MarshalRoot(r)
 }
 
-func (r CodeBundleLocationExperimentPositionTypeParam) implementsSharedCodeBundleLocationExperimentPositionUnionParam() {
+func (r CodeBundleLocationExperimentPositionTypeParam) implementsCodeBundleLocationExperimentPositionUnionParam() {
 }
 
 type CodeBundleLocationExperimentPositionScorerParam struct {
@@ -945,7 +944,7 @@ func (r CodeBundleLocationExperimentPositionScorerParam) MarshalJSON() (data []b
 	return apijson.MarshalRoot(r)
 }
 
-func (r CodeBundleLocationExperimentPositionScorerParam) implementsSharedCodeBundleLocationExperimentPositionUnionParam() {
+func (r CodeBundleLocationExperimentPositionScorerParam) implementsCodeBundleLocationExperimentPositionUnionParam() {
 }
 
 type CodeBundleLocationFunctionParam struct {
@@ -957,7 +956,7 @@ func (r CodeBundleLocationFunctionParam) MarshalJSON() (data []byte, err error) 
 	return apijson.MarshalRoot(r)
 }
 
-func (r CodeBundleLocationFunctionParam) implementsSharedCodeBundleLocationUnionParam() {}
+func (r CodeBundleLocationFunctionParam) implementsCodeBundleLocationUnionParam() {}
 
 type CodeBundleRuntimeContextParam struct {
 	Runtime param.Field[CodeBundleRuntimeContextRuntime] `json:"runtime,required"`
@@ -1921,7 +1920,7 @@ func (r FunctionFunctionData) AsUnion() FunctionFunctionDataUnion {
 // Union satisfied by [shared.FunctionFunctionDataPrompt],
 // [shared.FunctionFunctionDataCode] or [shared.FunctionFunctionDataGlobal].
 type FunctionFunctionDataUnion interface {
-	implementsSharedFunctionFunctionData()
+	implementsFunctionFunctionData()
 }
 
 func init() {
@@ -1964,7 +1963,7 @@ func (r functionFunctionDataPromptJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r FunctionFunctionDataPrompt) implementsSharedFunctionFunctionData() {}
+func (r FunctionFunctionDataPrompt) implementsFunctionFunctionData() {}
 
 type FunctionFunctionDataPromptType string
 
@@ -2003,7 +2002,7 @@ func (r functionFunctionDataCodeJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r FunctionFunctionDataCode) implementsSharedFunctionFunctionData() {}
+func (r FunctionFunctionDataCode) implementsFunctionFunctionData() {}
 
 type FunctionFunctionDataCodeData struct {
 	BundleID string `json:"bundle_id"`
@@ -2059,7 +2058,7 @@ func (r FunctionFunctionDataCodeData) AsUnion() FunctionFunctionDataCodeDataUnio
 // Union satisfied by [shared.FunctionFunctionDataCodeDataBundle] or
 // [shared.FunctionFunctionDataCodeDataInline].
 type FunctionFunctionDataCodeDataUnion interface {
-	implementsSharedFunctionFunctionDataCodeData()
+	implementsFunctionFunctionDataCodeData()
 }
 
 func init() {
@@ -2099,7 +2098,7 @@ func (r functionFunctionDataCodeDataBundleJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r FunctionFunctionDataCodeDataBundle) implementsSharedFunctionFunctionDataCodeData() {}
+func (r FunctionFunctionDataCodeDataBundle) implementsFunctionFunctionDataCodeData() {}
 
 type FunctionFunctionDataCodeDataBundleType string
 
@@ -2140,7 +2139,7 @@ func (r functionFunctionDataCodeDataInlineJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r FunctionFunctionDataCodeDataInline) implementsSharedFunctionFunctionDataCodeData() {}
+func (r FunctionFunctionDataCodeDataInline) implementsFunctionFunctionDataCodeData() {}
 
 type FunctionFunctionDataCodeDataInlineRuntimeContext struct {
 	Runtime FunctionFunctionDataCodeDataInlineRuntimeContextRuntime `json:"runtime,required"`
@@ -2246,7 +2245,7 @@ func (r functionFunctionDataGlobalJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r FunctionFunctionDataGlobal) implementsSharedFunctionFunctionData() {}
+func (r FunctionFunctionDataGlobal) implementsFunctionFunctionData() {}
 
 type FunctionFunctionDataGlobalType string
 
@@ -3102,7 +3101,7 @@ func (r OnlineScoreConfigScorer) AsUnion() OnlineScoreConfigScorersUnion {
 // Union satisfied by [shared.OnlineScoreConfigScorersFunction] or
 // [shared.OnlineScoreConfigScorersGlobal].
 type OnlineScoreConfigScorersUnion interface {
-	implementsSharedOnlineScoreConfigScorer()
+	implementsOnlineScoreConfigScorer()
 }
 
 func init() {
@@ -3143,7 +3142,7 @@ func (r onlineScoreConfigScorersFunctionJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r OnlineScoreConfigScorersFunction) implementsSharedOnlineScoreConfigScorer() {}
+func (r OnlineScoreConfigScorersFunction) implementsOnlineScoreConfigScorer() {}
 
 type OnlineScoreConfigScorersFunctionType string
 
@@ -3182,7 +3181,7 @@ func (r onlineScoreConfigScorersGlobalJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r OnlineScoreConfigScorersGlobal) implementsSharedOnlineScoreConfigScorer() {}
+func (r OnlineScoreConfigScorersGlobal) implementsOnlineScoreConfigScorer() {}
 
 type OnlineScoreConfigScorersGlobalType string
 
@@ -3238,12 +3237,12 @@ func (r OnlineScoreConfigScorerParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r OnlineScoreConfigScorerParam) implementsSharedOnlineScoreConfigScorersUnionParam() {}
+func (r OnlineScoreConfigScorerParam) implementsOnlineScoreConfigScorersUnionParam() {}
 
 // Satisfied by [shared.OnlineScoreConfigScorersFunctionParam],
 // [shared.OnlineScoreConfigScorersGlobalParam], [OnlineScoreConfigScorerParam].
 type OnlineScoreConfigScorersUnionParam interface {
-	implementsSharedOnlineScoreConfigScorersUnionParam()
+	implementsOnlineScoreConfigScorersUnionParam()
 }
 
 type OnlineScoreConfigScorersFunctionParam struct {
@@ -3255,7 +3254,7 @@ func (r OnlineScoreConfigScorersFunctionParam) MarshalJSON() (data []byte, err e
 	return apijson.MarshalRoot(r)
 }
 
-func (r OnlineScoreConfigScorersFunctionParam) implementsSharedOnlineScoreConfigScorersUnionParam() {}
+func (r OnlineScoreConfigScorersFunctionParam) implementsOnlineScoreConfigScorersUnionParam() {}
 
 type OnlineScoreConfigScorersGlobalParam struct {
 	Name param.Field[string]                             `json:"name,required"`
@@ -3266,7 +3265,7 @@ func (r OnlineScoreConfigScorersGlobalParam) MarshalJSON() (data []byte, err err
 	return apijson.MarshalRoot(r)
 }
 
-func (r OnlineScoreConfigScorersGlobalParam) implementsSharedOnlineScoreConfigScorersUnionParam() {}
+func (r OnlineScoreConfigScorersGlobalParam) implementsOnlineScoreConfigScorersUnionParam() {}
 
 type Organization struct {
 	// Unique identifier for the organization
@@ -3726,7 +3725,7 @@ func (r ProjectScoreScoreType) IsKnown() bool {
 // [shared.ProjectScoreCategoriesMinimum] or
 // [shared.ProjectScoreCategoriesNullableVariant].
 type ProjectScoreCategoriesUnion interface {
-	implementsSharedProjectScoreCategoriesUnion()
+	implementsProjectScoreCategoriesUnion()
 }
 
 func init() {
@@ -3750,11 +3749,11 @@ func init() {
 
 type ProjectScoreCategoriesCategorical []ProjectScoreCategory
 
-func (r ProjectScoreCategoriesCategorical) implementsSharedProjectScoreCategoriesUnion() {}
+func (r ProjectScoreCategoriesCategorical) implementsProjectScoreCategoriesUnion() {}
 
 type ProjectScoreCategoriesMinimum []string
 
-func (r ProjectScoreCategoriesMinimum) implementsSharedProjectScoreCategoriesUnion() {}
+func (r ProjectScoreCategoriesMinimum) implementsProjectScoreCategoriesUnion() {}
 
 type ProjectScoreCategoriesNullableVariant struct {
 	JSON projectScoreCategoriesNullableVariantJSON `json:"-"`
@@ -3775,7 +3774,7 @@ func (r projectScoreCategoriesNullableVariantJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r ProjectScoreCategoriesNullableVariant) implementsSharedProjectScoreCategoriesUnion() {}
+func (r ProjectScoreCategoriesNullableVariant) implementsProjectScoreCategoriesUnion() {}
 
 // For categorical-type project scores, defines a single category
 type ProjectScoreCategory struct {
@@ -4164,7 +4163,7 @@ func (r PromptDataPrompt) AsUnion() PromptDataPromptUnion {
 // Union satisfied by [shared.PromptDataPromptCompletion],
 // [shared.PromptDataPromptChat] or [shared.PromptDataPromptNullableVariant].
 type PromptDataPromptUnion interface {
-	implementsSharedPromptDataPrompt()
+	implementsPromptDataPrompt()
 }
 
 func init() {
@@ -4209,7 +4208,7 @@ func (r promptDataPromptCompletionJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptDataPromptCompletion) implementsSharedPromptDataPrompt() {}
+func (r PromptDataPromptCompletion) implementsPromptDataPrompt() {}
 
 type PromptDataPromptCompletionType string
 
@@ -4250,7 +4249,7 @@ func (r promptDataPromptChatJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptDataPromptChat) implementsSharedPromptDataPrompt() {}
+func (r PromptDataPromptChat) implementsPromptDataPrompt() {}
 
 type PromptDataPromptChatMessage struct {
 	Role PromptDataPromptChatMessagesRole `json:"role,required"`
@@ -4315,7 +4314,7 @@ func (r PromptDataPromptChatMessage) AsUnion() PromptDataPromptChatMessagesUnion
 // [shared.PromptDataPromptChatMessagesFunction] or
 // [shared.PromptDataPromptChatMessagesFallback].
 type PromptDataPromptChatMessagesUnion interface {
-	implementsSharedPromptDataPromptChatMessage()
+	implementsPromptDataPromptChatMessage()
 }
 
 func init() {
@@ -4374,7 +4373,7 @@ func (r promptDataPromptChatMessagesSystemJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptDataPromptChatMessagesSystem) implementsSharedPromptDataPromptChatMessage() {}
+func (r PromptDataPromptChatMessagesSystem) implementsPromptDataPromptChatMessage() {}
 
 type PromptDataPromptChatMessagesSystemRole string
 
@@ -4415,7 +4414,7 @@ func (r promptDataPromptChatMessagesUserJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptDataPromptChatMessagesUser) implementsSharedPromptDataPromptChatMessage() {}
+func (r PromptDataPromptChatMessagesUser) implementsPromptDataPromptChatMessage() {}
 
 type PromptDataPromptChatMessagesUserRole string
 
@@ -4434,7 +4433,7 @@ func (r PromptDataPromptChatMessagesUserRole) IsKnown() bool {
 // Union satisfied by [shared.UnionString] or
 // [shared.PromptDataPromptChatMessagesUserContentArray].
 type PromptDataPromptChatMessagesUserContentUnion interface {
-	ImplementsSharedPromptDataPromptChatMessagesUserContentUnion()
+	ImplementsPromptDataPromptChatMessagesUserContentUnion()
 }
 
 func init() {
@@ -4454,13 +4453,13 @@ func init() {
 
 type PromptDataPromptChatMessagesUserContentArray []PromptDataPromptChatMessagesUserContentArrayUnionItem
 
-func (r PromptDataPromptChatMessagesUserContentArray) ImplementsSharedPromptDataPromptChatMessagesUserContentUnion() {
+func (r PromptDataPromptChatMessagesUserContentArray) ImplementsPromptDataPromptChatMessagesUserContentUnion() {
 }
 
 // Union satisfied by [shared.ChatCompletionContentPartText] or
 // [shared.ChatCompletionContentPartImage].
 type PromptDataPromptChatMessagesUserContentArrayUnionItem interface {
-	ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItem()
+	ImplementsPromptDataPromptChatMessagesUserContentArrayUnionItem()
 }
 
 func init() {
@@ -4507,7 +4506,7 @@ func (r promptDataPromptChatMessagesAssistantJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptDataPromptChatMessagesAssistant) implementsSharedPromptDataPromptChatMessage() {}
+func (r PromptDataPromptChatMessagesAssistant) implementsPromptDataPromptChatMessage() {}
 
 type PromptDataPromptChatMessagesAssistantRole string
 
@@ -4571,7 +4570,7 @@ func (r promptDataPromptChatMessagesToolJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptDataPromptChatMessagesTool) implementsSharedPromptDataPromptChatMessage() {}
+func (r PromptDataPromptChatMessagesTool) implementsPromptDataPromptChatMessage() {}
 
 type PromptDataPromptChatMessagesToolRole string
 
@@ -4612,7 +4611,7 @@ func (r promptDataPromptChatMessagesFunctionJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptDataPromptChatMessagesFunction) implementsSharedPromptDataPromptChatMessage() {}
+func (r PromptDataPromptChatMessagesFunction) implementsPromptDataPromptChatMessage() {}
 
 type PromptDataPromptChatMessagesFunctionRole string
 
@@ -4651,7 +4650,7 @@ func (r promptDataPromptChatMessagesFallbackJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptDataPromptChatMessagesFallback) implementsSharedPromptDataPromptChatMessage() {}
+func (r PromptDataPromptChatMessagesFallback) implementsPromptDataPromptChatMessage() {}
 
 type PromptDataPromptChatMessagesFallbackRole string
 
@@ -4719,7 +4718,7 @@ func (r promptDataPromptNullableVariantJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptDataPromptNullableVariant) implementsSharedPromptDataPrompt() {}
+func (r PromptDataPromptNullableVariant) implementsPromptDataPrompt() {}
 
 type PromptDataPromptType string
 
@@ -4780,7 +4779,7 @@ func (r PromptDataToolFunction) AsUnion() PromptDataToolFunctionsUnion {
 // Union satisfied by [shared.PromptDataToolFunctionsFunction] or
 // [shared.PromptDataToolFunctionsGlobal].
 type PromptDataToolFunctionsUnion interface {
-	implementsSharedPromptDataToolFunction()
+	implementsPromptDataToolFunction()
 }
 
 func init() {
@@ -4821,7 +4820,7 @@ func (r promptDataToolFunctionsFunctionJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptDataToolFunctionsFunction) implementsSharedPromptDataToolFunction() {}
+func (r PromptDataToolFunctionsFunction) implementsPromptDataToolFunction() {}
 
 type PromptDataToolFunctionsFunctionType string
 
@@ -4860,7 +4859,7 @@ func (r promptDataToolFunctionsGlobalJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptDataToolFunctionsGlobal) implementsSharedPromptDataToolFunction() {}
+func (r PromptDataToolFunctionsGlobal) implementsPromptDataToolFunction() {}
 
 type PromptDataToolFunctionsGlobalType string
 
@@ -4935,13 +4934,13 @@ func (r PromptDataPromptParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptDataPromptParam) implementsSharedPromptDataPromptUnionParam() {}
+func (r PromptDataPromptParam) implementsPromptDataPromptUnionParam() {}
 
 // Satisfied by [shared.PromptDataPromptCompletionParam],
 // [shared.PromptDataPromptChatParam],
 // [shared.PromptDataPromptNullableVariantParam], [PromptDataPromptParam].
 type PromptDataPromptUnionParam interface {
-	implementsSharedPromptDataPromptUnionParam()
+	implementsPromptDataPromptUnionParam()
 }
 
 type PromptDataPromptCompletionParam struct {
@@ -4953,7 +4952,7 @@ func (r PromptDataPromptCompletionParam) MarshalJSON() (data []byte, err error) 
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptDataPromptCompletionParam) implementsSharedPromptDataPromptUnionParam() {}
+func (r PromptDataPromptCompletionParam) implementsPromptDataPromptUnionParam() {}
 
 type PromptDataPromptChatParam struct {
 	Messages param.Field[[]PromptDataPromptChatMessagesUnionParam] `json:"messages,required"`
@@ -4965,7 +4964,7 @@ func (r PromptDataPromptChatParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptDataPromptChatParam) implementsSharedPromptDataPromptUnionParam() {}
+func (r PromptDataPromptChatParam) implementsPromptDataPromptUnionParam() {}
 
 type PromptDataPromptChatMessageParam struct {
 	Role         param.Field[PromptDataPromptChatMessagesRole] `json:"role,required"`
@@ -4980,7 +4979,7 @@ func (r PromptDataPromptChatMessageParam) MarshalJSON() (data []byte, err error)
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptDataPromptChatMessageParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {}
+func (r PromptDataPromptChatMessageParam) implementsPromptDataPromptChatMessagesUnionParam() {}
 
 // Satisfied by [shared.PromptDataPromptChatMessagesSystemParam],
 // [shared.PromptDataPromptChatMessagesUserParam],
@@ -4990,7 +4989,7 @@ func (r PromptDataPromptChatMessageParam) implementsSharedPromptDataPromptChatMe
 // [shared.PromptDataPromptChatMessagesFallbackParam],
 // [PromptDataPromptChatMessageParam].
 type PromptDataPromptChatMessagesUnionParam interface {
-	implementsSharedPromptDataPromptChatMessagesUnionParam()
+	implementsPromptDataPromptChatMessagesUnionParam()
 }
 
 type PromptDataPromptChatMessagesSystemParam struct {
@@ -5003,8 +5002,7 @@ func (r PromptDataPromptChatMessagesSystemParam) MarshalJSON() (data []byte, err
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptDataPromptChatMessagesSystemParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
-}
+func (r PromptDataPromptChatMessagesSystemParam) implementsPromptDataPromptChatMessagesUnionParam() {}
 
 type PromptDataPromptChatMessagesUserParam struct {
 	Role    param.Field[PromptDataPromptChatMessagesUserRole]              `json:"role,required"`
@@ -5016,24 +5014,23 @@ func (r PromptDataPromptChatMessagesUserParam) MarshalJSON() (data []byte, err e
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptDataPromptChatMessagesUserParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
-}
+func (r PromptDataPromptChatMessagesUserParam) implementsPromptDataPromptChatMessagesUnionParam() {}
 
 // Satisfied by [shared.UnionString],
 // [shared.PromptDataPromptChatMessagesUserContentArrayParam].
 type PromptDataPromptChatMessagesUserContentUnionParam interface {
-	ImplementsSharedPromptDataPromptChatMessagesUserContentUnionParam()
+	ImplementsPromptDataPromptChatMessagesUserContentUnionParam()
 }
 
 type PromptDataPromptChatMessagesUserContentArrayParam []PromptDataPromptChatMessagesUserContentArrayUnionItemParam
 
-func (r PromptDataPromptChatMessagesUserContentArrayParam) ImplementsSharedPromptDataPromptChatMessagesUserContentUnionParam() {
+func (r PromptDataPromptChatMessagesUserContentArrayParam) ImplementsPromptDataPromptChatMessagesUserContentUnionParam() {
 }
 
 // Satisfied by [shared.ChatCompletionContentPartTextParam],
 // [shared.ChatCompletionContentPartImageParam].
 type PromptDataPromptChatMessagesUserContentArrayUnionItemParam interface {
-	ImplementsSharedPromptDataPromptChatMessagesUserContentArrayUnionItemParam()
+	ImplementsPromptDataPromptChatMessagesUserContentArrayUnionItemParam()
 }
 
 type PromptDataPromptChatMessagesAssistantParam struct {
@@ -5048,7 +5045,7 @@ func (r PromptDataPromptChatMessagesAssistantParam) MarshalJSON() (data []byte, 
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptDataPromptChatMessagesAssistantParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
+func (r PromptDataPromptChatMessagesAssistantParam) implementsPromptDataPromptChatMessagesUnionParam() {
 }
 
 type PromptDataPromptChatMessagesAssistantFunctionCallParam struct {
@@ -5070,8 +5067,7 @@ func (r PromptDataPromptChatMessagesToolParam) MarshalJSON() (data []byte, err e
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptDataPromptChatMessagesToolParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
-}
+func (r PromptDataPromptChatMessagesToolParam) implementsPromptDataPromptChatMessagesUnionParam() {}
 
 type PromptDataPromptChatMessagesFunctionParam struct {
 	Name    param.Field[string]                                   `json:"name,required"`
@@ -5083,7 +5079,7 @@ func (r PromptDataPromptChatMessagesFunctionParam) MarshalJSON() (data []byte, e
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptDataPromptChatMessagesFunctionParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
+func (r PromptDataPromptChatMessagesFunctionParam) implementsPromptDataPromptChatMessagesUnionParam() {
 }
 
 type PromptDataPromptChatMessagesFallbackParam struct {
@@ -5095,7 +5091,7 @@ func (r PromptDataPromptChatMessagesFallbackParam) MarshalJSON() (data []byte, e
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptDataPromptChatMessagesFallbackParam) implementsSharedPromptDataPromptChatMessagesUnionParam() {
+func (r PromptDataPromptChatMessagesFallbackParam) implementsPromptDataPromptChatMessagesUnionParam() {
 }
 
 type PromptDataPromptNullableVariantParam struct {
@@ -5105,7 +5101,7 @@ func (r PromptDataPromptNullableVariantParam) MarshalJSON() (data []byte, err er
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptDataPromptNullableVariantParam) implementsSharedPromptDataPromptUnionParam() {}
+func (r PromptDataPromptNullableVariantParam) implementsPromptDataPromptUnionParam() {}
 
 type PromptDataToolFunctionParam struct {
 	Type param.Field[PromptDataToolFunctionsType] `json:"type,required"`
@@ -5117,12 +5113,12 @@ func (r PromptDataToolFunctionParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptDataToolFunctionParam) implementsSharedPromptDataToolFunctionsUnionParam() {}
+func (r PromptDataToolFunctionParam) implementsPromptDataToolFunctionsUnionParam() {}
 
 // Satisfied by [shared.PromptDataToolFunctionsFunctionParam],
 // [shared.PromptDataToolFunctionsGlobalParam], [PromptDataToolFunctionParam].
 type PromptDataToolFunctionsUnionParam interface {
-	implementsSharedPromptDataToolFunctionsUnionParam()
+	implementsPromptDataToolFunctionsUnionParam()
 }
 
 type PromptDataToolFunctionsFunctionParam struct {
@@ -5134,7 +5130,7 @@ func (r PromptDataToolFunctionsFunctionParam) MarshalJSON() (data []byte, err er
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptDataToolFunctionsFunctionParam) implementsSharedPromptDataToolFunctionsUnionParam() {}
+func (r PromptDataToolFunctionsFunctionParam) implementsPromptDataToolFunctionsUnionParam() {}
 
 type PromptDataToolFunctionsGlobalParam struct {
 	Name param.Field[string]                            `json:"name,required"`
@@ -5145,7 +5141,7 @@ func (r PromptDataToolFunctionsGlobalParam) MarshalJSON() (data []byte, err erro
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptDataToolFunctionsGlobalParam) implementsSharedPromptDataToolFunctionsUnionParam() {}
+func (r PromptDataToolFunctionsGlobalParam) implementsPromptDataToolFunctionsUnionParam() {}
 
 type PromptOptions struct {
 	Model    string                   `json:"model"`
@@ -5177,7 +5173,7 @@ func (r promptOptionsJSON) RawJSON() string {
 // [shared.PromptOptionsParamsWindowAIModelParams] or
 // [shared.PromptOptionsParamsJsCompletionParams].
 type PromptOptionsParamsUnion interface {
-	implementsSharedPromptOptionsParamsUnion()
+	implementsPromptOptionsParamsUnion()
 }
 
 func init() {
@@ -5248,13 +5244,13 @@ func (r promptOptionsParamsOpenAIModelParamsJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptOptionsParamsOpenAIModelParams) implementsSharedPromptOptionsParamsUnion() {}
+func (r PromptOptionsParamsOpenAIModelParams) implementsPromptOptionsParamsUnion() {}
 
 // Union satisfied by
 // [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString] or
 // [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallFunction].
 type PromptOptionsParamsOpenAIModelParamsFunctionCallUnion interface {
-	implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnion()
+	implementsPromptOptionsParamsOpenAIModelParamsFunctionCallUnion()
 }
 
 func init() {
@@ -5287,10 +5283,10 @@ func (r PromptOptionsParamsOpenAIModelParamsFunctionCallString) IsKnown() bool {
 	return false
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsFunctionCallString) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnion() {
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallString) implementsPromptOptionsParamsOpenAIModelParamsFunctionCallUnion() {
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsFunctionCallString) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallString) implementsPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsFunctionCallFunction struct {
@@ -5315,7 +5311,7 @@ func (r promptOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON) RawJSON() 
 	return r.raw
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsFunctionCallFunction) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnion() {
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallFunction) implementsPromptOptionsParamsOpenAIModelParamsFunctionCallUnion() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsResponseFormat struct {
@@ -5367,7 +5363,7 @@ func (r PromptOptionsParamsOpenAIModelParamsResponseFormat) AsUnion() PromptOpti
 // [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatText] or
 // [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariant].
 type PromptOptionsParamsOpenAIModelParamsResponseFormatUnion interface {
-	implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormat()
+	implementsPromptOptionsParamsOpenAIModelParamsResponseFormat()
 }
 
 func init() {
@@ -5415,7 +5411,7 @@ func (r promptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectJSON) RawJSO
 	return r.raw
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormat() {
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject) implementsPromptOptionsParamsOpenAIModelParamsResponseFormat() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType string
@@ -5456,7 +5452,7 @@ func (r promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJSON) RawJSO
 	return r.raw
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormat() {
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema) implementsPromptOptionsParamsOpenAIModelParamsResponseFormat() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema struct {
@@ -5522,7 +5518,7 @@ func (r promptOptionsParamsOpenAIModelParamsResponseFormatTextJSON) RawJSON() st
 	return r.raw
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatText) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormat() {
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatText) implementsPromptOptionsParamsOpenAIModelParamsResponseFormat() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsResponseFormatTextType string
@@ -5559,7 +5555,7 @@ func (r promptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantJSON) R
 	return r.raw
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariant) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormat() {
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariant) implementsPromptOptionsParamsOpenAIModelParamsResponseFormat() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsResponseFormatType string
@@ -5581,7 +5577,7 @@ func (r PromptOptionsParamsOpenAIModelParamsResponseFormatType) IsKnown() bool {
 // Union satisfied by [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceString]
 // or [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunction].
 type PromptOptionsParamsOpenAIModelParamsToolChoiceUnion interface {
-	implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnion()
+	implementsPromptOptionsParamsOpenAIModelParamsToolChoiceUnion()
 }
 
 func init() {
@@ -5615,10 +5611,10 @@ func (r PromptOptionsParamsOpenAIModelParamsToolChoiceString) IsKnown() bool {
 	return false
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceString) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnion() {
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceString) implementsPromptOptionsParamsOpenAIModelParamsToolChoiceUnion() {
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceString) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceString) implementsPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsToolChoiceFunction struct {
@@ -5644,7 +5640,7 @@ func (r promptOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON) RawJSON() st
 	return r.raw
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunction) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnion() {
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunction) implementsPromptOptionsParamsOpenAIModelParamsToolChoiceUnion() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction struct {
@@ -5717,7 +5713,7 @@ func (r promptOptionsParamsAnthropicModelParamsJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptOptionsParamsAnthropicModelParams) implementsSharedPromptOptionsParamsUnion() {}
+func (r PromptOptionsParamsAnthropicModelParams) implementsPromptOptionsParamsUnion() {}
 
 type PromptOptionsParamsGoogleModelParams struct {
 	MaxOutputTokens float64                                  `json:"maxOutputTokens"`
@@ -5748,7 +5744,7 @@ func (r promptOptionsParamsGoogleModelParamsJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptOptionsParamsGoogleModelParams) implementsSharedPromptOptionsParamsUnion() {}
+func (r PromptOptionsParamsGoogleModelParams) implementsPromptOptionsParamsUnion() {}
 
 type PromptOptionsParamsWindowAIModelParams struct {
 	Temperature float64                                    `json:"temperature"`
@@ -5775,7 +5771,7 @@ func (r promptOptionsParamsWindowAIModelParamsJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptOptionsParamsWindowAIModelParams) implementsSharedPromptOptionsParamsUnion() {}
+func (r PromptOptionsParamsWindowAIModelParams) implementsPromptOptionsParamsUnion() {}
 
 type PromptOptionsParamsJsCompletionParams struct {
 	UseCache bool                                      `json:"use_cache"`
@@ -5798,7 +5794,7 @@ func (r promptOptionsParamsJsCompletionParamsJSON) RawJSON() string {
 	return r.raw
 }
 
-func (r PromptOptionsParamsJsCompletionParams) implementsSharedPromptOptionsParamsUnion() {}
+func (r PromptOptionsParamsJsCompletionParams) implementsPromptOptionsParamsUnion() {}
 
 type PromptOptionsParam struct {
 	Model    param.Field[string]                        `json:"model"`
@@ -5816,7 +5812,7 @@ func (r PromptOptionsParam) MarshalJSON() (data []byte, err error) {
 // [shared.PromptOptionsParamsWindowAIModelParamsParam],
 // [shared.PromptOptionsParamsJsCompletionParamsParam].
 type PromptOptionsParamsUnionParam interface {
-	implementsSharedPromptOptionsParamsUnionParam()
+	implementsPromptOptionsParamsUnionParam()
 }
 
 type PromptOptionsParamsOpenAIModelParamsParam struct {
@@ -5837,12 +5833,12 @@ func (r PromptOptionsParamsOpenAIModelParamsParam) MarshalJSON() (data []byte, e
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsParam) implementsSharedPromptOptionsParamsUnionParam() {}
+func (r PromptOptionsParamsOpenAIModelParamsParam) implementsPromptOptionsParamsUnionParam() {}
 
 // Satisfied by [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString],
 // [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam].
 type PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam interface {
-	implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam()
+	implementsPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam()
 }
 
 type PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam struct {
@@ -5853,7 +5849,7 @@ func (r PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) MarshalJS
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) implementsSharedPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) implementsPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsResponseFormatParam struct {
@@ -5865,7 +5861,7 @@ func (r PromptOptionsParamsOpenAIModelParamsResponseFormatParam) MarshalJSON() (
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatParam) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatParam) implementsPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
 }
 
 // Satisfied by
@@ -5875,7 +5871,7 @@ func (r PromptOptionsParamsOpenAIModelParamsResponseFormatParam) implementsShare
 // [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam],
 // [PromptOptionsParamsOpenAIModelParamsResponseFormatParam].
 type PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam interface {
-	implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam()
+	implementsPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam()
 }
 
 type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam struct {
@@ -5886,7 +5882,7 @@ func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam) Marsh
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam) implementsPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam struct {
@@ -5898,7 +5894,7 @@ func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam) Marsh
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam) implementsPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam struct {
@@ -5920,7 +5916,7 @@ func (r PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam) MarshalJSON
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam) implementsPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam struct {
@@ -5930,13 +5926,13 @@ func (r PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam) 
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam) implementsSharedPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam) implementsPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
 }
 
 // Satisfied by [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceString],
 // [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam].
 type PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam interface {
-	implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam()
+	implementsPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam()
 }
 
 type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam struct {
@@ -5948,7 +5944,7 @@ func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) MarshalJSON
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) implementsSharedPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) implementsPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam struct {
@@ -5974,8 +5970,7 @@ func (r PromptOptionsParamsAnthropicModelParamsParam) MarshalJSON() (data []byte
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptOptionsParamsAnthropicModelParamsParam) implementsSharedPromptOptionsParamsUnionParam() {
-}
+func (r PromptOptionsParamsAnthropicModelParamsParam) implementsPromptOptionsParamsUnionParam() {}
 
 type PromptOptionsParamsGoogleModelParamsParam struct {
 	MaxOutputTokens param.Field[float64] `json:"maxOutputTokens"`
@@ -5989,7 +5984,7 @@ func (r PromptOptionsParamsGoogleModelParamsParam) MarshalJSON() (data []byte, e
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptOptionsParamsGoogleModelParamsParam) implementsSharedPromptOptionsParamsUnionParam() {}
+func (r PromptOptionsParamsGoogleModelParamsParam) implementsPromptOptionsParamsUnionParam() {}
 
 type PromptOptionsParamsWindowAIModelParamsParam struct {
 	Temperature param.Field[float64] `json:"temperature"`
@@ -6001,8 +5996,7 @@ func (r PromptOptionsParamsWindowAIModelParamsParam) MarshalJSON() (data []byte,
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptOptionsParamsWindowAIModelParamsParam) implementsSharedPromptOptionsParamsUnionParam() {
-}
+func (r PromptOptionsParamsWindowAIModelParamsParam) implementsPromptOptionsParamsUnionParam() {}
 
 type PromptOptionsParamsJsCompletionParamsParam struct {
 	UseCache param.Field[bool] `json:"use_cache"`
@@ -6012,7 +6006,7 @@ func (r PromptOptionsParamsJsCompletionParamsParam) MarshalJSON() (data []byte, 
 	return apijson.MarshalRoot(r)
 }
 
-func (r PromptOptionsParamsJsCompletionParamsParam) implementsSharedPromptOptionsParamsUnionParam() {}
+func (r PromptOptionsParamsJsCompletionParamsParam) implementsPromptOptionsParamsUnionParam() {}
 
 // Metadata about the state of the repo when the experiment was created
 type RepoInfo struct {
