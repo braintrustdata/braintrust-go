@@ -4259,7 +4259,7 @@ type PromptDataPromptChatMessage struct {
 	// This field can have the runtime type of
 	// [PromptDataPromptChatMessagesAssistantFunctionCall].
 	FunctionCall interface{} `json:"function_call"`
-	Name         string      `json:"name"`
+	Name         string      `json:"name,nullable"`
 	ToolCallID   string      `json:"tool_call_id"`
 	// This field can have the runtime type of [[]ChatCompletionMessageToolCall].
 	ToolCalls interface{}                     `json:"tool_calls"`
