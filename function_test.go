@@ -47,9 +47,18 @@ func TestFunctionNewWithOptionalParams(t *testing.T) {
 		PromptData: braintrust.F(shared.PromptDataParam{
 			Options: braintrust.F(shared.PromptOptionsParam{
 				Model: braintrust.F("model"),
-				Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsAnthropicModelParamsParam{
-					MaxTokens:   braintrust.F(0.000000),
+				Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsOpenAIModelParamsParam{
+					FrequencyPenalty: braintrust.F(0.000000),
+					FunctionCall:     braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam](shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString(shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto)),
+					MaxTokens:        braintrust.F(0.000000),
+					N:                braintrust.F(0.000000),
+					PresencePenalty:  braintrust.F(0.000000),
+					ResponseFormat: braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam](shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam{
+						Type: braintrust.F(shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject),
+					}),
+					Stop:        braintrust.F([]string{"string"}),
 					Temperature: braintrust.F(0.000000),
+					ToolChoice:  braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam](shared.PromptOptionsParamsOpenAIModelParamsToolChoiceString(shared.PromptOptionsParamsOpenAIModelParamsToolChoiceStringAuto)),
 					TopP:        braintrust.F(0.000000),
 					UseCache:    braintrust.F(true),
 				}),
@@ -133,9 +142,18 @@ func TestFunctionUpdateWithOptionalParams(t *testing.T) {
 			PromptData: braintrust.F(shared.PromptDataParam{
 				Options: braintrust.F(shared.PromptOptionsParam{
 					Model: braintrust.F("model"),
-					Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsAnthropicModelParamsParam{
-						MaxTokens:   braintrust.F(0.000000),
+					Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsOpenAIModelParamsParam{
+						FrequencyPenalty: braintrust.F(0.000000),
+						FunctionCall:     braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam](shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString(shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto)),
+						MaxTokens:        braintrust.F(0.000000),
+						N:                braintrust.F(0.000000),
+						PresencePenalty:  braintrust.F(0.000000),
+						ResponseFormat: braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam](shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam{
+							Type: braintrust.F(shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject),
+						}),
+						Stop:        braintrust.F([]string{"string"}),
 						Temperature: braintrust.F(0.000000),
+						ToolChoice:  braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam](shared.PromptOptionsParamsOpenAIModelParamsToolChoiceString(shared.PromptOptionsParamsOpenAIModelParamsToolChoiceStringAuto)),
 						TopP:        braintrust.F(0.000000),
 						UseCache:    braintrust.F(true),
 					}),
@@ -310,9 +328,18 @@ func TestFunctionReplaceWithOptionalParams(t *testing.T) {
 		PromptData: braintrust.F(shared.PromptDataParam{
 			Options: braintrust.F(shared.PromptOptionsParam{
 				Model: braintrust.F("model"),
-				Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsAnthropicModelParamsParam{
-					MaxTokens:   braintrust.F(0.000000),
+				Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsOpenAIModelParamsParam{
+					FrequencyPenalty: braintrust.F(0.000000),
+					FunctionCall:     braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam](shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString(shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto)),
+					MaxTokens:        braintrust.F(0.000000),
+					N:                braintrust.F(0.000000),
+					PresencePenalty:  braintrust.F(0.000000),
+					ResponseFormat: braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam](shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam{
+						Type: braintrust.F(shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject),
+					}),
+					Stop:        braintrust.F([]string{"string"}),
 					Temperature: braintrust.F(0.000000),
+					ToolChoice:  braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam](shared.PromptOptionsParamsOpenAIModelParamsToolChoiceString(shared.PromptOptionsParamsOpenAIModelParamsToolChoiceStringAuto)),
 					TopP:        braintrust.F(0.000000),
 					UseCache:    braintrust.F(true),
 				}),
