@@ -5,7 +5,7 @@
 The Braintrust Go library provides convenient access to [the Braintrust REST
 API](https://www.braintrustdata.com/docs/api/spec) from applications written in Go. The full API of this library can be found in [api.md](api.md).
 
-It is generated with [Stainless](https://www.stainlessapi.com/).
+It is generated with [Stainless](https://www.stainless.com/).
 
 ## Installation
 
