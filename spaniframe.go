@@ -139,6 +139,8 @@ func (r SpanIframeNewParams) MarshalJSON() (data []byte, err error) {
 }
 
 type SpanIframeUpdateParams struct {
+	// Textual description of the span iframe
+	Description param.Field[string] `json:"description"`
 	// Name of the span iframe
 	Name param.Field[string] `json:"name"`
 	// Whether to post messages to the iframe containing the span's data. This is

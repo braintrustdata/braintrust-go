@@ -48,11 +48,13 @@ func TestFunctionNewWithOptionalParams(t *testing.T) {
 			Options: braintrust.F(shared.PromptOptionsParam{
 				Model: braintrust.F("model"),
 				Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsOpenAIModelParamsParam{
-					FrequencyPenalty: braintrust.F(0.000000),
-					FunctionCall:     braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam](shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString(shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto)),
-					MaxTokens:        braintrust.F(0.000000),
-					N:                braintrust.F(0.000000),
-					PresencePenalty:  braintrust.F(0.000000),
+					FrequencyPenalty:    braintrust.F(0.000000),
+					FunctionCall:        braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam](shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString(shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto)),
+					MaxCompletionTokens: braintrust.F(0.000000),
+					MaxTokens:           braintrust.F(0.000000),
+					N:                   braintrust.F(0.000000),
+					PresencePenalty:     braintrust.F(0.000000),
+					ReasoningEffort:     braintrust.F(shared.PromptOptionsParamsOpenAIModelParamsReasoningEffortLow),
 					ResponseFormat: braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam](shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam{
 						Type: braintrust.F(shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject),
 					}),
@@ -143,11 +145,13 @@ func TestFunctionUpdateWithOptionalParams(t *testing.T) {
 				Options: braintrust.F(shared.PromptOptionsParam{
 					Model: braintrust.F("model"),
 					Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsOpenAIModelParamsParam{
-						FrequencyPenalty: braintrust.F(0.000000),
-						FunctionCall:     braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam](shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString(shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto)),
-						MaxTokens:        braintrust.F(0.000000),
-						N:                braintrust.F(0.000000),
-						PresencePenalty:  braintrust.F(0.000000),
+						FrequencyPenalty:    braintrust.F(0.000000),
+						FunctionCall:        braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam](shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString(shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto)),
+						MaxCompletionTokens: braintrust.F(0.000000),
+						MaxTokens:           braintrust.F(0.000000),
+						N:                   braintrust.F(0.000000),
+						PresencePenalty:     braintrust.F(0.000000),
+						ReasoningEffort:     braintrust.F(shared.PromptOptionsParamsOpenAIModelParamsReasoningEffortLow),
 						ResponseFormat: braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam](shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam{
 							Type: braintrust.F(shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject),
 						}),
@@ -263,12 +267,16 @@ func TestFunctionInvokeWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.FunctionInvokeParams{
-			Input: braintrust.F[any](map[string]interface{}{}),
+			Expected: braintrust.F[any](map[string]interface{}{}),
+			Input:    braintrust.F[any](map[string]interface{}{}),
 			Messages: braintrust.F([]braintrust.FunctionInvokeParamsMessageUnion{braintrust.FunctionInvokeParamsMessagesSystem{
 				Role:    braintrust.F(braintrust.FunctionInvokeParamsMessagesSystemRoleSystem),
 				Content: braintrust.F("content"),
 				Name:    braintrust.F("name"),
 			}}),
+			Metadata: braintrust.F(map[string]interface{}{
+				"foo": "bar",
+			}),
 			Mode: braintrust.F(braintrust.FunctionInvokeParamsModeAuto),
 			Parent: braintrust.F[braintrust.FunctionInvokeParamsParentUnion](braintrust.FunctionInvokeParamsParentSpanParentStruct{
 				ObjectID:   braintrust.F("object_id"),
@@ -329,11 +337,13 @@ func TestFunctionReplaceWithOptionalParams(t *testing.T) {
 			Options: braintrust.F(shared.PromptOptionsParam{
 				Model: braintrust.F("model"),
 				Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsOpenAIModelParamsParam{
-					FrequencyPenalty: braintrust.F(0.000000),
-					FunctionCall:     braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam](shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString(shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto)),
-					MaxTokens:        braintrust.F(0.000000),
-					N:                braintrust.F(0.000000),
-					PresencePenalty:  braintrust.F(0.000000),
+					FrequencyPenalty:    braintrust.F(0.000000),
+					FunctionCall:        braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam](shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString(shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto)),
+					MaxCompletionTokens: braintrust.F(0.000000),
+					MaxTokens:           braintrust.F(0.000000),
+					N:                   braintrust.F(0.000000),
+					PresencePenalty:     braintrust.F(0.000000),
+					ReasoningEffort:     braintrust.F(shared.PromptOptionsParamsOpenAIModelParamsReasoningEffortLow),
 					ResponseFormat: braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam](shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam{
 						Type: braintrust.F(shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject),
 					}),

@@ -41,6 +41,9 @@ func TestViewNewWithOptionalParams(t *testing.T) {
 			ColumnVisibility: braintrust.F(map[string]bool{
 				"foo": true,
 			}),
+			Grouping:  braintrust.F("grouping"),
+			Layout:    braintrust.F("layout"),
+			RowHeight: braintrust.F("rowHeight"),
 		}),
 		UserID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ViewData: braintrust.F(shared.ViewDataParam{
@@ -117,6 +120,9 @@ func TestViewUpdateWithOptionalParams(t *testing.T) {
 				ColumnVisibility: braintrust.F(map[string]bool{
 					"foo": true,
 				}),
+				Grouping:  braintrust.F("grouping"),
+				Layout:    braintrust.F("layout"),
+				RowHeight: braintrust.F("rowHeight"),
 			}),
 			UserID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 			ViewData: braintrust.F(shared.ViewDataParam{
@@ -225,6 +231,9 @@ func TestViewReplaceWithOptionalParams(t *testing.T) {
 			ColumnVisibility: braintrust.F(map[string]bool{
 				"foo": true,
 			}),
+			Grouping:  braintrust.F("grouping"),
+			Layout:    braintrust.F("layout"),
+			RowHeight: braintrust.F("rowHeight"),
 		}),
 		UserID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ViewData: braintrust.F(shared.ViewDataParam{
