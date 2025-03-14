@@ -30,7 +30,7 @@ func TestViewNewWithOptionalParams(t *testing.T) {
 	_, err := client.Views.New(context.TODO(), braintrust.ViewNewParams{
 		Name:       braintrust.F("name"),
 		ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType: braintrust.F(braintrust.ViewNewParamsObjectTypeOrganization),
+		ObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 		ViewType:   braintrust.F(braintrust.ViewNewParamsViewTypeProjects),
 		DeletedAt:  braintrust.F(time.Now()),
 		Options: braintrust.F(shared.ViewOptionsParam{
@@ -81,7 +81,7 @@ func TestViewGet(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ViewGetParams{
 			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ObjectType: braintrust.F(braintrust.ViewGetParamsObjectTypeOrganization),
+			ObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 		},
 	)
 	if err != nil {
@@ -110,7 +110,7 @@ func TestViewUpdateWithOptionalParams(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ViewUpdateParams{
 			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ObjectType: braintrust.F(braintrust.ViewUpdateParamsObjectTypeOrganization),
+			ObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 			Name:       braintrust.F("name"),
 			Options: braintrust.F(shared.ViewOptionsParam{
 				ColumnOrder: braintrust.F([]string{"string"}),
@@ -159,13 +159,13 @@ func TestViewListWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.Views.List(context.TODO(), braintrust.ViewListParams{
 		ObjectID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType:    braintrust.F(braintrust.ViewListParamsObjectTypeOrganization),
+		ObjectType:    braintrust.F(shared.ACLObjectTypeOrganization),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		IDs:           braintrust.F[braintrust.ViewListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
 		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ViewName:      braintrust.F("view_name"),
-		ViewType:      braintrust.F(braintrust.ViewListParamsViewTypeProjects),
+		ViewType:      braintrust.F(shared.ViewTypeProjects),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -193,7 +193,7 @@ func TestViewDelete(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ViewDeleteParams{
 			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ObjectType: braintrust.F(braintrust.ViewDeleteParamsObjectTypeOrganization),
+			ObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 		},
 	)
 	if err != nil {
@@ -220,7 +220,7 @@ func TestViewReplaceWithOptionalParams(t *testing.T) {
 	_, err := client.Views.Replace(context.TODO(), braintrust.ViewReplaceParams{
 		Name:       braintrust.F("name"),
 		ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType: braintrust.F(braintrust.ViewReplaceParamsObjectTypeOrganization),
+		ObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 		ViewType:   braintrust.F(braintrust.ViewReplaceParamsViewTypeProjects),
 		DeletedAt:  braintrust.F(time.Now()),
 		Options: braintrust.F(shared.ViewOptionsParam{

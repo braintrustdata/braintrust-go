@@ -381,7 +381,7 @@ type FunctionNewParamsOrigin struct {
 	// Id of the object the function is originating from
 	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[FunctionNewParamsOriginObjectType] `json:"object_type,required"`
+	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
 	// The function exists for internal purposes and should not be displayed in the
 	// list of functions.
 	Internal param.Field[bool] `json:"internal"`
@@ -389,31 +389,6 @@ type FunctionNewParamsOrigin struct {
 
 func (r FunctionNewParamsOrigin) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
-}
-
-// The object type that the ACL applies to
-type FunctionNewParamsOriginObjectType string
-
-const (
-	FunctionNewParamsOriginObjectTypeOrganization  FunctionNewParamsOriginObjectType = "organization"
-	FunctionNewParamsOriginObjectTypeProject       FunctionNewParamsOriginObjectType = "project"
-	FunctionNewParamsOriginObjectTypeExperiment    FunctionNewParamsOriginObjectType = "experiment"
-	FunctionNewParamsOriginObjectTypeDataset       FunctionNewParamsOriginObjectType = "dataset"
-	FunctionNewParamsOriginObjectTypePrompt        FunctionNewParamsOriginObjectType = "prompt"
-	FunctionNewParamsOriginObjectTypePromptSession FunctionNewParamsOriginObjectType = "prompt_session"
-	FunctionNewParamsOriginObjectTypeGroup         FunctionNewParamsOriginObjectType = "group"
-	FunctionNewParamsOriginObjectTypeRole          FunctionNewParamsOriginObjectType = "role"
-	FunctionNewParamsOriginObjectTypeOrgMember     FunctionNewParamsOriginObjectType = "org_member"
-	FunctionNewParamsOriginObjectTypeProjectLog    FunctionNewParamsOriginObjectType = "project_log"
-	FunctionNewParamsOriginObjectTypeOrgProject    FunctionNewParamsOriginObjectType = "org_project"
-)
-
-func (r FunctionNewParamsOriginObjectType) IsKnown() bool {
-	switch r {
-	case FunctionNewParamsOriginObjectTypeOrganization, FunctionNewParamsOriginObjectTypeProject, FunctionNewParamsOriginObjectTypeExperiment, FunctionNewParamsOriginObjectTypeDataset, FunctionNewParamsOriginObjectTypePrompt, FunctionNewParamsOriginObjectTypePromptSession, FunctionNewParamsOriginObjectTypeGroup, FunctionNewParamsOriginObjectTypeRole, FunctionNewParamsOriginObjectTypeOrgMember, FunctionNewParamsOriginObjectTypeProjectLog, FunctionNewParamsOriginObjectTypeOrgProject:
-		return true
-	}
-	return false
 }
 
 type FunctionUpdateParams struct {
@@ -1245,7 +1220,7 @@ type FunctionReplaceParamsOrigin struct {
 	// Id of the object the function is originating from
 	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[FunctionReplaceParamsOriginObjectType] `json:"object_type,required"`
+	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
 	// The function exists for internal purposes and should not be displayed in the
 	// list of functions.
 	Internal param.Field[bool] `json:"internal"`
@@ -1253,29 +1228,4 @@ type FunctionReplaceParamsOrigin struct {
 
 func (r FunctionReplaceParamsOrigin) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
-}
-
-// The object type that the ACL applies to
-type FunctionReplaceParamsOriginObjectType string
-
-const (
-	FunctionReplaceParamsOriginObjectTypeOrganization  FunctionReplaceParamsOriginObjectType = "organization"
-	FunctionReplaceParamsOriginObjectTypeProject       FunctionReplaceParamsOriginObjectType = "project"
-	FunctionReplaceParamsOriginObjectTypeExperiment    FunctionReplaceParamsOriginObjectType = "experiment"
-	FunctionReplaceParamsOriginObjectTypeDataset       FunctionReplaceParamsOriginObjectType = "dataset"
-	FunctionReplaceParamsOriginObjectTypePrompt        FunctionReplaceParamsOriginObjectType = "prompt"
-	FunctionReplaceParamsOriginObjectTypePromptSession FunctionReplaceParamsOriginObjectType = "prompt_session"
-	FunctionReplaceParamsOriginObjectTypeGroup         FunctionReplaceParamsOriginObjectType = "group"
-	FunctionReplaceParamsOriginObjectTypeRole          FunctionReplaceParamsOriginObjectType = "role"
-	FunctionReplaceParamsOriginObjectTypeOrgMember     FunctionReplaceParamsOriginObjectType = "org_member"
-	FunctionReplaceParamsOriginObjectTypeProjectLog    FunctionReplaceParamsOriginObjectType = "project_log"
-	FunctionReplaceParamsOriginObjectTypeOrgProject    FunctionReplaceParamsOriginObjectType = "org_project"
-)
-
-func (r FunctionReplaceParamsOriginObjectType) IsKnown() bool {
-	switch r {
-	case FunctionReplaceParamsOriginObjectTypeOrganization, FunctionReplaceParamsOriginObjectTypeProject, FunctionReplaceParamsOriginObjectTypeExperiment, FunctionReplaceParamsOriginObjectTypeDataset, FunctionReplaceParamsOriginObjectTypePrompt, FunctionReplaceParamsOriginObjectTypePromptSession, FunctionReplaceParamsOriginObjectTypeGroup, FunctionReplaceParamsOriginObjectTypeRole, FunctionReplaceParamsOriginObjectTypeOrgMember, FunctionReplaceParamsOriginObjectTypeProjectLog, FunctionReplaceParamsOriginObjectTypeOrgProject:
-		return true
-	}
-	return false
 }
