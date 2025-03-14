@@ -79,7 +79,14 @@ func TestProjectUpdateWithOptionalParams(t *testing.T) {
 		braintrust.ProjectUpdateParams{
 			Name: braintrust.F("name"),
 			Settings: braintrust.F(shared.ProjectSettingsParam{
-				ComparisonKey: braintrust.F("comparison_key"),
+				BaselineExperimentID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+				ComparisonKey:        braintrust.F("comparison_key"),
+				SpanFieldOrder: braintrust.F([]shared.ProjectSettingsSpanFieldOrderParam{{
+					ColumnID:   braintrust.F("column_id"),
+					ObjectType: braintrust.F("object_type"),
+					Position:   braintrust.F("position"),
+					Layout:     braintrust.F(shared.ProjectSettingsSpanFieldOrderLayoutFull),
+				}}),
 			}),
 		},
 	)

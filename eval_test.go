@@ -29,6 +29,9 @@ func TestEvalNewWithOptionalParams(t *testing.T) {
 	_, err := client.Evals.New(context.TODO(), braintrust.EvalNewParams{
 		Data: braintrust.F[braintrust.EvalNewParamsDataUnion](braintrust.EvalNewParamsDataDatasetID{
 			DatasetID: braintrust.F("dataset_id"),
+			InternalBtql: braintrust.F(map[string]interface{}{
+				"foo": "bar",
+			}),
 		}),
 		ProjectID: braintrust.F("project_id"),
 		Scores: braintrust.F([]braintrust.EvalNewParamsScoreUnion{braintrust.EvalNewParamsScoresFunctionID{
@@ -50,6 +53,18 @@ func TestEvalNewWithOptionalParams(t *testing.T) {
 		MaxConcurrency: braintrust.F(0.000000),
 		Metadata: braintrust.F(map[string]interface{}{
 			"foo": "bar",
+		}),
+		Parent: braintrust.F[braintrust.EvalNewParamsParentUnion](braintrust.EvalNewParamsParentSpanParentStruct{
+			ObjectID:   braintrust.F("object_id"),
+			ObjectType: braintrust.F(braintrust.EvalNewParamsParentSpanParentStructObjectTypeProjectLogs),
+			PropagatedEvent: braintrust.F(map[string]interface{}{
+				"foo": "bar",
+			}),
+			RowIDs: braintrust.F(braintrust.EvalNewParamsParentSpanParentStructRowIDs{
+				ID:         braintrust.F("id"),
+				RootSpanID: braintrust.F("root_span_id"),
+				SpanID:     braintrust.F("span_id"),
+			}),
 		}),
 		RepoInfo: braintrust.F(shared.RepoInfoParam{
 			AuthorEmail:   braintrust.F("author_email"),
