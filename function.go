@@ -433,9 +433,9 @@ func (r FunctionUpdateParams) MarshalJSON() (data []byte, err error) {
 }
 
 type FunctionUpdateParamsFunctionData struct {
+	Type param.Field[FunctionUpdateParamsFunctionDataType] `json:"type,required"`
 	Data param.Field[interface{}]                          `json:"data"`
 	Name param.Field[string]                               `json:"name"`
-	Type param.Field[FunctionUpdateParamsFunctionDataType] `json:"type"`
 }
 
 func (r FunctionUpdateParamsFunctionData) MarshalJSON() (data []byte, err error) {
@@ -446,9 +446,7 @@ func (r FunctionUpdateParamsFunctionData) implementsFunctionUpdateParamsFunction
 
 // Satisfied by [FunctionUpdateParamsFunctionDataPrompt],
 // [FunctionUpdateParamsFunctionDataCode],
-// [FunctionUpdateParamsFunctionDataGlobal],
-// [FunctionUpdateParamsFunctionDataNullableVariant],
-// [FunctionUpdateParamsFunctionData].
+// [FunctionUpdateParamsFunctionDataGlobal], [FunctionUpdateParamsFunctionData].
 type FunctionUpdateParamsFunctionDataUnion interface {
 	implementsFunctionUpdateParamsFunctionDataUnion()
 }
@@ -610,16 +608,6 @@ func (r FunctionUpdateParamsFunctionDataGlobalType) IsKnown() bool {
 	return false
 }
 
-type FunctionUpdateParamsFunctionDataNullableVariant struct {
-}
-
-func (r FunctionUpdateParamsFunctionDataNullableVariant) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r FunctionUpdateParamsFunctionDataNullableVariant) implementsFunctionUpdateParamsFunctionDataUnion() {
-}
-
 type FunctionUpdateParamsFunctionDataType string
 
 const (
@@ -692,10 +680,14 @@ type FunctionListParamsIDsArray []string
 func (r FunctionListParamsIDsArray) ImplementsFunctionListParamsIDsUnion() {}
 
 type FunctionInvokeParams struct {
+	// The expected output of the function
+	Expected param.Field[interface{}] `json:"expected"`
 	// Argument to the function, which can be any JSON serializable value
 	Input param.Field[interface{}] `json:"input"`
 	// If the function is an LLM, additional messages to pass along to it
 	Messages param.Field[[]FunctionInvokeParamsMessageUnion] `json:"messages"`
+	// Any relevant metadata
+	Metadata param.Field[map[string]interface{}] `json:"metadata"`
 	// The mode format of the returned value (defaults to 'auto')
 	Mode param.Field[FunctionInvokeParamsMode] `json:"mode"`
 	// Options for tracing the function call
@@ -979,13 +971,14 @@ func (r FunctionInvokeParamsParentSpanParentStruct) ImplementsFunctionInvokePara
 type FunctionInvokeParamsParentSpanParentStructObjectType string
 
 const (
-	FunctionInvokeParamsParentSpanParentStructObjectTypeProjectLogs FunctionInvokeParamsParentSpanParentStructObjectType = "project_logs"
-	FunctionInvokeParamsParentSpanParentStructObjectTypeExperiment  FunctionInvokeParamsParentSpanParentStructObjectType = "experiment"
+	FunctionInvokeParamsParentSpanParentStructObjectTypeProjectLogs    FunctionInvokeParamsParentSpanParentStructObjectType = "project_logs"
+	FunctionInvokeParamsParentSpanParentStructObjectTypeExperiment     FunctionInvokeParamsParentSpanParentStructObjectType = "experiment"
+	FunctionInvokeParamsParentSpanParentStructObjectTypePlaygroundLogs FunctionInvokeParamsParentSpanParentStructObjectType = "playground_logs"
 )
 
 func (r FunctionInvokeParamsParentSpanParentStructObjectType) IsKnown() bool {
 	switch r {
-	case FunctionInvokeParamsParentSpanParentStructObjectTypeProjectLogs, FunctionInvokeParamsParentSpanParentStructObjectTypeExperiment:
+	case FunctionInvokeParamsParentSpanParentStructObjectTypeProjectLogs, FunctionInvokeParamsParentSpanParentStructObjectTypeExperiment, FunctionInvokeParamsParentSpanParentStructObjectTypePlaygroundLogs:
 		return true
 	}
 	return false

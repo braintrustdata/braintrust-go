@@ -134,9 +134,6 @@ const ACLRestrictObjectTypeProjectLog = shared.ACLRestrictObjectTypeProjectLog
 const ACLRestrictObjectTypeOrgProject = shared.ACLRestrictObjectTypeOrgProject
 
 // This is an alias to an internal type.
-type ACLBatchUpdateResponse = shared.ACLBatchUpdateResponse
-
-// This is an alias to an internal type.
 type APIKey = shared.APIKey
 
 // This is an alias to an internal type.
@@ -303,33 +300,14 @@ type Dataset = shared.Dataset
 // This is an alias to an internal type.
 type DatasetEvent = shared.DatasetEvent
 
-// Indicates the event was copied from another object.
+// A dictionary with additional data about the test example, model outputs, or just
+// about anything else that's relevant, that you can use to help find and analyze
+// examples later. For example, you could log the `prompt`, example's `id`, or
+// anything else that would be useful to slice/dice later. The values in `metadata`
+// can be any JSON-serializable type, but its keys must be strings
 //
 // This is an alias to an internal type.
-type DatasetEventOrigin = shared.DatasetEventOrigin
-
-// Type of the object the event is originating from.
-//
-// This is an alias to an internal type.
-type DatasetEventOriginObjectType = shared.DatasetEventOriginObjectType
-
-// This is an alias to an internal value.
-const DatasetEventOriginObjectTypeExperiment = shared.DatasetEventOriginObjectTypeExperiment
-
-// This is an alias to an internal value.
-const DatasetEventOriginObjectTypeDataset = shared.DatasetEventOriginObjectTypeDataset
-
-// This is an alias to an internal value.
-const DatasetEventOriginObjectTypePrompt = shared.DatasetEventOriginObjectTypePrompt
-
-// This is an alias to an internal value.
-const DatasetEventOriginObjectTypeFunction = shared.DatasetEventOriginObjectTypeFunction
-
-// This is an alias to an internal value.
-const DatasetEventOriginObjectTypePromptSession = shared.DatasetEventOriginObjectTypePromptSession
-
-// This is an alias to an internal value.
-const DatasetEventOriginObjectTypeProjectLogs = shared.DatasetEventOriginObjectTypeProjectLogs
+type DatasetEventMetadata = shared.DatasetEventMetadata
 
 // This is an alias to an internal type.
 type EnvVar = shared.EnvVar
@@ -362,40 +340,21 @@ type ExperimentEvent = shared.ExperimentEvent
 // This is an alias to an internal type.
 type ExperimentEventContext = shared.ExperimentEventContext
 
+// A dictionary with additional data about the test example, model outputs, or just
+// about anything else that's relevant, that you can use to help find and analyze
+// examples later. For example, you could log the `prompt`, example's `id`, or
+// anything else that would be useful to slice/dice later. The values in `metadata`
+// can be any JSON-serializable type, but its keys must be strings
+//
+// This is an alias to an internal type.
+type ExperimentEventMetadata = shared.ExperimentEventMetadata
+
 // Metrics are numerical measurements tracking the execution of the code that
 // produced the experiment event. Use "start" and "end" to track the time span over
 // which the experiment event was produced
 //
 // This is an alias to an internal type.
 type ExperimentEventMetrics = shared.ExperimentEventMetrics
-
-// Indicates the event was copied from another object.
-//
-// This is an alias to an internal type.
-type ExperimentEventOrigin = shared.ExperimentEventOrigin
-
-// Type of the object the event is originating from.
-//
-// This is an alias to an internal type.
-type ExperimentEventOriginObjectType = shared.ExperimentEventOriginObjectType
-
-// This is an alias to an internal value.
-const ExperimentEventOriginObjectTypeExperiment = shared.ExperimentEventOriginObjectTypeExperiment
-
-// This is an alias to an internal value.
-const ExperimentEventOriginObjectTypeDataset = shared.ExperimentEventOriginObjectTypeDataset
-
-// This is an alias to an internal value.
-const ExperimentEventOriginObjectTypePrompt = shared.ExperimentEventOriginObjectTypePrompt
-
-// This is an alias to an internal value.
-const ExperimentEventOriginObjectTypeFunction = shared.ExperimentEventOriginObjectTypeFunction
-
-// This is an alias to an internal value.
-const ExperimentEventOriginObjectTypePromptSession = shared.ExperimentEventOriginObjectTypePromptSession
-
-// This is an alias to an internal value.
-const ExperimentEventOriginObjectTypeProjectLogs = shared.ExperimentEventOriginObjectTypeProjectLogs
 
 // This is an alias to an internal type.
 type FeedbackDatasetItemParam = shared.FeedbackDatasetItemParam
@@ -635,6 +594,15 @@ type Group = shared.Group
 // This is an alias to an internal type.
 type InsertDatasetEventParam = shared.InsertDatasetEventParam
 
+// A dictionary with additional data about the test example, model outputs, or just
+// about anything else that's relevant, that you can use to help find and analyze
+// examples later. For example, you could log the `prompt`, example's `id`, or
+// anything else that would be useful to slice/dice later. The values in `metadata`
+// can be any JSON-serializable type, but its keys must be strings
+//
+// This is an alias to an internal type.
+type InsertDatasetEventMetadataParam = shared.InsertDatasetEventMetadataParam
+
 // This is an alias to an internal type.
 type InsertEventsResponse = shared.InsertEventsResponse
 
@@ -650,6 +618,15 @@ type InsertExperimentEventParam = shared.InsertExperimentEventParam
 //
 // This is an alias to an internal type.
 type InsertExperimentEventContextParam = shared.InsertExperimentEventContextParam
+
+// A dictionary with additional data about the test example, model outputs, or just
+// about anything else that's relevant, that you can use to help find and analyze
+// examples later. For example, you could log the `prompt`, example's `id`, or
+// anything else that would be useful to slice/dice later. The values in `metadata`
+// can be any JSON-serializable type, but its keys must be strings
+//
+// This is an alias to an internal type.
+type InsertExperimentEventMetadataParam = shared.InsertExperimentEventMetadataParam
 
 // Metrics are numerical measurements tracking the execution of the code that
 // produced the experiment event. Use "start" and "end" to track the time span over
@@ -671,6 +648,15 @@ type InsertProjectLogsEventParam = shared.InsertProjectLogsEventParam
 // This is an alias to an internal type.
 type InsertProjectLogsEventContextParam = shared.InsertProjectLogsEventContextParam
 
+// A dictionary with additional data about the test example, model outputs, or just
+// about anything else that's relevant, that you can use to help find and analyze
+// examples later. For example, you could log the `prompt`, example's `id`, or
+// anything else that would be useful to slice/dice later. The values in `metadata`
+// can be any JSON-serializable type, but its keys must be strings
+//
+// This is an alias to an internal type.
+type InsertProjectLogsEventMetadataParam = shared.InsertProjectLogsEventMetadataParam
+
 // Metrics are numerical measurements tracking the execution of the code that
 // produced the project logs event. Use "start" and "end" to track the time span
 // over which the project logs event was produced
@@ -682,6 +668,39 @@ type InsertProjectLogsEventMetricsParam = shared.InsertProjectLogsEventMetricsPa
 //
 // This is an alias to an internal type.
 type MetricSummary = shared.MetricSummary
+
+// Indicates the event was copied from another object.
+//
+// This is an alias to an internal type.
+type ObjectReference = shared.ObjectReference
+
+// Type of the object the event is originating from.
+//
+// This is an alias to an internal type.
+type ObjectReferenceObjectType = shared.ObjectReferenceObjectType
+
+// This is an alias to an internal value.
+const ObjectReferenceObjectTypeExperiment = shared.ObjectReferenceObjectTypeExperiment
+
+// This is an alias to an internal value.
+const ObjectReferenceObjectTypeDataset = shared.ObjectReferenceObjectTypeDataset
+
+// This is an alias to an internal value.
+const ObjectReferenceObjectTypePrompt = shared.ObjectReferenceObjectTypePrompt
+
+// This is an alias to an internal value.
+const ObjectReferenceObjectTypeFunction = shared.ObjectReferenceObjectTypeFunction
+
+// This is an alias to an internal value.
+const ObjectReferenceObjectTypePromptSession = shared.ObjectReferenceObjectTypePromptSession
+
+// This is an alias to an internal value.
+const ObjectReferenceObjectTypeProjectLogs = shared.ObjectReferenceObjectTypeProjectLogs
+
+// Indicates the event was copied from another object.
+//
+// This is an alias to an internal type.
+type ObjectReferenceParam = shared.ObjectReferenceParam
 
 // This is an alias to an internal type.
 type OnlineScoreConfig = shared.OnlineScoreConfig
@@ -762,40 +781,21 @@ const ProjectLogsEventLogIDG = shared.ProjectLogsEventLogIDG
 // This is an alias to an internal type.
 type ProjectLogsEventContext = shared.ProjectLogsEventContext
 
+// A dictionary with additional data about the test example, model outputs, or just
+// about anything else that's relevant, that you can use to help find and analyze
+// examples later. For example, you could log the `prompt`, example's `id`, or
+// anything else that would be useful to slice/dice later. The values in `metadata`
+// can be any JSON-serializable type, but its keys must be strings
+//
+// This is an alias to an internal type.
+type ProjectLogsEventMetadata = shared.ProjectLogsEventMetadata
+
 // Metrics are numerical measurements tracking the execution of the code that
 // produced the project logs event. Use "start" and "end" to track the time span
 // over which the project logs event was produced
 //
 // This is an alias to an internal type.
 type ProjectLogsEventMetrics = shared.ProjectLogsEventMetrics
-
-// Indicates the event was copied from another object.
-//
-// This is an alias to an internal type.
-type ProjectLogsEventOrigin = shared.ProjectLogsEventOrigin
-
-// Type of the object the event is originating from.
-//
-// This is an alias to an internal type.
-type ProjectLogsEventOriginObjectType = shared.ProjectLogsEventOriginObjectType
-
-// This is an alias to an internal value.
-const ProjectLogsEventOriginObjectTypeExperiment = shared.ProjectLogsEventOriginObjectTypeExperiment
-
-// This is an alias to an internal value.
-const ProjectLogsEventOriginObjectTypeDataset = shared.ProjectLogsEventOriginObjectTypeDataset
-
-// This is an alias to an internal value.
-const ProjectLogsEventOriginObjectTypePrompt = shared.ProjectLogsEventOriginObjectTypePrompt
-
-// This is an alias to an internal value.
-const ProjectLogsEventOriginObjectTypeFunction = shared.ProjectLogsEventOriginObjectTypeFunction
-
-// This is an alias to an internal value.
-const ProjectLogsEventOriginObjectTypePromptSession = shared.ProjectLogsEventOriginObjectTypePromptSession
-
-// This is an alias to an internal value.
-const ProjectLogsEventOriginObjectTypeProjectLogs = shared.ProjectLogsEventOriginObjectTypeProjectLogs
 
 // A project score is a user-configured score, which can be manually-labeled
 // through the UI
@@ -826,6 +826,9 @@ const ProjectScoreScoreTypeMaximum = shared.ProjectScoreScoreTypeMaximum
 // This is an alias to an internal value.
 const ProjectScoreScoreTypeOnline = shared.ProjectScoreScoreTypeOnline
 
+// This is an alias to an internal value.
+const ProjectScoreScoreTypeFreeForm = shared.ProjectScoreScoreTypeFreeForm
+
 // For categorical-type project scores, the list of all categories
 //
 // This is an alias to an internal type.
@@ -841,9 +844,6 @@ type ProjectScoreCategoriesCategorical = shared.ProjectScoreCategoriesCategorica
 // This is an alias to an internal type.
 type ProjectScoreCategoriesMinimum = shared.ProjectScoreCategoriesMinimum
 
-// This is an alias to an internal type.
-type ProjectScoreCategoriesNullableVariant = shared.ProjectScoreCategoriesNullableVariant
-
 // For categorical-type project scores, defines a single category
 //
 // This is an alias to an internal type.
@@ -858,19 +858,28 @@ type ProjectScoreCategoryParam = shared.ProjectScoreCategoryParam
 type ProjectScoreConfig = shared.ProjectScoreConfig
 
 // This is an alias to an internal type.
-type ProjectScoreConfigDestination = shared.ProjectScoreConfigDestination
-
-// This is an alias to an internal value.
-const ProjectScoreConfigDestinationExpected = shared.ProjectScoreConfigDestinationExpected
-
-// This is an alias to an internal type.
 type ProjectScoreConfigParam = shared.ProjectScoreConfigParam
 
 // This is an alias to an internal type.
 type ProjectSettings = shared.ProjectSettings
 
 // This is an alias to an internal type.
+type ProjectSettingsSpanFieldOrder = shared.ProjectSettingsSpanFieldOrder
+
+// This is an alias to an internal type.
+type ProjectSettingsSpanFieldOrderLayout = shared.ProjectSettingsSpanFieldOrderLayout
+
+// This is an alias to an internal value.
+const ProjectSettingsSpanFieldOrderLayoutFull = shared.ProjectSettingsSpanFieldOrderLayoutFull
+
+// This is an alias to an internal value.
+const ProjectSettingsSpanFieldOrderLayoutTwoColumn = shared.ProjectSettingsSpanFieldOrderLayoutTwoColumn
+
+// This is an alias to an internal type.
 type ProjectSettingsParam = shared.ProjectSettingsParam
+
+// This is an alias to an internal type.
+type ProjectSettingsSpanFieldOrderParam = shared.ProjectSettingsSpanFieldOrderParam
 
 // A project tag is a user-configured tag for tracking and filtering your
 // experiments, logs, and other data
@@ -1033,9 +1042,6 @@ type PromptDataPromptChatType = shared.PromptDataPromptChatType
 const PromptDataPromptChatTypeChat = shared.PromptDataPromptChatTypeChat
 
 // This is an alias to an internal type.
-type PromptDataPromptNullableVariant = shared.PromptDataPromptNullableVariant
-
-// This is an alias to an internal type.
 type PromptDataPromptType = shared.PromptDataPromptType
 
 // This is an alias to an internal value.
@@ -1128,9 +1134,6 @@ type PromptDataPromptChatMessagesFunctionParam = shared.PromptDataPromptChatMess
 type PromptDataPromptChatMessagesFallbackParam = shared.PromptDataPromptChatMessagesFallbackParam
 
 // This is an alias to an internal type.
-type PromptDataPromptNullableVariantParam = shared.PromptDataPromptNullableVariantParam
-
-// This is an alias to an internal type.
 type PromptDataToolFunctionsUnionParam = shared.PromptDataToolFunctionsUnionParam
 
 // This is an alias to an internal type.
@@ -1164,6 +1167,18 @@ const PromptOptionsParamsOpenAIModelParamsFunctionCallStringNone = shared.Prompt
 type PromptOptionsParamsOpenAIModelParamsFunctionCallFunction = shared.PromptOptionsParamsOpenAIModelParamsFunctionCallFunction
 
 // This is an alias to an internal type.
+type PromptOptionsParamsOpenAIModelParamsReasoningEffort = shared.PromptOptionsParamsOpenAIModelParamsReasoningEffort
+
+// This is an alias to an internal value.
+const PromptOptionsParamsOpenAIModelParamsReasoningEffortLow = shared.PromptOptionsParamsOpenAIModelParamsReasoningEffortLow
+
+// This is an alias to an internal value.
+const PromptOptionsParamsOpenAIModelParamsReasoningEffortMedium = shared.PromptOptionsParamsOpenAIModelParamsReasoningEffortMedium
+
+// This is an alias to an internal value.
+const PromptOptionsParamsOpenAIModelParamsReasoningEffortHigh = shared.PromptOptionsParamsOpenAIModelParamsReasoningEffortHigh
+
+// This is an alias to an internal type.
 type PromptOptionsParamsOpenAIModelParamsResponseFormat = shared.PromptOptionsParamsOpenAIModelParamsResponseFormat
 
 // This is an alias to an internal type.
@@ -1195,9 +1210,6 @@ type PromptOptionsParamsOpenAIModelParamsResponseFormatTextType = shared.PromptO
 
 // This is an alias to an internal value.
 const PromptOptionsParamsOpenAIModelParamsResponseFormatTextTypeText = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatTextTypeText
-
-// This is an alias to an internal type.
-type PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariant = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariant
 
 // This is an alias to an internal type.
 type PromptOptionsParamsOpenAIModelParamsResponseFormatType = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatType
@@ -1279,9 +1291,6 @@ type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam
 
 // This is an alias to an internal type.
 type PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam
-
-// This is an alias to an internal type.
-type PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam = shared.PromptOptionsParamsOpenAIModelParamsResponseFormatNullableVariantParam
 
 // This is an alias to an internal type.
 type PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam = shared.PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam
@@ -1499,25 +1508,34 @@ type ViewViewType = shared.ViewViewType
 const ViewViewTypeProjects = shared.ViewViewTypeProjects
 
 // This is an alias to an internal value.
-const ViewViewTypeLogs = shared.ViewViewTypeLogs
-
-// This is an alias to an internal value.
 const ViewViewTypeExperiments = shared.ViewViewTypeExperiments
-
-// This is an alias to an internal value.
-const ViewViewTypeDatasets = shared.ViewViewTypeDatasets
-
-// This is an alias to an internal value.
-const ViewViewTypePrompts = shared.ViewViewTypePrompts
-
-// This is an alias to an internal value.
-const ViewViewTypePlaygrounds = shared.ViewViewTypePlaygrounds
 
 // This is an alias to an internal value.
 const ViewViewTypeExperiment = shared.ViewViewTypeExperiment
 
 // This is an alias to an internal value.
+const ViewViewTypePlaygrounds = shared.ViewViewTypePlaygrounds
+
+// This is an alias to an internal value.
+const ViewViewTypePlayground = shared.ViewViewTypePlayground
+
+// This is an alias to an internal value.
+const ViewViewTypeDatasets = shared.ViewViewTypeDatasets
+
+// This is an alias to an internal value.
 const ViewViewTypeDataset = shared.ViewViewTypeDataset
+
+// This is an alias to an internal value.
+const ViewViewTypePrompts = shared.ViewViewTypePrompts
+
+// This is an alias to an internal value.
+const ViewViewTypeTools = shared.ViewViewTypeTools
+
+// This is an alias to an internal value.
+const ViewViewTypeScorers = shared.ViewViewTypeScorers
+
+// This is an alias to an internal value.
+const ViewViewTypeLogs = shared.ViewViewTypeLogs
 
 // The view definition
 //

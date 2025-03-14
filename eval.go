@@ -74,6 +74,8 @@ type EvalNewParams struct {
 	// Optional experiment-level metadata to store about the evaluation. You can later
 	// use this to slice & dice across experiments.
 	Metadata param.Field[map[string]interface{}] `json:"metadata"`
+	// Options for tracing the evaluation
+	Parent param.Field[EvalNewParamsParentUnion] `json:"parent"`
 	// Metadata about the state of the repo when the experiment was created
 	RepoInfo param.Field[shared.RepoInfoParam] `json:"repo_info"`
 	// Whether to stream the results of the eval. If true, the request will return two
@@ -95,9 +97,11 @@ func (r EvalNewParams) MarshalJSON() (data []byte, err error) {
 
 // The dataset to use
 type EvalNewParamsData struct {
-	DatasetID   param.Field[string] `json:"dataset_id"`
-	DatasetName param.Field[string] `json:"dataset_name"`
-	ProjectName param.Field[string] `json:"project_name"`
+	InternalBtql param.Field[interface{}] `json:"_internal_btql"`
+	Data         param.Field[interface{}] `json:"data"`
+	DatasetID    param.Field[string]      `json:"dataset_id"`
+	DatasetName  param.Field[string]      `json:"dataset_name"`
+	ProjectName  param.Field[string]      `json:"project_name"`
 }
 
 func (r EvalNewParamsData) MarshalJSON() (data []byte, err error) {
@@ -109,14 +113,16 @@ func (r EvalNewParamsData) implementsEvalNewParamsDataUnion() {}
 // The dataset to use
 //
 // Satisfied by [EvalNewParamsDataDatasetID],
-// [EvalNewParamsDataProjectDatasetName], [EvalNewParamsData].
+// [EvalNewParamsDataProjectDatasetName], [EvalNewParamsDataDatasetRows],
+// [EvalNewParamsData].
 type EvalNewParamsDataUnion interface {
 	implementsEvalNewParamsDataUnion()
 }
 
 // Dataset id
 type EvalNewParamsDataDatasetID struct {
-	DatasetID param.Field[string] `json:"dataset_id,required"`
+	DatasetID    param.Field[string]                 `json:"dataset_id,required"`
+	InternalBtql param.Field[map[string]interface{}] `json:"_internal_btql"`
 }
 
 func (r EvalNewParamsDataDatasetID) MarshalJSON() (data []byte, err error) {
@@ -127,8 +133,9 @@ func (r EvalNewParamsDataDatasetID) implementsEvalNewParamsDataUnion() {}
 
 // Project and dataset name
 type EvalNewParamsDataProjectDatasetName struct {
-	DatasetName param.Field[string] `json:"dataset_name,required"`
-	ProjectName param.Field[string] `json:"project_name,required"`
+	DatasetName  param.Field[string]                 `json:"dataset_name,required"`
+	ProjectName  param.Field[string]                 `json:"project_name,required"`
+	InternalBtql param.Field[map[string]interface{}] `json:"_internal_btql"`
 }
 
 func (r EvalNewParamsDataProjectDatasetName) MarshalJSON() (data []byte, err error) {
@@ -136,6 +143,17 @@ func (r EvalNewParamsDataProjectDatasetName) MarshalJSON() (data []byte, err err
 }
 
 func (r EvalNewParamsDataProjectDatasetName) implementsEvalNewParamsDataUnion() {}
+
+// Dataset rows
+type EvalNewParamsDataDatasetRows struct {
+	Data param.Field[[]interface{}] `json:"data,required"`
+}
+
+func (r EvalNewParamsDataDatasetRows) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r EvalNewParamsDataDatasetRows) implementsEvalNewParamsDataUnion() {}
 
 // The function to evaluate
 type EvalNewParamsScore struct {
@@ -492,4 +510,58 @@ func (r EvalNewParamsGitMetadataSettingsField) IsKnown() bool {
 		return true
 	}
 	return false
+}
+
+// Options for tracing the evaluation
+//
+// Satisfied by [EvalNewParamsParentSpanParentStruct], [shared.UnionString].
+type EvalNewParamsParentUnion interface {
+	ImplementsEvalNewParamsParentUnion()
+}
+
+// Span parent properties
+type EvalNewParamsParentSpanParentStruct struct {
+	// The id of the container object you are logging to
+	ObjectID   param.Field[string]                                        `json:"object_id,required"`
+	ObjectType param.Field[EvalNewParamsParentSpanParentStructObjectType] `json:"object_type,required"`
+	// Include these properties in every span created under this parent
+	PropagatedEvent param.Field[map[string]interface{}] `json:"propagated_event"`
+	// Identifiers for the row to to log a subspan under
+	RowIDs param.Field[EvalNewParamsParentSpanParentStructRowIDs] `json:"row_ids"`
+}
+
+func (r EvalNewParamsParentSpanParentStruct) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r EvalNewParamsParentSpanParentStruct) ImplementsEvalNewParamsParentUnion() {}
+
+type EvalNewParamsParentSpanParentStructObjectType string
+
+const (
+	EvalNewParamsParentSpanParentStructObjectTypeProjectLogs    EvalNewParamsParentSpanParentStructObjectType = "project_logs"
+	EvalNewParamsParentSpanParentStructObjectTypeExperiment     EvalNewParamsParentSpanParentStructObjectType = "experiment"
+	EvalNewParamsParentSpanParentStructObjectTypePlaygroundLogs EvalNewParamsParentSpanParentStructObjectType = "playground_logs"
+)
+
+func (r EvalNewParamsParentSpanParentStructObjectType) IsKnown() bool {
+	switch r {
+	case EvalNewParamsParentSpanParentStructObjectTypeProjectLogs, EvalNewParamsParentSpanParentStructObjectTypeExperiment, EvalNewParamsParentSpanParentStructObjectTypePlaygroundLogs:
+		return true
+	}
+	return false
+}
+
+// Identifiers for the row to to log a subspan under
+type EvalNewParamsParentSpanParentStructRowIDs struct {
+	// The id of the row
+	ID param.Field[string] `json:"id,required"`
+	// The root_span_id of the row
+	RootSpanID param.Field[string] `json:"root_span_id,required"`
+	// The span_id of the row
+	SpanID param.Field[string] `json:"span_id,required"`
+}
+
+func (r EvalNewParamsParentSpanParentStructRowIDs) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
 }

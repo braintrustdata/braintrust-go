@@ -80,6 +80,7 @@ func TestSpanIframeUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.SpanIframeUpdateParams{
+			Description: braintrust.F("description"),
 			Name:        braintrust.F("name"),
 			PostMessage: braintrust.F(true),
 			URL:         braintrust.F("url"),

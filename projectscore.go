@@ -148,11 +148,12 @@ const (
 	ProjectScoreNewParamsScoreTypeMinimum     ProjectScoreNewParamsScoreType = "minimum"
 	ProjectScoreNewParamsScoreTypeMaximum     ProjectScoreNewParamsScoreType = "maximum"
 	ProjectScoreNewParamsScoreTypeOnline      ProjectScoreNewParamsScoreType = "online"
+	ProjectScoreNewParamsScoreTypeFreeForm    ProjectScoreNewParamsScoreType = "free-form"
 )
 
 func (r ProjectScoreNewParamsScoreType) IsKnown() bool {
 	switch r {
-	case ProjectScoreNewParamsScoreTypeSlider, ProjectScoreNewParamsScoreTypeCategorical, ProjectScoreNewParamsScoreTypeWeighted, ProjectScoreNewParamsScoreTypeMinimum, ProjectScoreNewParamsScoreTypeMaximum, ProjectScoreNewParamsScoreTypeOnline:
+	case ProjectScoreNewParamsScoreTypeSlider, ProjectScoreNewParamsScoreTypeCategorical, ProjectScoreNewParamsScoreTypeWeighted, ProjectScoreNewParamsScoreTypeMinimum, ProjectScoreNewParamsScoreTypeMaximum, ProjectScoreNewParamsScoreTypeOnline, ProjectScoreNewParamsScoreTypeFreeForm:
 		return true
 	}
 	return false
@@ -161,8 +162,7 @@ func (r ProjectScoreNewParamsScoreType) IsKnown() bool {
 // For categorical-type project scores, the list of all categories
 //
 // Satisfied by [ProjectScoreNewParamsCategoriesCategorical],
-// [ProjectScoreNewParamsCategoriesMinimum],
-// [ProjectScoreNewParamsCategoriesNullableVariant].
+// [ProjectScoreNewParamsCategoriesMinimum].
 type ProjectScoreNewParamsCategoriesUnion interface {
 	implementsProjectScoreNewParamsCategoriesUnion()
 }
@@ -175,16 +175,6 @@ func (r ProjectScoreNewParamsCategoriesCategorical) implementsProjectScoreNewPar
 type ProjectScoreNewParamsCategoriesMinimum []string
 
 func (r ProjectScoreNewParamsCategoriesMinimum) implementsProjectScoreNewParamsCategoriesUnion() {}
-
-type ProjectScoreNewParamsCategoriesNullableVariant struct {
-}
-
-func (r ProjectScoreNewParamsCategoriesNullableVariant) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ProjectScoreNewParamsCategoriesNullableVariant) implementsProjectScoreNewParamsCategoriesUnion() {
-}
 
 type ProjectScoreUpdateParams struct {
 	// For categorical-type project scores, the list of all categories
@@ -205,8 +195,7 @@ func (r ProjectScoreUpdateParams) MarshalJSON() (data []byte, err error) {
 // For categorical-type project scores, the list of all categories
 //
 // Satisfied by [ProjectScoreUpdateParamsCategoriesCategorical],
-// [ProjectScoreUpdateParamsCategoriesMinimum],
-// [ProjectScoreUpdateParamsCategoriesNullableVariant].
+// [ProjectScoreUpdateParamsCategoriesMinimum].
 type ProjectScoreUpdateParamsCategoriesUnion interface {
 	implementsProjectScoreUpdateParamsCategoriesUnion()
 }
@@ -221,16 +210,6 @@ type ProjectScoreUpdateParamsCategoriesMinimum []string
 func (r ProjectScoreUpdateParamsCategoriesMinimum) implementsProjectScoreUpdateParamsCategoriesUnion() {
 }
 
-type ProjectScoreUpdateParamsCategoriesNullableVariant struct {
-}
-
-func (r ProjectScoreUpdateParamsCategoriesNullableVariant) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ProjectScoreUpdateParamsCategoriesNullableVariant) implementsProjectScoreUpdateParamsCategoriesUnion() {
-}
-
 // The type of the configured score
 type ProjectScoreUpdateParamsScoreType string
 
@@ -241,11 +220,12 @@ const (
 	ProjectScoreUpdateParamsScoreTypeMinimum     ProjectScoreUpdateParamsScoreType = "minimum"
 	ProjectScoreUpdateParamsScoreTypeMaximum     ProjectScoreUpdateParamsScoreType = "maximum"
 	ProjectScoreUpdateParamsScoreTypeOnline      ProjectScoreUpdateParamsScoreType = "online"
+	ProjectScoreUpdateParamsScoreTypeFreeForm    ProjectScoreUpdateParamsScoreType = "free-form"
 )
 
 func (r ProjectScoreUpdateParamsScoreType) IsKnown() bool {
 	switch r {
-	case ProjectScoreUpdateParamsScoreTypeSlider, ProjectScoreUpdateParamsScoreTypeCategorical, ProjectScoreUpdateParamsScoreTypeWeighted, ProjectScoreUpdateParamsScoreTypeMinimum, ProjectScoreUpdateParamsScoreTypeMaximum, ProjectScoreUpdateParamsScoreTypeOnline:
+	case ProjectScoreUpdateParamsScoreTypeSlider, ProjectScoreUpdateParamsScoreTypeCategorical, ProjectScoreUpdateParamsScoreTypeWeighted, ProjectScoreUpdateParamsScoreTypeMinimum, ProjectScoreUpdateParamsScoreTypeMaximum, ProjectScoreUpdateParamsScoreTypeOnline, ProjectScoreUpdateParamsScoreTypeFreeForm:
 		return true
 	}
 	return false
@@ -319,11 +299,12 @@ const (
 	ProjectScoreListParamsScoreTypeProjectScoreTypeMinimum     ProjectScoreListParamsScoreTypeProjectScoreType = "minimum"
 	ProjectScoreListParamsScoreTypeProjectScoreTypeMaximum     ProjectScoreListParamsScoreTypeProjectScoreType = "maximum"
 	ProjectScoreListParamsScoreTypeProjectScoreTypeOnline      ProjectScoreListParamsScoreTypeProjectScoreType = "online"
+	ProjectScoreListParamsScoreTypeProjectScoreTypeFreeForm    ProjectScoreListParamsScoreTypeProjectScoreType = "free-form"
 )
 
 func (r ProjectScoreListParamsScoreTypeProjectScoreType) IsKnown() bool {
 	switch r {
-	case ProjectScoreListParamsScoreTypeProjectScoreTypeSlider, ProjectScoreListParamsScoreTypeProjectScoreTypeCategorical, ProjectScoreListParamsScoreTypeProjectScoreTypeWeighted, ProjectScoreListParamsScoreTypeProjectScoreTypeMinimum, ProjectScoreListParamsScoreTypeProjectScoreTypeMaximum, ProjectScoreListParamsScoreTypeProjectScoreTypeOnline:
+	case ProjectScoreListParamsScoreTypeProjectScoreTypeSlider, ProjectScoreListParamsScoreTypeProjectScoreTypeCategorical, ProjectScoreListParamsScoreTypeProjectScoreTypeWeighted, ProjectScoreListParamsScoreTypeProjectScoreTypeMinimum, ProjectScoreListParamsScoreTypeProjectScoreTypeMaximum, ProjectScoreListParamsScoreTypeProjectScoreTypeOnline, ProjectScoreListParamsScoreTypeProjectScoreTypeFreeForm:
 		return true
 	}
 	return false
@@ -346,11 +327,12 @@ const (
 	ProjectScoreListParamsScoreTypeArrayItemMinimum     ProjectScoreListParamsScoreTypeArrayItem = "minimum"
 	ProjectScoreListParamsScoreTypeArrayItemMaximum     ProjectScoreListParamsScoreTypeArrayItem = "maximum"
 	ProjectScoreListParamsScoreTypeArrayItemOnline      ProjectScoreListParamsScoreTypeArrayItem = "online"
+	ProjectScoreListParamsScoreTypeArrayItemFreeForm    ProjectScoreListParamsScoreTypeArrayItem = "free-form"
 )
 
 func (r ProjectScoreListParamsScoreTypeArrayItem) IsKnown() bool {
 	switch r {
-	case ProjectScoreListParamsScoreTypeArrayItemSlider, ProjectScoreListParamsScoreTypeArrayItemCategorical, ProjectScoreListParamsScoreTypeArrayItemWeighted, ProjectScoreListParamsScoreTypeArrayItemMinimum, ProjectScoreListParamsScoreTypeArrayItemMaximum, ProjectScoreListParamsScoreTypeArrayItemOnline:
+	case ProjectScoreListParamsScoreTypeArrayItemSlider, ProjectScoreListParamsScoreTypeArrayItemCategorical, ProjectScoreListParamsScoreTypeArrayItemWeighted, ProjectScoreListParamsScoreTypeArrayItemMinimum, ProjectScoreListParamsScoreTypeArrayItemMaximum, ProjectScoreListParamsScoreTypeArrayItemOnline, ProjectScoreListParamsScoreTypeArrayItemFreeForm:
 		return true
 	}
 	return false
@@ -384,11 +366,12 @@ const (
 	ProjectScoreReplaceParamsScoreTypeMinimum     ProjectScoreReplaceParamsScoreType = "minimum"
 	ProjectScoreReplaceParamsScoreTypeMaximum     ProjectScoreReplaceParamsScoreType = "maximum"
 	ProjectScoreReplaceParamsScoreTypeOnline      ProjectScoreReplaceParamsScoreType = "online"
+	ProjectScoreReplaceParamsScoreTypeFreeForm    ProjectScoreReplaceParamsScoreType = "free-form"
 )
 
 func (r ProjectScoreReplaceParamsScoreType) IsKnown() bool {
 	switch r {
-	case ProjectScoreReplaceParamsScoreTypeSlider, ProjectScoreReplaceParamsScoreTypeCategorical, ProjectScoreReplaceParamsScoreTypeWeighted, ProjectScoreReplaceParamsScoreTypeMinimum, ProjectScoreReplaceParamsScoreTypeMaximum, ProjectScoreReplaceParamsScoreTypeOnline:
+	case ProjectScoreReplaceParamsScoreTypeSlider, ProjectScoreReplaceParamsScoreTypeCategorical, ProjectScoreReplaceParamsScoreTypeWeighted, ProjectScoreReplaceParamsScoreTypeMinimum, ProjectScoreReplaceParamsScoreTypeMaximum, ProjectScoreReplaceParamsScoreTypeOnline, ProjectScoreReplaceParamsScoreTypeFreeForm:
 		return true
 	}
 	return false
@@ -397,8 +380,7 @@ func (r ProjectScoreReplaceParamsScoreType) IsKnown() bool {
 // For categorical-type project scores, the list of all categories
 //
 // Satisfied by [ProjectScoreReplaceParamsCategoriesCategorical],
-// [ProjectScoreReplaceParamsCategoriesMinimum],
-// [ProjectScoreReplaceParamsCategoriesNullableVariant].
+// [ProjectScoreReplaceParamsCategoriesMinimum].
 type ProjectScoreReplaceParamsCategoriesUnion interface {
 	implementsProjectScoreReplaceParamsCategoriesUnion()
 }
@@ -411,14 +393,4 @@ func (r ProjectScoreReplaceParamsCategoriesCategorical) implementsProjectScoreRe
 type ProjectScoreReplaceParamsCategoriesMinimum []string
 
 func (r ProjectScoreReplaceParamsCategoriesMinimum) implementsProjectScoreReplaceParamsCategoriesUnion() {
-}
-
-type ProjectScoreReplaceParamsCategoriesNullableVariant struct {
-}
-
-func (r ProjectScoreReplaceParamsCategoriesNullableVariant) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r ProjectScoreReplaceParamsCategoriesNullableVariant) implementsProjectScoreReplaceParamsCategoriesUnion() {
 }

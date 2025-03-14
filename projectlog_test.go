@@ -149,8 +149,8 @@ func TestProjectLogInsert(t *testing.T) {
 				Error:    braintrust.F[any](map[string]interface{}{}),
 				Expected: braintrust.F[any](map[string]interface{}{}),
 				Input:    braintrust.F[any](map[string]interface{}{}),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": "bar",
+				Metadata: braintrust.F(shared.InsertProjectLogsEventMetadataParam{
+					Model: braintrust.F("model"),
 				}),
 				Metrics: braintrust.F(shared.InsertProjectLogsEventMetricsParam{
 					CallerFilename:     braintrust.F[any](map[string]interface{}{}),
@@ -161,6 +161,13 @@ func TestProjectLogInsert(t *testing.T) {
 					PromptTokens:       braintrust.F(int64(0)),
 					Start:              braintrust.F(0.000000),
 					Tokens:             braintrust.F(int64(0)),
+				}),
+				Origin: braintrust.F(shared.ObjectReferenceParam{
+					ID:         braintrust.F("id"),
+					XactID:     braintrust.F("_xact_id"),
+					ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+					ObjectType: braintrust.F(shared.ObjectReferenceObjectTypeExperiment),
+					Created:    braintrust.F("created"),
 				}),
 				Output:     braintrust.F[any](map[string]interface{}{}),
 				RootSpanID: braintrust.F("root_span_id"),

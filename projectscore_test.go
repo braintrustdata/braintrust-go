@@ -35,7 +35,7 @@ func TestProjectScoreNewWithOptionalParams(t *testing.T) {
 			Value: braintrust.F(0.000000),
 		}})),
 		Config: braintrust.F(shared.ProjectScoreConfigParam{
-			Destination: braintrust.F(shared.ProjectScoreConfigDestinationExpected),
+			Destination: braintrust.F("destination"),
 			MultiSelect: braintrust.F(true),
 			Online: braintrust.F(shared.OnlineScoreConfigParam{
 				SamplingRate: braintrust.F(0.000000),
@@ -101,7 +101,7 @@ func TestProjectScoreUpdateWithOptionalParams(t *testing.T) {
 				Value: braintrust.F(0.000000),
 			}})),
 			Config: braintrust.F(shared.ProjectScoreConfigParam{
-				Destination: braintrust.F(shared.ProjectScoreConfigDestinationExpected),
+				Destination: braintrust.F("destination"),
 				MultiSelect: braintrust.F(true),
 				Online: braintrust.F(shared.OnlineScoreConfigParam{
 					SamplingRate: braintrust.F(0.000000),
@@ -202,7 +202,7 @@ func TestProjectScoreReplaceWithOptionalParams(t *testing.T) {
 			Value: braintrust.F(0.000000),
 		}})),
 		Config: braintrust.F(shared.ProjectScoreConfigParam{
-			Destination: braintrust.F(shared.ProjectScoreConfigDestinationExpected),
+			Destination: braintrust.F("destination"),
 			MultiSelect: braintrust.F(true),
 			Online: braintrust.F(shared.OnlineScoreConfigParam{
 				SamplingRate: braintrust.F(0.000000),

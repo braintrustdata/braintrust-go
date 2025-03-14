@@ -173,18 +173,21 @@ type ViewNewParamsViewType string
 
 const (
 	ViewNewParamsViewTypeProjects    ViewNewParamsViewType = "projects"
-	ViewNewParamsViewTypeLogs        ViewNewParamsViewType = "logs"
 	ViewNewParamsViewTypeExperiments ViewNewParamsViewType = "experiments"
-	ViewNewParamsViewTypeDatasets    ViewNewParamsViewType = "datasets"
-	ViewNewParamsViewTypePrompts     ViewNewParamsViewType = "prompts"
-	ViewNewParamsViewTypePlaygrounds ViewNewParamsViewType = "playgrounds"
 	ViewNewParamsViewTypeExperiment  ViewNewParamsViewType = "experiment"
+	ViewNewParamsViewTypePlaygrounds ViewNewParamsViewType = "playgrounds"
+	ViewNewParamsViewTypePlayground  ViewNewParamsViewType = "playground"
+	ViewNewParamsViewTypeDatasets    ViewNewParamsViewType = "datasets"
 	ViewNewParamsViewTypeDataset     ViewNewParamsViewType = "dataset"
+	ViewNewParamsViewTypePrompts     ViewNewParamsViewType = "prompts"
+	ViewNewParamsViewTypeTools       ViewNewParamsViewType = "tools"
+	ViewNewParamsViewTypeScorers     ViewNewParamsViewType = "scorers"
+	ViewNewParamsViewTypeLogs        ViewNewParamsViewType = "logs"
 )
 
 func (r ViewNewParamsViewType) IsKnown() bool {
 	switch r {
-	case ViewNewParamsViewTypeProjects, ViewNewParamsViewTypeLogs, ViewNewParamsViewTypeExperiments, ViewNewParamsViewTypeDatasets, ViewNewParamsViewTypePrompts, ViewNewParamsViewTypePlaygrounds, ViewNewParamsViewTypeExperiment, ViewNewParamsViewTypeDataset:
+	case ViewNewParamsViewTypeProjects, ViewNewParamsViewTypeExperiments, ViewNewParamsViewTypeExperiment, ViewNewParamsViewTypePlaygrounds, ViewNewParamsViewTypePlayground, ViewNewParamsViewTypeDatasets, ViewNewParamsViewTypeDataset, ViewNewParamsViewTypePrompts, ViewNewParamsViewTypeTools, ViewNewParamsViewTypeScorers, ViewNewParamsViewTypeLogs:
 		return true
 	}
 	return false
@@ -281,18 +284,21 @@ type ViewUpdateParamsViewType string
 
 const (
 	ViewUpdateParamsViewTypeProjects    ViewUpdateParamsViewType = "projects"
-	ViewUpdateParamsViewTypeLogs        ViewUpdateParamsViewType = "logs"
 	ViewUpdateParamsViewTypeExperiments ViewUpdateParamsViewType = "experiments"
-	ViewUpdateParamsViewTypeDatasets    ViewUpdateParamsViewType = "datasets"
-	ViewUpdateParamsViewTypePrompts     ViewUpdateParamsViewType = "prompts"
-	ViewUpdateParamsViewTypePlaygrounds ViewUpdateParamsViewType = "playgrounds"
 	ViewUpdateParamsViewTypeExperiment  ViewUpdateParamsViewType = "experiment"
+	ViewUpdateParamsViewTypePlaygrounds ViewUpdateParamsViewType = "playgrounds"
+	ViewUpdateParamsViewTypePlayground  ViewUpdateParamsViewType = "playground"
+	ViewUpdateParamsViewTypeDatasets    ViewUpdateParamsViewType = "datasets"
 	ViewUpdateParamsViewTypeDataset     ViewUpdateParamsViewType = "dataset"
+	ViewUpdateParamsViewTypePrompts     ViewUpdateParamsViewType = "prompts"
+	ViewUpdateParamsViewTypeTools       ViewUpdateParamsViewType = "tools"
+	ViewUpdateParamsViewTypeScorers     ViewUpdateParamsViewType = "scorers"
+	ViewUpdateParamsViewTypeLogs        ViewUpdateParamsViewType = "logs"
 )
 
 func (r ViewUpdateParamsViewType) IsKnown() bool {
 	switch r {
-	case ViewUpdateParamsViewTypeProjects, ViewUpdateParamsViewTypeLogs, ViewUpdateParamsViewTypeExperiments, ViewUpdateParamsViewTypeDatasets, ViewUpdateParamsViewTypePrompts, ViewUpdateParamsViewTypePlaygrounds, ViewUpdateParamsViewTypeExperiment, ViewUpdateParamsViewTypeDataset:
+	case ViewUpdateParamsViewTypeProjects, ViewUpdateParamsViewTypeExperiments, ViewUpdateParamsViewTypeExperiment, ViewUpdateParamsViewTypePlaygrounds, ViewUpdateParamsViewTypePlayground, ViewUpdateParamsViewTypeDatasets, ViewUpdateParamsViewTypeDataset, ViewUpdateParamsViewTypePrompts, ViewUpdateParamsViewTypeTools, ViewUpdateParamsViewTypeScorers, ViewUpdateParamsViewTypeLogs:
 		return true
 	}
 	return false
@@ -376,18 +382,21 @@ type ViewListParamsViewType string
 
 const (
 	ViewListParamsViewTypeProjects    ViewListParamsViewType = "projects"
-	ViewListParamsViewTypeLogs        ViewListParamsViewType = "logs"
 	ViewListParamsViewTypeExperiments ViewListParamsViewType = "experiments"
-	ViewListParamsViewTypeDatasets    ViewListParamsViewType = "datasets"
-	ViewListParamsViewTypePrompts     ViewListParamsViewType = "prompts"
-	ViewListParamsViewTypePlaygrounds ViewListParamsViewType = "playgrounds"
 	ViewListParamsViewTypeExperiment  ViewListParamsViewType = "experiment"
+	ViewListParamsViewTypePlaygrounds ViewListParamsViewType = "playgrounds"
+	ViewListParamsViewTypePlayground  ViewListParamsViewType = "playground"
+	ViewListParamsViewTypeDatasets    ViewListParamsViewType = "datasets"
 	ViewListParamsViewTypeDataset     ViewListParamsViewType = "dataset"
+	ViewListParamsViewTypePrompts     ViewListParamsViewType = "prompts"
+	ViewListParamsViewTypeTools       ViewListParamsViewType = "tools"
+	ViewListParamsViewTypeScorers     ViewListParamsViewType = "scorers"
+	ViewListParamsViewTypeLogs        ViewListParamsViewType = "logs"
 )
 
 func (r ViewListParamsViewType) IsKnown() bool {
 	switch r {
-	case ViewListParamsViewTypeProjects, ViewListParamsViewTypeLogs, ViewListParamsViewTypeExperiments, ViewListParamsViewTypeDatasets, ViewListParamsViewTypePrompts, ViewListParamsViewTypePlaygrounds, ViewListParamsViewTypeExperiment, ViewListParamsViewTypeDataset:
+	case ViewListParamsViewTypeProjects, ViewListParamsViewTypeExperiments, ViewListParamsViewTypeExperiment, ViewListParamsViewTypePlaygrounds, ViewListParamsViewTypePlayground, ViewListParamsViewTypeDatasets, ViewListParamsViewTypeDataset, ViewListParamsViewTypePrompts, ViewListParamsViewTypeTools, ViewListParamsViewTypeScorers, ViewListParamsViewTypeLogs:
 		return true
 	}
 	return false
@@ -482,18 +491,21 @@ type ViewReplaceParamsViewType string
 
 const (
 	ViewReplaceParamsViewTypeProjects    ViewReplaceParamsViewType = "projects"
-	ViewReplaceParamsViewTypeLogs        ViewReplaceParamsViewType = "logs"
 	ViewReplaceParamsViewTypeExperiments ViewReplaceParamsViewType = "experiments"
-	ViewReplaceParamsViewTypeDatasets    ViewReplaceParamsViewType = "datasets"
-	ViewReplaceParamsViewTypePrompts     ViewReplaceParamsViewType = "prompts"
-	ViewReplaceParamsViewTypePlaygrounds ViewReplaceParamsViewType = "playgrounds"
 	ViewReplaceParamsViewTypeExperiment  ViewReplaceParamsViewType = "experiment"
+	ViewReplaceParamsViewTypePlaygrounds ViewReplaceParamsViewType = "playgrounds"
+	ViewReplaceParamsViewTypePlayground  ViewReplaceParamsViewType = "playground"
+	ViewReplaceParamsViewTypeDatasets    ViewReplaceParamsViewType = "datasets"
 	ViewReplaceParamsViewTypeDataset     ViewReplaceParamsViewType = "dataset"
+	ViewReplaceParamsViewTypePrompts     ViewReplaceParamsViewType = "prompts"
+	ViewReplaceParamsViewTypeTools       ViewReplaceParamsViewType = "tools"
+	ViewReplaceParamsViewTypeScorers     ViewReplaceParamsViewType = "scorers"
+	ViewReplaceParamsViewTypeLogs        ViewReplaceParamsViewType = "logs"
 )
 
 func (r ViewReplaceParamsViewType) IsKnown() bool {
 	switch r {
-	case ViewReplaceParamsViewTypeProjects, ViewReplaceParamsViewTypeLogs, ViewReplaceParamsViewTypeExperiments, ViewReplaceParamsViewTypeDatasets, ViewReplaceParamsViewTypePrompts, ViewReplaceParamsViewTypePlaygrounds, ViewReplaceParamsViewTypeExperiment, ViewReplaceParamsViewTypeDataset:
+	case ViewReplaceParamsViewTypeProjects, ViewReplaceParamsViewTypeExperiments, ViewReplaceParamsViewTypeExperiment, ViewReplaceParamsViewTypePlaygrounds, ViewReplaceParamsViewTypePlayground, ViewReplaceParamsViewTypeDatasets, ViewReplaceParamsViewTypeDataset, ViewReplaceParamsViewTypePrompts, ViewReplaceParamsViewTypeTools, ViewReplaceParamsViewTypeScorers, ViewReplaceParamsViewTypeLogs:
 		return true
 	}
 	return false
