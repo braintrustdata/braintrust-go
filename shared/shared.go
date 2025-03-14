@@ -187,6 +187,49 @@ func (r ACLRestrictObjectType) IsKnown() bool {
 	return false
 }
 
+type ACLBatchUpdateResponse struct {
+	// An ACL grants a certain permission or role to a certain user or group on an
+	// object.
+	//
+	// ACLs are inherited across the object hierarchy. So for example, if a user has
+	// read permissions on a project, they will also have read permissions on any
+	// experiment, dataset, etc. created within that project.
+	//
+	// To restrict a grant to a particular sub-object, you may specify
+	// `restrict_object_type` in the ACL, as part of a direct permission grant or as
+	// part of a role.
+	AddedACLs []ACL `json:"added_acls,required"`
+	// An ACL grants a certain permission or role to a certain user or group on an
+	// object.
+	//
+	// ACLs are inherited across the object hierarchy. So for example, if a user has
+	// read permissions on a project, they will also have read permissions on any
+	// experiment, dataset, etc. created within that project.
+	//
+	// To restrict a grant to a particular sub-object, you may specify
+	// `restrict_object_type` in the ACL, as part of a direct permission grant or as
+	// part of a role.
+	RemovedACLs []ACL                      `json:"removed_acls,required"`
+	JSON        aclBatchUpdateResponseJSON `json:"-"`
+}
+
+// aclBatchUpdateResponseJSON contains the JSON metadata for the struct
+// [ACLBatchUpdateResponse]
+type aclBatchUpdateResponseJSON struct {
+	AddedACLs   apijson.Field
+	RemovedACLs apijson.Field
+	raw         string
+	ExtraFields map[string]apijson.Field
+}
+
+func (r *ACLBatchUpdateResponse) UnmarshalJSON(data []byte) (err error) {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func (r aclBatchUpdateResponseJSON) RawJSON() string {
+	return r.raw
+}
+
 type APIKey struct {
 	// Unique identifier for the api key
 	ID string `json:"id,required" format:"uuid"`

@@ -117,6 +117,47 @@ func TestACLDelete(t *testing.T) {
 	}
 }
 
+func TestACLBatchUpdateWithOptionalParams(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := braintrust.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.ACLs.BatchUpdate(context.TODO(), braintrust.ACLBatchUpdateParams{
+		AddACLs: braintrust.F([]braintrust.ACLBatchUpdateParamsAddACL{{
+			ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			ObjectType:         braintrust.F(braintrust.ACLBatchUpdateParamsAddACLsObjectTypeOrganization),
+			GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Permission:         braintrust.F(braintrust.ACLBatchUpdateParamsAddACLsPermissionCreate),
+			RestrictObjectType: braintrust.F(braintrust.ACLBatchUpdateParamsAddACLsRestrictObjectTypeOrganization),
+			RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		}}),
+		RemoveACLs: braintrust.F([]braintrust.ACLBatchUpdateParamsRemoveACL{{
+			ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			ObjectType:         braintrust.F(braintrust.ACLBatchUpdateParamsRemoveACLsObjectTypeOrganization),
+			GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Permission:         braintrust.F(braintrust.ACLBatchUpdateParamsRemoveACLsPermissionCreate),
+			RestrictObjectType: braintrust.F(braintrust.ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeOrganization),
+			RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		}}),
+	})
+	if err != nil {
+		var apierr *braintrust.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
 func TestACLFindAndDeleteWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
