@@ -109,7 +109,7 @@ func TestEnvVarListWithOptionalParams(t *testing.T) {
 		IDs:        braintrust.F[braintrust.EnvVarListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:      braintrust.F(int64(0)),
 		ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType: braintrust.F(braintrust.EnvVarListParamsObjectTypeOrganization),
+		ObjectType: braintrust.F(shared.EnvVarObjectTypeOrganization),
 	})
 	if err != nil {
 		var apierr *braintrust.Error

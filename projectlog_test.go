@@ -176,7 +176,7 @@ func TestProjectLogInsert(t *testing.T) {
 				}),
 				SpanAttributes: braintrust.F(shared.SpanAttributesParam{
 					Name: braintrust.F("name"),
-					Type: braintrust.F(shared.SpanAttributesTypeLlm),
+					Type: braintrust.F(shared.SpanTypeLlm),
 				}),
 				SpanID:      braintrust.F("span_id"),
 				SpanParents: braintrust.F([]string{"string"}),

@@ -117,16 +117,16 @@ type ACLNewParams struct {
 	// The id of the object the ACL applies to
 	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[ACLNewParamsObjectType] `json:"object_type,required"`
+	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
 	// Id of the group the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
 	GroupID param.Field[string] `json:"group_id" format:"uuid"`
 	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
-	Permission param.Field[ACLNewParamsPermission] `json:"permission"`
+	Permission param.Field[shared.Permission] `json:"permission"`
 	// When setting a permission directly, optionally restricts the permission grant to
 	// just the specified object type. Cannot be set alongside a `role_id`.
-	RestrictObjectType param.Field[ACLNewParamsRestrictObjectType] `json:"restrict_object_type"`
+	RestrictObjectType param.Field[shared.ACLObjectType] `json:"restrict_object_type"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
 	RoleID param.Field[string] `json:"role_id" format:"uuid"`
@@ -139,85 +139,11 @@ func (r ACLNewParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-// The object type that the ACL applies to
-type ACLNewParamsObjectType string
-
-const (
-	ACLNewParamsObjectTypeOrganization  ACLNewParamsObjectType = "organization"
-	ACLNewParamsObjectTypeProject       ACLNewParamsObjectType = "project"
-	ACLNewParamsObjectTypeExperiment    ACLNewParamsObjectType = "experiment"
-	ACLNewParamsObjectTypeDataset       ACLNewParamsObjectType = "dataset"
-	ACLNewParamsObjectTypePrompt        ACLNewParamsObjectType = "prompt"
-	ACLNewParamsObjectTypePromptSession ACLNewParamsObjectType = "prompt_session"
-	ACLNewParamsObjectTypeGroup         ACLNewParamsObjectType = "group"
-	ACLNewParamsObjectTypeRole          ACLNewParamsObjectType = "role"
-	ACLNewParamsObjectTypeOrgMember     ACLNewParamsObjectType = "org_member"
-	ACLNewParamsObjectTypeProjectLog    ACLNewParamsObjectType = "project_log"
-	ACLNewParamsObjectTypeOrgProject    ACLNewParamsObjectType = "org_project"
-)
-
-func (r ACLNewParamsObjectType) IsKnown() bool {
-	switch r {
-	case ACLNewParamsObjectTypeOrganization, ACLNewParamsObjectTypeProject, ACLNewParamsObjectTypeExperiment, ACLNewParamsObjectTypeDataset, ACLNewParamsObjectTypePrompt, ACLNewParamsObjectTypePromptSession, ACLNewParamsObjectTypeGroup, ACLNewParamsObjectTypeRole, ACLNewParamsObjectTypeOrgMember, ACLNewParamsObjectTypeProjectLog, ACLNewParamsObjectTypeOrgProject:
-		return true
-	}
-	return false
-}
-
-// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
-// provided
-type ACLNewParamsPermission string
-
-const (
-	ACLNewParamsPermissionCreate     ACLNewParamsPermission = "create"
-	ACLNewParamsPermissionRead       ACLNewParamsPermission = "read"
-	ACLNewParamsPermissionUpdate     ACLNewParamsPermission = "update"
-	ACLNewParamsPermissionDelete     ACLNewParamsPermission = "delete"
-	ACLNewParamsPermissionCreateACLs ACLNewParamsPermission = "create_acls"
-	ACLNewParamsPermissionReadACLs   ACLNewParamsPermission = "read_acls"
-	ACLNewParamsPermissionUpdateACLs ACLNewParamsPermission = "update_acls"
-	ACLNewParamsPermissionDeleteACLs ACLNewParamsPermission = "delete_acls"
-)
-
-func (r ACLNewParamsPermission) IsKnown() bool {
-	switch r {
-	case ACLNewParamsPermissionCreate, ACLNewParamsPermissionRead, ACLNewParamsPermissionUpdate, ACLNewParamsPermissionDelete, ACLNewParamsPermissionCreateACLs, ACLNewParamsPermissionReadACLs, ACLNewParamsPermissionUpdateACLs, ACLNewParamsPermissionDeleteACLs:
-		return true
-	}
-	return false
-}
-
-// When setting a permission directly, optionally restricts the permission grant to
-// just the specified object type. Cannot be set alongside a `role_id`.
-type ACLNewParamsRestrictObjectType string
-
-const (
-	ACLNewParamsRestrictObjectTypeOrganization  ACLNewParamsRestrictObjectType = "organization"
-	ACLNewParamsRestrictObjectTypeProject       ACLNewParamsRestrictObjectType = "project"
-	ACLNewParamsRestrictObjectTypeExperiment    ACLNewParamsRestrictObjectType = "experiment"
-	ACLNewParamsRestrictObjectTypeDataset       ACLNewParamsRestrictObjectType = "dataset"
-	ACLNewParamsRestrictObjectTypePrompt        ACLNewParamsRestrictObjectType = "prompt"
-	ACLNewParamsRestrictObjectTypePromptSession ACLNewParamsRestrictObjectType = "prompt_session"
-	ACLNewParamsRestrictObjectTypeGroup         ACLNewParamsRestrictObjectType = "group"
-	ACLNewParamsRestrictObjectTypeRole          ACLNewParamsRestrictObjectType = "role"
-	ACLNewParamsRestrictObjectTypeOrgMember     ACLNewParamsRestrictObjectType = "org_member"
-	ACLNewParamsRestrictObjectTypeProjectLog    ACLNewParamsRestrictObjectType = "project_log"
-	ACLNewParamsRestrictObjectTypeOrgProject    ACLNewParamsRestrictObjectType = "org_project"
-)
-
-func (r ACLNewParamsRestrictObjectType) IsKnown() bool {
-	switch r {
-	case ACLNewParamsRestrictObjectTypeOrganization, ACLNewParamsRestrictObjectTypeProject, ACLNewParamsRestrictObjectTypeExperiment, ACLNewParamsRestrictObjectTypeDataset, ACLNewParamsRestrictObjectTypePrompt, ACLNewParamsRestrictObjectTypePromptSession, ACLNewParamsRestrictObjectTypeGroup, ACLNewParamsRestrictObjectTypeRole, ACLNewParamsRestrictObjectTypeOrgMember, ACLNewParamsRestrictObjectTypeProjectLog, ACLNewParamsRestrictObjectTypeOrgProject:
-		return true
-	}
-	return false
-}
-
 type ACLListParams struct {
 	// The id of the object the ACL applies to
 	ObjectID param.Field[string] `query:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[ACLListParamsObjectType] `query:"object_type,required"`
+	ObjectType param.Field[shared.ACLObjectType] `query:"object_type,required"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
@@ -243,31 +169,6 @@ func (r ACLListParams) URLQuery() (v url.Values) {
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
-}
-
-// The object type that the ACL applies to
-type ACLListParamsObjectType string
-
-const (
-	ACLListParamsObjectTypeOrganization  ACLListParamsObjectType = "organization"
-	ACLListParamsObjectTypeProject       ACLListParamsObjectType = "project"
-	ACLListParamsObjectTypeExperiment    ACLListParamsObjectType = "experiment"
-	ACLListParamsObjectTypeDataset       ACLListParamsObjectType = "dataset"
-	ACLListParamsObjectTypePrompt        ACLListParamsObjectType = "prompt"
-	ACLListParamsObjectTypePromptSession ACLListParamsObjectType = "prompt_session"
-	ACLListParamsObjectTypeGroup         ACLListParamsObjectType = "group"
-	ACLListParamsObjectTypeRole          ACLListParamsObjectType = "role"
-	ACLListParamsObjectTypeOrgMember     ACLListParamsObjectType = "org_member"
-	ACLListParamsObjectTypeProjectLog    ACLListParamsObjectType = "project_log"
-	ACLListParamsObjectTypeOrgProject    ACLListParamsObjectType = "org_project"
-)
-
-func (r ACLListParamsObjectType) IsKnown() bool {
-	switch r {
-	case ACLListParamsObjectTypeOrganization, ACLListParamsObjectTypeProject, ACLListParamsObjectTypeExperiment, ACLListParamsObjectTypeDataset, ACLListParamsObjectTypePrompt, ACLListParamsObjectTypePromptSession, ACLListParamsObjectTypeGroup, ACLListParamsObjectTypeRole, ACLListParamsObjectTypeOrgMember, ACLListParamsObjectTypeProjectLog, ACLListParamsObjectTypeOrgProject:
-		return true
-	}
-	return false
 }
 
 // Filter search results to a particular set of object IDs. To specify a list of
@@ -325,16 +226,16 @@ type ACLBatchUpdateParamsAddACL struct {
 	// The id of the object the ACL applies to
 	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[ACLBatchUpdateParamsAddACLsObjectType] `json:"object_type,required"`
+	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
 	// Id of the group the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
 	GroupID param.Field[string] `json:"group_id" format:"uuid"`
 	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
-	Permission param.Field[ACLBatchUpdateParamsAddACLsPermission] `json:"permission"`
+	Permission param.Field[shared.Permission] `json:"permission"`
 	// When setting a permission directly, optionally restricts the permission grant to
 	// just the specified object type. Cannot be set alongside a `role_id`.
-	RestrictObjectType param.Field[ACLBatchUpdateParamsAddACLsRestrictObjectType] `json:"restrict_object_type"`
+	RestrictObjectType param.Field[shared.ACLObjectType] `json:"restrict_object_type"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
 	RoleID param.Field[string] `json:"role_id" format:"uuid"`
@@ -345,80 +246,6 @@ type ACLBatchUpdateParamsAddACL struct {
 
 func (r ACLBatchUpdateParamsAddACL) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
-}
-
-// The object type that the ACL applies to
-type ACLBatchUpdateParamsAddACLsObjectType string
-
-const (
-	ACLBatchUpdateParamsAddACLsObjectTypeOrganization  ACLBatchUpdateParamsAddACLsObjectType = "organization"
-	ACLBatchUpdateParamsAddACLsObjectTypeProject       ACLBatchUpdateParamsAddACLsObjectType = "project"
-	ACLBatchUpdateParamsAddACLsObjectTypeExperiment    ACLBatchUpdateParamsAddACLsObjectType = "experiment"
-	ACLBatchUpdateParamsAddACLsObjectTypeDataset       ACLBatchUpdateParamsAddACLsObjectType = "dataset"
-	ACLBatchUpdateParamsAddACLsObjectTypePrompt        ACLBatchUpdateParamsAddACLsObjectType = "prompt"
-	ACLBatchUpdateParamsAddACLsObjectTypePromptSession ACLBatchUpdateParamsAddACLsObjectType = "prompt_session"
-	ACLBatchUpdateParamsAddACLsObjectTypeGroup         ACLBatchUpdateParamsAddACLsObjectType = "group"
-	ACLBatchUpdateParamsAddACLsObjectTypeRole          ACLBatchUpdateParamsAddACLsObjectType = "role"
-	ACLBatchUpdateParamsAddACLsObjectTypeOrgMember     ACLBatchUpdateParamsAddACLsObjectType = "org_member"
-	ACLBatchUpdateParamsAddACLsObjectTypeProjectLog    ACLBatchUpdateParamsAddACLsObjectType = "project_log"
-	ACLBatchUpdateParamsAddACLsObjectTypeOrgProject    ACLBatchUpdateParamsAddACLsObjectType = "org_project"
-)
-
-func (r ACLBatchUpdateParamsAddACLsObjectType) IsKnown() bool {
-	switch r {
-	case ACLBatchUpdateParamsAddACLsObjectTypeOrganization, ACLBatchUpdateParamsAddACLsObjectTypeProject, ACLBatchUpdateParamsAddACLsObjectTypeExperiment, ACLBatchUpdateParamsAddACLsObjectTypeDataset, ACLBatchUpdateParamsAddACLsObjectTypePrompt, ACLBatchUpdateParamsAddACLsObjectTypePromptSession, ACLBatchUpdateParamsAddACLsObjectTypeGroup, ACLBatchUpdateParamsAddACLsObjectTypeRole, ACLBatchUpdateParamsAddACLsObjectTypeOrgMember, ACLBatchUpdateParamsAddACLsObjectTypeProjectLog, ACLBatchUpdateParamsAddACLsObjectTypeOrgProject:
-		return true
-	}
-	return false
-}
-
-// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
-// provided
-type ACLBatchUpdateParamsAddACLsPermission string
-
-const (
-	ACLBatchUpdateParamsAddACLsPermissionCreate     ACLBatchUpdateParamsAddACLsPermission = "create"
-	ACLBatchUpdateParamsAddACLsPermissionRead       ACLBatchUpdateParamsAddACLsPermission = "read"
-	ACLBatchUpdateParamsAddACLsPermissionUpdate     ACLBatchUpdateParamsAddACLsPermission = "update"
-	ACLBatchUpdateParamsAddACLsPermissionDelete     ACLBatchUpdateParamsAddACLsPermission = "delete"
-	ACLBatchUpdateParamsAddACLsPermissionCreateACLs ACLBatchUpdateParamsAddACLsPermission = "create_acls"
-	ACLBatchUpdateParamsAddACLsPermissionReadACLs   ACLBatchUpdateParamsAddACLsPermission = "read_acls"
-	ACLBatchUpdateParamsAddACLsPermissionUpdateACLs ACLBatchUpdateParamsAddACLsPermission = "update_acls"
-	ACLBatchUpdateParamsAddACLsPermissionDeleteACLs ACLBatchUpdateParamsAddACLsPermission = "delete_acls"
-)
-
-func (r ACLBatchUpdateParamsAddACLsPermission) IsKnown() bool {
-	switch r {
-	case ACLBatchUpdateParamsAddACLsPermissionCreate, ACLBatchUpdateParamsAddACLsPermissionRead, ACLBatchUpdateParamsAddACLsPermissionUpdate, ACLBatchUpdateParamsAddACLsPermissionDelete, ACLBatchUpdateParamsAddACLsPermissionCreateACLs, ACLBatchUpdateParamsAddACLsPermissionReadACLs, ACLBatchUpdateParamsAddACLsPermissionUpdateACLs, ACLBatchUpdateParamsAddACLsPermissionDeleteACLs:
-		return true
-	}
-	return false
-}
-
-// When setting a permission directly, optionally restricts the permission grant to
-// just the specified object type. Cannot be set alongside a `role_id`.
-type ACLBatchUpdateParamsAddACLsRestrictObjectType string
-
-const (
-	ACLBatchUpdateParamsAddACLsRestrictObjectTypeOrganization  ACLBatchUpdateParamsAddACLsRestrictObjectType = "organization"
-	ACLBatchUpdateParamsAddACLsRestrictObjectTypeProject       ACLBatchUpdateParamsAddACLsRestrictObjectType = "project"
-	ACLBatchUpdateParamsAddACLsRestrictObjectTypeExperiment    ACLBatchUpdateParamsAddACLsRestrictObjectType = "experiment"
-	ACLBatchUpdateParamsAddACLsRestrictObjectTypeDataset       ACLBatchUpdateParamsAddACLsRestrictObjectType = "dataset"
-	ACLBatchUpdateParamsAddACLsRestrictObjectTypePrompt        ACLBatchUpdateParamsAddACLsRestrictObjectType = "prompt"
-	ACLBatchUpdateParamsAddACLsRestrictObjectTypePromptSession ACLBatchUpdateParamsAddACLsRestrictObjectType = "prompt_session"
-	ACLBatchUpdateParamsAddACLsRestrictObjectTypeGroup         ACLBatchUpdateParamsAddACLsRestrictObjectType = "group"
-	ACLBatchUpdateParamsAddACLsRestrictObjectTypeRole          ACLBatchUpdateParamsAddACLsRestrictObjectType = "role"
-	ACLBatchUpdateParamsAddACLsRestrictObjectTypeOrgMember     ACLBatchUpdateParamsAddACLsRestrictObjectType = "org_member"
-	ACLBatchUpdateParamsAddACLsRestrictObjectTypeProjectLog    ACLBatchUpdateParamsAddACLsRestrictObjectType = "project_log"
-	ACLBatchUpdateParamsAddACLsRestrictObjectTypeOrgProject    ACLBatchUpdateParamsAddACLsRestrictObjectType = "org_project"
-)
-
-func (r ACLBatchUpdateParamsAddACLsRestrictObjectType) IsKnown() bool {
-	switch r {
-	case ACLBatchUpdateParamsAddACLsRestrictObjectTypeOrganization, ACLBatchUpdateParamsAddACLsRestrictObjectTypeProject, ACLBatchUpdateParamsAddACLsRestrictObjectTypeExperiment, ACLBatchUpdateParamsAddACLsRestrictObjectTypeDataset, ACLBatchUpdateParamsAddACLsRestrictObjectTypePrompt, ACLBatchUpdateParamsAddACLsRestrictObjectTypePromptSession, ACLBatchUpdateParamsAddACLsRestrictObjectTypeGroup, ACLBatchUpdateParamsAddACLsRestrictObjectTypeRole, ACLBatchUpdateParamsAddACLsRestrictObjectTypeOrgMember, ACLBatchUpdateParamsAddACLsRestrictObjectTypeProjectLog, ACLBatchUpdateParamsAddACLsRestrictObjectTypeOrgProject:
-		return true
-	}
-	return false
 }
 
 // An ACL grants a certain permission or role to a certain user or group on an
@@ -435,16 +262,16 @@ type ACLBatchUpdateParamsRemoveACL struct {
 	// The id of the object the ACL applies to
 	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[ACLBatchUpdateParamsRemoveACLsObjectType] `json:"object_type,required"`
+	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
 	// Id of the group the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
 	GroupID param.Field[string] `json:"group_id" format:"uuid"`
 	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
-	Permission param.Field[ACLBatchUpdateParamsRemoveACLsPermission] `json:"permission"`
+	Permission param.Field[shared.Permission] `json:"permission"`
 	// When setting a permission directly, optionally restricts the permission grant to
 	// just the specified object type. Cannot be set alongside a `role_id`.
-	RestrictObjectType param.Field[ACLBatchUpdateParamsRemoveACLsRestrictObjectType] `json:"restrict_object_type"`
+	RestrictObjectType param.Field[shared.ACLObjectType] `json:"restrict_object_type"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
 	RoleID param.Field[string] `json:"role_id" format:"uuid"`
@@ -457,94 +284,20 @@ func (r ACLBatchUpdateParamsRemoveACL) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-// The object type that the ACL applies to
-type ACLBatchUpdateParamsRemoveACLsObjectType string
-
-const (
-	ACLBatchUpdateParamsRemoveACLsObjectTypeOrganization  ACLBatchUpdateParamsRemoveACLsObjectType = "organization"
-	ACLBatchUpdateParamsRemoveACLsObjectTypeProject       ACLBatchUpdateParamsRemoveACLsObjectType = "project"
-	ACLBatchUpdateParamsRemoveACLsObjectTypeExperiment    ACLBatchUpdateParamsRemoveACLsObjectType = "experiment"
-	ACLBatchUpdateParamsRemoveACLsObjectTypeDataset       ACLBatchUpdateParamsRemoveACLsObjectType = "dataset"
-	ACLBatchUpdateParamsRemoveACLsObjectTypePrompt        ACLBatchUpdateParamsRemoveACLsObjectType = "prompt"
-	ACLBatchUpdateParamsRemoveACLsObjectTypePromptSession ACLBatchUpdateParamsRemoveACLsObjectType = "prompt_session"
-	ACLBatchUpdateParamsRemoveACLsObjectTypeGroup         ACLBatchUpdateParamsRemoveACLsObjectType = "group"
-	ACLBatchUpdateParamsRemoveACLsObjectTypeRole          ACLBatchUpdateParamsRemoveACLsObjectType = "role"
-	ACLBatchUpdateParamsRemoveACLsObjectTypeOrgMember     ACLBatchUpdateParamsRemoveACLsObjectType = "org_member"
-	ACLBatchUpdateParamsRemoveACLsObjectTypeProjectLog    ACLBatchUpdateParamsRemoveACLsObjectType = "project_log"
-	ACLBatchUpdateParamsRemoveACLsObjectTypeOrgProject    ACLBatchUpdateParamsRemoveACLsObjectType = "org_project"
-)
-
-func (r ACLBatchUpdateParamsRemoveACLsObjectType) IsKnown() bool {
-	switch r {
-	case ACLBatchUpdateParamsRemoveACLsObjectTypeOrganization, ACLBatchUpdateParamsRemoveACLsObjectTypeProject, ACLBatchUpdateParamsRemoveACLsObjectTypeExperiment, ACLBatchUpdateParamsRemoveACLsObjectTypeDataset, ACLBatchUpdateParamsRemoveACLsObjectTypePrompt, ACLBatchUpdateParamsRemoveACLsObjectTypePromptSession, ACLBatchUpdateParamsRemoveACLsObjectTypeGroup, ACLBatchUpdateParamsRemoveACLsObjectTypeRole, ACLBatchUpdateParamsRemoveACLsObjectTypeOrgMember, ACLBatchUpdateParamsRemoveACLsObjectTypeProjectLog, ACLBatchUpdateParamsRemoveACLsObjectTypeOrgProject:
-		return true
-	}
-	return false
-}
-
-// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
-// provided
-type ACLBatchUpdateParamsRemoveACLsPermission string
-
-const (
-	ACLBatchUpdateParamsRemoveACLsPermissionCreate     ACLBatchUpdateParamsRemoveACLsPermission = "create"
-	ACLBatchUpdateParamsRemoveACLsPermissionRead       ACLBatchUpdateParamsRemoveACLsPermission = "read"
-	ACLBatchUpdateParamsRemoveACLsPermissionUpdate     ACLBatchUpdateParamsRemoveACLsPermission = "update"
-	ACLBatchUpdateParamsRemoveACLsPermissionDelete     ACLBatchUpdateParamsRemoveACLsPermission = "delete"
-	ACLBatchUpdateParamsRemoveACLsPermissionCreateACLs ACLBatchUpdateParamsRemoveACLsPermission = "create_acls"
-	ACLBatchUpdateParamsRemoveACLsPermissionReadACLs   ACLBatchUpdateParamsRemoveACLsPermission = "read_acls"
-	ACLBatchUpdateParamsRemoveACLsPermissionUpdateACLs ACLBatchUpdateParamsRemoveACLsPermission = "update_acls"
-	ACLBatchUpdateParamsRemoveACLsPermissionDeleteACLs ACLBatchUpdateParamsRemoveACLsPermission = "delete_acls"
-)
-
-func (r ACLBatchUpdateParamsRemoveACLsPermission) IsKnown() bool {
-	switch r {
-	case ACLBatchUpdateParamsRemoveACLsPermissionCreate, ACLBatchUpdateParamsRemoveACLsPermissionRead, ACLBatchUpdateParamsRemoveACLsPermissionUpdate, ACLBatchUpdateParamsRemoveACLsPermissionDelete, ACLBatchUpdateParamsRemoveACLsPermissionCreateACLs, ACLBatchUpdateParamsRemoveACLsPermissionReadACLs, ACLBatchUpdateParamsRemoveACLsPermissionUpdateACLs, ACLBatchUpdateParamsRemoveACLsPermissionDeleteACLs:
-		return true
-	}
-	return false
-}
-
-// When setting a permission directly, optionally restricts the permission grant to
-// just the specified object type. Cannot be set alongside a `role_id`.
-type ACLBatchUpdateParamsRemoveACLsRestrictObjectType string
-
-const (
-	ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeOrganization  ACLBatchUpdateParamsRemoveACLsRestrictObjectType = "organization"
-	ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeProject       ACLBatchUpdateParamsRemoveACLsRestrictObjectType = "project"
-	ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeExperiment    ACLBatchUpdateParamsRemoveACLsRestrictObjectType = "experiment"
-	ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeDataset       ACLBatchUpdateParamsRemoveACLsRestrictObjectType = "dataset"
-	ACLBatchUpdateParamsRemoveACLsRestrictObjectTypePrompt        ACLBatchUpdateParamsRemoveACLsRestrictObjectType = "prompt"
-	ACLBatchUpdateParamsRemoveACLsRestrictObjectTypePromptSession ACLBatchUpdateParamsRemoveACLsRestrictObjectType = "prompt_session"
-	ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeGroup         ACLBatchUpdateParamsRemoveACLsRestrictObjectType = "group"
-	ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeRole          ACLBatchUpdateParamsRemoveACLsRestrictObjectType = "role"
-	ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeOrgMember     ACLBatchUpdateParamsRemoveACLsRestrictObjectType = "org_member"
-	ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeProjectLog    ACLBatchUpdateParamsRemoveACLsRestrictObjectType = "project_log"
-	ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeOrgProject    ACLBatchUpdateParamsRemoveACLsRestrictObjectType = "org_project"
-)
-
-func (r ACLBatchUpdateParamsRemoveACLsRestrictObjectType) IsKnown() bool {
-	switch r {
-	case ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeOrganization, ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeProject, ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeExperiment, ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeDataset, ACLBatchUpdateParamsRemoveACLsRestrictObjectTypePrompt, ACLBatchUpdateParamsRemoveACLsRestrictObjectTypePromptSession, ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeGroup, ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeRole, ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeOrgMember, ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeProjectLog, ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeOrgProject:
-		return true
-	}
-	return false
-}
-
 type ACLFindAndDeleteParams struct {
 	// The id of the object the ACL applies to
 	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[ACLFindAndDeleteParamsObjectType] `json:"object_type,required"`
+	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
 	// Id of the group the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
 	GroupID param.Field[string] `json:"group_id" format:"uuid"`
 	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
-	Permission param.Field[ACLFindAndDeleteParamsPermission] `json:"permission"`
+	Permission param.Field[shared.Permission] `json:"permission"`
 	// When setting a permission directly, optionally restricts the permission grant to
 	// just the specified object type. Cannot be set alongside a `role_id`.
-	RestrictObjectType param.Field[ACLFindAndDeleteParamsRestrictObjectType] `json:"restrict_object_type"`
+	RestrictObjectType param.Field[shared.ACLObjectType] `json:"restrict_object_type"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
 	RoleID param.Field[string] `json:"role_id" format:"uuid"`
@@ -555,78 +308,4 @@ type ACLFindAndDeleteParams struct {
 
 func (r ACLFindAndDeleteParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
-}
-
-// The object type that the ACL applies to
-type ACLFindAndDeleteParamsObjectType string
-
-const (
-	ACLFindAndDeleteParamsObjectTypeOrganization  ACLFindAndDeleteParamsObjectType = "organization"
-	ACLFindAndDeleteParamsObjectTypeProject       ACLFindAndDeleteParamsObjectType = "project"
-	ACLFindAndDeleteParamsObjectTypeExperiment    ACLFindAndDeleteParamsObjectType = "experiment"
-	ACLFindAndDeleteParamsObjectTypeDataset       ACLFindAndDeleteParamsObjectType = "dataset"
-	ACLFindAndDeleteParamsObjectTypePrompt        ACLFindAndDeleteParamsObjectType = "prompt"
-	ACLFindAndDeleteParamsObjectTypePromptSession ACLFindAndDeleteParamsObjectType = "prompt_session"
-	ACLFindAndDeleteParamsObjectTypeGroup         ACLFindAndDeleteParamsObjectType = "group"
-	ACLFindAndDeleteParamsObjectTypeRole          ACLFindAndDeleteParamsObjectType = "role"
-	ACLFindAndDeleteParamsObjectTypeOrgMember     ACLFindAndDeleteParamsObjectType = "org_member"
-	ACLFindAndDeleteParamsObjectTypeProjectLog    ACLFindAndDeleteParamsObjectType = "project_log"
-	ACLFindAndDeleteParamsObjectTypeOrgProject    ACLFindAndDeleteParamsObjectType = "org_project"
-)
-
-func (r ACLFindAndDeleteParamsObjectType) IsKnown() bool {
-	switch r {
-	case ACLFindAndDeleteParamsObjectTypeOrganization, ACLFindAndDeleteParamsObjectTypeProject, ACLFindAndDeleteParamsObjectTypeExperiment, ACLFindAndDeleteParamsObjectTypeDataset, ACLFindAndDeleteParamsObjectTypePrompt, ACLFindAndDeleteParamsObjectTypePromptSession, ACLFindAndDeleteParamsObjectTypeGroup, ACLFindAndDeleteParamsObjectTypeRole, ACLFindAndDeleteParamsObjectTypeOrgMember, ACLFindAndDeleteParamsObjectTypeProjectLog, ACLFindAndDeleteParamsObjectTypeOrgProject:
-		return true
-	}
-	return false
-}
-
-// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
-// provided
-type ACLFindAndDeleteParamsPermission string
-
-const (
-	ACLFindAndDeleteParamsPermissionCreate     ACLFindAndDeleteParamsPermission = "create"
-	ACLFindAndDeleteParamsPermissionRead       ACLFindAndDeleteParamsPermission = "read"
-	ACLFindAndDeleteParamsPermissionUpdate     ACLFindAndDeleteParamsPermission = "update"
-	ACLFindAndDeleteParamsPermissionDelete     ACLFindAndDeleteParamsPermission = "delete"
-	ACLFindAndDeleteParamsPermissionCreateACLs ACLFindAndDeleteParamsPermission = "create_acls"
-	ACLFindAndDeleteParamsPermissionReadACLs   ACLFindAndDeleteParamsPermission = "read_acls"
-	ACLFindAndDeleteParamsPermissionUpdateACLs ACLFindAndDeleteParamsPermission = "update_acls"
-	ACLFindAndDeleteParamsPermissionDeleteACLs ACLFindAndDeleteParamsPermission = "delete_acls"
-)
-
-func (r ACLFindAndDeleteParamsPermission) IsKnown() bool {
-	switch r {
-	case ACLFindAndDeleteParamsPermissionCreate, ACLFindAndDeleteParamsPermissionRead, ACLFindAndDeleteParamsPermissionUpdate, ACLFindAndDeleteParamsPermissionDelete, ACLFindAndDeleteParamsPermissionCreateACLs, ACLFindAndDeleteParamsPermissionReadACLs, ACLFindAndDeleteParamsPermissionUpdateACLs, ACLFindAndDeleteParamsPermissionDeleteACLs:
-		return true
-	}
-	return false
-}
-
-// When setting a permission directly, optionally restricts the permission grant to
-// just the specified object type. Cannot be set alongside a `role_id`.
-type ACLFindAndDeleteParamsRestrictObjectType string
-
-const (
-	ACLFindAndDeleteParamsRestrictObjectTypeOrganization  ACLFindAndDeleteParamsRestrictObjectType = "organization"
-	ACLFindAndDeleteParamsRestrictObjectTypeProject       ACLFindAndDeleteParamsRestrictObjectType = "project"
-	ACLFindAndDeleteParamsRestrictObjectTypeExperiment    ACLFindAndDeleteParamsRestrictObjectType = "experiment"
-	ACLFindAndDeleteParamsRestrictObjectTypeDataset       ACLFindAndDeleteParamsRestrictObjectType = "dataset"
-	ACLFindAndDeleteParamsRestrictObjectTypePrompt        ACLFindAndDeleteParamsRestrictObjectType = "prompt"
-	ACLFindAndDeleteParamsRestrictObjectTypePromptSession ACLFindAndDeleteParamsRestrictObjectType = "prompt_session"
-	ACLFindAndDeleteParamsRestrictObjectTypeGroup         ACLFindAndDeleteParamsRestrictObjectType = "group"
-	ACLFindAndDeleteParamsRestrictObjectTypeRole          ACLFindAndDeleteParamsRestrictObjectType = "role"
-	ACLFindAndDeleteParamsRestrictObjectTypeOrgMember     ACLFindAndDeleteParamsRestrictObjectType = "org_member"
-	ACLFindAndDeleteParamsRestrictObjectTypeProjectLog    ACLFindAndDeleteParamsRestrictObjectType = "project_log"
-	ACLFindAndDeleteParamsRestrictObjectTypeOrgProject    ACLFindAndDeleteParamsRestrictObjectType = "org_project"
-)
-
-func (r ACLFindAndDeleteParamsRestrictObjectType) IsKnown() bool {
-	switch r {
-	case ACLFindAndDeleteParamsRestrictObjectTypeOrganization, ACLFindAndDeleteParamsRestrictObjectTypeProject, ACLFindAndDeleteParamsRestrictObjectTypeExperiment, ACLFindAndDeleteParamsRestrictObjectTypeDataset, ACLFindAndDeleteParamsRestrictObjectTypePrompt, ACLFindAndDeleteParamsRestrictObjectTypePromptSession, ACLFindAndDeleteParamsRestrictObjectTypeGroup, ACLFindAndDeleteParamsRestrictObjectTypeRole, ACLFindAndDeleteParamsRestrictObjectTypeOrgMember, ACLFindAndDeleteParamsRestrictObjectTypeProjectLog, ACLFindAndDeleteParamsRestrictObjectTypeOrgProject:
-		return true
-	}
-	return false
 }

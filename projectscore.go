@@ -126,7 +126,7 @@ type ProjectScoreNewParams struct {
 	// Unique identifier for the project that the project score belongs under
 	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
 	// The type of the configured score
-	ScoreType param.Field[ProjectScoreNewParamsScoreType] `json:"score_type,required"`
+	ScoreType param.Field[shared.ProjectScoreType] `json:"score_type,required"`
 	// For categorical-type project scores, the list of all categories
 	Categories param.Field[ProjectScoreNewParamsCategoriesUnion] `json:"categories"`
 	Config     param.Field[shared.ProjectScoreConfigParam]       `json:"config"`
@@ -136,27 +136,6 @@ type ProjectScoreNewParams struct {
 
 func (r ProjectScoreNewParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
-}
-
-// The type of the configured score
-type ProjectScoreNewParamsScoreType string
-
-const (
-	ProjectScoreNewParamsScoreTypeSlider      ProjectScoreNewParamsScoreType = "slider"
-	ProjectScoreNewParamsScoreTypeCategorical ProjectScoreNewParamsScoreType = "categorical"
-	ProjectScoreNewParamsScoreTypeWeighted    ProjectScoreNewParamsScoreType = "weighted"
-	ProjectScoreNewParamsScoreTypeMinimum     ProjectScoreNewParamsScoreType = "minimum"
-	ProjectScoreNewParamsScoreTypeMaximum     ProjectScoreNewParamsScoreType = "maximum"
-	ProjectScoreNewParamsScoreTypeOnline      ProjectScoreNewParamsScoreType = "online"
-	ProjectScoreNewParamsScoreTypeFreeForm    ProjectScoreNewParamsScoreType = "free-form"
-)
-
-func (r ProjectScoreNewParamsScoreType) IsKnown() bool {
-	switch r {
-	case ProjectScoreNewParamsScoreTypeSlider, ProjectScoreNewParamsScoreTypeCategorical, ProjectScoreNewParamsScoreTypeWeighted, ProjectScoreNewParamsScoreTypeMinimum, ProjectScoreNewParamsScoreTypeMaximum, ProjectScoreNewParamsScoreTypeOnline, ProjectScoreNewParamsScoreTypeFreeForm:
-		return true
-	}
-	return false
 }
 
 // For categorical-type project scores, the list of all categories
@@ -185,7 +164,7 @@ type ProjectScoreUpdateParams struct {
 	// Name of the project score
 	Name param.Field[string] `json:"name"`
 	// The type of the configured score
-	ScoreType param.Field[ProjectScoreUpdateParamsScoreType] `json:"score_type"`
+	ScoreType param.Field[shared.ProjectScoreType] `json:"score_type"`
 }
 
 func (r ProjectScoreUpdateParams) MarshalJSON() (data []byte, err error) {
@@ -208,27 +187,6 @@ func (r ProjectScoreUpdateParamsCategoriesCategorical) implementsProjectScoreUpd
 type ProjectScoreUpdateParamsCategoriesMinimum []string
 
 func (r ProjectScoreUpdateParamsCategoriesMinimum) implementsProjectScoreUpdateParamsCategoriesUnion() {
-}
-
-// The type of the configured score
-type ProjectScoreUpdateParamsScoreType string
-
-const (
-	ProjectScoreUpdateParamsScoreTypeSlider      ProjectScoreUpdateParamsScoreType = "slider"
-	ProjectScoreUpdateParamsScoreTypeCategorical ProjectScoreUpdateParamsScoreType = "categorical"
-	ProjectScoreUpdateParamsScoreTypeWeighted    ProjectScoreUpdateParamsScoreType = "weighted"
-	ProjectScoreUpdateParamsScoreTypeMinimum     ProjectScoreUpdateParamsScoreType = "minimum"
-	ProjectScoreUpdateParamsScoreTypeMaximum     ProjectScoreUpdateParamsScoreType = "maximum"
-	ProjectScoreUpdateParamsScoreTypeOnline      ProjectScoreUpdateParamsScoreType = "online"
-	ProjectScoreUpdateParamsScoreTypeFreeForm    ProjectScoreUpdateParamsScoreType = "free-form"
-)
-
-func (r ProjectScoreUpdateParamsScoreType) IsKnown() bool {
-	switch r {
-	case ProjectScoreUpdateParamsScoreTypeSlider, ProjectScoreUpdateParamsScoreTypeCategorical, ProjectScoreUpdateParamsScoreTypeWeighted, ProjectScoreUpdateParamsScoreTypeMinimum, ProjectScoreUpdateParamsScoreTypeMaximum, ProjectScoreUpdateParamsScoreTypeOnline, ProjectScoreUpdateParamsScoreTypeFreeForm:
-		return true
-	}
-	return false
 }
 
 type ProjectScoreListParams struct {
@@ -283,60 +241,14 @@ func (r ProjectScoreListParamsIDsArray) ImplementsProjectScoreListParamsIDsUnion
 
 // The type of the configured score
 //
-// Satisfied by [ProjectScoreListParamsScoreTypeProjectScoreType],
-// [ProjectScoreListParamsScoreTypeArray].
+// Satisfied by [shared.ProjectScoreType], [ProjectScoreListParamsScoreTypeArray].
 type ProjectScoreListParamsScoreTypeUnion interface {
-	implementsProjectScoreListParamsScoreTypeUnion()
+	ImplementsProjectScoreListParamsScoreTypeUnion()
 }
 
-// The type of the configured score
-type ProjectScoreListParamsScoreTypeProjectScoreType string
+type ProjectScoreListParamsScoreTypeArray []shared.ProjectScoreType
 
-const (
-	ProjectScoreListParamsScoreTypeProjectScoreTypeSlider      ProjectScoreListParamsScoreTypeProjectScoreType = "slider"
-	ProjectScoreListParamsScoreTypeProjectScoreTypeCategorical ProjectScoreListParamsScoreTypeProjectScoreType = "categorical"
-	ProjectScoreListParamsScoreTypeProjectScoreTypeWeighted    ProjectScoreListParamsScoreTypeProjectScoreType = "weighted"
-	ProjectScoreListParamsScoreTypeProjectScoreTypeMinimum     ProjectScoreListParamsScoreTypeProjectScoreType = "minimum"
-	ProjectScoreListParamsScoreTypeProjectScoreTypeMaximum     ProjectScoreListParamsScoreTypeProjectScoreType = "maximum"
-	ProjectScoreListParamsScoreTypeProjectScoreTypeOnline      ProjectScoreListParamsScoreTypeProjectScoreType = "online"
-	ProjectScoreListParamsScoreTypeProjectScoreTypeFreeForm    ProjectScoreListParamsScoreTypeProjectScoreType = "free-form"
-)
-
-func (r ProjectScoreListParamsScoreTypeProjectScoreType) IsKnown() bool {
-	switch r {
-	case ProjectScoreListParamsScoreTypeProjectScoreTypeSlider, ProjectScoreListParamsScoreTypeProjectScoreTypeCategorical, ProjectScoreListParamsScoreTypeProjectScoreTypeWeighted, ProjectScoreListParamsScoreTypeProjectScoreTypeMinimum, ProjectScoreListParamsScoreTypeProjectScoreTypeMaximum, ProjectScoreListParamsScoreTypeProjectScoreTypeOnline, ProjectScoreListParamsScoreTypeProjectScoreTypeFreeForm:
-		return true
-	}
-	return false
-}
-
-func (r ProjectScoreListParamsScoreTypeProjectScoreType) implementsProjectScoreListParamsScoreTypeUnion() {
-}
-
-type ProjectScoreListParamsScoreTypeArray []ProjectScoreListParamsScoreTypeArrayItem
-
-func (r ProjectScoreListParamsScoreTypeArray) implementsProjectScoreListParamsScoreTypeUnion() {}
-
-// The type of the configured score
-type ProjectScoreListParamsScoreTypeArrayItem string
-
-const (
-	ProjectScoreListParamsScoreTypeArrayItemSlider      ProjectScoreListParamsScoreTypeArrayItem = "slider"
-	ProjectScoreListParamsScoreTypeArrayItemCategorical ProjectScoreListParamsScoreTypeArrayItem = "categorical"
-	ProjectScoreListParamsScoreTypeArrayItemWeighted    ProjectScoreListParamsScoreTypeArrayItem = "weighted"
-	ProjectScoreListParamsScoreTypeArrayItemMinimum     ProjectScoreListParamsScoreTypeArrayItem = "minimum"
-	ProjectScoreListParamsScoreTypeArrayItemMaximum     ProjectScoreListParamsScoreTypeArrayItem = "maximum"
-	ProjectScoreListParamsScoreTypeArrayItemOnline      ProjectScoreListParamsScoreTypeArrayItem = "online"
-	ProjectScoreListParamsScoreTypeArrayItemFreeForm    ProjectScoreListParamsScoreTypeArrayItem = "free-form"
-)
-
-func (r ProjectScoreListParamsScoreTypeArrayItem) IsKnown() bool {
-	switch r {
-	case ProjectScoreListParamsScoreTypeArrayItemSlider, ProjectScoreListParamsScoreTypeArrayItemCategorical, ProjectScoreListParamsScoreTypeArrayItemWeighted, ProjectScoreListParamsScoreTypeArrayItemMinimum, ProjectScoreListParamsScoreTypeArrayItemMaximum, ProjectScoreListParamsScoreTypeArrayItemOnline, ProjectScoreListParamsScoreTypeArrayItemFreeForm:
-		return true
-	}
-	return false
-}
+func (r ProjectScoreListParamsScoreTypeArray) ImplementsProjectScoreListParamsScoreTypeUnion() {}
 
 type ProjectScoreReplaceParams struct {
 	// Name of the project score
@@ -344,7 +256,7 @@ type ProjectScoreReplaceParams struct {
 	// Unique identifier for the project that the project score belongs under
 	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
 	// The type of the configured score
-	ScoreType param.Field[ProjectScoreReplaceParamsScoreType] `json:"score_type,required"`
+	ScoreType param.Field[shared.ProjectScoreType] `json:"score_type,required"`
 	// For categorical-type project scores, the list of all categories
 	Categories param.Field[ProjectScoreReplaceParamsCategoriesUnion] `json:"categories"`
 	Config     param.Field[shared.ProjectScoreConfigParam]           `json:"config"`
@@ -354,27 +266,6 @@ type ProjectScoreReplaceParams struct {
 
 func (r ProjectScoreReplaceParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
-}
-
-// The type of the configured score
-type ProjectScoreReplaceParamsScoreType string
-
-const (
-	ProjectScoreReplaceParamsScoreTypeSlider      ProjectScoreReplaceParamsScoreType = "slider"
-	ProjectScoreReplaceParamsScoreTypeCategorical ProjectScoreReplaceParamsScoreType = "categorical"
-	ProjectScoreReplaceParamsScoreTypeWeighted    ProjectScoreReplaceParamsScoreType = "weighted"
-	ProjectScoreReplaceParamsScoreTypeMinimum     ProjectScoreReplaceParamsScoreType = "minimum"
-	ProjectScoreReplaceParamsScoreTypeMaximum     ProjectScoreReplaceParamsScoreType = "maximum"
-	ProjectScoreReplaceParamsScoreTypeOnline      ProjectScoreReplaceParamsScoreType = "online"
-	ProjectScoreReplaceParamsScoreTypeFreeForm    ProjectScoreReplaceParamsScoreType = "free-form"
-)
-
-func (r ProjectScoreReplaceParamsScoreType) IsKnown() bool {
-	switch r {
-	case ProjectScoreReplaceParamsScoreTypeSlider, ProjectScoreReplaceParamsScoreTypeCategorical, ProjectScoreReplaceParamsScoreTypeWeighted, ProjectScoreReplaceParamsScoreTypeMinimum, ProjectScoreReplaceParamsScoreTypeMaximum, ProjectScoreReplaceParamsScoreTypeOnline, ProjectScoreReplaceParamsScoreTypeFreeForm:
-		return true
-	}
-	return false
 }
 
 // For categorical-type project scores, the list of all categories
