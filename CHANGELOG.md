@@ -1,5 +1,58 @@
 # Changelog
 
+## 0.6.0 (2025-03-14)
+
+Full Changelog: [v0.5.0...v0.6.0](https://github.com/braintrustdata/braintrust-go/compare/v0.5.0...v0.6.0)
+
+### Features
+
+* add SKIP_BREW env var to ./scripts/bootstrap ([#127](https://github.com/braintrustdata/braintrust-go/issues/127)) ([d3d254e](https://github.com/braintrustdata/braintrust-go/commit/d3d254e3a205a4e08e650369635ab27047f6e505))
+* **api:** manual updates ([#132](https://github.com/braintrustdata/braintrust-go/issues/132)) ([4156f1e](https://github.com/braintrustdata/braintrust-go/commit/4156f1eef8e761006513811a83468ad613edec6a))
+* **api:** manual updates ([#133](https://github.com/braintrustdata/braintrust-go/issues/133)) ([846c8d4](https://github.com/braintrustdata/braintrust-go/commit/846c8d4069448d271c25ca8adbc610dc9cfb8ae4))
+* **client:** accept RFC6838 JSON content types ([#128](https://github.com/braintrustdata/braintrust-go/issues/128)) ([03f3af7](https://github.com/braintrustdata/braintrust-go/commit/03f3af7eb119976bc20156e21af89c7a9f5eade6))
+* **client:** allow custom baseurls without trailing slash ([#126](https://github.com/braintrustdata/braintrust-go/issues/126)) ([c175900](https://github.com/braintrustdata/braintrust-go/commit/c1759002dd0f06526907d198a10682dfe1508b04))
+* **client:** improve default client options support ([#130](https://github.com/braintrustdata/braintrust-go/issues/130)) ([dbfcb1b](https://github.com/braintrustdata/braintrust-go/commit/dbfcb1b4ecccd9e6d20989ab51136259e219864d))
+* **client:** send `X-Stainless-Timeout` header ([#118](https://github.com/braintrustdata/braintrust-go/issues/118)) ([80c1565](https://github.com/braintrustdata/braintrust-go/commit/80c156562081332a1c4a81310a84432beccd3ece))
+
+
+### Bug Fixes
+
+* **client:** don't truncate manually specified filenames ([#123](https://github.com/braintrustdata/braintrust-go/issues/123)) ([2e6f118](https://github.com/braintrustdata/braintrust-go/commit/2e6f1181beac39df27f9ddd3836613005e51b153))
+* do not call path.Base on ContentType ([#122](https://github.com/braintrustdata/braintrust-go/issues/122)) ([c6cb6aa](https://github.com/braintrustdata/braintrust-go/commit/c6cb6aa7f982fd8cda9f60e4dd86f930575aef9f))
+* fix apijson.Port for embedded structs ([#110](https://github.com/braintrustdata/braintrust-go/issues/110)) ([1791277](https://github.com/braintrustdata/braintrust-go/commit/1791277c48cd4d8eec13a962578405ad2668beca))
+* fix apijson.Port for embedded structs ([#111](https://github.com/braintrustdata/braintrust-go/issues/111)) ([5301af0](https://github.com/braintrustdata/braintrust-go/commit/5301af03c238757d67d35dfed6eaf9b6da04e92e))
+* fix early cancel when RequestTimeout is provided for streaming requests ([#120](https://github.com/braintrustdata/braintrust-go/issues/120)) ([5e636f7](https://github.com/braintrustdata/braintrust-go/commit/5e636f7952aec436910460a9a0deef6538e3a9fd))
+* fix interface implementation stub names for unions ([#113](https://github.com/braintrustdata/braintrust-go/issues/113)) ([a89a6d5](https://github.com/braintrustdata/braintrust-go/commit/a89a6d50a799e54464b30fe6d31ba3920102c5e8))
+* fix unicode encoding for json ([#116](https://github.com/braintrustdata/braintrust-go/issues/116)) ([4d28998](https://github.com/braintrustdata/braintrust-go/commit/4d2899885b9aea04b0d8255a9496e8c258ab02a9))
+
+
+### Chores
+
+* add UnionUnmarshaler for responses that are interfaces ([#119](https://github.com/braintrustdata/braintrust-go/issues/119)) ([ac3c813](https://github.com/braintrustdata/braintrust-go/commit/ac3c8132b8392a91e044cdfa01e78749487a0335))
+* **client:** remove unnecessary `nullable` struct tags ([#107](https://github.com/braintrustdata/braintrust-go/issues/107)) ([67da890](https://github.com/braintrustdata/braintrust-go/commit/67da89065e7b4afda857129e6c6903402bb930de))
+* **internal:** codegen related update ([#105](https://github.com/braintrustdata/braintrust-go/issues/105)) ([953511f](https://github.com/braintrustdata/braintrust-go/commit/953511f3de68a0829dae360a3f8044b80b1a08fe))
+* **internal:** codegen related update ([#106](https://github.com/braintrustdata/braintrust-go/issues/106)) ([386543b](https://github.com/braintrustdata/braintrust-go/commit/386543bd410409b5654cf216d632a4371eb854f2))
+* **internal:** codegen related update ([#108](https://github.com/braintrustdata/braintrust-go/issues/108)) ([8b0908f](https://github.com/braintrustdata/braintrust-go/commit/8b0908fa059ee934bdb7f22bd9c9d6f28baacfbf))
+* **internal:** codegen related update ([#109](https://github.com/braintrustdata/braintrust-go/issues/109)) ([72bd256](https://github.com/braintrustdata/braintrust-go/commit/72bd25617efca17a6d62ac3678414c52989f3ebc))
+* **internal:** codegen related update ([#112](https://github.com/braintrustdata/braintrust-go/issues/112)) ([50142f6](https://github.com/braintrustdata/braintrust-go/commit/50142f61a74e4f245b4c28d84b589e47c88887e1))
+* **internal:** codegen related update ([#115](https://github.com/braintrustdata/braintrust-go/issues/115)) ([dec22c9](https://github.com/braintrustdata/braintrust-go/commit/dec22c9b9e21ed3d799d9c45f6f40ef9381fee28))
+* **internal:** fix devcontainers setup ([#124](https://github.com/braintrustdata/braintrust-go/issues/124)) ([19dcac6](https://github.com/braintrustdata/braintrust-go/commit/19dcac62f53372200925b74fd97e3b2b63d90bbd))
+* **internal:** remove extra empty newlines ([#131](https://github.com/braintrustdata/braintrust-go/issues/131)) ([3e8a639](https://github.com/braintrustdata/braintrust-go/commit/3e8a639ea5d703e71c023d44c1f64033e9b592c6))
+* **internal:** version bump ([#103](https://github.com/braintrustdata/braintrust-go/issues/103)) ([b7b6ac8](https://github.com/braintrustdata/braintrust-go/commit/b7b6ac85800f427e9095ae80203bcb392b36a442))
+* minor change to tests ([#121](https://github.com/braintrustdata/braintrust-go/issues/121)) ([396d6c9](https://github.com/braintrustdata/braintrust-go/commit/396d6c9ef39c5916044da3fcaf663fd36d4371d9))
+* refactor client tests ([#114](https://github.com/braintrustdata/braintrust-go/issues/114)) ([eba2c08](https://github.com/braintrustdata/braintrust-go/commit/eba2c08ed874f6cc061d945f48fd08d259f35a95))
+
+
+### Documentation
+
+* document raw responses ([#117](https://github.com/braintrustdata/braintrust-go/issues/117)) ([e7502ce](https://github.com/braintrustdata/braintrust-go/commit/e7502ce0ab2348c3cbf84145c062285a3b026b29))
+* update URLs from stainlessapi.com to stainless.com ([#125](https://github.com/braintrustdata/braintrust-go/issues/125)) ([8c12a9d](https://github.com/braintrustdata/braintrust-go/commit/8c12a9d0c5ac918e171d236291e3bf4ab43a59c8))
+
+
+### Refactors
+
+* tidy up dependencies ([#129](https://github.com/braintrustdata/braintrust-go/issues/129)) ([f24edf4](https://github.com/braintrustdata/braintrust-go/commit/f24edf488db2320e948aff01a4eafce81c220de9))
+
 ## 0.5.0 (2024-11-20)
 
 Full Changelog: [v0.4.0...v0.5.0](https://github.com/braintrustdata/braintrust-go/compare/v0.4.0...v0.5.0)
