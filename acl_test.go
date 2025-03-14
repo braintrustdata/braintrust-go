@@ -28,10 +28,10 @@ func TestACLNewWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.ACLs.New(context.TODO(), braintrust.ACLNewParams{
 		ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType:         braintrust.F(braintrust.ACLNewParamsObjectTypeOrganization),
+		ObjectType:         braintrust.F(shared.ACLObjectTypeOrganization),
 		GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Permission:         braintrust.F(braintrust.ACLNewParamsPermissionCreate),
-		RestrictObjectType: braintrust.F(braintrust.ACLNewParamsRestrictObjectTypeOrganization),
+		Permission:         braintrust.F(shared.PermissionCreate),
+		RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 		RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
@@ -80,7 +80,7 @@ func TestACLListWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.ACLs.List(context.TODO(), braintrust.ACLListParams{
 		ObjectID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType:    braintrust.F(braintrust.ACLListParamsObjectTypeOrganization),
+		ObjectType:    braintrust.F(shared.ACLObjectTypeOrganization),
 		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		IDs:           braintrust.F[braintrust.ACLListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
 		Limit:         braintrust.F(int64(0)),
@@ -132,19 +132,19 @@ func TestACLBatchUpdateWithOptionalParams(t *testing.T) {
 	_, err := client.ACLs.BatchUpdate(context.TODO(), braintrust.ACLBatchUpdateParams{
 		AddACLs: braintrust.F([]braintrust.ACLBatchUpdateParamsAddACL{{
 			ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ObjectType:         braintrust.F(braintrust.ACLBatchUpdateParamsAddACLsObjectTypeOrganization),
+			ObjectType:         braintrust.F(shared.ACLObjectTypeOrganization),
 			GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			Permission:         braintrust.F(braintrust.ACLBatchUpdateParamsAddACLsPermissionCreate),
-			RestrictObjectType: braintrust.F(braintrust.ACLBatchUpdateParamsAddACLsRestrictObjectTypeOrganization),
+			Permission:         braintrust.F(shared.PermissionCreate),
+			RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 			RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 			UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		}}),
 		RemoveACLs: braintrust.F([]braintrust.ACLBatchUpdateParamsRemoveACL{{
 			ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ObjectType:         braintrust.F(braintrust.ACLBatchUpdateParamsRemoveACLsObjectTypeOrganization),
+			ObjectType:         braintrust.F(shared.ACLObjectTypeOrganization),
 			GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			Permission:         braintrust.F(braintrust.ACLBatchUpdateParamsRemoveACLsPermissionCreate),
-			RestrictObjectType: braintrust.F(braintrust.ACLBatchUpdateParamsRemoveACLsRestrictObjectTypeOrganization),
+			Permission:         braintrust.F(shared.PermissionCreate),
+			RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 			RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 			UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		}}),
@@ -172,10 +172,10 @@ func TestACLFindAndDeleteWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.ACLs.FindAndDelete(context.TODO(), braintrust.ACLFindAndDeleteParams{
 		ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType:         braintrust.F(braintrust.ACLFindAndDeleteParamsObjectTypeOrganization),
+		ObjectType:         braintrust.F(shared.ACLObjectTypeOrganization),
 		GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Permission:         braintrust.F(braintrust.ACLFindAndDeleteParamsPermissionCreate),
-		RestrictObjectType: braintrust.F(braintrust.ACLFindAndDeleteParamsRestrictObjectTypeOrganization),
+		Permission:         braintrust.F(shared.PermissionCreate),
+		RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 		RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})

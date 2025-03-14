@@ -30,8 +30,8 @@ func TestRoleNewWithOptionalParams(t *testing.T) {
 		Name:        braintrust.F("x"),
 		Description: braintrust.F("description"),
 		MemberPermissions: braintrust.F([]braintrust.RoleNewParamsMemberPermission{{
-			Permission:         braintrust.F(braintrust.RoleNewParamsMemberPermissionsPermissionCreate),
-			RestrictObjectType: braintrust.F(braintrust.RoleNewParamsMemberPermissionsRestrictObjectTypeOrganization),
+			Permission:         braintrust.F(shared.PermissionCreate),
+			RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 		}}),
 		MemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
 		OrgName:     braintrust.F("org_name"),
@@ -84,15 +84,15 @@ func TestRoleUpdateWithOptionalParams(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.RoleUpdateParams{
 			AddMemberPermissions: braintrust.F([]braintrust.RoleUpdateParamsAddMemberPermission{{
-				Permission:         braintrust.F(braintrust.RoleUpdateParamsAddMemberPermissionsPermissionCreate),
-				RestrictObjectType: braintrust.F(braintrust.RoleUpdateParamsAddMemberPermissionsRestrictObjectTypeOrganization),
+				Permission:         braintrust.F(shared.PermissionCreate),
+				RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 			}}),
 			AddMemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
 			Description:    braintrust.F("description"),
 			Name:           braintrust.F("x"),
 			RemoveMemberPermissions: braintrust.F([]braintrust.RoleUpdateParamsRemoveMemberPermission{{
-				Permission:         braintrust.F(braintrust.RoleUpdateParamsRemoveMemberPermissionsPermissionCreate),
-				RestrictObjectType: braintrust.F(braintrust.RoleUpdateParamsRemoveMemberPermissionsRestrictObjectTypeOrganization),
+				Permission:         braintrust.F(shared.PermissionCreate),
+				RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 			}}),
 			RemoveMemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
 		},
@@ -173,8 +173,8 @@ func TestRoleReplaceWithOptionalParams(t *testing.T) {
 		Name:        braintrust.F("x"),
 		Description: braintrust.F("description"),
 		MemberPermissions: braintrust.F([]braintrust.RoleReplaceParamsMemberPermission{{
-			Permission:         braintrust.F(braintrust.RoleReplaceParamsMemberPermissionsPermissionCreate),
-			RestrictObjectType: braintrust.F(braintrust.RoleReplaceParamsMemberPermissionsRestrictObjectTypeOrganization),
+			Permission:         braintrust.F(shared.PermissionCreate),
+			RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 		}}),
 		MemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
 		OrgName:     braintrust.F("org_name"),
