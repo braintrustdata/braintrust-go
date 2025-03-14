@@ -26,6 +26,9 @@ type AISecret = shared.AISecret
 // This is an alias to an internal type.
 type ACL = shared.ACL
 
+// This is an alias to an internal type.
+type ACLBatchUpdateResponse = shared.ACLBatchUpdateResponse
+
 // The object type that the ACL applies to
 //
 // This is an alias to an internal type.
@@ -63,78 +66,6 @@ const ACLObjectTypeProjectLog = shared.ACLObjectTypeProjectLog
 
 // This is an alias to an internal value.
 const ACLObjectTypeOrgProject = shared.ACLObjectTypeOrgProject
-
-// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
-// provided
-//
-// This is an alias to an internal type.
-type ACLPermission = shared.ACLPermission
-
-// This is an alias to an internal value.
-const ACLPermissionCreate = shared.ACLPermissionCreate
-
-// This is an alias to an internal value.
-const ACLPermissionRead = shared.ACLPermissionRead
-
-// This is an alias to an internal value.
-const ACLPermissionUpdate = shared.ACLPermissionUpdate
-
-// This is an alias to an internal value.
-const ACLPermissionDelete = shared.ACLPermissionDelete
-
-// This is an alias to an internal value.
-const ACLPermissionCreateACLs = shared.ACLPermissionCreateACLs
-
-// This is an alias to an internal value.
-const ACLPermissionReadACLs = shared.ACLPermissionReadACLs
-
-// This is an alias to an internal value.
-const ACLPermissionUpdateACLs = shared.ACLPermissionUpdateACLs
-
-// This is an alias to an internal value.
-const ACLPermissionDeleteACLs = shared.ACLPermissionDeleteACLs
-
-// When setting a permission directly, optionally restricts the permission grant to
-// just the specified object type. Cannot be set alongside a `role_id`.
-//
-// This is an alias to an internal type.
-type ACLRestrictObjectType = shared.ACLRestrictObjectType
-
-// This is an alias to an internal value.
-const ACLRestrictObjectTypeOrganization = shared.ACLRestrictObjectTypeOrganization
-
-// This is an alias to an internal value.
-const ACLRestrictObjectTypeProject = shared.ACLRestrictObjectTypeProject
-
-// This is an alias to an internal value.
-const ACLRestrictObjectTypeExperiment = shared.ACLRestrictObjectTypeExperiment
-
-// This is an alias to an internal value.
-const ACLRestrictObjectTypeDataset = shared.ACLRestrictObjectTypeDataset
-
-// This is an alias to an internal value.
-const ACLRestrictObjectTypePrompt = shared.ACLRestrictObjectTypePrompt
-
-// This is an alias to an internal value.
-const ACLRestrictObjectTypePromptSession = shared.ACLRestrictObjectTypePromptSession
-
-// This is an alias to an internal value.
-const ACLRestrictObjectTypeGroup = shared.ACLRestrictObjectTypeGroup
-
-// This is an alias to an internal value.
-const ACLRestrictObjectTypeRole = shared.ACLRestrictObjectTypeRole
-
-// This is an alias to an internal value.
-const ACLRestrictObjectTypeOrgMember = shared.ACLRestrictObjectTypeOrgMember
-
-// This is an alias to an internal value.
-const ACLRestrictObjectTypeProjectLog = shared.ACLRestrictObjectTypeProjectLog
-
-// This is an alias to an internal value.
-const ACLRestrictObjectTypeOrgProject = shared.ACLRestrictObjectTypeOrgProject
-
-// This is an alias to an internal type.
-type ACLBatchUpdateResponse = shared.ACLBatchUpdateResponse
 
 // This is an alias to an internal type.
 type APIKey = shared.APIKey
@@ -546,44 +477,6 @@ const FunctionFunctionTypeTool = shared.FunctionFunctionTypeTool
 // This is an alias to an internal type.
 type FunctionOrigin = shared.FunctionOrigin
 
-// The object type that the ACL applies to
-//
-// This is an alias to an internal type.
-type FunctionOriginObjectType = shared.FunctionOriginObjectType
-
-// This is an alias to an internal value.
-const FunctionOriginObjectTypeOrganization = shared.FunctionOriginObjectTypeOrganization
-
-// This is an alias to an internal value.
-const FunctionOriginObjectTypeProject = shared.FunctionOriginObjectTypeProject
-
-// This is an alias to an internal value.
-const FunctionOriginObjectTypeExperiment = shared.FunctionOriginObjectTypeExperiment
-
-// This is an alias to an internal value.
-const FunctionOriginObjectTypeDataset = shared.FunctionOriginObjectTypeDataset
-
-// This is an alias to an internal value.
-const FunctionOriginObjectTypePrompt = shared.FunctionOriginObjectTypePrompt
-
-// This is an alias to an internal value.
-const FunctionOriginObjectTypePromptSession = shared.FunctionOriginObjectTypePromptSession
-
-// This is an alias to an internal value.
-const FunctionOriginObjectTypeGroup = shared.FunctionOriginObjectTypeGroup
-
-// This is an alias to an internal value.
-const FunctionOriginObjectTypeRole = shared.FunctionOriginObjectTypeRole
-
-// This is an alias to an internal value.
-const FunctionOriginObjectTypeOrgMember = shared.FunctionOriginObjectTypeOrgMember
-
-// This is an alias to an internal value.
-const FunctionOriginObjectTypeProjectLog = shared.FunctionOriginObjectTypeProjectLog
-
-// This is an alias to an internal value.
-const FunctionOriginObjectTypeOrgProject = shared.FunctionOriginObjectTypeOrgProject
-
 // A group is a collection of users which can be assigned an ACL
 //
 // Groups can consist of individual users, as well as a set of groups they inherit
@@ -762,6 +655,38 @@ type PatchOrganizationMembersOutputStatus = shared.PatchOrganizationMembersOutpu
 // This is an alias to an internal value.
 const PatchOrganizationMembersOutputStatusSuccess = shared.PatchOrganizationMembersOutputStatusSuccess
 
+// Each permission permits a certain type of operation on an object in the system
+//
+// Permissions can be assigned to to objects on an individual basis, or grouped
+// into roles
+//
+// This is an alias to an internal type.
+type Permission = shared.Permission
+
+// This is an alias to an internal value.
+const PermissionCreate = shared.PermissionCreate
+
+// This is an alias to an internal value.
+const PermissionRead = shared.PermissionRead
+
+// This is an alias to an internal value.
+const PermissionUpdate = shared.PermissionUpdate
+
+// This is an alias to an internal value.
+const PermissionDelete = shared.PermissionDelete
+
+// This is an alias to an internal value.
+const PermissionCreateACLs = shared.PermissionCreateACLs
+
+// This is an alias to an internal value.
+const PermissionReadACLs = shared.PermissionReadACLs
+
+// This is an alias to an internal value.
+const PermissionUpdateACLs = shared.PermissionUpdateACLs
+
+// This is an alias to an internal value.
+const PermissionDeleteACLs = shared.PermissionDeleteACLs
+
 // This is an alias to an internal type.
 type Project = shared.Project
 
@@ -806,32 +731,6 @@ type ProjectLogsEventMetrics = shared.ProjectLogsEventMetrics
 // This is an alias to an internal type.
 type ProjectScore = shared.ProjectScore
 
-// The type of the configured score
-//
-// This is an alias to an internal type.
-type ProjectScoreScoreType = shared.ProjectScoreScoreType
-
-// This is an alias to an internal value.
-const ProjectScoreScoreTypeSlider = shared.ProjectScoreScoreTypeSlider
-
-// This is an alias to an internal value.
-const ProjectScoreScoreTypeCategorical = shared.ProjectScoreScoreTypeCategorical
-
-// This is an alias to an internal value.
-const ProjectScoreScoreTypeWeighted = shared.ProjectScoreScoreTypeWeighted
-
-// This is an alias to an internal value.
-const ProjectScoreScoreTypeMinimum = shared.ProjectScoreScoreTypeMinimum
-
-// This is an alias to an internal value.
-const ProjectScoreScoreTypeMaximum = shared.ProjectScoreScoreTypeMaximum
-
-// This is an alias to an internal value.
-const ProjectScoreScoreTypeOnline = shared.ProjectScoreScoreTypeOnline
-
-// This is an alias to an internal value.
-const ProjectScoreScoreTypeFreeForm = shared.ProjectScoreScoreTypeFreeForm
-
 // For categorical-type project scores, the list of all categories
 //
 // This is an alias to an internal type.
@@ -862,6 +761,32 @@ type ProjectScoreConfig = shared.ProjectScoreConfig
 
 // This is an alias to an internal type.
 type ProjectScoreConfigParam = shared.ProjectScoreConfigParam
+
+// The type of the configured score
+//
+// This is an alias to an internal type.
+type ProjectScoreType = shared.ProjectScoreType
+
+// This is an alias to an internal value.
+const ProjectScoreTypeSlider = shared.ProjectScoreTypeSlider
+
+// This is an alias to an internal value.
+const ProjectScoreTypeCategorical = shared.ProjectScoreTypeCategorical
+
+// This is an alias to an internal value.
+const ProjectScoreTypeWeighted = shared.ProjectScoreTypeWeighted
+
+// This is an alias to an internal value.
+const ProjectScoreTypeMinimum = shared.ProjectScoreTypeMinimum
+
+// This is an alias to an internal value.
+const ProjectScoreTypeMaximum = shared.ProjectScoreTypeMaximum
+
+// This is an alias to an internal value.
+const ProjectScoreTypeOnline = shared.ProjectScoreTypeOnline
+
+// This is an alias to an internal value.
+const ProjectScoreTypeFreeForm = shared.ProjectScoreTypeFreeForm
 
 // This is an alias to an internal type.
 type ProjectSettings = shared.ProjectSettings
@@ -1337,76 +1262,6 @@ type Role = shared.Role
 // This is an alias to an internal type.
 type RoleMemberPermission = shared.RoleMemberPermission
 
-// Each permission permits a certain type of operation on an object in the system
-//
-// Permissions can be assigned to to objects on an individual basis, or grouped
-// into roles
-//
-// This is an alias to an internal type.
-type RoleMemberPermissionsPermission = shared.RoleMemberPermissionsPermission
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsPermissionCreate = shared.RoleMemberPermissionsPermissionCreate
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsPermissionRead = shared.RoleMemberPermissionsPermissionRead
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsPermissionUpdate = shared.RoleMemberPermissionsPermissionUpdate
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsPermissionDelete = shared.RoleMemberPermissionsPermissionDelete
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsPermissionCreateACLs = shared.RoleMemberPermissionsPermissionCreateACLs
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsPermissionReadACLs = shared.RoleMemberPermissionsPermissionReadACLs
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsPermissionUpdateACLs = shared.RoleMemberPermissionsPermissionUpdateACLs
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsPermissionDeleteACLs = shared.RoleMemberPermissionsPermissionDeleteACLs
-
-// The object type that the ACL applies to
-//
-// This is an alias to an internal type.
-type RoleMemberPermissionsRestrictObjectType = shared.RoleMemberPermissionsRestrictObjectType
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsRestrictObjectTypeOrganization = shared.RoleMemberPermissionsRestrictObjectTypeOrganization
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsRestrictObjectTypeProject = shared.RoleMemberPermissionsRestrictObjectTypeProject
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsRestrictObjectTypeExperiment = shared.RoleMemberPermissionsRestrictObjectTypeExperiment
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsRestrictObjectTypeDataset = shared.RoleMemberPermissionsRestrictObjectTypeDataset
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsRestrictObjectTypePrompt = shared.RoleMemberPermissionsRestrictObjectTypePrompt
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsRestrictObjectTypePromptSession = shared.RoleMemberPermissionsRestrictObjectTypePromptSession
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsRestrictObjectTypeGroup = shared.RoleMemberPermissionsRestrictObjectTypeGroup
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsRestrictObjectTypeRole = shared.RoleMemberPermissionsRestrictObjectTypeRole
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsRestrictObjectTypeOrgMember = shared.RoleMemberPermissionsRestrictObjectTypeOrgMember
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsRestrictObjectTypeProjectLog = shared.RoleMemberPermissionsRestrictObjectTypeProjectLog
-
-// This is an alias to an internal value.
-const RoleMemberPermissionsRestrictObjectTypeOrgProject = shared.RoleMemberPermissionsRestrictObjectTypeOrgProject
-
 // Summary of a score's performance
 //
 // This is an alias to an internal type.
@@ -1417,29 +1272,6 @@ type ScoreSummary = shared.ScoreSummary
 // This is an alias to an internal type.
 type SpanAttributes = shared.SpanAttributes
 
-// Type of the span, for display purposes only
-//
-// This is an alias to an internal type.
-type SpanAttributesType = shared.SpanAttributesType
-
-// This is an alias to an internal value.
-const SpanAttributesTypeLlm = shared.SpanAttributesTypeLlm
-
-// This is an alias to an internal value.
-const SpanAttributesTypeScore = shared.SpanAttributesTypeScore
-
-// This is an alias to an internal value.
-const SpanAttributesTypeFunction = shared.SpanAttributesTypeFunction
-
-// This is an alias to an internal value.
-const SpanAttributesTypeEval = shared.SpanAttributesTypeEval
-
-// This is an alias to an internal value.
-const SpanAttributesTypeTask = shared.SpanAttributesTypeTask
-
-// This is an alias to an internal value.
-const SpanAttributesTypeTool = shared.SpanAttributesTypeTool
-
 // Human-identifying attributes of the span, such as name, type, etc.
 //
 // This is an alias to an internal type.
@@ -1447,6 +1279,29 @@ type SpanAttributesParam = shared.SpanAttributesParam
 
 // This is an alias to an internal type.
 type SpanIFrame = shared.SpanIFrame
+
+// Type of the span, for display purposes only
+//
+// This is an alias to an internal type.
+type SpanType = shared.SpanType
+
+// This is an alias to an internal value.
+const SpanTypeLlm = shared.SpanTypeLlm
+
+// This is an alias to an internal value.
+const SpanTypeScore = shared.SpanTypeScore
+
+// This is an alias to an internal value.
+const SpanTypeFunction = shared.SpanTypeFunction
+
+// This is an alias to an internal value.
+const SpanTypeEval = shared.SpanTypeEval
+
+// This is an alias to an internal value.
+const SpanTypeTask = shared.SpanTypeTask
+
+// This is an alias to an internal value.
+const SpanTypeTool = shared.SpanTypeTool
 
 // Summary of a dataset
 //
@@ -1463,44 +1318,6 @@ type User = shared.User
 
 // This is an alias to an internal type.
 type View = shared.View
-
-// The object type that the ACL applies to
-//
-// This is an alias to an internal type.
-type ViewObjectType = shared.ViewObjectType
-
-// This is an alias to an internal value.
-const ViewObjectTypeOrganization = shared.ViewObjectTypeOrganization
-
-// This is an alias to an internal value.
-const ViewObjectTypeProject = shared.ViewObjectTypeProject
-
-// This is an alias to an internal value.
-const ViewObjectTypeExperiment = shared.ViewObjectTypeExperiment
-
-// This is an alias to an internal value.
-const ViewObjectTypeDataset = shared.ViewObjectTypeDataset
-
-// This is an alias to an internal value.
-const ViewObjectTypePrompt = shared.ViewObjectTypePrompt
-
-// This is an alias to an internal value.
-const ViewObjectTypePromptSession = shared.ViewObjectTypePromptSession
-
-// This is an alias to an internal value.
-const ViewObjectTypeGroup = shared.ViewObjectTypeGroup
-
-// This is an alias to an internal value.
-const ViewObjectTypeRole = shared.ViewObjectTypeRole
-
-// This is an alias to an internal value.
-const ViewObjectTypeOrgMember = shared.ViewObjectTypeOrgMember
-
-// This is an alias to an internal value.
-const ViewObjectTypeProjectLog = shared.ViewObjectTypeProjectLog
-
-// This is an alias to an internal value.
-const ViewObjectTypeOrgProject = shared.ViewObjectTypeOrgProject
 
 // Type of table that the view corresponds to.
 //
@@ -1565,3 +1382,41 @@ type ViewOptions = shared.ViewOptions
 //
 // This is an alias to an internal type.
 type ViewOptionsParam = shared.ViewOptionsParam
+
+// Type of table that the view corresponds to.
+//
+// This is an alias to an internal type.
+type ViewType = shared.ViewType
+
+// This is an alias to an internal value.
+const ViewTypeProjects = shared.ViewTypeProjects
+
+// This is an alias to an internal value.
+const ViewTypeExperiments = shared.ViewTypeExperiments
+
+// This is an alias to an internal value.
+const ViewTypeExperiment = shared.ViewTypeExperiment
+
+// This is an alias to an internal value.
+const ViewTypePlaygrounds = shared.ViewTypePlaygrounds
+
+// This is an alias to an internal value.
+const ViewTypePlayground = shared.ViewTypePlayground
+
+// This is an alias to an internal value.
+const ViewTypeDatasets = shared.ViewTypeDatasets
+
+// This is an alias to an internal value.
+const ViewTypeDataset = shared.ViewTypeDataset
+
+// This is an alias to an internal value.
+const ViewTypePrompts = shared.ViewTypePrompts
+
+// This is an alias to an internal value.
+const ViewTypeTools = shared.ViewTypeTools
+
+// This is an alias to an internal value.
+const ViewTypeScorers = shared.ViewTypeScorers
+
+// This is an alias to an internal value.
+const ViewTypeLogs = shared.ViewTypeLogs
