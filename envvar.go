@@ -178,7 +178,7 @@ type EnvVarListParams struct {
 	// The id of the object the environment variable is scoped for
 	ObjectID param.Field[string] `query:"object_id" format:"uuid"`
 	// The type of the object the environment variable is scoped for
-	ObjectType param.Field[EnvVarListParamsObjectType] `query:"object_type"`
+	ObjectType param.Field[shared.EnvVarObjectType] `query:"object_type"`
 }
 
 // URLQuery serializes [EnvVarListParams]'s query parameters as `url.Values`.
@@ -200,23 +200,6 @@ type EnvVarListParamsIDsUnion interface {
 type EnvVarListParamsIDsArray []string
 
 func (r EnvVarListParamsIDsArray) ImplementsEnvVarListParamsIDsUnion() {}
-
-// The type of the object the environment variable is scoped for
-type EnvVarListParamsObjectType string
-
-const (
-	EnvVarListParamsObjectTypeOrganization EnvVarListParamsObjectType = "organization"
-	EnvVarListParamsObjectTypeProject      EnvVarListParamsObjectType = "project"
-	EnvVarListParamsObjectTypeFunction     EnvVarListParamsObjectType = "function"
-)
-
-func (r EnvVarListParamsObjectType) IsKnown() bool {
-	switch r {
-	case EnvVarListParamsObjectTypeOrganization, EnvVarListParamsObjectTypeProject, EnvVarListParamsObjectTypeFunction:
-		return true
-	}
-	return false
-}
 
 type EnvVarReplaceParams struct {
 	// The name of the environment variable

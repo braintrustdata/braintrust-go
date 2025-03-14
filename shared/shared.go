@@ -76,10 +76,10 @@ type ACL struct {
 	GroupID string `json:"group_id,nullable" format:"uuid"`
 	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
-	Permission ACLPermission `json:"permission,nullable"`
+	Permission Permission `json:"permission,nullable"`
 	// When setting a permission directly, optionally restricts the permission grant to
 	// just the specified object type. Cannot be set alongside a `role_id`.
-	RestrictObjectType ACLRestrictObjectType `json:"restrict_object_type,nullable"`
+	RestrictObjectType ACLObjectType `json:"restrict_object_type,nullable"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
 	RoleID string `json:"role_id,nullable" format:"uuid"`
@@ -111,80 +111,6 @@ func (r *ACL) UnmarshalJSON(data []byte) (err error) {
 
 func (r aclJSON) RawJSON() string {
 	return r.raw
-}
-
-// The object type that the ACL applies to
-type ACLObjectType string
-
-const (
-	ACLObjectTypeOrganization  ACLObjectType = "organization"
-	ACLObjectTypeProject       ACLObjectType = "project"
-	ACLObjectTypeExperiment    ACLObjectType = "experiment"
-	ACLObjectTypeDataset       ACLObjectType = "dataset"
-	ACLObjectTypePrompt        ACLObjectType = "prompt"
-	ACLObjectTypePromptSession ACLObjectType = "prompt_session"
-	ACLObjectTypeGroup         ACLObjectType = "group"
-	ACLObjectTypeRole          ACLObjectType = "role"
-	ACLObjectTypeOrgMember     ACLObjectType = "org_member"
-	ACLObjectTypeProjectLog    ACLObjectType = "project_log"
-	ACLObjectTypeOrgProject    ACLObjectType = "org_project"
-)
-
-func (r ACLObjectType) IsKnown() bool {
-	switch r {
-	case ACLObjectTypeOrganization, ACLObjectTypeProject, ACLObjectTypeExperiment, ACLObjectTypeDataset, ACLObjectTypePrompt, ACLObjectTypePromptSession, ACLObjectTypeGroup, ACLObjectTypeRole, ACLObjectTypeOrgMember, ACLObjectTypeProjectLog, ACLObjectTypeOrgProject:
-		return true
-	}
-	return false
-}
-
-// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
-// provided
-type ACLPermission string
-
-const (
-	ACLPermissionCreate     ACLPermission = "create"
-	ACLPermissionRead       ACLPermission = "read"
-	ACLPermissionUpdate     ACLPermission = "update"
-	ACLPermissionDelete     ACLPermission = "delete"
-	ACLPermissionCreateACLs ACLPermission = "create_acls"
-	ACLPermissionReadACLs   ACLPermission = "read_acls"
-	ACLPermissionUpdateACLs ACLPermission = "update_acls"
-	ACLPermissionDeleteACLs ACLPermission = "delete_acls"
-)
-
-func (r ACLPermission) IsKnown() bool {
-	switch r {
-	case ACLPermissionCreate, ACLPermissionRead, ACLPermissionUpdate, ACLPermissionDelete, ACLPermissionCreateACLs, ACLPermissionReadACLs, ACLPermissionUpdateACLs, ACLPermissionDeleteACLs:
-		return true
-	}
-	return false
-}
-
-// When setting a permission directly, optionally restricts the permission grant to
-// just the specified object type. Cannot be set alongside a `role_id`.
-type ACLRestrictObjectType string
-
-const (
-	ACLRestrictObjectTypeOrganization  ACLRestrictObjectType = "organization"
-	ACLRestrictObjectTypeProject       ACLRestrictObjectType = "project"
-	ACLRestrictObjectTypeExperiment    ACLRestrictObjectType = "experiment"
-	ACLRestrictObjectTypeDataset       ACLRestrictObjectType = "dataset"
-	ACLRestrictObjectTypePrompt        ACLRestrictObjectType = "prompt"
-	ACLRestrictObjectTypePromptSession ACLRestrictObjectType = "prompt_session"
-	ACLRestrictObjectTypeGroup         ACLRestrictObjectType = "group"
-	ACLRestrictObjectTypeRole          ACLRestrictObjectType = "role"
-	ACLRestrictObjectTypeOrgMember     ACLRestrictObjectType = "org_member"
-	ACLRestrictObjectTypeProjectLog    ACLRestrictObjectType = "project_log"
-	ACLRestrictObjectTypeOrgProject    ACLRestrictObjectType = "org_project"
-)
-
-func (r ACLRestrictObjectType) IsKnown() bool {
-	switch r {
-	case ACLRestrictObjectTypeOrganization, ACLRestrictObjectTypeProject, ACLRestrictObjectTypeExperiment, ACLRestrictObjectTypeDataset, ACLRestrictObjectTypePrompt, ACLRestrictObjectTypePromptSession, ACLRestrictObjectTypeGroup, ACLRestrictObjectTypeRole, ACLRestrictObjectTypeOrgMember, ACLRestrictObjectTypeProjectLog, ACLRestrictObjectTypeOrgProject:
-		return true
-	}
-	return false
 }
 
 type ACLBatchUpdateResponse struct {
@@ -228,6 +154,31 @@ func (r *ACLBatchUpdateResponse) UnmarshalJSON(data []byte) (err error) {
 
 func (r aclBatchUpdateResponseJSON) RawJSON() string {
 	return r.raw
+}
+
+// The object type that the ACL applies to
+type ACLObjectType string
+
+const (
+	ACLObjectTypeOrganization  ACLObjectType = "organization"
+	ACLObjectTypeProject       ACLObjectType = "project"
+	ACLObjectTypeExperiment    ACLObjectType = "experiment"
+	ACLObjectTypeDataset       ACLObjectType = "dataset"
+	ACLObjectTypePrompt        ACLObjectType = "prompt"
+	ACLObjectTypePromptSession ACLObjectType = "prompt_session"
+	ACLObjectTypeGroup         ACLObjectType = "group"
+	ACLObjectTypeRole          ACLObjectType = "role"
+	ACLObjectTypeOrgMember     ACLObjectType = "org_member"
+	ACLObjectTypeProjectLog    ACLObjectType = "project_log"
+	ACLObjectTypeOrgProject    ACLObjectType = "org_project"
+)
+
+func (r ACLObjectType) IsKnown() bool {
+	switch r {
+	case ACLObjectTypeOrganization, ACLObjectTypeProject, ACLObjectTypeExperiment, ACLObjectTypeDataset, ACLObjectTypePrompt, ACLObjectTypePromptSession, ACLObjectTypeGroup, ACLObjectTypeRole, ACLObjectTypeOrgMember, ACLObjectTypeProjectLog, ACLObjectTypeOrgProject:
+		return true
+	}
+	return false
 }
 
 type APIKey struct {
@@ -2288,7 +2239,7 @@ type FunctionOrigin struct {
 	// Id of the object the function is originating from
 	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType FunctionOriginObjectType `json:"object_type,required"`
+	ObjectType ACLObjectType `json:"object_type,required"`
 	// The function exists for internal purposes and should not be displayed in the
 	// list of functions.
 	Internal bool               `json:"internal,nullable"`
@@ -2310,31 +2261,6 @@ func (r *FunctionOrigin) UnmarshalJSON(data []byte) (err error) {
 
 func (r functionOriginJSON) RawJSON() string {
 	return r.raw
-}
-
-// The object type that the ACL applies to
-type FunctionOriginObjectType string
-
-const (
-	FunctionOriginObjectTypeOrganization  FunctionOriginObjectType = "organization"
-	FunctionOriginObjectTypeProject       FunctionOriginObjectType = "project"
-	FunctionOriginObjectTypeExperiment    FunctionOriginObjectType = "experiment"
-	FunctionOriginObjectTypeDataset       FunctionOriginObjectType = "dataset"
-	FunctionOriginObjectTypePrompt        FunctionOriginObjectType = "prompt"
-	FunctionOriginObjectTypePromptSession FunctionOriginObjectType = "prompt_session"
-	FunctionOriginObjectTypeGroup         FunctionOriginObjectType = "group"
-	FunctionOriginObjectTypeRole          FunctionOriginObjectType = "role"
-	FunctionOriginObjectTypeOrgMember     FunctionOriginObjectType = "org_member"
-	FunctionOriginObjectTypeProjectLog    FunctionOriginObjectType = "project_log"
-	FunctionOriginObjectTypeOrgProject    FunctionOriginObjectType = "org_project"
-)
-
-func (r FunctionOriginObjectType) IsKnown() bool {
-	switch r {
-	case FunctionOriginObjectTypeOrganization, FunctionOriginObjectTypeProject, FunctionOriginObjectTypeExperiment, FunctionOriginObjectTypeDataset, FunctionOriginObjectTypePrompt, FunctionOriginObjectTypePromptSession, FunctionOriginObjectTypeGroup, FunctionOriginObjectTypeRole, FunctionOriginObjectTypeOrgMember, FunctionOriginObjectTypeProjectLog, FunctionOriginObjectTypeOrgProject:
-		return true
-	}
-	return false
 }
 
 // A group is a collection of users which can be assigned an ACL
@@ -3427,6 +3353,31 @@ func (r PatchOrganizationMembersOutputStatus) IsKnown() bool {
 	return false
 }
 
+// Each permission permits a certain type of operation on an object in the system
+//
+// Permissions can be assigned to to objects on an individual basis, or grouped
+// into roles
+type Permission string
+
+const (
+	PermissionCreate     Permission = "create"
+	PermissionRead       Permission = "read"
+	PermissionUpdate     Permission = "update"
+	PermissionDelete     Permission = "delete"
+	PermissionCreateACLs Permission = "create_acls"
+	PermissionReadACLs   Permission = "read_acls"
+	PermissionUpdateACLs Permission = "update_acls"
+	PermissionDeleteACLs Permission = "delete_acls"
+)
+
+func (r Permission) IsKnown() bool {
+	switch r {
+	case PermissionCreate, PermissionRead, PermissionUpdate, PermissionDelete, PermissionCreateACLs, PermissionReadACLs, PermissionUpdateACLs, PermissionDeleteACLs:
+		return true
+	}
+	return false
+}
+
 type Project struct {
 	// Unique identifier for the project
 	ID string `json:"id,required" format:"uuid"`
@@ -3719,8 +3670,8 @@ type ProjectScore struct {
 	// Unique identifier for the project that the project score belongs under
 	ProjectID string `json:"project_id,required" format:"uuid"`
 	// The type of the configured score
-	ScoreType ProjectScoreScoreType `json:"score_type,required"`
-	UserID    string                `json:"user_id,required" format:"uuid"`
+	ScoreType ProjectScoreType `json:"score_type,required"`
+	UserID    string           `json:"user_id,required" format:"uuid"`
 	// For categorical-type project scores, the list of all categories
 	Categories ProjectScoreCategoriesUnion `json:"categories,nullable"`
 	Config     ProjectScoreConfig          `json:"config,nullable"`
@@ -3756,27 +3707,6 @@ func (r *ProjectScore) UnmarshalJSON(data []byte) (err error) {
 
 func (r projectScoreJSON) RawJSON() string {
 	return r.raw
-}
-
-// The type of the configured score
-type ProjectScoreScoreType string
-
-const (
-	ProjectScoreScoreTypeSlider      ProjectScoreScoreType = "slider"
-	ProjectScoreScoreTypeCategorical ProjectScoreScoreType = "categorical"
-	ProjectScoreScoreTypeWeighted    ProjectScoreScoreType = "weighted"
-	ProjectScoreScoreTypeMinimum     ProjectScoreScoreType = "minimum"
-	ProjectScoreScoreTypeMaximum     ProjectScoreScoreType = "maximum"
-	ProjectScoreScoreTypeOnline      ProjectScoreScoreType = "online"
-	ProjectScoreScoreTypeFreeForm    ProjectScoreScoreType = "free-form"
-)
-
-func (r ProjectScoreScoreType) IsKnown() bool {
-	switch r {
-	case ProjectScoreScoreTypeSlider, ProjectScoreScoreTypeCategorical, ProjectScoreScoreTypeWeighted, ProjectScoreScoreTypeMinimum, ProjectScoreScoreTypeMaximum, ProjectScoreScoreTypeOnline, ProjectScoreScoreTypeFreeForm:
-		return true
-	}
-	return false
 }
 
 // For categorical-type project scores, the list of all categories
@@ -3882,6 +3812,29 @@ type ProjectScoreConfigParam struct {
 func (r ProjectScoreConfigParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
+
+// The type of the configured score
+type ProjectScoreType string
+
+const (
+	ProjectScoreTypeSlider      ProjectScoreType = "slider"
+	ProjectScoreTypeCategorical ProjectScoreType = "categorical"
+	ProjectScoreTypeWeighted    ProjectScoreType = "weighted"
+	ProjectScoreTypeMinimum     ProjectScoreType = "minimum"
+	ProjectScoreTypeMaximum     ProjectScoreType = "maximum"
+	ProjectScoreTypeOnline      ProjectScoreType = "online"
+	ProjectScoreTypeFreeForm    ProjectScoreType = "free-form"
+)
+
+func (r ProjectScoreType) IsKnown() bool {
+	switch r {
+	case ProjectScoreTypeSlider, ProjectScoreTypeCategorical, ProjectScoreTypeWeighted, ProjectScoreTypeMinimum, ProjectScoreTypeMaximum, ProjectScoreTypeOnline, ProjectScoreTypeFreeForm:
+		return true
+	}
+	return false
+}
+
+func (r ProjectScoreType) ImplementsProjectScoreListParamsScoreTypeUnion() {}
 
 type ProjectSettings struct {
 	// The id of the experiment to use as the default baseline for comparisons
@@ -6176,10 +6129,10 @@ type RoleMemberPermission struct {
 	//
 	// Permissions can be assigned to to objects on an individual basis, or grouped
 	// into roles
-	Permission RoleMemberPermissionsPermission `json:"permission,required"`
+	Permission Permission `json:"permission,required"`
 	// The object type that the ACL applies to
-	RestrictObjectType RoleMemberPermissionsRestrictObjectType `json:"restrict_object_type,nullable"`
-	JSON               roleMemberPermissionJSON                `json:"-"`
+	RestrictObjectType ACLObjectType            `json:"restrict_object_type,nullable"`
+	JSON               roleMemberPermissionJSON `json:"-"`
 }
 
 // roleMemberPermissionJSON contains the JSON metadata for the struct
@@ -6197,56 +6150,6 @@ func (r *RoleMemberPermission) UnmarshalJSON(data []byte) (err error) {
 
 func (r roleMemberPermissionJSON) RawJSON() string {
 	return r.raw
-}
-
-// Each permission permits a certain type of operation on an object in the system
-//
-// Permissions can be assigned to to objects on an individual basis, or grouped
-// into roles
-type RoleMemberPermissionsPermission string
-
-const (
-	RoleMemberPermissionsPermissionCreate     RoleMemberPermissionsPermission = "create"
-	RoleMemberPermissionsPermissionRead       RoleMemberPermissionsPermission = "read"
-	RoleMemberPermissionsPermissionUpdate     RoleMemberPermissionsPermission = "update"
-	RoleMemberPermissionsPermissionDelete     RoleMemberPermissionsPermission = "delete"
-	RoleMemberPermissionsPermissionCreateACLs RoleMemberPermissionsPermission = "create_acls"
-	RoleMemberPermissionsPermissionReadACLs   RoleMemberPermissionsPermission = "read_acls"
-	RoleMemberPermissionsPermissionUpdateACLs RoleMemberPermissionsPermission = "update_acls"
-	RoleMemberPermissionsPermissionDeleteACLs RoleMemberPermissionsPermission = "delete_acls"
-)
-
-func (r RoleMemberPermissionsPermission) IsKnown() bool {
-	switch r {
-	case RoleMemberPermissionsPermissionCreate, RoleMemberPermissionsPermissionRead, RoleMemberPermissionsPermissionUpdate, RoleMemberPermissionsPermissionDelete, RoleMemberPermissionsPermissionCreateACLs, RoleMemberPermissionsPermissionReadACLs, RoleMemberPermissionsPermissionUpdateACLs, RoleMemberPermissionsPermissionDeleteACLs:
-		return true
-	}
-	return false
-}
-
-// The object type that the ACL applies to
-type RoleMemberPermissionsRestrictObjectType string
-
-const (
-	RoleMemberPermissionsRestrictObjectTypeOrganization  RoleMemberPermissionsRestrictObjectType = "organization"
-	RoleMemberPermissionsRestrictObjectTypeProject       RoleMemberPermissionsRestrictObjectType = "project"
-	RoleMemberPermissionsRestrictObjectTypeExperiment    RoleMemberPermissionsRestrictObjectType = "experiment"
-	RoleMemberPermissionsRestrictObjectTypeDataset       RoleMemberPermissionsRestrictObjectType = "dataset"
-	RoleMemberPermissionsRestrictObjectTypePrompt        RoleMemberPermissionsRestrictObjectType = "prompt"
-	RoleMemberPermissionsRestrictObjectTypePromptSession RoleMemberPermissionsRestrictObjectType = "prompt_session"
-	RoleMemberPermissionsRestrictObjectTypeGroup         RoleMemberPermissionsRestrictObjectType = "group"
-	RoleMemberPermissionsRestrictObjectTypeRole          RoleMemberPermissionsRestrictObjectType = "role"
-	RoleMemberPermissionsRestrictObjectTypeOrgMember     RoleMemberPermissionsRestrictObjectType = "org_member"
-	RoleMemberPermissionsRestrictObjectTypeProjectLog    RoleMemberPermissionsRestrictObjectType = "project_log"
-	RoleMemberPermissionsRestrictObjectTypeOrgProject    RoleMemberPermissionsRestrictObjectType = "org_project"
-)
-
-func (r RoleMemberPermissionsRestrictObjectType) IsKnown() bool {
-	switch r {
-	case RoleMemberPermissionsRestrictObjectTypeOrganization, RoleMemberPermissionsRestrictObjectTypeProject, RoleMemberPermissionsRestrictObjectTypeExperiment, RoleMemberPermissionsRestrictObjectTypeDataset, RoleMemberPermissionsRestrictObjectTypePrompt, RoleMemberPermissionsRestrictObjectTypePromptSession, RoleMemberPermissionsRestrictObjectTypeGroup, RoleMemberPermissionsRestrictObjectTypeRole, RoleMemberPermissionsRestrictObjectTypeOrgMember, RoleMemberPermissionsRestrictObjectTypeProjectLog, RoleMemberPermissionsRestrictObjectTypeOrgProject:
-		return true
-	}
-	return false
 }
 
 // Summary of a score's performance
@@ -6288,7 +6191,7 @@ type SpanAttributes struct {
 	// Name of the span, for display purposes only
 	Name string `json:"name,nullable"`
 	// Type of the span, for display purposes only
-	Type        SpanAttributesType     `json:"type,nullable"`
+	Type        SpanType               `json:"type,nullable"`
 	ExtraFields map[string]interface{} `json:"-,extras"`
 	JSON        spanAttributesJSON     `json:"-"`
 }
@@ -6309,33 +6212,13 @@ func (r spanAttributesJSON) RawJSON() string {
 	return r.raw
 }
 
-// Type of the span, for display purposes only
-type SpanAttributesType string
-
-const (
-	SpanAttributesTypeLlm      SpanAttributesType = "llm"
-	SpanAttributesTypeScore    SpanAttributesType = "score"
-	SpanAttributesTypeFunction SpanAttributesType = "function"
-	SpanAttributesTypeEval     SpanAttributesType = "eval"
-	SpanAttributesTypeTask     SpanAttributesType = "task"
-	SpanAttributesTypeTool     SpanAttributesType = "tool"
-)
-
-func (r SpanAttributesType) IsKnown() bool {
-	switch r {
-	case SpanAttributesTypeLlm, SpanAttributesTypeScore, SpanAttributesTypeFunction, SpanAttributesTypeEval, SpanAttributesTypeTask, SpanAttributesTypeTool:
-		return true
-	}
-	return false
-}
-
 // Human-identifying attributes of the span, such as name, type, etc.
 type SpanAttributesParam struct {
 	// Name of the span, for display purposes only
 	Name param.Field[string] `json:"name"`
 	// Type of the span, for display purposes only
-	Type        param.Field[SpanAttributesType] `json:"type"`
-	ExtraFields map[string]interface{}          `json:"-,extras"`
+	Type        param.Field[SpanType]  `json:"type"`
+	ExtraFields map[string]interface{} `json:"-,extras"`
 }
 
 func (r SpanAttributesParam) MarshalJSON() (data []byte, err error) {
@@ -6386,6 +6269,26 @@ func (r *SpanIFrame) UnmarshalJSON(data []byte) (err error) {
 
 func (r spanIFrameJSON) RawJSON() string {
 	return r.raw
+}
+
+// Type of the span, for display purposes only
+type SpanType string
+
+const (
+	SpanTypeLlm      SpanType = "llm"
+	SpanTypeScore    SpanType = "score"
+	SpanTypeFunction SpanType = "function"
+	SpanTypeEval     SpanType = "eval"
+	SpanTypeTask     SpanType = "task"
+	SpanTypeTool     SpanType = "tool"
+)
+
+func (r SpanType) IsKnown() bool {
+	switch r {
+	case SpanTypeLlm, SpanTypeScore, SpanTypeFunction, SpanTypeEval, SpanTypeTask, SpanTypeTool:
+		return true
+	}
+	return false
 }
 
 // Summary of a dataset
@@ -6508,7 +6411,7 @@ type View struct {
 	// The id of the object the view applies to
 	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType ViewObjectType `json:"object_type,required"`
+	ObjectType ACLObjectType `json:"object_type,required"`
 	// Type of table that the view corresponds to.
 	ViewType ViewViewType `json:"view_type,required,nullable"`
 	// Date of view creation
@@ -6546,31 +6449,6 @@ func (r *View) UnmarshalJSON(data []byte) (err error) {
 
 func (r viewJSON) RawJSON() string {
 	return r.raw
-}
-
-// The object type that the ACL applies to
-type ViewObjectType string
-
-const (
-	ViewObjectTypeOrganization  ViewObjectType = "organization"
-	ViewObjectTypeProject       ViewObjectType = "project"
-	ViewObjectTypeExperiment    ViewObjectType = "experiment"
-	ViewObjectTypeDataset       ViewObjectType = "dataset"
-	ViewObjectTypePrompt        ViewObjectType = "prompt"
-	ViewObjectTypePromptSession ViewObjectType = "prompt_session"
-	ViewObjectTypeGroup         ViewObjectType = "group"
-	ViewObjectTypeRole          ViewObjectType = "role"
-	ViewObjectTypeOrgMember     ViewObjectType = "org_member"
-	ViewObjectTypeProjectLog    ViewObjectType = "project_log"
-	ViewObjectTypeOrgProject    ViewObjectType = "org_project"
-)
-
-func (r ViewObjectType) IsKnown() bool {
-	switch r {
-	case ViewObjectTypeOrganization, ViewObjectTypeProject, ViewObjectTypeExperiment, ViewObjectTypeDataset, ViewObjectTypePrompt, ViewObjectTypePromptSession, ViewObjectTypeGroup, ViewObjectTypeRole, ViewObjectTypeOrgMember, ViewObjectTypeProjectLog, ViewObjectTypeOrgProject:
-		return true
-	}
-	return false
 }
 
 // Type of table that the view corresponds to.
@@ -6708,4 +6586,29 @@ type ViewOptionsParam struct {
 
 func (r ViewOptionsParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
+}
+
+// Type of table that the view corresponds to.
+type ViewType string
+
+const (
+	ViewTypeProjects    ViewType = "projects"
+	ViewTypeExperiments ViewType = "experiments"
+	ViewTypeExperiment  ViewType = "experiment"
+	ViewTypePlaygrounds ViewType = "playgrounds"
+	ViewTypePlayground  ViewType = "playground"
+	ViewTypeDatasets    ViewType = "datasets"
+	ViewTypeDataset     ViewType = "dataset"
+	ViewTypePrompts     ViewType = "prompts"
+	ViewTypeTools       ViewType = "tools"
+	ViewTypeScorers     ViewType = "scorers"
+	ViewTypeLogs        ViewType = "logs"
+)
+
+func (r ViewType) IsKnown() bool {
+	switch r {
+	case ViewTypeProjects, ViewTypeExperiments, ViewTypeExperiment, ViewTypePlaygrounds, ViewTypePlayground, ViewTypeDatasets, ViewTypeDataset, ViewTypePrompts, ViewTypeTools, ViewTypeScorers, ViewTypeLogs:
+		return true
+	}
+	return false
 }

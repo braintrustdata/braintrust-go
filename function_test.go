@@ -41,7 +41,7 @@ func TestFunctionNewWithOptionalParams(t *testing.T) {
 		FunctionType: braintrust.F(braintrust.FunctionNewParamsFunctionTypeLlm),
 		Origin: braintrust.F(braintrust.FunctionNewParamsOrigin{
 			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ObjectType: braintrust.F(braintrust.FunctionNewParamsOriginObjectTypeOrganization),
+			ObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 			Internal:   braintrust.F(true),
 		}),
 		PromptData: braintrust.F(shared.PromptDataParam{
@@ -330,7 +330,7 @@ func TestFunctionReplaceWithOptionalParams(t *testing.T) {
 		FunctionType: braintrust.F(braintrust.FunctionReplaceParamsFunctionTypeLlm),
 		Origin: braintrust.F(braintrust.FunctionReplaceParamsOrigin{
 			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ObjectType: braintrust.F(braintrust.FunctionReplaceParamsOriginObjectTypeOrganization),
+			ObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
 			Internal:   braintrust.F(true),
 		}),
 		PromptData: braintrust.F(shared.PromptDataParam{
