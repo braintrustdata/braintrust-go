@@ -312,13 +312,12 @@ func TestExperimentInsert(t *testing.T) {
 					CallerFunctionname: braintrust.F("caller_functionname"),
 					CallerLineno:       braintrust.F(int64(0)),
 				}),
-				Created:         braintrust.F(time.Now()),
-				DatasetRecordID: braintrust.F("dataset_record_id"),
-				Error:           braintrust.F[any](map[string]interface{}{}),
-				Expected:        braintrust.F[any](map[string]interface{}{}),
-				Input:           braintrust.F[any](map[string]interface{}{}),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": "bar",
+				Created:  braintrust.F(time.Now()),
+				Error:    braintrust.F[any](map[string]interface{}{}),
+				Expected: braintrust.F[any](map[string]interface{}{}),
+				Input:    braintrust.F[any](map[string]interface{}{}),
+				Metadata: braintrust.F(shared.InsertExperimentEventMetadataParam{
+					Model: braintrust.F("model"),
 				}),
 				Metrics: braintrust.F(shared.InsertExperimentEventMetricsParam{
 					CallerFilename:     braintrust.F[any](map[string]interface{}{}),
@@ -329,6 +328,13 @@ func TestExperimentInsert(t *testing.T) {
 					PromptTokens:       braintrust.F(int64(0)),
 					Start:              braintrust.F(0.000000),
 					Tokens:             braintrust.F(int64(0)),
+				}),
+				Origin: braintrust.F(shared.ObjectReferenceParam{
+					ID:         braintrust.F("id"),
+					XactID:     braintrust.F("_xact_id"),
+					ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+					ObjectType: braintrust.F(shared.ObjectReferenceObjectTypeExperiment),
+					Created:    braintrust.F("created"),
 				}),
 				Output:     braintrust.F[any](map[string]interface{}{}),
 				RootSpanID: braintrust.F("root_span_id"),

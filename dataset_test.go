@@ -275,8 +275,15 @@ func TestDatasetInsert(t *testing.T) {
 				Created:      braintrust.F(time.Now()),
 				Expected:     braintrust.F[any](map[string]interface{}{}),
 				Input:        braintrust.F[any](map[string]interface{}{}),
-				Metadata: braintrust.F(map[string]interface{}{
-					"foo": "bar",
+				Metadata: braintrust.F(shared.InsertDatasetEventMetadataParam{
+					Model: braintrust.F("model"),
+				}),
+				Origin: braintrust.F(shared.ObjectReferenceParam{
+					ID:         braintrust.F("id"),
+					XactID:     braintrust.F("_xact_id"),
+					ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+					ObjectType: braintrust.F(shared.ObjectReferenceObjectTypeExperiment),
+					Created:    braintrust.F("created"),
 				}),
 				RootSpanID:  braintrust.F("root_span_id"),
 				SpanID:      braintrust.F("span_id"),
