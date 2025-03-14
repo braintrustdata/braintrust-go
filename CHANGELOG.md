@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.0 (2025-03-14)
+
+Full Changelog: [v0.6.0...v0.7.0](https://github.com/braintrustdata/braintrust-go/compare/v0.6.0...v0.7.0)
+
+### Features
+
+* **api:** manual updates ([#135](https://github.com/braintrustdata/braintrust-go/issues/135)) ([b42ab00](https://github.com/braintrustdata/braintrust-go/commit/b42ab00d3ff3d2ce617c85e09dac892c6bf97082))
+
 ## 0.6.0 (2025-03-14)
 
 Full Changelog: [v0.5.0...v0.6.0](https://github.com/braintrustdata/braintrust-go/compare/v0.5.0...v0.6.0)
