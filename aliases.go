@@ -134,6 +134,9 @@ const ACLRestrictObjectTypeProjectLog = shared.ACLRestrictObjectTypeProjectLog
 const ACLRestrictObjectTypeOrgProject = shared.ACLRestrictObjectTypeOrgProject
 
 // This is an alias to an internal type.
+type ACLBatchUpdateResponse = shared.ACLBatchUpdateResponse
+
+// This is an alias to an internal type.
 type APIKey = shared.APIKey
 
 // This is an alias to an internal type.
