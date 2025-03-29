@@ -27,27 +27,31 @@ func TestProjectScoreNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ProjectScores.New(context.TODO(), braintrust.ProjectScoreNewParams{
-		Name:      braintrust.F("name"),
-		ProjectID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ScoreType: braintrust.F(shared.ProjectScoreTypeSlider),
-		Categories: braintrust.F[braintrust.ProjectScoreNewParamsCategoriesUnion](braintrust.ProjectScoreNewParamsCategoriesCategorical([]shared.ProjectScoreCategoryParam{{
-			Name:  braintrust.F("name"),
-			Value: braintrust.F(0.000000),
-		}})),
-		Config: braintrust.F(shared.ProjectScoreConfigParam{
-			Destination: braintrust.F("destination"),
-			MultiSelect: braintrust.F(true),
-			Online: braintrust.F(shared.OnlineScoreConfigParam{
-				SamplingRate: braintrust.F(0.000000),
-				Scorers: braintrust.F([]shared.OnlineScoreConfigScorersUnionParam{shared.OnlineScoreConfigScorersFunctionParam{
-					ID:   braintrust.F("id"),
-					Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
-				}}),
-				ApplyToRootSpan:  braintrust.F(true),
-				ApplyToSpanNames: braintrust.F([]string{"string"}),
-			}),
-		}),
-		Description: braintrust.F("description"),
+		Name:      "name",
+		ProjectID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		ScoreType: shared.ProjectScoreTypeSlider,
+		Categories: braintrust.ProjectScoreNewParamsCategoriesUnion{
+			OfCategorical: []shared.ProjectScoreCategoryParam{{
+				Name:  "name",
+				Value: 0,
+			}},
+		},
+		Config: shared.ProjectScoreConfigParam{
+			Destination: braintrust.String("destination"),
+			MultiSelect: braintrust.Bool(true),
+			Online: shared.OnlineScoreConfigParam{
+				SamplingRate: 0,
+				Scorers: []shared.OnlineScoreConfigScorerUnionParam{{
+					OfFunction: &shared.OnlineScoreConfigScorerFunctionParam{
+						ID:   "id",
+						Type: "function",
+					},
+				}},
+				ApplyToRootSpan:  braintrust.Bool(true),
+				ApplyToSpanNames: []string{"string"},
+			},
+		},
+		Description: braintrust.String("description"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -96,26 +100,30 @@ func TestProjectScoreUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectScoreUpdateParams{
-			Categories: braintrust.F[braintrust.ProjectScoreUpdateParamsCategoriesUnion](braintrust.ProjectScoreUpdateParamsCategoriesCategorical([]shared.ProjectScoreCategoryParam{{
-				Name:  braintrust.F("name"),
-				Value: braintrust.F(0.000000),
-			}})),
-			Config: braintrust.F(shared.ProjectScoreConfigParam{
-				Destination: braintrust.F("destination"),
-				MultiSelect: braintrust.F(true),
-				Online: braintrust.F(shared.OnlineScoreConfigParam{
-					SamplingRate: braintrust.F(0.000000),
-					Scorers: braintrust.F([]shared.OnlineScoreConfigScorersUnionParam{shared.OnlineScoreConfigScorersFunctionParam{
-						ID:   braintrust.F("id"),
-						Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
-					}}),
-					ApplyToRootSpan:  braintrust.F(true),
-					ApplyToSpanNames: braintrust.F([]string{"string"}),
-				}),
-			}),
-			Description: braintrust.F("description"),
-			Name:        braintrust.F("name"),
-			ScoreType:   braintrust.F(shared.ProjectScoreTypeSlider),
+			Categories: braintrust.ProjectScoreUpdateParamsCategoriesUnion{
+				OfCategorical: []shared.ProjectScoreCategoryParam{{
+					Name:  "name",
+					Value: 0,
+				}},
+			},
+			Config: shared.ProjectScoreConfigParam{
+				Destination: braintrust.String("destination"),
+				MultiSelect: braintrust.Bool(true),
+				Online: shared.OnlineScoreConfigParam{
+					SamplingRate: 0,
+					Scorers: []shared.OnlineScoreConfigScorerUnionParam{{
+						OfFunction: &shared.OnlineScoreConfigScorerFunctionParam{
+							ID:   "id",
+							Type: "function",
+						},
+					}},
+					ApplyToRootSpan:  braintrust.Bool(true),
+					ApplyToSpanNames: []string{"string"},
+				},
+			},
+			Description: braintrust.String("description"),
+			Name:        braintrust.String("name"),
+			ScoreType:   shared.ProjectScoreTypeSlider,
 		},
 	)
 	if err != nil {
@@ -140,15 +148,19 @@ func TestProjectScoreListWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ProjectScores.List(context.TODO(), braintrust.ProjectScoreListParams{
-		EndingBefore:     braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:              braintrust.F[braintrust.ProjectScoreListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
-		Limit:            braintrust.F(int64(0)),
-		OrgName:          braintrust.F("org_name"),
-		ProjectID:        braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ProjectName:      braintrust.F("project_name"),
-		ProjectScoreName: braintrust.F("project_score_name"),
-		ScoreType:        braintrust.F[braintrust.ProjectScoreListParamsScoreTypeUnion](shared.ProjectScoreType(shared.ProjectScoreTypeSlider)),
-		StartingAfter:    braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		EndingBefore: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		IDs: braintrust.ProjectScoreListParamsIDsUnion{
+			OfString: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		},
+		Limit:            braintrust.Int(0),
+		OrgName:          braintrust.String("org_name"),
+		ProjectID:        braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		ProjectName:      braintrust.String("project_name"),
+		ProjectScoreName: braintrust.String("project_score_name"),
+		ScoreType: braintrust.ProjectScoreListParamsScoreTypeUnion{
+			OfProjectScoreTypeSingle: braintrust.Opt(shared.ProjectScoreTypeSlider),
+		},
+		StartingAfter: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -194,27 +206,31 @@ func TestProjectScoreReplaceWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ProjectScores.Replace(context.TODO(), braintrust.ProjectScoreReplaceParams{
-		Name:      braintrust.F("name"),
-		ProjectID: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ScoreType: braintrust.F(shared.ProjectScoreTypeSlider),
-		Categories: braintrust.F[braintrust.ProjectScoreReplaceParamsCategoriesUnion](braintrust.ProjectScoreReplaceParamsCategoriesCategorical([]shared.ProjectScoreCategoryParam{{
-			Name:  braintrust.F("name"),
-			Value: braintrust.F(0.000000),
-		}})),
-		Config: braintrust.F(shared.ProjectScoreConfigParam{
-			Destination: braintrust.F("destination"),
-			MultiSelect: braintrust.F(true),
-			Online: braintrust.F(shared.OnlineScoreConfigParam{
-				SamplingRate: braintrust.F(0.000000),
-				Scorers: braintrust.F([]shared.OnlineScoreConfigScorersUnionParam{shared.OnlineScoreConfigScorersFunctionParam{
-					ID:   braintrust.F("id"),
-					Type: braintrust.F(shared.OnlineScoreConfigScorersFunctionTypeFunction),
-				}}),
-				ApplyToRootSpan:  braintrust.F(true),
-				ApplyToSpanNames: braintrust.F([]string{"string"}),
-			}),
-		}),
-		Description: braintrust.F("description"),
+		Name:      "name",
+		ProjectID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		ScoreType: shared.ProjectScoreTypeSlider,
+		Categories: braintrust.ProjectScoreReplaceParamsCategoriesUnion{
+			OfCategorical: []shared.ProjectScoreCategoryParam{{
+				Name:  "name",
+				Value: 0,
+			}},
+		},
+		Config: shared.ProjectScoreConfigParam{
+			Destination: braintrust.String("destination"),
+			MultiSelect: braintrust.Bool(true),
+			Online: shared.OnlineScoreConfigParam{
+				SamplingRate: 0,
+				Scorers: []shared.OnlineScoreConfigScorerUnionParam{{
+					OfFunction: &shared.OnlineScoreConfigScorerFunctionParam{
+						ID:   "id",
+						Type: "function",
+					},
+				}},
+				ApplyToRootSpan:  braintrust.Bool(true),
+				ApplyToSpanNames: []string{"string"},
+			},
+		},
+		Description: braintrust.String("description"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error

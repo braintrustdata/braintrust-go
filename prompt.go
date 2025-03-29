@@ -9,12 +9,11 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/pagination"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -31,8 +30,8 @@ type PromptService struct {
 // NewPromptService generates a new service that applies the given options to each
 // request. These options are applied after the parent client's options (if there
 // is one), and before any request-specific options.
-func NewPromptService(opts ...option.RequestOption) (r *PromptService) {
-	r = &PromptService{}
+func NewPromptService(opts ...option.RequestOption) (r PromptService) {
+	r = PromptService{}
 	r.Options = opts
 	return
 }
@@ -122,22 +121,29 @@ func (r *PromptService) Replace(ctx context.Context, body PromptReplaceParams, o
 
 type PromptNewParams struct {
 	// Name of the prompt
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Unique identifier for the project that the prompt belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	ProjectID string `json:"project_id,required" format:"uuid"`
 	// Unique identifier for the prompt
-	Slug param.Field[string] `json:"slug,required"`
+	Slug string `json:"slug,required"`
 	// Textual description of the prompt
-	Description  param.Field[string]                      `json:"description"`
-	FunctionType param.Field[PromptNewParamsFunctionType] `json:"function_type"`
+	Description param.Opt[string] `json:"description,omitzero"`
+	// Any of "llm", "scorer", "task", "tool".
+	FunctionType PromptNewParamsFunctionType `json:"function_type,omitzero"`
 	// The prompt, model, and its parameters
-	PromptData param.Field[shared.PromptDataParam] `json:"prompt_data"`
+	PromptData shared.PromptDataParam `json:"prompt_data,omitzero"`
 	// A list of tags for the prompt
-	Tags param.Field[[]string] `json:"tags"`
+	Tags []string `json:"tags,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f PromptNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r PromptNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptNewParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 type PromptNewParamsFunctionType string
@@ -149,65 +155,68 @@ const (
 	PromptNewParamsFunctionTypeTool   PromptNewParamsFunctionType = "tool"
 )
 
-func (r PromptNewParamsFunctionType) IsKnown() bool {
-	switch r {
-	case PromptNewParamsFunctionTypeLlm, PromptNewParamsFunctionTypeScorer, PromptNewParamsFunctionTypeTask, PromptNewParamsFunctionTypeTool:
-		return true
-	}
-	return false
-}
-
 type PromptUpdateParams struct {
 	// Textual description of the prompt
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
 	// Name of the prompt
-	Name param.Field[string] `json:"name"`
-	// The prompt, model, and its parameters
-	PromptData param.Field[shared.PromptDataParam] `json:"prompt_data"`
+	Name param.Opt[string] `json:"name,omitzero"`
 	// Unique identifier for the prompt
-	Slug param.Field[string] `json:"slug"`
+	Slug param.Opt[string] `json:"slug,omitzero"`
+	// The prompt, model, and its parameters
+	PromptData shared.PromptDataParam `json:"prompt_data,omitzero"`
 	// A list of tags for the prompt
-	Tags param.Field[[]string] `json:"tags"`
+	Tags []string `json:"tags,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f PromptUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r PromptUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 type PromptListParams struct {
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
-	// Filter search results to a particular set of object IDs. To specify a list of
-	// IDs, include the query param multiple times
-	IDs param.Field[PromptListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	EndingBefore param.Opt[string] `query:"ending_before,omitzero" format:"uuid" json:"-"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Opt[string] `query:"org_name,omitzero" json:"-"`
 	// Project id
-	ProjectID param.Field[string] `query:"project_id" format:"uuid"`
+	ProjectID param.Opt[string] `query:"project_id,omitzero" format:"uuid" json:"-"`
 	// Name of the project to search for
-	ProjectName param.Field[string] `query:"project_name"`
+	ProjectName param.Opt[string] `query:"project_name,omitzero" json:"-"`
 	// Name of the prompt to search for
-	PromptName param.Field[string] `query:"prompt_name"`
+	PromptName param.Opt[string] `query:"prompt_name,omitzero" json:"-"`
 	// Retrieve prompt with a specific slug
-	Slug param.Field[string] `query:"slug"`
+	Slug param.Opt[string] `query:"slug,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Opt[string] `query:"starting_after,omitzero" format:"uuid" json:"-"`
 	// Retrieve prompt at a specific version.
 	//
 	// The version id can either be a transaction id (e.g. '1000192656880881099') or a
 	// version identifier (e.g. '81cd05ee665fdfb3').
-	Version param.Field[string] `query:"version"`
+	Version param.Opt[string] `query:"version,omitzero" json:"-"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs PromptListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
+	paramObj
 }
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f PromptListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [PromptListParams]'s query parameters as `url.Values`.
 func (r PromptListParams) URLQuery() (v url.Values) {
@@ -217,36 +226,56 @@ func (r PromptListParams) URLQuery() (v url.Values) {
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [PromptListParamsIDsArray].
-type PromptListParamsIDsUnion interface {
-	ImplementsPromptListParamsIDsUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type PromptListParamsIDsUnion struct {
+	OfString              param.Opt[string] `json:",omitzero,inline"`
+	OfPromptListsIDsArray []string          `json:",omitzero,inline"`
+	paramUnion
 }
 
-type PromptListParamsIDsArray []string
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u PromptListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
+func (u PromptListParamsIDsUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[PromptListParamsIDsUnion](u.OfString, u.OfPromptListsIDsArray)
+}
 
-func (r PromptListParamsIDsArray) ImplementsPromptListParamsIDsUnion() {}
+func (u *PromptListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfPromptListsIDsArray) {
+		return &u.OfPromptListsIDsArray
+	}
+	return nil
+}
 
 type PromptReplaceParams struct {
 	// Name of the prompt
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Unique identifier for the project that the prompt belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	ProjectID string `json:"project_id,required" format:"uuid"`
 	// Unique identifier for the prompt
-	Slug param.Field[string] `json:"slug,required"`
+	Slug string `json:"slug,required"`
 	// Textual description of the prompt
-	Description  param.Field[string]                          `json:"description"`
-	FunctionType param.Field[PromptReplaceParamsFunctionType] `json:"function_type"`
+	Description param.Opt[string] `json:"description,omitzero"`
+	// Any of "llm", "scorer", "task", "tool".
+	FunctionType PromptReplaceParamsFunctionType `json:"function_type,omitzero"`
 	// The prompt, model, and its parameters
-	PromptData param.Field[shared.PromptDataParam] `json:"prompt_data"`
+	PromptData shared.PromptDataParam `json:"prompt_data,omitzero"`
 	// A list of tags for the prompt
-	Tags param.Field[[]string] `json:"tags"`
+	Tags []string `json:"tags,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f PromptReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r PromptReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptReplaceParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 type PromptReplaceParamsFunctionType string
@@ -257,11 +286,3 @@ const (
 	PromptReplaceParamsFunctionTypeTask   PromptReplaceParamsFunctionType = "task"
 	PromptReplaceParamsFunctionTypeTool   PromptReplaceParamsFunctionType = "tool"
 )
-
-func (r PromptReplaceParamsFunctionType) IsKnown() bool {
-	switch r {
-	case PromptReplaceParamsFunctionTypeLlm, PromptReplaceParamsFunctionTypeScorer, PromptReplaceParamsFunctionTypeTask, PromptReplaceParamsFunctionTypeTool:
-		return true
-	}
-	return false
-}

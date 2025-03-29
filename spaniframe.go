@@ -9,12 +9,11 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/pagination"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -31,8 +30,8 @@ type SpanIframeService struct {
 // NewSpanIframeService generates a new service that applies the given options to
 // each request. These options are applied after the parent client's options (if
 // there is one), and before any request-specific options.
-func NewSpanIframeService(opts ...option.RequestOption) (r *SpanIframeService) {
-	r = &SpanIframeService{}
+func NewSpanIframeService(opts ...option.RequestOption) (r SpanIframeService) {
+	r = SpanIframeService{}
 	r.Options = opts
 	return
 }
@@ -122,61 +121,78 @@ func (r *SpanIframeService) Replace(ctx context.Context, body SpanIframeReplaceP
 
 type SpanIframeNewParams struct {
 	// Name of the span iframe
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Unique identifier for the project that the span iframe belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	ProjectID string `json:"project_id,required" format:"uuid"`
 	// URL to embed the project viewer in an iframe
-	URL param.Field[string] `json:"url,required"`
+	URL string `json:"url,required"`
 	// Textual description of the span iframe
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
 	// Whether to post messages to the iframe containing the span's data. This is
 	// useful when you want to render more data than fits in the URL.
-	PostMessage param.Field[bool] `json:"post_message"`
+	PostMessage param.Opt[bool] `json:"post_message,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f SpanIframeNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r SpanIframeNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow SpanIframeNewParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 type SpanIframeUpdateParams struct {
 	// Textual description of the span iframe
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
 	// Name of the span iframe
-	Name param.Field[string] `json:"name"`
+	Name param.Opt[string] `json:"name,omitzero"`
 	// Whether to post messages to the iframe containing the span's data. This is
 	// useful when you want to render more data than fits in the URL.
-	PostMessage param.Field[bool] `json:"post_message"`
+	PostMessage param.Opt[bool] `json:"post_message,omitzero"`
 	// URL to embed the project viewer in an iframe
-	URL param.Field[string] `json:"url"`
+	URL param.Opt[string] `json:"url,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f SpanIframeUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r SpanIframeUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow SpanIframeUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 type SpanIframeListParams struct {
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
-	// Filter search results to a particular set of object IDs. To specify a list of
-	// IDs, include the query param multiple times
-	IDs param.Field[SpanIframeListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	EndingBefore param.Opt[string] `query:"ending_before,omitzero" format:"uuid" json:"-"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Opt[string] `query:"org_name,omitzero" json:"-"`
 	// Name of the span_iframe to search for
-	SpanIframeName param.Field[string] `query:"span_iframe_name"`
+	SpanIframeName param.Opt[string] `query:"span_iframe_name,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Opt[string] `query:"starting_after,omitzero" format:"uuid" json:"-"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs SpanIframeListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
+	paramObj
 }
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f SpanIframeListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [SpanIframeListParams]'s query parameters as `url.Values`.
 func (r SpanIframeListParams) URLQuery() (v url.Values) {
@@ -186,32 +202,51 @@ func (r SpanIframeListParams) URLQuery() (v url.Values) {
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [SpanIframeListParamsIDsArray].
-type SpanIframeListParamsIDsUnion interface {
-	ImplementsSpanIframeListParamsIDsUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type SpanIframeListParamsIDsUnion struct {
+	OfString                  param.Opt[string] `json:",omitzero,inline"`
+	OfSpanIframeListsIDsArray []string          `json:",omitzero,inline"`
+	paramUnion
 }
 
-type SpanIframeListParamsIDsArray []string
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u SpanIframeListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
+func (u SpanIframeListParamsIDsUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[SpanIframeListParamsIDsUnion](u.OfString, u.OfSpanIframeListsIDsArray)
+}
 
-func (r SpanIframeListParamsIDsArray) ImplementsSpanIframeListParamsIDsUnion() {}
+func (u *SpanIframeListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfSpanIframeListsIDsArray) {
+		return &u.OfSpanIframeListsIDsArray
+	}
+	return nil
+}
 
 type SpanIframeReplaceParams struct {
 	// Name of the span iframe
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Unique identifier for the project that the span iframe belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	ProjectID string `json:"project_id,required" format:"uuid"`
 	// URL to embed the project viewer in an iframe
-	URL param.Field[string] `json:"url,required"`
+	URL string `json:"url,required"`
 	// Textual description of the span iframe
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
 	// Whether to post messages to the iframe containing the span's data. This is
 	// useful when you want to render more data than fits in the URL.
-	PostMessage param.Field[bool] `json:"post_message"`
+	PostMessage param.Opt[bool] `json:"post_message,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f SpanIframeReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r SpanIframeReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow SpanIframeReplaceParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }

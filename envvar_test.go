@@ -27,10 +27,10 @@ func TestEnvVarNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.EnvVars.New(context.TODO(), braintrust.EnvVarNewParams{
-		Name:       braintrust.F("name"),
-		ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType: braintrust.F(braintrust.EnvVarNewParamsObjectTypeOrganization),
-		Value:      braintrust.F("value"),
+		Name:       "name",
+		ObjectID:   "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		ObjectType: braintrust.EnvVarNewParamsObjectTypeOrganization,
+		Value:      braintrust.String("value"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -79,8 +79,8 @@ func TestEnvVarUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.EnvVarUpdateParams{
-			Name:  braintrust.F("name"),
-			Value: braintrust.F("value"),
+			Name:  "name",
+			Value: braintrust.String("value"),
 		},
 	)
 	if err != nil {
@@ -105,11 +105,13 @@ func TestEnvVarListWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.EnvVars.List(context.TODO(), braintrust.EnvVarListParams{
-		EnvVarName: braintrust.F("env_var_name"),
-		IDs:        braintrust.F[braintrust.EnvVarListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
-		Limit:      braintrust.F(int64(0)),
-		ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType: braintrust.F(shared.EnvVarObjectTypeOrganization),
+		EnvVarName: braintrust.String("env_var_name"),
+		IDs: braintrust.EnvVarListParamsIDsUnion{
+			OfString: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		},
+		Limit:      braintrust.Int(0),
+		ObjectID:   braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		ObjectType: shared.EnvVarObjectTypeOrganization,
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -155,10 +157,10 @@ func TestEnvVarReplaceWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.EnvVars.Replace(context.TODO(), braintrust.EnvVarReplaceParams{
-		Name:       braintrust.F("name"),
-		ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType: braintrust.F(braintrust.EnvVarReplaceParamsObjectTypeOrganization),
-		Value:      braintrust.F("value"),
+		Name:       "name",
+		ObjectID:   "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		ObjectType: braintrust.EnvVarReplaceParamsObjectTypeOrganization,
+		Value:      braintrust.String("value"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error

@@ -22,7 +22,6 @@ import (
 	"github.com/braintrustdata/braintrust-go/internal/apierror"
 	"github.com/braintrustdata/braintrust-go/internal/apiform"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 )
 
 func getDefaultHeaders() map[string]string {
@@ -183,13 +182,6 @@ func NewRequestConfig(ctx context.Context, method string, u string, body interfa
 	}
 
 	return &cfg, nil
-}
-
-func UseDefaultParam[T any](dst *param.Field[T], src *T) {
-	if !dst.Present && src != nil {
-		dst.Value = *src
-		dst.Present = true
-	}
 }
 
 // RequestConfig represents all the state related to one request.
