@@ -16,25 +16,25 @@ import (
 // directly, and instead use the [NewClient] method instead.
 type Client struct {
 	Options       []option.RequestOption
-	TopLevel      *TopLevelService
-	Projects      *ProjectService
-	Experiments   *ExperimentService
-	Datasets      *DatasetService
-	Prompts       *PromptService
-	Roles         *RoleService
-	Groups        *GroupService
-	ACLs          *ACLService
-	Users         *UserService
-	ProjectScores *ProjectScoreService
-	ProjectTags   *ProjectTagService
-	SpanIframes   *SpanIframeService
-	Functions     *FunctionService
-	Views         *ViewService
-	Organizations *OrganizationService
-	APIKeys       *APIKeyService
-	AISecrets     *AISecretService
-	EnvVars       *EnvVarService
-	Evals         *EvalService
+	TopLevel      TopLevelService
+	Projects      ProjectService
+	Experiments   ExperimentService
+	Datasets      DatasetService
+	Prompts       PromptService
+	Roles         RoleService
+	Groups        GroupService
+	ACLs          ACLService
+	Users         UserService
+	ProjectScores ProjectScoreService
+	ProjectTags   ProjectTagService
+	SpanIframes   SpanIframeService
+	Functions     FunctionService
+	Views         ViewService
+	Organizations OrganizationService
+	APIKeys       APIKeyService
+	AISecrets     AISecretService
+	EnvVars       EnvVarService
+	Evals         EvalService
 }
 
 // DefaultClientOptions read from the environment (BRAINTRUST_API_KEY). This should
@@ -51,10 +51,10 @@ func DefaultClientOptions() []option.RequestOption {
 // environment (BRAINTRUST_API_KEY). The option passed in as arguments are applied
 // after these default arguments, and all option will be passed down to the
 // services and requests that this client makes.
-func NewClient(opts ...option.RequestOption) (r *Client) {
+func NewClient(opts ...option.RequestOption) (r Client) {
 	opts = append(DefaultClientOptions(), opts...)
 
-	r = &Client{Options: opts}
+	r = Client{Options: opts}
 
 	r.TopLevel = NewTopLevelService(opts...)
 	r.Projects = NewProjectService(opts...)

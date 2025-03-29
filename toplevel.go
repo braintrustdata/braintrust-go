@@ -23,8 +23,8 @@ type TopLevelService struct {
 // NewTopLevelService generates a new service that applies the given options to
 // each request. These options are applied after the parent client's options (if
 // there is one), and before any request-specific options.
-func NewTopLevelService(opts ...option.RequestOption) (r *TopLevelService) {
-	r = &TopLevelService{}
+func NewTopLevelService(opts ...option.RequestOption) (r TopLevelService) {
+	r = TopLevelService{}
 	r.Options = opts
 	return
 }

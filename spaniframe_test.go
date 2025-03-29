@@ -11,7 +11,6 @@ import (
 	"github.com/braintrustdata/braintrust-go"
 	"github.com/braintrustdata/braintrust-go/internal/testutil"
 	"github.com/braintrustdata/braintrust-go/option"
-	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 func TestSpanIframeNewWithOptionalParams(t *testing.T) {
@@ -27,11 +26,11 @@ func TestSpanIframeNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.SpanIframes.New(context.TODO(), braintrust.SpanIframeNewParams{
-		Name:        braintrust.F("name"),
-		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		URL:         braintrust.F("url"),
-		Description: braintrust.F("description"),
-		PostMessage: braintrust.F(true),
+		Name:        "name",
+		ProjectID:   "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		URL:         "url",
+		Description: braintrust.String("description"),
+		PostMessage: braintrust.Bool(true),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -80,10 +79,10 @@ func TestSpanIframeUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.SpanIframeUpdateParams{
-			Description: braintrust.F("description"),
-			Name:        braintrust.F("name"),
-			PostMessage: braintrust.F(true),
-			URL:         braintrust.F("url"),
+			Description: braintrust.String("description"),
+			Name:        braintrust.String("name"),
+			PostMessage: braintrust.Bool(true),
+			URL:         braintrust.String("url"),
 		},
 	)
 	if err != nil {
@@ -108,12 +107,14 @@ func TestSpanIframeListWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.SpanIframes.List(context.TODO(), braintrust.SpanIframeListParams{
-		EndingBefore:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:            braintrust.F[braintrust.SpanIframeListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
-		Limit:          braintrust.F(int64(0)),
-		OrgName:        braintrust.F("org_name"),
-		SpanIframeName: braintrust.F("span_iframe_name"),
-		StartingAfter:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		EndingBefore: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		IDs: braintrust.SpanIframeListParamsIDsUnion{
+			OfString: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		},
+		Limit:          braintrust.Int(0),
+		OrgName:        braintrust.String("org_name"),
+		SpanIframeName: braintrust.String("span_iframe_name"),
+		StartingAfter:  braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -159,11 +160,11 @@ func TestSpanIframeReplaceWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.SpanIframes.Replace(context.TODO(), braintrust.SpanIframeReplaceParams{
-		Name:        braintrust.F("name"),
-		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		URL:         braintrust.F("url"),
-		Description: braintrust.F("description"),
-		PostMessage: braintrust.F(true),
+		Name:        "name",
+		ProjectID:   "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		URL:         "url",
+		Description: braintrust.String("description"),
+		PostMessage: braintrust.Bool(true),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
