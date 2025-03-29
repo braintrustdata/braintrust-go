@@ -9,12 +9,11 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/pagination"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -31,8 +30,8 @@ type ProjectTagService struct {
 // NewProjectTagService generates a new service that applies the given options to
 // each request. These options are applied after the parent client's options (if
 // there is one), and before any request-specific options.
-func NewProjectTagService(opts ...option.RequestOption) (r *ProjectTagService) {
-	r = &ProjectTagService{}
+func NewProjectTagService(opts ...option.RequestOption) (r ProjectTagService) {
+	r = ProjectTagService{}
 	r.Options = opts
 	return
 }
@@ -122,59 +121,76 @@ func (r *ProjectTagService) Replace(ctx context.Context, body ProjectTagReplaceP
 
 type ProjectTagNewParams struct {
 	// Name of the project tag
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Unique identifier for the project that the project tag belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	ProjectID string `json:"project_id,required" format:"uuid"`
 	// Color of the tag for the UI
-	Color param.Field[string] `json:"color"`
+	Color param.Opt[string] `json:"color,omitzero"`
 	// Textual description of the project tag
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f ProjectTagNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r ProjectTagNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ProjectTagNewParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 type ProjectTagUpdateParams struct {
 	// Color of the tag for the UI
-	Color param.Field[string] `json:"color"`
+	Color param.Opt[string] `json:"color,omitzero"`
 	// Textual description of the project tag
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
 	// Name of the project tag
-	Name param.Field[string] `json:"name"`
+	Name param.Opt[string] `json:"name,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f ProjectTagUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r ProjectTagUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ProjectTagUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 type ProjectTagListParams struct {
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
-	// Filter search results to a particular set of object IDs. To specify a list of
-	// IDs, include the query param multiple times
-	IDs param.Field[ProjectTagListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	EndingBefore param.Opt[string] `query:"ending_before,omitzero" format:"uuid" json:"-"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Opt[string] `query:"org_name,omitzero" json:"-"`
 	// Project id
-	ProjectID param.Field[string] `query:"project_id" format:"uuid"`
+	ProjectID param.Opt[string] `query:"project_id,omitzero" format:"uuid" json:"-"`
 	// Name of the project to search for
-	ProjectName param.Field[string] `query:"project_name"`
+	ProjectName param.Opt[string] `query:"project_name,omitzero" json:"-"`
 	// Name of the project_tag to search for
-	ProjectTagName param.Field[string] `query:"project_tag_name"`
+	ProjectTagName param.Opt[string] `query:"project_tag_name,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Opt[string] `query:"starting_after,omitzero" format:"uuid" json:"-"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs ProjectTagListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
+	paramObj
 }
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f ProjectTagListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [ProjectTagListParams]'s query parameters as `url.Values`.
 func (r ProjectTagListParams) URLQuery() (v url.Values) {
@@ -184,29 +200,48 @@ func (r ProjectTagListParams) URLQuery() (v url.Values) {
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [ProjectTagListParamsIDsArray].
-type ProjectTagListParamsIDsUnion interface {
-	ImplementsProjectTagListParamsIDsUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type ProjectTagListParamsIDsUnion struct {
+	OfString                  param.Opt[string] `json:",omitzero,inline"`
+	OfProjectTagListsIDsArray []string          `json:",omitzero,inline"`
+	paramUnion
 }
 
-type ProjectTagListParamsIDsArray []string
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u ProjectTagListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
+func (u ProjectTagListParamsIDsUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[ProjectTagListParamsIDsUnion](u.OfString, u.OfProjectTagListsIDsArray)
+}
 
-func (r ProjectTagListParamsIDsArray) ImplementsProjectTagListParamsIDsUnion() {}
+func (u *ProjectTagListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfProjectTagListsIDsArray) {
+		return &u.OfProjectTagListsIDsArray
+	}
+	return nil
+}
 
 type ProjectTagReplaceParams struct {
 	// Name of the project tag
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Unique identifier for the project that the project tag belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	ProjectID string `json:"project_id,required" format:"uuid"`
 	// Color of the tag for the UI
-	Color param.Field[string] `json:"color"`
+	Color param.Opt[string] `json:"color,omitzero"`
 	// Textual description of the project tag
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f ProjectTagReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r ProjectTagReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ProjectTagReplaceParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }

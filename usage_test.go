@@ -25,10 +25,10 @@ func TestUsage(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	project, err := client.Projects.New(context.TODO(), braintrust.ProjectNewParams{
-		Name: braintrust.F("foobar"),
+		Name: "foobar",
 	})
 	if err != nil {
-		t.Error(err)
+		t.Fatalf("err should be nil: %s", err.Error())
 	}
 	t.Logf("%+v\n", project.ID)
 }

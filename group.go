@@ -9,12 +9,11 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/pagination"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -31,8 +30,8 @@ type GroupService struct {
 // NewGroupService generates a new service that applies the given options to each
 // request. These options are applied after the parent client's options (if there
 // is one), and before any request-specific options.
-func NewGroupService(opts ...option.RequestOption) (r *GroupService) {
-	r = &GroupService{}
+func NewGroupService(opts ...option.RequestOption) (r GroupService) {
+	r = GroupService{}
 	r.Options = opts
 	return
 }
@@ -121,68 +120,85 @@ func (r *GroupService) Replace(ctx context.Context, body GroupReplaceParams, opt
 
 type GroupNewParams struct {
 	// Name of the group
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Textual description of the group
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
+	// For nearly all users, this parameter should be unnecessary. But in the rare case
+	// that your API key belongs to multiple organizations, you may specify the name of
+	// the organization the group belongs in.
+	OrgName param.Opt[string] `json:"org_name,omitzero"`
 	// Ids of the groups this group inherits from
 	//
 	// An inheriting group has all the users contained in its member groups, as well as
 	// all of their inherited users
-	MemberGroups param.Field[[]string] `json:"member_groups" format:"uuid"`
+	MemberGroups []string `json:"member_groups,omitzero" format:"uuid"`
 	// Ids of users which belong to this group
-	MemberUsers param.Field[[]string] `json:"member_users" format:"uuid"`
-	// For nearly all users, this parameter should be unnecessary. But in the rare case
-	// that your API key belongs to multiple organizations, you may specify the name of
-	// the organization the group belongs in.
-	OrgName param.Field[string] `json:"org_name"`
+	MemberUsers []string `json:"member_users,omitzero" format:"uuid"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f GroupNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r GroupNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow GroupNewParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 type GroupUpdateParams struct {
-	// A list of group IDs to add to the group's inheriting-from set
-	AddMemberGroups param.Field[[]string] `json:"add_member_groups" format:"uuid"`
-	// A list of user IDs to add to the group
-	AddMemberUsers param.Field[[]string] `json:"add_member_users" format:"uuid"`
 	// Textual description of the group
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
 	// Name of the group
-	Name param.Field[string] `json:"name"`
+	Name param.Opt[string] `json:"name,omitzero"`
+	// A list of group IDs to add to the group's inheriting-from set
+	AddMemberGroups []string `json:"add_member_groups,omitzero" format:"uuid"`
+	// A list of user IDs to add to the group
+	AddMemberUsers []string `json:"add_member_users,omitzero" format:"uuid"`
 	// A list of group IDs to remove from the group's inheriting-from set
-	RemoveMemberGroups param.Field[[]string] `json:"remove_member_groups" format:"uuid"`
+	RemoveMemberGroups []string `json:"remove_member_groups,omitzero" format:"uuid"`
 	// A list of user IDs to remove from the group
-	RemoveMemberUsers param.Field[[]string] `json:"remove_member_users" format:"uuid"`
+	RemoveMemberUsers []string `json:"remove_member_users,omitzero" format:"uuid"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f GroupUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r GroupUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow GroupUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 type GroupListParams struct {
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Opt[string] `query:"ending_before,omitzero" format:"uuid" json:"-"`
 	// Name of the group to search for
-	GroupName param.Field[string] `query:"group_name"`
-	// Filter search results to a particular set of object IDs. To specify a list of
-	// IDs, include the query param multiple times
-	IDs param.Field[GroupListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	GroupName param.Opt[string] `query:"group_name,omitzero" json:"-"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Opt[string] `query:"org_name,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Opt[string] `query:"starting_after,omitzero" format:"uuid" json:"-"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs GroupListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
+	paramObj
 }
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f GroupListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [GroupListParams]'s query parameters as `url.Values`.
 func (r GroupListParams) URLQuery() (v url.Values) {
@@ -192,36 +208,55 @@ func (r GroupListParams) URLQuery() (v url.Values) {
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [GroupListParamsIDsArray].
-type GroupListParamsIDsUnion interface {
-	ImplementsGroupListParamsIDsUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type GroupListParamsIDsUnion struct {
+	OfString             param.Opt[string] `json:",omitzero,inline"`
+	OfGroupListsIDsArray []string          `json:",omitzero,inline"`
+	paramUnion
 }
 
-type GroupListParamsIDsArray []string
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u GroupListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
+func (u GroupListParamsIDsUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[GroupListParamsIDsUnion](u.OfString, u.OfGroupListsIDsArray)
+}
 
-func (r GroupListParamsIDsArray) ImplementsGroupListParamsIDsUnion() {}
+func (u *GroupListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfGroupListsIDsArray) {
+		return &u.OfGroupListsIDsArray
+	}
+	return nil
+}
 
 type GroupReplaceParams struct {
 	// Name of the group
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Textual description of the group
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
+	// For nearly all users, this parameter should be unnecessary. But in the rare case
+	// that your API key belongs to multiple organizations, you may specify the name of
+	// the organization the group belongs in.
+	OrgName param.Opt[string] `json:"org_name,omitzero"`
 	// Ids of the groups this group inherits from
 	//
 	// An inheriting group has all the users contained in its member groups, as well as
 	// all of their inherited users
-	MemberGroups param.Field[[]string] `json:"member_groups" format:"uuid"`
+	MemberGroups []string `json:"member_groups,omitzero" format:"uuid"`
 	// Ids of users which belong to this group
-	MemberUsers param.Field[[]string] `json:"member_users" format:"uuid"`
-	// For nearly all users, this parameter should be unnecessary. But in the rare case
-	// that your API key belongs to multiple organizations, you may specify the name of
-	// the organization the group belongs in.
-	OrgName param.Field[string] `json:"org_name"`
+	MemberUsers []string `json:"member_users,omitzero" format:"uuid"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f GroupReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r GroupReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow GroupReplaceParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }

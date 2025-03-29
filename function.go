@@ -11,10 +11,10 @@ import (
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/pagination"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -31,8 +31,8 @@ type FunctionService struct {
 // NewFunctionService generates a new service that applies the given options to
 // each request. These options are applied after the parent client's options (if
 // there is one), and before any request-specific options.
-func NewFunctionService(opts ...option.RequestOption) (r *FunctionService) {
-	r = &FunctionService{}
+func NewFunctionService(opts ...option.RequestOption) (r FunctionService) {
+	r = FunctionService{}
 	r.Options = opts
 	return
 }
@@ -135,229 +135,363 @@ func (r *FunctionService) Replace(ctx context.Context, body FunctionReplaceParam
 type FunctionInvokeResponse = interface{}
 
 type FunctionNewParams struct {
-	FunctionData param.Field[FunctionNewParamsFunctionDataUnion] `json:"function_data,required"`
+	FunctionData FunctionNewParamsFunctionDataUnion `json:"function_data,omitzero,required"`
 	// Name of the prompt
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Unique identifier for the project that the prompt belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	ProjectID string `json:"project_id,required" format:"uuid"`
 	// Unique identifier for the prompt
-	Slug param.Field[string] `json:"slug,required"`
+	Slug string `json:"slug,required"`
 	// Textual description of the prompt
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
 	// JSON schema for the function's parameters and return type
-	FunctionSchema param.Field[FunctionNewParamsFunctionSchema] `json:"function_schema"`
-	FunctionType   param.Field[FunctionNewParamsFunctionType]   `json:"function_type"`
-	Origin         param.Field[FunctionNewParamsOrigin]         `json:"origin"`
+	FunctionSchema FunctionNewParamsFunctionSchema `json:"function_schema,omitzero"`
+	// Any of "llm", "scorer", "task", "tool".
+	FunctionType FunctionNewParamsFunctionType `json:"function_type,omitzero"`
+	Origin       FunctionNewParamsOrigin       `json:"origin,omitzero"`
 	// The prompt, model, and its parameters
-	PromptData param.Field[shared.PromptDataParam] `json:"prompt_data"`
+	PromptData shared.PromptDataParam `json:"prompt_data,omitzero"`
 	// A list of tags for the prompt
-	Tags param.Field[[]string] `json:"tags"`
+	Tags []string `json:"tags,omitzero"`
+	paramObj
 }
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r FunctionNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionNewParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-type FunctionNewParamsFunctionData struct {
-	Type param.Field[FunctionNewParamsFunctionDataType] `json:"type,required"`
-	Data param.Field[interface{}]                       `json:"data"`
-	Name param.Field[string]                            `json:"name"`
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type FunctionNewParamsFunctionDataUnion struct {
+	OfPrompt *FunctionNewParamsFunctionDataPrompt `json:",omitzero,inline"`
+	OfCode   *FunctionNewParamsFunctionDataCode   `json:",omitzero,inline"`
+	OfGlobal *FunctionNewParamsFunctionDataGlobal `json:",omitzero,inline"`
+	paramUnion
 }
 
-func (r FunctionNewParamsFunctionData) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u FunctionNewParamsFunctionDataUnion) IsPresent() bool {
+	return !param.IsOmitted(u) && !u.IsNull()
+}
+func (u FunctionNewParamsFunctionDataUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[FunctionNewParamsFunctionDataUnion](u.OfPrompt, u.OfCode, u.OfGlobal)
 }
 
-func (r FunctionNewParamsFunctionData) implementsFunctionNewParamsFunctionDataUnion() {}
-
-// Satisfied by [FunctionNewParamsFunctionDataPrompt],
-// [FunctionNewParamsFunctionDataCode], [FunctionNewParamsFunctionDataGlobal],
-// [FunctionNewParamsFunctionData].
-type FunctionNewParamsFunctionDataUnion interface {
-	implementsFunctionNewParamsFunctionDataUnion()
-}
-
-type FunctionNewParamsFunctionDataPrompt struct {
-	Type param.Field[FunctionNewParamsFunctionDataPromptType] `json:"type,required"`
-}
-
-func (r FunctionNewParamsFunctionDataPrompt) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r FunctionNewParamsFunctionDataPrompt) implementsFunctionNewParamsFunctionDataUnion() {}
-
-type FunctionNewParamsFunctionDataPromptType string
-
-const (
-	FunctionNewParamsFunctionDataPromptTypePrompt FunctionNewParamsFunctionDataPromptType = "prompt"
-)
-
-func (r FunctionNewParamsFunctionDataPromptType) IsKnown() bool {
-	switch r {
-	case FunctionNewParamsFunctionDataPromptTypePrompt:
-		return true
+func (u *FunctionNewParamsFunctionDataUnion) asAny() any {
+	if !param.IsOmitted(u.OfPrompt) {
+		return u.OfPrompt
+	} else if !param.IsOmitted(u.OfCode) {
+		return u.OfCode
+	} else if !param.IsOmitted(u.OfGlobal) {
+		return u.OfGlobal
 	}
-	return false
+	return nil
 }
 
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionNewParamsFunctionDataUnion) GetData() *FunctionNewParamsFunctionDataCodeDataUnion {
+	if vt := u.OfCode; vt != nil {
+		return &vt.Data
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionNewParamsFunctionDataUnion) GetName() *string {
+	if vt := u.OfGlobal; vt != nil {
+		return &vt.Name
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionNewParamsFunctionDataUnion) GetType() *string {
+	if vt := u.OfPrompt; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfCode; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfGlobal; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
+}
+
+// The property Type is required.
+type FunctionNewParamsFunctionDataPrompt struct {
+	// Any of "prompt".
+	Type string `json:"type,omitzero,required"`
+	paramObj
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionNewParamsFunctionDataPrompt) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
+func (r FunctionNewParamsFunctionDataPrompt) MarshalJSON() (data []byte, err error) {
+	type shadow FunctionNewParamsFunctionDataPrompt
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+
+func init() {
+	apijson.RegisterFieldValidator[FunctionNewParamsFunctionDataPrompt](
+		"Type", false, "prompt",
+	)
+}
+
+// The properties Data, Type are required.
 type FunctionNewParamsFunctionDataCode struct {
-	Data param.Field[FunctionNewParamsFunctionDataCodeDataUnion] `json:"data,required"`
-	Type param.Field[FunctionNewParamsFunctionDataCodeType]      `json:"type,required"`
+	Data FunctionNewParamsFunctionDataCodeDataUnion `json:"data,omitzero,required"`
+	// Any of "code".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionNewParamsFunctionDataCode) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
 func (r FunctionNewParamsFunctionDataCode) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionNewParamsFunctionDataCode
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-func (r FunctionNewParamsFunctionDataCode) implementsFunctionNewParamsFunctionDataUnion() {}
+func init() {
+	apijson.RegisterFieldValidator[FunctionNewParamsFunctionDataCode](
+		"Type", false, "code",
+	)
+}
 
-// Satisfied by [FunctionNewParamsFunctionDataCodeDataBundle],
-// [FunctionNewParamsFunctionDataCodeDataInline].
-type FunctionNewParamsFunctionDataCodeDataUnion interface {
-	implementsFunctionNewParamsFunctionDataCodeDataUnion()
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type FunctionNewParamsFunctionDataCodeDataUnion struct {
+	OfBundle *FunctionNewParamsFunctionDataCodeDataBundle `json:",omitzero,inline"`
+	OfInline *FunctionNewParamsFunctionDataCodeDataInline `json:",omitzero,inline"`
+	paramUnion
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u FunctionNewParamsFunctionDataCodeDataUnion) IsPresent() bool {
+	return !param.IsOmitted(u) && !u.IsNull()
+}
+func (u FunctionNewParamsFunctionDataCodeDataUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[FunctionNewParamsFunctionDataCodeDataUnion](u.OfBundle, u.OfInline)
+}
+
+func (u *FunctionNewParamsFunctionDataCodeDataUnion) asAny() any {
+	if !param.IsOmitted(u.OfBundle) {
+		return u.OfBundle
+	} else if !param.IsOmitted(u.OfInline) {
+		return u.OfInline
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionNewParamsFunctionDataCodeDataUnion) GetBundleID() *string {
+	if vt := u.OfBundle; vt != nil {
+		return &vt.BundleID
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionNewParamsFunctionDataCodeDataUnion) GetLocation() *shared.CodeBundleLocationUnionParam {
+	if vt := u.OfBundle; vt != nil {
+		return &vt.Location
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionNewParamsFunctionDataCodeDataUnion) GetPreview() *string {
+	if vt := u.OfBundle; vt != nil && vt.Preview.IsPresent() {
+		return &vt.Preview.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionNewParamsFunctionDataCodeDataUnion) GetCode() *string {
+	if vt := u.OfInline; vt != nil {
+		return &vt.Code
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionNewParamsFunctionDataCodeDataUnion) GetType() *string {
+	if vt := u.OfBundle; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfInline; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
+}
+
+// Returns a subunion which exports methods to access subproperties
+//
+// Or use AsAny() to get the underlying value
+func (u FunctionNewParamsFunctionDataCodeDataUnion) GetRuntimeContext() (res functionNewParamsFunctionDataCodeDataUnionRuntimeContext) {
+	if vt := u.OfBundle; vt != nil {
+		res.ofCodeBundleRuntimeContext = &vt.RuntimeContext
+	} else if vt := u.OfInline; vt != nil {
+		res.ofFunctionNewsFunctionDataCodeDataInlineRuntimeContext = &vt.RuntimeContext
+	}
+	return
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type functionNewParamsFunctionDataCodeDataUnionRuntimeContext struct {
+	ofCodeBundleRuntimeContext                             *shared.CodeBundleRuntimeContextParam
+	ofFunctionNewsFunctionDataCodeDataInlineRuntimeContext *FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext
+}
+
+// Use the following switch statement to get the type of the union:
+//
+//	switch u.AsAny().(type) {
+//	case *shared.CodeBundleRuntimeContextParam:
+//	case *braintrust.FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext:
+//	default:
+//	    fmt.Errorf("not present")
+//	}
+func (u functionNewParamsFunctionDataCodeDataUnionRuntimeContext) AsAny() any {
+	if !param.IsOmitted(u.ofCodeBundleRuntimeContext) {
+		return u.ofCodeBundleRuntimeContext
+	} else if !param.IsOmitted(u.ofFunctionNewsFunctionDataCodeDataInlineRuntimeContext) {
+		return u.ofFunctionNewsFunctionDataCodeDataInlineRuntimeContext
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u functionNewParamsFunctionDataCodeDataUnionRuntimeContext) GetRuntime() *string {
+	if vt := u.ofCodeBundleRuntimeContext; vt != nil {
+		return (*string)(&vt.Runtime)
+	} else if vt := u.ofFunctionNewsFunctionDataCodeDataInlineRuntimeContext; vt != nil {
+		return (*string)(&vt.Runtime)
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u functionNewParamsFunctionDataCodeDataUnionRuntimeContext) GetVersion() *string {
+	if vt := u.ofCodeBundleRuntimeContext; vt != nil {
+		return (*string)(&vt.Version)
+	} else if vt := u.ofFunctionNewsFunctionDataCodeDataInlineRuntimeContext; vt != nil {
+		return (*string)(&vt.Version)
+	}
+	return nil
 }
 
 type FunctionNewParamsFunctionDataCodeDataBundle struct {
-	Type param.Field[FunctionNewParamsFunctionDataCodeDataBundleType] `json:"type,required"`
+	Type string `json:"type,omitzero,required"`
 	shared.CodeBundleParam
 }
 
 func (r FunctionNewParamsFunctionDataCodeDataBundle) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionNewParamsFunctionDataCodeDataBundle
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-func (r FunctionNewParamsFunctionDataCodeDataBundle) implementsFunctionNewParamsFunctionDataCodeDataUnion() {
-}
-
-type FunctionNewParamsFunctionDataCodeDataBundleType string
-
-const (
-	FunctionNewParamsFunctionDataCodeDataBundleTypeBundle FunctionNewParamsFunctionDataCodeDataBundleType = "bundle"
-)
-
-func (r FunctionNewParamsFunctionDataCodeDataBundleType) IsKnown() bool {
-	switch r {
-	case FunctionNewParamsFunctionDataCodeDataBundleTypeBundle:
-		return true
-	}
-	return false
-}
-
+// The properties Code, RuntimeContext, Type are required.
 type FunctionNewParamsFunctionDataCodeDataInline struct {
-	Code           param.Field[string]                                                    `json:"code,required"`
-	RuntimeContext param.Field[FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext] `json:"runtime_context,required"`
-	Type           param.Field[FunctionNewParamsFunctionDataCodeDataInlineType]           `json:"type,required"`
+	Code           string                                                    `json:"code,required"`
+	RuntimeContext FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext `json:"runtime_context,omitzero,required"`
+	// Any of "inline".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionNewParamsFunctionDataCodeDataInline) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
 func (r FunctionNewParamsFunctionDataCodeDataInline) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionNewParamsFunctionDataCodeDataInline
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-func (r FunctionNewParamsFunctionDataCodeDataInline) implementsFunctionNewParamsFunctionDataCodeDataUnion() {
+func init() {
+	apijson.RegisterFieldValidator[FunctionNewParamsFunctionDataCodeDataInline](
+		"Type", false, "inline",
+	)
 }
 
+// The properties Runtime, Version are required.
 type FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext struct {
-	Runtime param.Field[FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntime] `json:"runtime,required"`
-	Version param.Field[string]                                                           `json:"version,required"`
+	// Any of "node", "python".
+	Runtime string `json:"runtime,omitzero,required"`
+	Version string `json:"version,required"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
 func (r FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-type FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntime string
-
-const (
-	FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntimeNode   FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntime = "node"
-	FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntimePython FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntime = "python"
-)
-
-func (r FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntime) IsKnown() bool {
-	switch r {
-	case FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntimeNode, FunctionNewParamsFunctionDataCodeDataInlineRuntimeContextRuntimePython:
-		return true
-	}
-	return false
+func init() {
+	apijson.RegisterFieldValidator[FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext](
+		"Runtime", false, "node", "python",
+	)
 }
 
-type FunctionNewParamsFunctionDataCodeDataInlineType string
-
-const (
-	FunctionNewParamsFunctionDataCodeDataInlineTypeInline FunctionNewParamsFunctionDataCodeDataInlineType = "inline"
-)
-
-func (r FunctionNewParamsFunctionDataCodeDataInlineType) IsKnown() bool {
-	switch r {
-	case FunctionNewParamsFunctionDataCodeDataInlineTypeInline:
-		return true
-	}
-	return false
-}
-
-type FunctionNewParamsFunctionDataCodeType string
-
-const (
-	FunctionNewParamsFunctionDataCodeTypeCode FunctionNewParamsFunctionDataCodeType = "code"
-)
-
-func (r FunctionNewParamsFunctionDataCodeType) IsKnown() bool {
-	switch r {
-	case FunctionNewParamsFunctionDataCodeTypeCode:
-		return true
-	}
-	return false
-}
-
+// The properties Name, Type are required.
 type FunctionNewParamsFunctionDataGlobal struct {
-	Name param.Field[string]                                  `json:"name,required"`
-	Type param.Field[FunctionNewParamsFunctionDataGlobalType] `json:"type,required"`
+	Name string `json:"name,required"`
+	// Any of "global".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionNewParamsFunctionDataGlobal) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
 func (r FunctionNewParamsFunctionDataGlobal) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionNewParamsFunctionDataGlobal
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-func (r FunctionNewParamsFunctionDataGlobal) implementsFunctionNewParamsFunctionDataUnion() {}
-
-type FunctionNewParamsFunctionDataGlobalType string
-
-const (
-	FunctionNewParamsFunctionDataGlobalTypeGlobal FunctionNewParamsFunctionDataGlobalType = "global"
-)
-
-func (r FunctionNewParamsFunctionDataGlobalType) IsKnown() bool {
-	switch r {
-	case FunctionNewParamsFunctionDataGlobalTypeGlobal:
-		return true
-	}
-	return false
-}
-
-type FunctionNewParamsFunctionDataType string
-
-const (
-	FunctionNewParamsFunctionDataTypePrompt FunctionNewParamsFunctionDataType = "prompt"
-	FunctionNewParamsFunctionDataTypeCode   FunctionNewParamsFunctionDataType = "code"
-	FunctionNewParamsFunctionDataTypeGlobal FunctionNewParamsFunctionDataType = "global"
-)
-
-func (r FunctionNewParamsFunctionDataType) IsKnown() bool {
-	switch r {
-	case FunctionNewParamsFunctionDataTypePrompt, FunctionNewParamsFunctionDataTypeCode, FunctionNewParamsFunctionDataTypeGlobal:
-		return true
-	}
-	return false
+func init() {
+	apijson.RegisterFieldValidator[FunctionNewParamsFunctionDataGlobal](
+		"Type", false, "global",
+	)
 }
 
 // JSON schema for the function's parameters and return type
 type FunctionNewParamsFunctionSchema struct {
-	Parameters param.Field[interface{}] `json:"parameters"`
-	Returns    param.Field[interface{}] `json:"returns"`
+	Parameters interface{} `json:"parameters,omitzero"`
+	Returns    interface{} `json:"returns,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionNewParamsFunctionSchema) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r FunctionNewParamsFunctionSchema) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionNewParamsFunctionSchema
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 type FunctionNewParamsFunctionType string
@@ -369,270 +503,404 @@ const (
 	FunctionNewParamsFunctionTypeTool   FunctionNewParamsFunctionType = "tool"
 )
 
-func (r FunctionNewParamsFunctionType) IsKnown() bool {
-	switch r {
-	case FunctionNewParamsFunctionTypeLlm, FunctionNewParamsFunctionTypeScorer, FunctionNewParamsFunctionTypeTask, FunctionNewParamsFunctionTypeTool:
-		return true
-	}
-	return false
-}
-
+// The properties ObjectID, ObjectType are required.
 type FunctionNewParamsOrigin struct {
 	// Id of the object the function is originating from
-	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	ObjectType shared.ACLObjectType `json:"object_type,omitzero,required"`
 	// The function exists for internal purposes and should not be displayed in the
 	// list of functions.
-	Internal param.Field[bool] `json:"internal"`
+	Internal param.Opt[bool] `json:"internal,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionNewParamsOrigin) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r FunctionNewParamsOrigin) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionNewParamsOrigin
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 type FunctionUpdateParams struct {
 	// Textual description of the prompt
-	Description  param.Field[string]                                `json:"description"`
-	FunctionData param.Field[FunctionUpdateParamsFunctionDataUnion] `json:"function_data"`
+	Description param.Opt[string] `json:"description,omitzero"`
 	// Name of the prompt
-	Name param.Field[string] `json:"name"`
+	Name         param.Opt[string]                     `json:"name,omitzero"`
+	FunctionData FunctionUpdateParamsFunctionDataUnion `json:"function_data,omitzero"`
 	// The prompt, model, and its parameters
-	PromptData param.Field[shared.PromptDataParam] `json:"prompt_data"`
+	PromptData shared.PromptDataParam `json:"prompt_data,omitzero"`
 	// A list of tags for the prompt
-	Tags param.Field[[]string] `json:"tags"`
+	Tags []string `json:"tags,omitzero"`
+	paramObj
 }
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r FunctionUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-type FunctionUpdateParamsFunctionData struct {
-	Type param.Field[FunctionUpdateParamsFunctionDataType] `json:"type,required"`
-	Data param.Field[interface{}]                          `json:"data"`
-	Name param.Field[string]                               `json:"name"`
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type FunctionUpdateParamsFunctionDataUnion struct {
+	OfPrompt *FunctionUpdateParamsFunctionDataPrompt `json:",omitzero,inline"`
+	OfCode   *FunctionUpdateParamsFunctionDataCode   `json:",omitzero,inline"`
+	OfGlobal *FunctionUpdateParamsFunctionDataGlobal `json:",omitzero,inline"`
+	paramUnion
 }
 
-func (r FunctionUpdateParamsFunctionData) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u FunctionUpdateParamsFunctionDataUnion) IsPresent() bool {
+	return !param.IsOmitted(u) && !u.IsNull()
+}
+func (u FunctionUpdateParamsFunctionDataUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[FunctionUpdateParamsFunctionDataUnion](u.OfPrompt, u.OfCode, u.OfGlobal)
 }
 
-func (r FunctionUpdateParamsFunctionData) implementsFunctionUpdateParamsFunctionDataUnion() {}
-
-// Satisfied by [FunctionUpdateParamsFunctionDataPrompt],
-// [FunctionUpdateParamsFunctionDataCode],
-// [FunctionUpdateParamsFunctionDataGlobal], [FunctionUpdateParamsFunctionData].
-type FunctionUpdateParamsFunctionDataUnion interface {
-	implementsFunctionUpdateParamsFunctionDataUnion()
-}
-
-type FunctionUpdateParamsFunctionDataPrompt struct {
-	Type param.Field[FunctionUpdateParamsFunctionDataPromptType] `json:"type,required"`
-}
-
-func (r FunctionUpdateParamsFunctionDataPrompt) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r FunctionUpdateParamsFunctionDataPrompt) implementsFunctionUpdateParamsFunctionDataUnion() {}
-
-type FunctionUpdateParamsFunctionDataPromptType string
-
-const (
-	FunctionUpdateParamsFunctionDataPromptTypePrompt FunctionUpdateParamsFunctionDataPromptType = "prompt"
-)
-
-func (r FunctionUpdateParamsFunctionDataPromptType) IsKnown() bool {
-	switch r {
-	case FunctionUpdateParamsFunctionDataPromptTypePrompt:
-		return true
+func (u *FunctionUpdateParamsFunctionDataUnion) asAny() any {
+	if !param.IsOmitted(u.OfPrompt) {
+		return u.OfPrompt
+	} else if !param.IsOmitted(u.OfCode) {
+		return u.OfCode
+	} else if !param.IsOmitted(u.OfGlobal) {
+		return u.OfGlobal
 	}
-	return false
+	return nil
 }
 
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionUpdateParamsFunctionDataUnion) GetData() *FunctionUpdateParamsFunctionDataCodeDataUnion {
+	if vt := u.OfCode; vt != nil {
+		return &vt.Data
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionUpdateParamsFunctionDataUnion) GetName() *string {
+	if vt := u.OfGlobal; vt != nil {
+		return &vt.Name
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionUpdateParamsFunctionDataUnion) GetType() *string {
+	if vt := u.OfPrompt; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfCode; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfGlobal; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
+}
+
+// The property Type is required.
+type FunctionUpdateParamsFunctionDataPrompt struct {
+	// Any of "prompt".
+	Type string `json:"type,omitzero,required"`
+	paramObj
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionUpdateParamsFunctionDataPrompt) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
+func (r FunctionUpdateParamsFunctionDataPrompt) MarshalJSON() (data []byte, err error) {
+	type shadow FunctionUpdateParamsFunctionDataPrompt
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+
+func init() {
+	apijson.RegisterFieldValidator[FunctionUpdateParamsFunctionDataPrompt](
+		"Type", false, "prompt",
+	)
+}
+
+// The properties Data, Type are required.
 type FunctionUpdateParamsFunctionDataCode struct {
-	Data param.Field[FunctionUpdateParamsFunctionDataCodeDataUnion] `json:"data,required"`
-	Type param.Field[FunctionUpdateParamsFunctionDataCodeType]      `json:"type,required"`
+	Data FunctionUpdateParamsFunctionDataCodeDataUnion `json:"data,omitzero,required"`
+	// Any of "code".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionUpdateParamsFunctionDataCode) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
 func (r FunctionUpdateParamsFunctionDataCode) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionUpdateParamsFunctionDataCode
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-func (r FunctionUpdateParamsFunctionDataCode) implementsFunctionUpdateParamsFunctionDataUnion() {}
+func init() {
+	apijson.RegisterFieldValidator[FunctionUpdateParamsFunctionDataCode](
+		"Type", false, "code",
+	)
+}
 
-// Satisfied by [FunctionUpdateParamsFunctionDataCodeDataBundle],
-// [FunctionUpdateParamsFunctionDataCodeDataInline].
-type FunctionUpdateParamsFunctionDataCodeDataUnion interface {
-	implementsFunctionUpdateParamsFunctionDataCodeDataUnion()
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type FunctionUpdateParamsFunctionDataCodeDataUnion struct {
+	OfBundle *FunctionUpdateParamsFunctionDataCodeDataBundle `json:",omitzero,inline"`
+	OfInline *FunctionUpdateParamsFunctionDataCodeDataInline `json:",omitzero,inline"`
+	paramUnion
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u FunctionUpdateParamsFunctionDataCodeDataUnion) IsPresent() bool {
+	return !param.IsOmitted(u) && !u.IsNull()
+}
+func (u FunctionUpdateParamsFunctionDataCodeDataUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[FunctionUpdateParamsFunctionDataCodeDataUnion](u.OfBundle, u.OfInline)
+}
+
+func (u *FunctionUpdateParamsFunctionDataCodeDataUnion) asAny() any {
+	if !param.IsOmitted(u.OfBundle) {
+		return u.OfBundle
+	} else if !param.IsOmitted(u.OfInline) {
+		return u.OfInline
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionUpdateParamsFunctionDataCodeDataUnion) GetBundleID() *string {
+	if vt := u.OfBundle; vt != nil {
+		return &vt.BundleID
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionUpdateParamsFunctionDataCodeDataUnion) GetLocation() *shared.CodeBundleLocationUnionParam {
+	if vt := u.OfBundle; vt != nil {
+		return &vt.Location
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionUpdateParamsFunctionDataCodeDataUnion) GetPreview() *string {
+	if vt := u.OfBundle; vt != nil && vt.Preview.IsPresent() {
+		return &vt.Preview.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionUpdateParamsFunctionDataCodeDataUnion) GetCode() *string {
+	if vt := u.OfInline; vt != nil {
+		return &vt.Code
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionUpdateParamsFunctionDataCodeDataUnion) GetType() *string {
+	if vt := u.OfBundle; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfInline; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
+}
+
+// Returns a subunion which exports methods to access subproperties
+//
+// Or use AsAny() to get the underlying value
+func (u FunctionUpdateParamsFunctionDataCodeDataUnion) GetRuntimeContext() (res functionUpdateParamsFunctionDataCodeDataUnionRuntimeContext) {
+	if vt := u.OfBundle; vt != nil {
+		res.ofCodeBundleRuntimeContext = &vt.RuntimeContext
+	} else if vt := u.OfInline; vt != nil {
+		res.ofFunctionUpdatesFunctionDataCodeDataInlineRuntimeContext = &vt.RuntimeContext
+	}
+	return
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type functionUpdateParamsFunctionDataCodeDataUnionRuntimeContext struct {
+	ofCodeBundleRuntimeContext                                *shared.CodeBundleRuntimeContextParam
+	ofFunctionUpdatesFunctionDataCodeDataInlineRuntimeContext *FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext
+}
+
+// Use the following switch statement to get the type of the union:
+//
+//	switch u.AsAny().(type) {
+//	case *shared.CodeBundleRuntimeContextParam:
+//	case *braintrust.FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext:
+//	default:
+//	    fmt.Errorf("not present")
+//	}
+func (u functionUpdateParamsFunctionDataCodeDataUnionRuntimeContext) AsAny() any {
+	if !param.IsOmitted(u.ofCodeBundleRuntimeContext) {
+		return u.ofCodeBundleRuntimeContext
+	} else if !param.IsOmitted(u.ofFunctionUpdatesFunctionDataCodeDataInlineRuntimeContext) {
+		return u.ofFunctionUpdatesFunctionDataCodeDataInlineRuntimeContext
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u functionUpdateParamsFunctionDataCodeDataUnionRuntimeContext) GetRuntime() *string {
+	if vt := u.ofCodeBundleRuntimeContext; vt != nil {
+		return (*string)(&vt.Runtime)
+	} else if vt := u.ofFunctionUpdatesFunctionDataCodeDataInlineRuntimeContext; vt != nil {
+		return (*string)(&vt.Runtime)
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u functionUpdateParamsFunctionDataCodeDataUnionRuntimeContext) GetVersion() *string {
+	if vt := u.ofCodeBundleRuntimeContext; vt != nil {
+		return (*string)(&vt.Version)
+	} else if vt := u.ofFunctionUpdatesFunctionDataCodeDataInlineRuntimeContext; vt != nil {
+		return (*string)(&vt.Version)
+	}
+	return nil
 }
 
 type FunctionUpdateParamsFunctionDataCodeDataBundle struct {
-	Type param.Field[FunctionUpdateParamsFunctionDataCodeDataBundleType] `json:"type,required"`
+	Type string `json:"type,omitzero,required"`
 	shared.CodeBundleParam
 }
 
 func (r FunctionUpdateParamsFunctionDataCodeDataBundle) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionUpdateParamsFunctionDataCodeDataBundle
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-func (r FunctionUpdateParamsFunctionDataCodeDataBundle) implementsFunctionUpdateParamsFunctionDataCodeDataUnion() {
-}
-
-type FunctionUpdateParamsFunctionDataCodeDataBundleType string
-
-const (
-	FunctionUpdateParamsFunctionDataCodeDataBundleTypeBundle FunctionUpdateParamsFunctionDataCodeDataBundleType = "bundle"
-)
-
-func (r FunctionUpdateParamsFunctionDataCodeDataBundleType) IsKnown() bool {
-	switch r {
-	case FunctionUpdateParamsFunctionDataCodeDataBundleTypeBundle:
-		return true
-	}
-	return false
-}
-
+// The properties Code, RuntimeContext, Type are required.
 type FunctionUpdateParamsFunctionDataCodeDataInline struct {
-	Code           param.Field[string]                                                       `json:"code,required"`
-	RuntimeContext param.Field[FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext] `json:"runtime_context,required"`
-	Type           param.Field[FunctionUpdateParamsFunctionDataCodeDataInlineType]           `json:"type,required"`
+	Code           string                                                       `json:"code,required"`
+	RuntimeContext FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext `json:"runtime_context,omitzero,required"`
+	// Any of "inline".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionUpdateParamsFunctionDataCodeDataInline) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
 func (r FunctionUpdateParamsFunctionDataCodeDataInline) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionUpdateParamsFunctionDataCodeDataInline
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-func (r FunctionUpdateParamsFunctionDataCodeDataInline) implementsFunctionUpdateParamsFunctionDataCodeDataUnion() {
+func init() {
+	apijson.RegisterFieldValidator[FunctionUpdateParamsFunctionDataCodeDataInline](
+		"Type", false, "inline",
+	)
 }
 
+// The properties Runtime, Version are required.
 type FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext struct {
-	Runtime param.Field[FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntime] `json:"runtime,required"`
-	Version param.Field[string]                                                              `json:"version,required"`
+	// Any of "node", "python".
+	Runtime string `json:"runtime,omitzero,required"`
+	Version string `json:"version,required"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
 func (r FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-type FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntime string
-
-const (
-	FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntimeNode   FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntime = "node"
-	FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntimePython FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntime = "python"
-)
-
-func (r FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntime) IsKnown() bool {
-	switch r {
-	case FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntimeNode, FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContextRuntimePython:
-		return true
-	}
-	return false
+func init() {
+	apijson.RegisterFieldValidator[FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext](
+		"Runtime", false, "node", "python",
+	)
 }
 
-type FunctionUpdateParamsFunctionDataCodeDataInlineType string
-
-const (
-	FunctionUpdateParamsFunctionDataCodeDataInlineTypeInline FunctionUpdateParamsFunctionDataCodeDataInlineType = "inline"
-)
-
-func (r FunctionUpdateParamsFunctionDataCodeDataInlineType) IsKnown() bool {
-	switch r {
-	case FunctionUpdateParamsFunctionDataCodeDataInlineTypeInline:
-		return true
-	}
-	return false
-}
-
-type FunctionUpdateParamsFunctionDataCodeType string
-
-const (
-	FunctionUpdateParamsFunctionDataCodeTypeCode FunctionUpdateParamsFunctionDataCodeType = "code"
-)
-
-func (r FunctionUpdateParamsFunctionDataCodeType) IsKnown() bool {
-	switch r {
-	case FunctionUpdateParamsFunctionDataCodeTypeCode:
-		return true
-	}
-	return false
-}
-
+// The properties Name, Type are required.
 type FunctionUpdateParamsFunctionDataGlobal struct {
-	Name param.Field[string]                                     `json:"name,required"`
-	Type param.Field[FunctionUpdateParamsFunctionDataGlobalType] `json:"type,required"`
+	Name string `json:"name,required"`
+	// Any of "global".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionUpdateParamsFunctionDataGlobal) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
 func (r FunctionUpdateParamsFunctionDataGlobal) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionUpdateParamsFunctionDataGlobal
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-func (r FunctionUpdateParamsFunctionDataGlobal) implementsFunctionUpdateParamsFunctionDataUnion() {}
-
-type FunctionUpdateParamsFunctionDataGlobalType string
-
-const (
-	FunctionUpdateParamsFunctionDataGlobalTypeGlobal FunctionUpdateParamsFunctionDataGlobalType = "global"
-)
-
-func (r FunctionUpdateParamsFunctionDataGlobalType) IsKnown() bool {
-	switch r {
-	case FunctionUpdateParamsFunctionDataGlobalTypeGlobal:
-		return true
-	}
-	return false
-}
-
-type FunctionUpdateParamsFunctionDataType string
-
-const (
-	FunctionUpdateParamsFunctionDataTypePrompt FunctionUpdateParamsFunctionDataType = "prompt"
-	FunctionUpdateParamsFunctionDataTypeCode   FunctionUpdateParamsFunctionDataType = "code"
-	FunctionUpdateParamsFunctionDataTypeGlobal FunctionUpdateParamsFunctionDataType = "global"
-)
-
-func (r FunctionUpdateParamsFunctionDataType) IsKnown() bool {
-	switch r {
-	case FunctionUpdateParamsFunctionDataTypePrompt, FunctionUpdateParamsFunctionDataTypeCode, FunctionUpdateParamsFunctionDataTypeGlobal:
-		return true
-	}
-	return false
+func init() {
+	apijson.RegisterFieldValidator[FunctionUpdateParamsFunctionDataGlobal](
+		"Type", false, "global",
+	)
 }
 
 type FunctionListParams struct {
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Opt[string] `query:"ending_before,omitzero" format:"uuid" json:"-"`
 	// Name of the function to search for
-	FunctionName param.Field[string] `query:"function_name"`
-	// Filter search results to a particular set of object IDs. To specify a list of
-	// IDs, include the query param multiple times
-	IDs param.Field[FunctionListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	FunctionName param.Opt[string] `query:"function_name,omitzero" json:"-"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Opt[string] `query:"org_name,omitzero" json:"-"`
 	// Project id
-	ProjectID param.Field[string] `query:"project_id" format:"uuid"`
+	ProjectID param.Opt[string] `query:"project_id,omitzero" format:"uuid" json:"-"`
 	// Name of the project to search for
-	ProjectName param.Field[string] `query:"project_name"`
+	ProjectName param.Opt[string] `query:"project_name,omitzero" json:"-"`
 	// Retrieve prompt with a specific slug
-	Slug param.Field[string] `query:"slug"`
+	Slug param.Opt[string] `query:"slug,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Opt[string] `query:"starting_after,omitzero" format:"uuid" json:"-"`
 	// Retrieve prompt at a specific version.
 	//
 	// The version id can either be a transaction id (e.g. '1000192656880881099') or a
 	// version identifier (e.g. '81cd05ee665fdfb3').
-	Version param.Field[string] `query:"version"`
+	Version param.Opt[string] `query:"version,omitzero" json:"-"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs FunctionListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
+	paramObj
 }
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [FunctionListParams]'s query parameters as `url.Values`.
 func (r FunctionListParams) URLQuery() (v url.Values) {
@@ -642,265 +910,456 @@ func (r FunctionListParams) URLQuery() (v url.Values) {
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [FunctionListParamsIDsArray].
-type FunctionListParamsIDsUnion interface {
-	ImplementsFunctionListParamsIDsUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type FunctionListParamsIDsUnion struct {
+	OfString                param.Opt[string] `json:",omitzero,inline"`
+	OfFunctionListsIDsArray []string          `json:",omitzero,inline"`
+	paramUnion
 }
 
-type FunctionListParamsIDsArray []string
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u FunctionListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
+func (u FunctionListParamsIDsUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[FunctionListParamsIDsUnion](u.OfString, u.OfFunctionListsIDsArray)
+}
 
-func (r FunctionListParamsIDsArray) ImplementsFunctionListParamsIDsUnion() {}
+func (u *FunctionListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfFunctionListsIDsArray) {
+		return &u.OfFunctionListsIDsArray
+	}
+	return nil
+}
 
 type FunctionInvokeParams struct {
-	// The expected output of the function
-	Expected param.Field[interface{}] `json:"expected"`
-	// Argument to the function, which can be any JSON serializable value
-	Input param.Field[interface{}] `json:"input"`
-	// If the function is an LLM, additional messages to pass along to it
-	Messages param.Field[[]FunctionInvokeParamsMessageUnion] `json:"messages"`
-	// Any relevant metadata
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
-	// The mode format of the returned value (defaults to 'auto')
-	Mode param.Field[FunctionInvokeParamsMode] `json:"mode"`
-	// Options for tracing the function call
-	Parent param.Field[FunctionInvokeParamsParentUnion] `json:"parent"`
 	// Whether to stream the response. If true, results will be returned in the
 	// Braintrust SSE format.
-	Stream param.Field[bool] `json:"stream"`
+	Stream param.Opt[bool] `json:"stream,omitzero"`
 	// The version of the function
-	Version param.Field[string] `json:"version"`
+	Version param.Opt[string] `json:"version,omitzero"`
+	// Any relevant metadata
+	Metadata map[string]interface{} `json:"metadata,omitzero"`
+	// The mode format of the returned value (defaults to 'auto')
+	//
+	// Any of "auto", "parallel".
+	Mode FunctionInvokeParamsMode `json:"mode,omitzero"`
+	// The expected output of the function
+	Expected interface{} `json:"expected,omitzero"`
+	// Argument to the function, which can be any JSON serializable value
+	Input interface{} `json:"input,omitzero"`
+	// If the function is an LLM, additional messages to pass along to it
+	Messages []FunctionInvokeParamsMessageUnion `json:"messages,omitzero"`
+	// Options for tracing the function call
+	Parent FunctionInvokeParamsParentUnion `json:"parent,omitzero"`
+	paramObj
 }
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionInvokeParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r FunctionInvokeParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionInvokeParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-type FunctionInvokeParamsMessage struct {
-	Role         param.Field[FunctionInvokeParamsMessagesRole] `json:"role,required"`
-	Content      param.Field[interface{}]                      `json:"content"`
-	FunctionCall param.Field[interface{}]                      `json:"function_call"`
-	Name         param.Field[string]                           `json:"name"`
-	ToolCallID   param.Field[string]                           `json:"tool_call_id"`
-	ToolCalls    param.Field[interface{}]                      `json:"tool_calls"`
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type FunctionInvokeParamsMessageUnion struct {
+	OfSystem    *FunctionInvokeParamsMessageSystem    `json:",omitzero,inline"`
+	OfUser      *FunctionInvokeParamsMessageUser      `json:",omitzero,inline"`
+	OfAssistant *FunctionInvokeParamsMessageAssistant `json:",omitzero,inline"`
+	OfTool      *FunctionInvokeParamsMessageTool      `json:",omitzero,inline"`
+	OfFunction  *FunctionInvokeParamsMessageFunction  `json:",omitzero,inline"`
+	OfFallback  *FunctionInvokeParamsMessageFallback  `json:",omitzero,inline"`
+	paramUnion
 }
 
-func (r FunctionInvokeParamsMessage) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u FunctionInvokeParamsMessageUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
+func (u FunctionInvokeParamsMessageUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[FunctionInvokeParamsMessageUnion](u.OfSystem,
+		u.OfUser,
+		u.OfAssistant,
+		u.OfTool,
+		u.OfFunction,
+		u.OfFallback)
 }
 
-func (r FunctionInvokeParamsMessage) implementsFunctionInvokeParamsMessageUnion() {}
-
-// Satisfied by [FunctionInvokeParamsMessagesSystem],
-// [FunctionInvokeParamsMessagesUser], [FunctionInvokeParamsMessagesAssistant],
-// [FunctionInvokeParamsMessagesTool], [FunctionInvokeParamsMessagesFunction],
-// [FunctionInvokeParamsMessagesFallback], [FunctionInvokeParamsMessage].
-type FunctionInvokeParamsMessageUnion interface {
-	implementsFunctionInvokeParamsMessageUnion()
-}
-
-type FunctionInvokeParamsMessagesSystem struct {
-	Role    param.Field[FunctionInvokeParamsMessagesSystemRole] `json:"role,required"`
-	Content param.Field[string]                                 `json:"content"`
-	Name    param.Field[string]                                 `json:"name"`
-}
-
-func (r FunctionInvokeParamsMessagesSystem) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r FunctionInvokeParamsMessagesSystem) implementsFunctionInvokeParamsMessageUnion() {}
-
-type FunctionInvokeParamsMessagesSystemRole string
-
-const (
-	FunctionInvokeParamsMessagesSystemRoleSystem FunctionInvokeParamsMessagesSystemRole = "system"
-)
-
-func (r FunctionInvokeParamsMessagesSystemRole) IsKnown() bool {
-	switch r {
-	case FunctionInvokeParamsMessagesSystemRoleSystem:
-		return true
+func (u *FunctionInvokeParamsMessageUnion) asAny() any {
+	if !param.IsOmitted(u.OfSystem) {
+		return u.OfSystem
+	} else if !param.IsOmitted(u.OfUser) {
+		return u.OfUser
+	} else if !param.IsOmitted(u.OfAssistant) {
+		return u.OfAssistant
+	} else if !param.IsOmitted(u.OfTool) {
+		return u.OfTool
+	} else if !param.IsOmitted(u.OfFunction) {
+		return u.OfFunction
+	} else if !param.IsOmitted(u.OfFallback) {
+		return u.OfFallback
 	}
-	return false
+	return nil
 }
 
-type FunctionInvokeParamsMessagesUser struct {
-	Role    param.Field[FunctionInvokeParamsMessagesUserRole]         `json:"role,required"`
-	Content param.Field[FunctionInvokeParamsMessagesUserContentUnion] `json:"content"`
-	Name    param.Field[string]                                       `json:"name"`
-}
-
-func (r FunctionInvokeParamsMessagesUser) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r FunctionInvokeParamsMessagesUser) implementsFunctionInvokeParamsMessageUnion() {}
-
-type FunctionInvokeParamsMessagesUserRole string
-
-const (
-	FunctionInvokeParamsMessagesUserRoleUser FunctionInvokeParamsMessagesUserRole = "user"
-)
-
-func (r FunctionInvokeParamsMessagesUserRole) IsKnown() bool {
-	switch r {
-	case FunctionInvokeParamsMessagesUserRoleUser:
-		return true
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionInvokeParamsMessageUnion) GetFunctionCall() *FunctionInvokeParamsMessageAssistantFunctionCall {
+	if vt := u.OfAssistant; vt != nil {
+		return &vt.FunctionCall
 	}
-	return false
+	return nil
 }
 
-// Satisfied by [shared.UnionString],
-// [FunctionInvokeParamsMessagesUserContentArray].
-type FunctionInvokeParamsMessagesUserContentUnion interface {
-	ImplementsFunctionInvokeParamsMessagesUserContentUnion()
-}
-
-type FunctionInvokeParamsMessagesUserContentArray []FunctionInvokeParamsMessagesUserContentArrayItemUnion
-
-func (r FunctionInvokeParamsMessagesUserContentArray) ImplementsFunctionInvokeParamsMessagesUserContentUnion() {
-}
-
-// Satisfied by [shared.ChatCompletionContentPartTextParam],
-// [shared.ChatCompletionContentPartImageParam].
-type FunctionInvokeParamsMessagesUserContentArrayItemUnion interface {
-	ImplementsFunctionInvokeParamsMessagesUserContentArrayItemUnion()
-}
-
-type FunctionInvokeParamsMessagesAssistant struct {
-	Role         param.Field[FunctionInvokeParamsMessagesAssistantRole]         `json:"role,required"`
-	Content      param.Field[string]                                            `json:"content"`
-	FunctionCall param.Field[FunctionInvokeParamsMessagesAssistantFunctionCall] `json:"function_call"`
-	Name         param.Field[string]                                            `json:"name"`
-	ToolCalls    param.Field[[]shared.ChatCompletionMessageToolCallParam]       `json:"tool_calls"`
-}
-
-func (r FunctionInvokeParamsMessagesAssistant) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r FunctionInvokeParamsMessagesAssistant) implementsFunctionInvokeParamsMessageUnion() {}
-
-type FunctionInvokeParamsMessagesAssistantRole string
-
-const (
-	FunctionInvokeParamsMessagesAssistantRoleAssistant FunctionInvokeParamsMessagesAssistantRole = "assistant"
-)
-
-func (r FunctionInvokeParamsMessagesAssistantRole) IsKnown() bool {
-	switch r {
-	case FunctionInvokeParamsMessagesAssistantRoleAssistant:
-		return true
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionInvokeParamsMessageUnion) GetToolCalls() []shared.ChatCompletionMessageToolCallParam {
+	if vt := u.OfAssistant; vt != nil {
+		return vt.ToolCalls
 	}
-	return false
+	return nil
 }
 
-type FunctionInvokeParamsMessagesAssistantFunctionCall struct {
-	Arguments param.Field[string] `json:"arguments,required"`
-	Name      param.Field[string] `json:"name,required"`
-}
-
-func (r FunctionInvokeParamsMessagesAssistantFunctionCall) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type FunctionInvokeParamsMessagesTool struct {
-	Role       param.Field[FunctionInvokeParamsMessagesToolRole] `json:"role,required"`
-	Content    param.Field[string]                               `json:"content"`
-	ToolCallID param.Field[string]                               `json:"tool_call_id"`
-}
-
-func (r FunctionInvokeParamsMessagesTool) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r FunctionInvokeParamsMessagesTool) implementsFunctionInvokeParamsMessageUnion() {}
-
-type FunctionInvokeParamsMessagesToolRole string
-
-const (
-	FunctionInvokeParamsMessagesToolRoleTool FunctionInvokeParamsMessagesToolRole = "tool"
-)
-
-func (r FunctionInvokeParamsMessagesToolRole) IsKnown() bool {
-	switch r {
-	case FunctionInvokeParamsMessagesToolRoleTool:
-		return true
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionInvokeParamsMessageUnion) GetToolCallID() *string {
+	if vt := u.OfTool; vt != nil && vt.ToolCallID.IsPresent() {
+		return &vt.ToolCallID.Value
 	}
-	return false
+	return nil
 }
 
-type FunctionInvokeParamsMessagesFunction struct {
-	Name    param.Field[string]                                   `json:"name,required"`
-	Role    param.Field[FunctionInvokeParamsMessagesFunctionRole] `json:"role,required"`
-	Content param.Field[string]                                   `json:"content"`
-}
-
-func (r FunctionInvokeParamsMessagesFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r FunctionInvokeParamsMessagesFunction) implementsFunctionInvokeParamsMessageUnion() {}
-
-type FunctionInvokeParamsMessagesFunctionRole string
-
-const (
-	FunctionInvokeParamsMessagesFunctionRoleFunction FunctionInvokeParamsMessagesFunctionRole = "function"
-)
-
-func (r FunctionInvokeParamsMessagesFunctionRole) IsKnown() bool {
-	switch r {
-	case FunctionInvokeParamsMessagesFunctionRoleFunction:
-		return true
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionInvokeParamsMessageUnion) GetRole() *string {
+	if vt := u.OfSystem; vt != nil {
+		return (*string)(&vt.Role)
+	} else if vt := u.OfUser; vt != nil {
+		return (*string)(&vt.Role)
+	} else if vt := u.OfAssistant; vt != nil {
+		return (*string)(&vt.Role)
+	} else if vt := u.OfTool; vt != nil {
+		return (*string)(&vt.Role)
+	} else if vt := u.OfFunction; vt != nil {
+		return (*string)(&vt.Role)
+	} else if vt := u.OfFallback; vt != nil {
+		return (*string)(&vt.Role)
 	}
-	return false
+	return nil
 }
 
-type FunctionInvokeParamsMessagesFallback struct {
-	Role    param.Field[FunctionInvokeParamsMessagesFallbackRole] `json:"role,required"`
-	Content param.Field[string]                                   `json:"content"`
-}
-
-func (r FunctionInvokeParamsMessagesFallback) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r FunctionInvokeParamsMessagesFallback) implementsFunctionInvokeParamsMessageUnion() {}
-
-type FunctionInvokeParamsMessagesFallbackRole string
-
-const (
-	FunctionInvokeParamsMessagesFallbackRoleModel FunctionInvokeParamsMessagesFallbackRole = "model"
-)
-
-func (r FunctionInvokeParamsMessagesFallbackRole) IsKnown() bool {
-	switch r {
-	case FunctionInvokeParamsMessagesFallbackRoleModel:
-		return true
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionInvokeParamsMessageUnion) GetName() *string {
+	if vt := u.OfSystem; vt != nil && vt.Name.IsPresent() {
+		return &vt.Name.Value
+	} else if vt := u.OfUser; vt != nil && vt.Name.IsPresent() {
+		return &vt.Name.Value
+	} else if vt := u.OfAssistant; vt != nil && vt.Name.IsPresent() {
+		return &vt.Name.Value
+	} else if vt := u.OfFunction; vt != nil {
+		return (*string)(&vt.Name)
 	}
-	return false
+	return nil
 }
 
-type FunctionInvokeParamsMessagesRole string
-
-const (
-	FunctionInvokeParamsMessagesRoleSystem    FunctionInvokeParamsMessagesRole = "system"
-	FunctionInvokeParamsMessagesRoleUser      FunctionInvokeParamsMessagesRole = "user"
-	FunctionInvokeParamsMessagesRoleAssistant FunctionInvokeParamsMessagesRole = "assistant"
-	FunctionInvokeParamsMessagesRoleTool      FunctionInvokeParamsMessagesRole = "tool"
-	FunctionInvokeParamsMessagesRoleFunction  FunctionInvokeParamsMessagesRole = "function"
-	FunctionInvokeParamsMessagesRoleModel     FunctionInvokeParamsMessagesRole = "model"
-)
-
-func (r FunctionInvokeParamsMessagesRole) IsKnown() bool {
-	switch r {
-	case FunctionInvokeParamsMessagesRoleSystem, FunctionInvokeParamsMessagesRoleUser, FunctionInvokeParamsMessagesRoleAssistant, FunctionInvokeParamsMessagesRoleTool, FunctionInvokeParamsMessagesRoleFunction, FunctionInvokeParamsMessagesRoleModel:
-		return true
+// Returns a subunion which exports methods to access subproperties
+//
+// Or use AsAny() to get the underlying value
+func (u FunctionInvokeParamsMessageUnion) GetContent() (res functionInvokeParamsMessageUnionContent) {
+	if vt := u.OfSystem; vt != nil && vt.Content.IsPresent() {
+		res.ofString = &vt.Content.Value
+	} else if vt := u.OfUser; vt != nil {
+		res.ofFunctionInvokesMessageUserContent = &vt.Content
+	} else if vt := u.OfAssistant; vt != nil && vt.Content.IsPresent() {
+		res.ofString = &vt.Content.Value
+	} else if vt := u.OfTool; vt != nil && vt.Content.IsPresent() {
+		res.ofString = &vt.Content.Value
+	} else if vt := u.OfFunction; vt != nil && vt.Content.IsPresent() {
+		res.ofString = &vt.Content.Value
+	} else if vt := u.OfFallback; vt != nil && vt.Content.IsPresent() {
+		res.ofString = &vt.Content.Value
 	}
-	return false
+	return
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type functionInvokeParamsMessageUnionContent struct {
+	ofString                            *string
+	ofFunctionInvokesMessageUserContent *FunctionInvokeParamsMessageUserContentUnion
+}
+
+// Use the following switch statement to get the type of the union:
+//
+//	switch u.AsAny().(type) {
+//	case *string:
+//	case *[]braintrust.FunctionInvokeParamsMessageUserContentArrayItemUnion:
+//	default:
+//	    fmt.Errorf("not present")
+//	}
+func (u functionInvokeParamsMessageUnionContent) AsAny() any {
+	if !param.IsOmitted(u.ofString) {
+		return u.ofString
+	} else if !param.IsOmitted(u.ofFunctionInvokesMessageUserContent) {
+		return u.ofFunctionInvokesMessageUserContent.asAny()
+	} else if !param.IsOmitted(u.ofString) {
+		return u.ofString
+	} else if !param.IsOmitted(u.ofString) {
+		return u.ofString
+	} else if !param.IsOmitted(u.ofString) {
+		return u.ofString
+	} else if !param.IsOmitted(u.ofString) {
+		return u.ofString
+	}
+	return nil
+}
+
+// The property Role is required.
+type FunctionInvokeParamsMessageSystem struct {
+	// Any of "system".
+	Role    string            `json:"role,omitzero,required"`
+	Content param.Opt[string] `json:"content,omitzero"`
+	Name    param.Opt[string] `json:"name,omitzero"`
+	paramObj
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionInvokeParamsMessageSystem) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
+func (r FunctionInvokeParamsMessageSystem) MarshalJSON() (data []byte, err error) {
+	type shadow FunctionInvokeParamsMessageSystem
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+
+func init() {
+	apijson.RegisterFieldValidator[FunctionInvokeParamsMessageSystem](
+		"Role", false, "system",
+	)
+}
+
+// The property Role is required.
+type FunctionInvokeParamsMessageUser struct {
+	// Any of "user".
+	Role    string                                      `json:"role,omitzero,required"`
+	Name    param.Opt[string]                           `json:"name,omitzero"`
+	Content FunctionInvokeParamsMessageUserContentUnion `json:"content,omitzero"`
+	paramObj
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionInvokeParamsMessageUser) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+func (r FunctionInvokeParamsMessageUser) MarshalJSON() (data []byte, err error) {
+	type shadow FunctionInvokeParamsMessageUser
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+
+func init() {
+	apijson.RegisterFieldValidator[FunctionInvokeParamsMessageUser](
+		"Role", false, "user",
+	)
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type FunctionInvokeParamsMessageUserContentUnion struct {
+	OfString param.Opt[string]                                      `json:",omitzero,inline"`
+	OfArray  []FunctionInvokeParamsMessageUserContentArrayItemUnion `json:",omitzero,inline"`
+	paramUnion
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u FunctionInvokeParamsMessageUserContentUnion) IsPresent() bool {
+	return !param.IsOmitted(u) && !u.IsNull()
+}
+func (u FunctionInvokeParamsMessageUserContentUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[FunctionInvokeParamsMessageUserContentUnion](u.OfString, u.OfArray)
+}
+
+func (u *FunctionInvokeParamsMessageUserContentUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfArray) {
+		return &u.OfArray
+	}
+	return nil
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type FunctionInvokeParamsMessageUserContentArrayItemUnion struct {
+	OfText     *shared.ChatCompletionContentPartTextParam  `json:",omitzero,inline"`
+	OfImageURL *shared.ChatCompletionContentPartImageParam `json:",omitzero,inline"`
+	paramUnion
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u FunctionInvokeParamsMessageUserContentArrayItemUnion) IsPresent() bool {
+	return !param.IsOmitted(u) && !u.IsNull()
+}
+func (u FunctionInvokeParamsMessageUserContentArrayItemUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[FunctionInvokeParamsMessageUserContentArrayItemUnion](u.OfText, u.OfImageURL)
+}
+
+func (u *FunctionInvokeParamsMessageUserContentArrayItemUnion) asAny() any {
+	if !param.IsOmitted(u.OfText) {
+		return u.OfText
+	} else if !param.IsOmitted(u.OfImageURL) {
+		return u.OfImageURL
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionInvokeParamsMessageUserContentArrayItemUnion) GetText() *string {
+	if vt := u.OfText; vt != nil && vt.Text.IsPresent() {
+		return &vt.Text.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionInvokeParamsMessageUserContentArrayItemUnion) GetImageURL() *shared.ChatCompletionContentPartImageImageURLParam {
+	if vt := u.OfImageURL; vt != nil {
+		return &vt.ImageURL
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionInvokeParamsMessageUserContentArrayItemUnion) GetType() *string {
+	if vt := u.OfText; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfImageURL; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
+}
+
+// The property Role is required.
+type FunctionInvokeParamsMessageAssistant struct {
+	// Any of "assistant".
+	Role         string                                           `json:"role,omitzero,required"`
+	Content      param.Opt[string]                                `json:"content,omitzero"`
+	Name         param.Opt[string]                                `json:"name,omitzero"`
+	FunctionCall FunctionInvokeParamsMessageAssistantFunctionCall `json:"function_call,omitzero"`
+	ToolCalls    []shared.ChatCompletionMessageToolCallParam      `json:"tool_calls,omitzero"`
+	paramObj
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionInvokeParamsMessageAssistant) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
+func (r FunctionInvokeParamsMessageAssistant) MarshalJSON() (data []byte, err error) {
+	type shadow FunctionInvokeParamsMessageAssistant
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+
+func init() {
+	apijson.RegisterFieldValidator[FunctionInvokeParamsMessageAssistant](
+		"Role", false, "assistant",
+	)
+}
+
+// The properties Arguments, Name are required.
+type FunctionInvokeParamsMessageAssistantFunctionCall struct {
+	Arguments string `json:"arguments,required"`
+	Name      string `json:"name,required"`
+	paramObj
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionInvokeParamsMessageAssistantFunctionCall) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
+func (r FunctionInvokeParamsMessageAssistantFunctionCall) MarshalJSON() (data []byte, err error) {
+	type shadow FunctionInvokeParamsMessageAssistantFunctionCall
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+
+// The property Role is required.
+type FunctionInvokeParamsMessageTool struct {
+	// Any of "tool".
+	Role       string            `json:"role,omitzero,required"`
+	Content    param.Opt[string] `json:"content,omitzero"`
+	ToolCallID param.Opt[string] `json:"tool_call_id,omitzero"`
+	paramObj
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionInvokeParamsMessageTool) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+func (r FunctionInvokeParamsMessageTool) MarshalJSON() (data []byte, err error) {
+	type shadow FunctionInvokeParamsMessageTool
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+
+func init() {
+	apijson.RegisterFieldValidator[FunctionInvokeParamsMessageTool](
+		"Role", false, "tool",
+	)
+}
+
+// The properties Name, Role are required.
+type FunctionInvokeParamsMessageFunction struct {
+	Name string `json:"name,required"`
+	// Any of "function".
+	Role    string            `json:"role,omitzero,required"`
+	Content param.Opt[string] `json:"content,omitzero"`
+	paramObj
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionInvokeParamsMessageFunction) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
+func (r FunctionInvokeParamsMessageFunction) MarshalJSON() (data []byte, err error) {
+	type shadow FunctionInvokeParamsMessageFunction
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+
+func init() {
+	apijson.RegisterFieldValidator[FunctionInvokeParamsMessageFunction](
+		"Role", false, "function",
+	)
+}
+
+// The property Role is required.
+type FunctionInvokeParamsMessageFallback struct {
+	// Any of "model".
+	Role    string            `json:"role,omitzero,required"`
+	Content param.Opt[string] `json:"content,omitzero"`
+	paramObj
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionInvokeParamsMessageFallback) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
+func (r FunctionInvokeParamsMessageFallback) MarshalJSON() (data []byte, err error) {
+	type shadow FunctionInvokeParamsMessageFallback
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+
+func init() {
+	apijson.RegisterFieldValidator[FunctionInvokeParamsMessageFallback](
+		"Role", false, "model",
+	)
 }
 
 // The mode format of the returned value (defaults to 'auto')
@@ -911,292 +1370,477 @@ const (
 	FunctionInvokeParamsModeParallel FunctionInvokeParamsMode = "parallel"
 )
 
-func (r FunctionInvokeParamsMode) IsKnown() bool {
-	switch r {
-	case FunctionInvokeParamsModeAuto, FunctionInvokeParamsModeParallel:
-		return true
-	}
-	return false
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type FunctionInvokeParamsParentUnion struct {
+	OfSpanParentStruct *FunctionInvokeParamsParentSpanParentStruct `json:",omitzero,inline"`
+	OfString           param.Opt[string]                           `json:",omitzero,inline"`
+	paramUnion
 }
 
-// Options for tracing the function call
-//
-// Satisfied by [FunctionInvokeParamsParentSpanParentStruct], [shared.UnionString].
-type FunctionInvokeParamsParentUnion interface {
-	ImplementsFunctionInvokeParamsParentUnion()
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u FunctionInvokeParamsParentUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
+func (u FunctionInvokeParamsParentUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[FunctionInvokeParamsParentUnion](u.OfSpanParentStruct, u.OfString)
+}
+
+func (u *FunctionInvokeParamsParentUnion) asAny() any {
+	if !param.IsOmitted(u.OfSpanParentStruct) {
+		return u.OfSpanParentStruct
+	} else if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionInvokeParamsParentUnion) GetObjectID() *string {
+	if vt := u.OfSpanParentStruct; vt != nil {
+		return &vt.ObjectID
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionInvokeParamsParentUnion) GetObjectType() *string {
+	if vt := u.OfSpanParentStruct; vt != nil {
+		return &vt.ObjectType
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionInvokeParamsParentUnion) GetPropagatedEvent() map[string]interface{} {
+	if vt := u.OfSpanParentStruct; vt != nil {
+		return vt.PropagatedEvent
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionInvokeParamsParentUnion) GetRowIDs() *FunctionInvokeParamsParentSpanParentStructRowIDs {
+	if vt := u.OfSpanParentStruct; vt != nil {
+		return &vt.RowIDs
+	}
+	return nil
 }
 
 // Span parent properties
+//
+// The properties ObjectID, ObjectType are required.
 type FunctionInvokeParamsParentSpanParentStruct struct {
 	// The id of the container object you are logging to
-	ObjectID   param.Field[string]                                               `json:"object_id,required"`
-	ObjectType param.Field[FunctionInvokeParamsParentSpanParentStructObjectType] `json:"object_type,required"`
+	ObjectID string `json:"object_id,required"`
+	// Any of "project_logs", "experiment", "playground_logs".
+	ObjectType string `json:"object_type,omitzero,required"`
 	// Include these properties in every span created under this parent
-	PropagatedEvent param.Field[map[string]interface{}] `json:"propagated_event"`
+	PropagatedEvent map[string]interface{} `json:"propagated_event,omitzero"`
 	// Identifiers for the row to to log a subspan under
-	RowIDs param.Field[FunctionInvokeParamsParentSpanParentStructRowIDs] `json:"row_ids"`
+	RowIDs FunctionInvokeParamsParentSpanParentStructRowIDs `json:"row_ids,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionInvokeParamsParentSpanParentStruct) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
 func (r FunctionInvokeParamsParentSpanParentStruct) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionInvokeParamsParentSpanParentStruct
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-func (r FunctionInvokeParamsParentSpanParentStruct) ImplementsFunctionInvokeParamsParentUnion() {}
-
-type FunctionInvokeParamsParentSpanParentStructObjectType string
-
-const (
-	FunctionInvokeParamsParentSpanParentStructObjectTypeProjectLogs    FunctionInvokeParamsParentSpanParentStructObjectType = "project_logs"
-	FunctionInvokeParamsParentSpanParentStructObjectTypeExperiment     FunctionInvokeParamsParentSpanParentStructObjectType = "experiment"
-	FunctionInvokeParamsParentSpanParentStructObjectTypePlaygroundLogs FunctionInvokeParamsParentSpanParentStructObjectType = "playground_logs"
-)
-
-func (r FunctionInvokeParamsParentSpanParentStructObjectType) IsKnown() bool {
-	switch r {
-	case FunctionInvokeParamsParentSpanParentStructObjectTypeProjectLogs, FunctionInvokeParamsParentSpanParentStructObjectTypeExperiment, FunctionInvokeParamsParentSpanParentStructObjectTypePlaygroundLogs:
-		return true
-	}
-	return false
+func init() {
+	apijson.RegisterFieldValidator[FunctionInvokeParamsParentSpanParentStruct](
+		"ObjectType", false, "project_logs", "experiment", "playground_logs",
+	)
 }
 
 // Identifiers for the row to to log a subspan under
+//
+// The properties ID, RootSpanID, SpanID are required.
 type FunctionInvokeParamsParentSpanParentStructRowIDs struct {
 	// The id of the row
-	ID param.Field[string] `json:"id,required"`
+	ID string `json:"id,required"`
 	// The root_span_id of the row
-	RootSpanID param.Field[string] `json:"root_span_id,required"`
+	RootSpanID string `json:"root_span_id,required"`
 	// The span_id of the row
-	SpanID param.Field[string] `json:"span_id,required"`
+	SpanID string `json:"span_id,required"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionInvokeParamsParentSpanParentStructRowIDs) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
 func (r FunctionInvokeParamsParentSpanParentStructRowIDs) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionInvokeParamsParentSpanParentStructRowIDs
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 type FunctionReplaceParams struct {
-	FunctionData param.Field[FunctionReplaceParamsFunctionDataUnion] `json:"function_data,required"`
+	FunctionData FunctionReplaceParamsFunctionDataUnion `json:"function_data,omitzero,required"`
 	// Name of the prompt
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Unique identifier for the project that the prompt belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	ProjectID string `json:"project_id,required" format:"uuid"`
 	// Unique identifier for the prompt
-	Slug param.Field[string] `json:"slug,required"`
+	Slug string `json:"slug,required"`
 	// Textual description of the prompt
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
 	// JSON schema for the function's parameters and return type
-	FunctionSchema param.Field[FunctionReplaceParamsFunctionSchema] `json:"function_schema"`
-	FunctionType   param.Field[FunctionReplaceParamsFunctionType]   `json:"function_type"`
-	Origin         param.Field[FunctionReplaceParamsOrigin]         `json:"origin"`
+	FunctionSchema FunctionReplaceParamsFunctionSchema `json:"function_schema,omitzero"`
+	// Any of "llm", "scorer", "task", "tool".
+	FunctionType FunctionReplaceParamsFunctionType `json:"function_type,omitzero"`
+	Origin       FunctionReplaceParamsOrigin       `json:"origin,omitzero"`
 	// The prompt, model, and its parameters
-	PromptData param.Field[shared.PromptDataParam] `json:"prompt_data"`
+	PromptData shared.PromptDataParam `json:"prompt_data,omitzero"`
 	// A list of tags for the prompt
-	Tags param.Field[[]string] `json:"tags"`
+	Tags []string `json:"tags,omitzero"`
+	paramObj
 }
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r FunctionReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionReplaceParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-type FunctionReplaceParamsFunctionData struct {
-	Type param.Field[FunctionReplaceParamsFunctionDataType] `json:"type,required"`
-	Data param.Field[interface{}]                           `json:"data"`
-	Name param.Field[string]                                `json:"name"`
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type FunctionReplaceParamsFunctionDataUnion struct {
+	OfPrompt *FunctionReplaceParamsFunctionDataPrompt `json:",omitzero,inline"`
+	OfCode   *FunctionReplaceParamsFunctionDataCode   `json:",omitzero,inline"`
+	OfGlobal *FunctionReplaceParamsFunctionDataGlobal `json:",omitzero,inline"`
+	paramUnion
 }
 
-func (r FunctionReplaceParamsFunctionData) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u FunctionReplaceParamsFunctionDataUnion) IsPresent() bool {
+	return !param.IsOmitted(u) && !u.IsNull()
+}
+func (u FunctionReplaceParamsFunctionDataUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[FunctionReplaceParamsFunctionDataUnion](u.OfPrompt, u.OfCode, u.OfGlobal)
 }
 
-func (r FunctionReplaceParamsFunctionData) implementsFunctionReplaceParamsFunctionDataUnion() {}
-
-// Satisfied by [FunctionReplaceParamsFunctionDataPrompt],
-// [FunctionReplaceParamsFunctionDataCode],
-// [FunctionReplaceParamsFunctionDataGlobal], [FunctionReplaceParamsFunctionData].
-type FunctionReplaceParamsFunctionDataUnion interface {
-	implementsFunctionReplaceParamsFunctionDataUnion()
-}
-
-type FunctionReplaceParamsFunctionDataPrompt struct {
-	Type param.Field[FunctionReplaceParamsFunctionDataPromptType] `json:"type,required"`
-}
-
-func (r FunctionReplaceParamsFunctionDataPrompt) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r FunctionReplaceParamsFunctionDataPrompt) implementsFunctionReplaceParamsFunctionDataUnion() {}
-
-type FunctionReplaceParamsFunctionDataPromptType string
-
-const (
-	FunctionReplaceParamsFunctionDataPromptTypePrompt FunctionReplaceParamsFunctionDataPromptType = "prompt"
-)
-
-func (r FunctionReplaceParamsFunctionDataPromptType) IsKnown() bool {
-	switch r {
-	case FunctionReplaceParamsFunctionDataPromptTypePrompt:
-		return true
+func (u *FunctionReplaceParamsFunctionDataUnion) asAny() any {
+	if !param.IsOmitted(u.OfPrompt) {
+		return u.OfPrompt
+	} else if !param.IsOmitted(u.OfCode) {
+		return u.OfCode
+	} else if !param.IsOmitted(u.OfGlobal) {
+		return u.OfGlobal
 	}
-	return false
+	return nil
 }
 
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionReplaceParamsFunctionDataUnion) GetData() *FunctionReplaceParamsFunctionDataCodeDataUnion {
+	if vt := u.OfCode; vt != nil {
+		return &vt.Data
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionReplaceParamsFunctionDataUnion) GetName() *string {
+	if vt := u.OfGlobal; vt != nil {
+		return &vt.Name
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionReplaceParamsFunctionDataUnion) GetType() *string {
+	if vt := u.OfPrompt; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfCode; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfGlobal; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
+}
+
+// The property Type is required.
+type FunctionReplaceParamsFunctionDataPrompt struct {
+	// Any of "prompt".
+	Type string `json:"type,omitzero,required"`
+	paramObj
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionReplaceParamsFunctionDataPrompt) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
+func (r FunctionReplaceParamsFunctionDataPrompt) MarshalJSON() (data []byte, err error) {
+	type shadow FunctionReplaceParamsFunctionDataPrompt
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+
+func init() {
+	apijson.RegisterFieldValidator[FunctionReplaceParamsFunctionDataPrompt](
+		"Type", false, "prompt",
+	)
+}
+
+// The properties Data, Type are required.
 type FunctionReplaceParamsFunctionDataCode struct {
-	Data param.Field[FunctionReplaceParamsFunctionDataCodeDataUnion] `json:"data,required"`
-	Type param.Field[FunctionReplaceParamsFunctionDataCodeType]      `json:"type,required"`
+	Data FunctionReplaceParamsFunctionDataCodeDataUnion `json:"data,omitzero,required"`
+	// Any of "code".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionReplaceParamsFunctionDataCode) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
 func (r FunctionReplaceParamsFunctionDataCode) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionReplaceParamsFunctionDataCode
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-func (r FunctionReplaceParamsFunctionDataCode) implementsFunctionReplaceParamsFunctionDataUnion() {}
+func init() {
+	apijson.RegisterFieldValidator[FunctionReplaceParamsFunctionDataCode](
+		"Type", false, "code",
+	)
+}
 
-// Satisfied by [FunctionReplaceParamsFunctionDataCodeDataBundle],
-// [FunctionReplaceParamsFunctionDataCodeDataInline].
-type FunctionReplaceParamsFunctionDataCodeDataUnion interface {
-	implementsFunctionReplaceParamsFunctionDataCodeDataUnion()
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type FunctionReplaceParamsFunctionDataCodeDataUnion struct {
+	OfBundle *FunctionReplaceParamsFunctionDataCodeDataBundle `json:",omitzero,inline"`
+	OfInline *FunctionReplaceParamsFunctionDataCodeDataInline `json:",omitzero,inline"`
+	paramUnion
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u FunctionReplaceParamsFunctionDataCodeDataUnion) IsPresent() bool {
+	return !param.IsOmitted(u) && !u.IsNull()
+}
+func (u FunctionReplaceParamsFunctionDataCodeDataUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[FunctionReplaceParamsFunctionDataCodeDataUnion](u.OfBundle, u.OfInline)
+}
+
+func (u *FunctionReplaceParamsFunctionDataCodeDataUnion) asAny() any {
+	if !param.IsOmitted(u.OfBundle) {
+		return u.OfBundle
+	} else if !param.IsOmitted(u.OfInline) {
+		return u.OfInline
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionReplaceParamsFunctionDataCodeDataUnion) GetBundleID() *string {
+	if vt := u.OfBundle; vt != nil {
+		return &vt.BundleID
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionReplaceParamsFunctionDataCodeDataUnion) GetLocation() *shared.CodeBundleLocationUnionParam {
+	if vt := u.OfBundle; vt != nil {
+		return &vt.Location
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionReplaceParamsFunctionDataCodeDataUnion) GetPreview() *string {
+	if vt := u.OfBundle; vt != nil && vt.Preview.IsPresent() {
+		return &vt.Preview.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionReplaceParamsFunctionDataCodeDataUnion) GetCode() *string {
+	if vt := u.OfInline; vt != nil {
+		return &vt.Code
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u FunctionReplaceParamsFunctionDataCodeDataUnion) GetType() *string {
+	if vt := u.OfBundle; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfInline; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
+}
+
+// Returns a subunion which exports methods to access subproperties
+//
+// Or use AsAny() to get the underlying value
+func (u FunctionReplaceParamsFunctionDataCodeDataUnion) GetRuntimeContext() (res functionReplaceParamsFunctionDataCodeDataUnionRuntimeContext) {
+	if vt := u.OfBundle; vt != nil {
+		res.ofCodeBundleRuntimeContext = &vt.RuntimeContext
+	} else if vt := u.OfInline; vt != nil {
+		res.ofFunctionReplacesFunctionDataCodeDataInlineRuntimeContext = &vt.RuntimeContext
+	}
+	return
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type functionReplaceParamsFunctionDataCodeDataUnionRuntimeContext struct {
+	ofCodeBundleRuntimeContext                                 *shared.CodeBundleRuntimeContextParam
+	ofFunctionReplacesFunctionDataCodeDataInlineRuntimeContext *FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext
+}
+
+// Use the following switch statement to get the type of the union:
+//
+//	switch u.AsAny().(type) {
+//	case *shared.CodeBundleRuntimeContextParam:
+//	case *braintrust.FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext:
+//	default:
+//	    fmt.Errorf("not present")
+//	}
+func (u functionReplaceParamsFunctionDataCodeDataUnionRuntimeContext) AsAny() any {
+	if !param.IsOmitted(u.ofCodeBundleRuntimeContext) {
+		return u.ofCodeBundleRuntimeContext
+	} else if !param.IsOmitted(u.ofFunctionReplacesFunctionDataCodeDataInlineRuntimeContext) {
+		return u.ofFunctionReplacesFunctionDataCodeDataInlineRuntimeContext
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u functionReplaceParamsFunctionDataCodeDataUnionRuntimeContext) GetRuntime() *string {
+	if vt := u.ofCodeBundleRuntimeContext; vt != nil {
+		return (*string)(&vt.Runtime)
+	} else if vt := u.ofFunctionReplacesFunctionDataCodeDataInlineRuntimeContext; vt != nil {
+		return (*string)(&vt.Runtime)
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u functionReplaceParamsFunctionDataCodeDataUnionRuntimeContext) GetVersion() *string {
+	if vt := u.ofCodeBundleRuntimeContext; vt != nil {
+		return (*string)(&vt.Version)
+	} else if vt := u.ofFunctionReplacesFunctionDataCodeDataInlineRuntimeContext; vt != nil {
+		return (*string)(&vt.Version)
+	}
+	return nil
 }
 
 type FunctionReplaceParamsFunctionDataCodeDataBundle struct {
-	Type param.Field[FunctionReplaceParamsFunctionDataCodeDataBundleType] `json:"type,required"`
+	Type string `json:"type,omitzero,required"`
 	shared.CodeBundleParam
 }
 
 func (r FunctionReplaceParamsFunctionDataCodeDataBundle) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionReplaceParamsFunctionDataCodeDataBundle
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-func (r FunctionReplaceParamsFunctionDataCodeDataBundle) implementsFunctionReplaceParamsFunctionDataCodeDataUnion() {
-}
-
-type FunctionReplaceParamsFunctionDataCodeDataBundleType string
-
-const (
-	FunctionReplaceParamsFunctionDataCodeDataBundleTypeBundle FunctionReplaceParamsFunctionDataCodeDataBundleType = "bundle"
-)
-
-func (r FunctionReplaceParamsFunctionDataCodeDataBundleType) IsKnown() bool {
-	switch r {
-	case FunctionReplaceParamsFunctionDataCodeDataBundleTypeBundle:
-		return true
-	}
-	return false
-}
-
+// The properties Code, RuntimeContext, Type are required.
 type FunctionReplaceParamsFunctionDataCodeDataInline struct {
-	Code           param.Field[string]                                                        `json:"code,required"`
-	RuntimeContext param.Field[FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext] `json:"runtime_context,required"`
-	Type           param.Field[FunctionReplaceParamsFunctionDataCodeDataInlineType]           `json:"type,required"`
+	Code           string                                                        `json:"code,required"`
+	RuntimeContext FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext `json:"runtime_context,omitzero,required"`
+	// Any of "inline".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionReplaceParamsFunctionDataCodeDataInline) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
 func (r FunctionReplaceParamsFunctionDataCodeDataInline) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionReplaceParamsFunctionDataCodeDataInline
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-func (r FunctionReplaceParamsFunctionDataCodeDataInline) implementsFunctionReplaceParamsFunctionDataCodeDataUnion() {
+func init() {
+	apijson.RegisterFieldValidator[FunctionReplaceParamsFunctionDataCodeDataInline](
+		"Type", false, "inline",
+	)
 }
 
+// The properties Runtime, Version are required.
 type FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext struct {
-	Runtime param.Field[FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntime] `json:"runtime,required"`
-	Version param.Field[string]                                                               `json:"version,required"`
+	// Any of "node", "python".
+	Runtime string `json:"runtime,omitzero,required"`
+	Version string `json:"version,required"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
 func (r FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-type FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntime string
-
-const (
-	FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntimeNode   FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntime = "node"
-	FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntimePython FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntime = "python"
-)
-
-func (r FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntime) IsKnown() bool {
-	switch r {
-	case FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntimeNode, FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContextRuntimePython:
-		return true
-	}
-	return false
+func init() {
+	apijson.RegisterFieldValidator[FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext](
+		"Runtime", false, "node", "python",
+	)
 }
 
-type FunctionReplaceParamsFunctionDataCodeDataInlineType string
-
-const (
-	FunctionReplaceParamsFunctionDataCodeDataInlineTypeInline FunctionReplaceParamsFunctionDataCodeDataInlineType = "inline"
-)
-
-func (r FunctionReplaceParamsFunctionDataCodeDataInlineType) IsKnown() bool {
-	switch r {
-	case FunctionReplaceParamsFunctionDataCodeDataInlineTypeInline:
-		return true
-	}
-	return false
-}
-
-type FunctionReplaceParamsFunctionDataCodeType string
-
-const (
-	FunctionReplaceParamsFunctionDataCodeTypeCode FunctionReplaceParamsFunctionDataCodeType = "code"
-)
-
-func (r FunctionReplaceParamsFunctionDataCodeType) IsKnown() bool {
-	switch r {
-	case FunctionReplaceParamsFunctionDataCodeTypeCode:
-		return true
-	}
-	return false
-}
-
+// The properties Name, Type are required.
 type FunctionReplaceParamsFunctionDataGlobal struct {
-	Name param.Field[string]                                      `json:"name,required"`
-	Type param.Field[FunctionReplaceParamsFunctionDataGlobalType] `json:"type,required"`
+	Name string `json:"name,required"`
+	// Any of "global".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionReplaceParamsFunctionDataGlobal) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
 func (r FunctionReplaceParamsFunctionDataGlobal) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionReplaceParamsFunctionDataGlobal
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-func (r FunctionReplaceParamsFunctionDataGlobal) implementsFunctionReplaceParamsFunctionDataUnion() {}
-
-type FunctionReplaceParamsFunctionDataGlobalType string
-
-const (
-	FunctionReplaceParamsFunctionDataGlobalTypeGlobal FunctionReplaceParamsFunctionDataGlobalType = "global"
-)
-
-func (r FunctionReplaceParamsFunctionDataGlobalType) IsKnown() bool {
-	switch r {
-	case FunctionReplaceParamsFunctionDataGlobalTypeGlobal:
-		return true
-	}
-	return false
-}
-
-type FunctionReplaceParamsFunctionDataType string
-
-const (
-	FunctionReplaceParamsFunctionDataTypePrompt FunctionReplaceParamsFunctionDataType = "prompt"
-	FunctionReplaceParamsFunctionDataTypeCode   FunctionReplaceParamsFunctionDataType = "code"
-	FunctionReplaceParamsFunctionDataTypeGlobal FunctionReplaceParamsFunctionDataType = "global"
-)
-
-func (r FunctionReplaceParamsFunctionDataType) IsKnown() bool {
-	switch r {
-	case FunctionReplaceParamsFunctionDataTypePrompt, FunctionReplaceParamsFunctionDataTypeCode, FunctionReplaceParamsFunctionDataTypeGlobal:
-		return true
-	}
-	return false
+func init() {
+	apijson.RegisterFieldValidator[FunctionReplaceParamsFunctionDataGlobal](
+		"Type", false, "global",
+	)
 }
 
 // JSON schema for the function's parameters and return type
 type FunctionReplaceParamsFunctionSchema struct {
-	Parameters param.Field[interface{}] `json:"parameters"`
-	Returns    param.Field[interface{}] `json:"returns"`
+	Parameters interface{} `json:"parameters,omitzero"`
+	Returns    interface{} `json:"returns,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionReplaceParamsFunctionSchema) IsPresent() bool {
+	return !param.IsOmitted(f) && !f.IsNull()
+}
 func (r FunctionReplaceParamsFunctionSchema) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionReplaceParamsFunctionSchema
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 type FunctionReplaceParamsFunctionType string
@@ -1208,24 +1852,25 @@ const (
 	FunctionReplaceParamsFunctionTypeTool   FunctionReplaceParamsFunctionType = "tool"
 )
 
-func (r FunctionReplaceParamsFunctionType) IsKnown() bool {
-	switch r {
-	case FunctionReplaceParamsFunctionTypeLlm, FunctionReplaceParamsFunctionTypeScorer, FunctionReplaceParamsFunctionTypeTask, FunctionReplaceParamsFunctionTypeTool:
-		return true
-	}
-	return false
-}
-
+// The properties ObjectID, ObjectType are required.
 type FunctionReplaceParamsOrigin struct {
 	// Id of the object the function is originating from
-	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	ObjectType shared.ACLObjectType `json:"object_type,omitzero,required"`
 	// The function exists for internal purposes and should not be displayed in the
 	// list of functions.
-	Internal param.Field[bool] `json:"internal"`
+	Internal param.Opt[bool] `json:"internal,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f FunctionReplaceParamsOrigin) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r FunctionReplaceParamsOrigin) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FunctionReplaceParamsOrigin
+	return param.MarshalObject(r, (*shadow)(&r))
 }

@@ -9,12 +9,11 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/pagination"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -31,8 +30,8 @@ type ProjectScoreService struct {
 // NewProjectScoreService generates a new service that applies the given options to
 // each request. These options are applied after the parent client's options (if
 // there is one), and before any request-specific options.
-func NewProjectScoreService(opts ...option.RequestOption) (r *ProjectScoreService) {
-	r = &ProjectScoreService{}
+func NewProjectScoreService(opts ...option.RequestOption) (r ProjectScoreService) {
+	r = ProjectScoreService{}
 	r.Options = opts
 	return
 }
@@ -122,102 +121,144 @@ func (r *ProjectScoreService) Replace(ctx context.Context, body ProjectScoreRepl
 
 type ProjectScoreNewParams struct {
 	// Name of the project score
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Unique identifier for the project that the project score belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	ProjectID string `json:"project_id,required" format:"uuid"`
 	// The type of the configured score
-	ScoreType param.Field[shared.ProjectScoreType] `json:"score_type,required"`
-	// For categorical-type project scores, the list of all categories
-	Categories param.Field[ProjectScoreNewParamsCategoriesUnion] `json:"categories"`
-	Config     param.Field[shared.ProjectScoreConfigParam]       `json:"config"`
+	//
+	// Any of "slider", "categorical", "weighted", "minimum", "maximum", "online",
+	// "free-form".
+	ScoreType shared.ProjectScoreType `json:"score_type,omitzero,required"`
 	// Textual description of the project score
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
+	// For categorical-type project scores, the list of all categories
+	Categories ProjectScoreNewParamsCategoriesUnion `json:"categories,omitzero"`
+	Config     shared.ProjectScoreConfigParam       `json:"config,omitzero"`
+	paramObj
 }
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f ProjectScoreNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r ProjectScoreNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ProjectScoreNewParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-// For categorical-type project scores, the list of all categories
+// Only one field can be non-zero.
 //
-// Satisfied by [ProjectScoreNewParamsCategoriesCategorical],
-// [ProjectScoreNewParamsCategoriesMinimum].
-type ProjectScoreNewParamsCategoriesUnion interface {
-	implementsProjectScoreNewParamsCategoriesUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type ProjectScoreNewParamsCategoriesUnion struct {
+	OfCategorical []shared.ProjectScoreCategoryParam `json:",omitzero,inline"`
+	OfMinimum     []string                           `json:",omitzero,inline"`
+	paramUnion
 }
 
-type ProjectScoreNewParamsCategoriesCategorical []shared.ProjectScoreCategoryParam
-
-func (r ProjectScoreNewParamsCategoriesCategorical) implementsProjectScoreNewParamsCategoriesUnion() {
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u ProjectScoreNewParamsCategoriesUnion) IsPresent() bool {
+	return !param.IsOmitted(u) && !u.IsNull()
+}
+func (u ProjectScoreNewParamsCategoriesUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[ProjectScoreNewParamsCategoriesUnion](u.OfCategorical, u.OfMinimum)
 }
 
-type ProjectScoreNewParamsCategoriesMinimum []string
-
-func (r ProjectScoreNewParamsCategoriesMinimum) implementsProjectScoreNewParamsCategoriesUnion() {}
+func (u *ProjectScoreNewParamsCategoriesUnion) asAny() any {
+	if !param.IsOmitted(u.OfCategorical) {
+		return &u.OfCategorical
+	} else if !param.IsOmitted(u.OfMinimum) {
+		return &u.OfMinimum
+	}
+	return nil
+}
 
 type ProjectScoreUpdateParams struct {
-	// For categorical-type project scores, the list of all categories
-	Categories param.Field[ProjectScoreUpdateParamsCategoriesUnion] `json:"categories"`
-	Config     param.Field[shared.ProjectScoreConfigParam]          `json:"config"`
 	// Textual description of the project score
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
 	// Name of the project score
-	Name param.Field[string] `json:"name"`
+	Name param.Opt[string] `json:"name,omitzero"`
+	// For categorical-type project scores, the list of all categories
+	Categories ProjectScoreUpdateParamsCategoriesUnion `json:"categories,omitzero"`
+	Config     shared.ProjectScoreConfigParam          `json:"config,omitzero"`
 	// The type of the configured score
-	ScoreType param.Field[shared.ProjectScoreType] `json:"score_type"`
+	//
+	// Any of "slider", "categorical", "weighted", "minimum", "maximum", "online",
+	// "free-form".
+	ScoreType shared.ProjectScoreType `json:"score_type,omitzero"`
+	paramObj
 }
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f ProjectScoreUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r ProjectScoreUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ProjectScoreUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-// For categorical-type project scores, the list of all categories
+// Only one field can be non-zero.
 //
-// Satisfied by [ProjectScoreUpdateParamsCategoriesCategorical],
-// [ProjectScoreUpdateParamsCategoriesMinimum].
-type ProjectScoreUpdateParamsCategoriesUnion interface {
-	implementsProjectScoreUpdateParamsCategoriesUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type ProjectScoreUpdateParamsCategoriesUnion struct {
+	OfCategorical []shared.ProjectScoreCategoryParam `json:",omitzero,inline"`
+	OfMinimum     []string                           `json:",omitzero,inline"`
+	paramUnion
 }
 
-type ProjectScoreUpdateParamsCategoriesCategorical []shared.ProjectScoreCategoryParam
-
-func (r ProjectScoreUpdateParamsCategoriesCategorical) implementsProjectScoreUpdateParamsCategoriesUnion() {
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u ProjectScoreUpdateParamsCategoriesUnion) IsPresent() bool {
+	return !param.IsOmitted(u) && !u.IsNull()
+}
+func (u ProjectScoreUpdateParamsCategoriesUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[ProjectScoreUpdateParamsCategoriesUnion](u.OfCategorical, u.OfMinimum)
 }
 
-type ProjectScoreUpdateParamsCategoriesMinimum []string
-
-func (r ProjectScoreUpdateParamsCategoriesMinimum) implementsProjectScoreUpdateParamsCategoriesUnion() {
+func (u *ProjectScoreUpdateParamsCategoriesUnion) asAny() any {
+	if !param.IsOmitted(u.OfCategorical) {
+		return &u.OfCategorical
+	} else if !param.IsOmitted(u.OfMinimum) {
+		return &u.OfMinimum
+	}
+	return nil
 }
 
 type ProjectScoreListParams struct {
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
-	// Filter search results to a particular set of object IDs. To specify a list of
-	// IDs, include the query param multiple times
-	IDs param.Field[ProjectScoreListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	EndingBefore param.Opt[string] `query:"ending_before,omitzero" format:"uuid" json:"-"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Opt[string] `query:"org_name,omitzero" json:"-"`
 	// Project id
-	ProjectID param.Field[string] `query:"project_id" format:"uuid"`
+	ProjectID param.Opt[string] `query:"project_id,omitzero" format:"uuid" json:"-"`
 	// Name of the project to search for
-	ProjectName param.Field[string] `query:"project_name"`
+	ProjectName param.Opt[string] `query:"project_name,omitzero" json:"-"`
 	// Name of the project_score to search for
-	ProjectScoreName param.Field[string] `query:"project_score_name"`
-	// The type of the configured score
-	ScoreType param.Field[ProjectScoreListParamsScoreTypeUnion] `query:"score_type"`
+	ProjectScoreName param.Opt[string] `query:"project_score_name,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Opt[string] `query:"starting_after,omitzero" format:"uuid" json:"-"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs ProjectScoreListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
+	// The type of the configured score
+	ScoreType ProjectScoreListParamsScoreTypeUnion `query:"score_type,omitzero" json:"-"`
+	paramObj
 }
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f ProjectScoreListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [ProjectScoreListParams]'s query parameters as `url.Values`.
 func (r ProjectScoreListParams) URLQuery() (v url.Values) {
@@ -227,61 +268,110 @@ func (r ProjectScoreListParams) URLQuery() (v url.Values) {
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [ProjectScoreListParamsIDsArray].
-type ProjectScoreListParamsIDsUnion interface {
-	ImplementsProjectScoreListParamsIDsUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type ProjectScoreListParamsIDsUnion struct {
+	OfString                    param.Opt[string] `json:",omitzero,inline"`
+	OfProjectScoreListsIDsArray []string          `json:",omitzero,inline"`
+	paramUnion
 }
 
-type ProjectScoreListParamsIDsArray []string
-
-func (r ProjectScoreListParamsIDsArray) ImplementsProjectScoreListParamsIDsUnion() {}
-
-// The type of the configured score
-//
-// Satisfied by [shared.ProjectScoreType], [ProjectScoreListParamsScoreTypeArray].
-type ProjectScoreListParamsScoreTypeUnion interface {
-	ImplementsProjectScoreListParamsScoreTypeUnion()
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u ProjectScoreListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
+func (u ProjectScoreListParamsIDsUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[ProjectScoreListParamsIDsUnion](u.OfString, u.OfProjectScoreListsIDsArray)
 }
 
-type ProjectScoreListParamsScoreTypeArray []shared.ProjectScoreType
+func (u *ProjectScoreListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfProjectScoreListsIDsArray) {
+		return &u.OfProjectScoreListsIDsArray
+	}
+	return nil
+}
 
-func (r ProjectScoreListParamsScoreTypeArray) ImplementsProjectScoreListParamsScoreTypeUnion() {}
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ProjectScoreListParamsScoreTypeUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfProjectScoreTypeSingle)
+	OfProjectScoreTypeSingle          param.Opt[shared.ProjectScoreType] `json:",omitzero,inline"`
+	OfProjectScoreListsScoreTypeArray []string                           `json:",omitzero,inline"`
+	paramUnion
+}
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u ProjectScoreListParamsScoreTypeUnion) IsPresent() bool {
+	return !param.IsOmitted(u) && !u.IsNull()
+}
+func (u ProjectScoreListParamsScoreTypeUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[ProjectScoreListParamsScoreTypeUnion](u.OfProjectScoreTypeSingle, u.OfProjectScoreListsScoreTypeArray)
+}
+
+func (u *ProjectScoreListParamsScoreTypeUnion) asAny() any {
+	if !param.IsOmitted(u.OfProjectScoreTypeSingle) {
+		return &u.OfProjectScoreTypeSingle
+	} else if !param.IsOmitted(u.OfProjectScoreListsScoreTypeArray) {
+		return &u.OfProjectScoreListsScoreTypeArray
+	}
+	return nil
+}
 
 type ProjectScoreReplaceParams struct {
 	// Name of the project score
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Unique identifier for the project that the project score belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	ProjectID string `json:"project_id,required" format:"uuid"`
 	// The type of the configured score
-	ScoreType param.Field[shared.ProjectScoreType] `json:"score_type,required"`
-	// For categorical-type project scores, the list of all categories
-	Categories param.Field[ProjectScoreReplaceParamsCategoriesUnion] `json:"categories"`
-	Config     param.Field[shared.ProjectScoreConfigParam]           `json:"config"`
+	//
+	// Any of "slider", "categorical", "weighted", "minimum", "maximum", "online",
+	// "free-form".
+	ScoreType shared.ProjectScoreType `json:"score_type,omitzero,required"`
 	// Textual description of the project score
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
+	// For categorical-type project scores, the list of all categories
+	Categories ProjectScoreReplaceParamsCategoriesUnion `json:"categories,omitzero"`
+	Config     shared.ProjectScoreConfigParam           `json:"config,omitzero"`
+	paramObj
 }
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f ProjectScoreReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r ProjectScoreReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ProjectScoreReplaceParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
-// For categorical-type project scores, the list of all categories
+// Only one field can be non-zero.
 //
-// Satisfied by [ProjectScoreReplaceParamsCategoriesCategorical],
-// [ProjectScoreReplaceParamsCategoriesMinimum].
-type ProjectScoreReplaceParamsCategoriesUnion interface {
-	implementsProjectScoreReplaceParamsCategoriesUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type ProjectScoreReplaceParamsCategoriesUnion struct {
+	OfCategorical []shared.ProjectScoreCategoryParam `json:",omitzero,inline"`
+	OfMinimum     []string                           `json:",omitzero,inline"`
+	paramUnion
 }
 
-type ProjectScoreReplaceParamsCategoriesCategorical []shared.ProjectScoreCategoryParam
-
-func (r ProjectScoreReplaceParamsCategoriesCategorical) implementsProjectScoreReplaceParamsCategoriesUnion() {
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u ProjectScoreReplaceParamsCategoriesUnion) IsPresent() bool {
+	return !param.IsOmitted(u) && !u.IsNull()
+}
+func (u ProjectScoreReplaceParamsCategoriesUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[ProjectScoreReplaceParamsCategoriesUnion](u.OfCategorical, u.OfMinimum)
 }
 
-type ProjectScoreReplaceParamsCategoriesMinimum []string
-
-func (r ProjectScoreReplaceParamsCategoriesMinimum) implementsProjectScoreReplaceParamsCategoriesUnion() {
+func (u *ProjectScoreReplaceParamsCategoriesUnion) asAny() any {
+	if !param.IsOmitted(u.OfCategorical) {
+		return &u.OfCategorical
+	} else if !param.IsOmitted(u.OfMinimum) {
+		return &u.OfMinimum
+	}
+	return nil
 }

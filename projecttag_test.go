@@ -11,7 +11,6 @@ import (
 	"github.com/braintrustdata/braintrust-go"
 	"github.com/braintrustdata/braintrust-go/internal/testutil"
 	"github.com/braintrustdata/braintrust-go/option"
-	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 func TestProjectTagNewWithOptionalParams(t *testing.T) {
@@ -27,10 +26,10 @@ func TestProjectTagNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ProjectTags.New(context.TODO(), braintrust.ProjectTagNewParams{
-		Name:        braintrust.F("name"),
-		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Color:       braintrust.F("color"),
-		Description: braintrust.F("description"),
+		Name:        "name",
+		ProjectID:   "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		Color:       braintrust.String("color"),
+		Description: braintrust.String("description"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -79,9 +78,9 @@ func TestProjectTagUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.ProjectTagUpdateParams{
-			Color:       braintrust.F("color"),
-			Description: braintrust.F("description"),
-			Name:        braintrust.F("name"),
+			Color:       braintrust.String("color"),
+			Description: braintrust.String("description"),
+			Name:        braintrust.String("name"),
 		},
 	)
 	if err != nil {
@@ -106,14 +105,16 @@ func TestProjectTagListWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ProjectTags.List(context.TODO(), braintrust.ProjectTagListParams{
-		EndingBefore:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:            braintrust.F[braintrust.ProjectTagListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
-		Limit:          braintrust.F(int64(0)),
-		OrgName:        braintrust.F("org_name"),
-		ProjectID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ProjectName:    braintrust.F("project_name"),
-		ProjectTagName: braintrust.F("project_tag_name"),
-		StartingAfter:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		EndingBefore: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		IDs: braintrust.ProjectTagListParamsIDsUnion{
+			OfString: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		},
+		Limit:          braintrust.Int(0),
+		OrgName:        braintrust.String("org_name"),
+		ProjectID:      braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		ProjectName:    braintrust.String("project_name"),
+		ProjectTagName: braintrust.String("project_tag_name"),
+		StartingAfter:  braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -159,10 +160,10 @@ func TestProjectTagReplaceWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ProjectTags.Replace(context.TODO(), braintrust.ProjectTagReplaceParams{
-		Name:        braintrust.F("name"),
-		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Color:       braintrust.F("color"),
-		Description: braintrust.F("description"),
+		Name:        "name",
+		ProjectID:   "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		Color:       braintrust.String("color"),
+		Description: braintrust.String("description"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
