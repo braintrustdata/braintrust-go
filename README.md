@@ -53,7 +53,7 @@ func main() {
 		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("BRAINTRUST_API_KEY")
 	)
 	project, err := client.Projects.New(context.TODO(), braintrust.ProjectNewParams{
-		Name: braintrust.F("foobar"),
+		Name: "foobar",
 	})
 	if err != nil {
 		panic(err.Error())
@@ -65,31 +65,82 @@ func main() {
 
 ### Request fields
 
-All request parameters are wrapped in a generic `Field` type,
-which we use to distinguish zero values from null or omitted fields.
+The braintrust library uses the [`omitzero`](https://tip.golang.org/doc/go1.24#encodingjsonpkgencodingjson)
+semantics from the Go 1.24+ `encoding/json` release for request fields.
 
-This prevents accidentally sending a zero value if you forget a required parameter,
-and enables explicitly sending `null`, `false`, `''`, or `0` on optional parameters.
-Any field not specified is not sent.
+Required primitive fields (`int64`, `string`, etc.) feature the tag <code>\`json:...,required\`</code>. These
+fields are always serialized, even their zero values.
 
-To construct fields with values, use the helpers `String()`, `Int()`, `Float()`, or most commonly, the generic `F[T]()`.
-To send a null, use `Null[T]()`, and to send a nonconforming value, use `Raw[T](any)`. For example:
+Optional primitive types are wrapped in a `param.Opt[T]`. Use the provided constructors set `param.Opt[T]` fields such as `braintrust.String(string)`, `braintrust.Int(int64)`, etc.
+
+Optional primitives, maps, slices and structs and string enums (represented as `string`) always feature the
+tag <code>\`json:"...,omitzero"\`</code>. Their zero values are considered omitted.
+
+Any non-nil slice of length zero will serialize as an empty JSON array, `"[]"`. Similarly, any non-nil map with length zero with serialize as an empty JSON object, `"{}"`.
+
+To send `null` instead of an `param.Opt[T]`, use `param.NullOpt[T]()`.
+To send `null` instead of a struct, use `param.NullObj[T]()`, where `T` is a struct.
+To send a custom value instead of a struct, use `param.OverrideObj[T](value)`.
+
+To override request structs contain a `.WithExtraFields(map[string]any)` method which can be used to
+send non-conforming fields in the request body. Extra fields overwrite any struct fields with a matching
+key, so only use with trusted data.
 
 ```go
 params := FooParams{
-	Name: braintrust.F("hello"),
+	ID: "id_xxx",                          // required property
+	Name: braintrust.String("hello"), // optional property
+	Description: param.NullOpt[string](),  // explicit null property
 
-	// Explicitly send `"description": null`
-	Description: braintrust.Null[string](),
-
-	Point: braintrust.F(braintrust.Point{
-		X: braintrust.Int(0),
-		Y: braintrust.Int(1),
-
-		// In cases where the API specifies a given type,
-		// but you want to send something else, use `Raw`:
-		Z: braintrust.Raw[int64](0.01), // sends a float
+	Point: braintrust.Point{
+		X: 0, // required field will serialize as 0
+		Y: braintrust.Int(1), // optional field will serialize as 1
+	  // ... omitted non-required fields will not be serialized
 	}),
+
+	Origin: braintrust.Origin{}, // the zero value of [Origin] is considered omitted
+}
+
+// In cases where the API specifies a given type,
+// but you want to send something else, use [WithExtraFields]:
+params.WithExtraFields(map[string]any{
+	"x": 0.01, // send "x" as a float instead of int
+})
+
+// Send a number instead of an object
+custom := param.OverrideObj[braintrust.FooParams](12)
+```
+
+When available, use the `.IsPresent()` method to check if an optional parameter is not omitted or `null`.
+Otherwise, the `param.IsOmitted(any)` function can confirm the presence of any `omitzero` field.
+
+### Request unions
+
+Unions are represented as a struct with fields prefixed by "Of" for each of it's variants,
+only one field can be non-zero. The non-zero field will be serialized.
+
+Sub-properties of the union can be accessed via methods on the union struct.
+These methods return a mutable pointer to the underlying data, if present.
+
+```go
+// Only one field can be non-zero, use param.IsOmitted() to check if a field is set
+type AnimalUnionParam struct {
+	OfCat 	 *Cat              `json:",omitzero,inline`
+	OfDog    *Dog              `json:",omitzero,inline`
+}
+
+animal := AnimalUnionParam{
+	OfCat: &Cat{
+		Name: "Whiskers",
+		Owner: PersonParam{
+			Address: AddressParam{Street: "3333 Coyote Hill Rd", Zip: 0},
+		},
+	},
+}
+
+// Mutating a field
+if address := animal.GetOwner().GetAddress(); address != nil {
+	address.ZipCode = 94304
 }
 ```
 
@@ -105,14 +156,14 @@ information about each property, which you can use like so:
 
 ```go
 if res.Name == "" {
-	// true if `"name"` is either not present or explicitly null
-	res.JSON.Name.IsNull()
+	// true if `"name"` was unmarshalled successfully
+	res.JSON.Name.IsPresent()
 
-	// true if the `"name"` key was not present in the response JSON at all
-	res.JSON.Name.IsMissing()
+	res.JSON.Name.IsExplicitNull() // true if `"name"` is explicitly null
+	res.JSON.Name.Raw() == ""          // true if `"name"` field does not exist
 
 	// When the API returns data that cannot be coerced to the expected type:
-	if res.JSON.Name.IsInvalid() {
+	if !res.JSON.Name.IsPresent() && res.JSON.Name.Raw() != "" {
 		raw := res.JSON.Name.Raw()
 
 		legacyName := struct{
@@ -125,13 +176,56 @@ if res.Name == "" {
 }
 ```
 
-These `.JSON` structs also include an `Extras` map containing
+These `.JSON` structs also include an `ExtraFields` map containing
 any properties in the json response that were not specified
 in the struct. This can be useful for API features not yet
 present in the SDK.
 
 ```go
 body := res.JSON.ExtraFields["my_unexpected_field"].Raw()
+```
+
+### Response Unions
+
+In responses, unions are represented by a flattened struct containing all possible fields from each of the
+object variants.
+To convert it to a variant use the `.AsFooVariant()` method or the `.AsAny()` method if present.
+
+If a response value union contains primitive values, primitive fields will be alongside
+the properties but prefixed with `Of` and feature the tag `json:"...,inline"`.
+
+```go
+type AnimalUnion struct {
+	OfString string `json:",inline"`
+	Name     string `json:"name"`
+	Owner    Person `json:"owner"`
+	// ...
+	JSON struct {
+		OfString resp.Field
+		Name     resp.Field
+		Owner    resp.Field
+		// ...
+	}
+}
+
+// If animal variant
+if animal.Owner.Address.JSON.ZipCode == "" {
+	panic("missing zip code")
+}
+
+// If string variant
+if !animal.OfString == "" {
+	panic("expected a name")
+}
+
+// Switch on the variant
+switch variant := animalOrName.AsAny().(type) {
+case string:
+case Dog:
+case Cat:
+default:
+	panic("unexpected type")
+}
 ```
 
 ### RequestOptions
@@ -202,7 +296,7 @@ To handle errors, we recommend that you use the `errors.As` pattern:
 
 ```go
 _, err := client.Projects.New(context.TODO(), braintrust.ProjectNewParams{
-	Name: braintrust.F("foobar"),
+	Name: "foobar",
 })
 if err != nil {
 	var apierr *braintrust.Error
@@ -231,7 +325,7 @@ defer cancel()
 client.Projects.New(
 	ctx,
 	braintrust.ProjectNewParams{
-		Name: braintrust.F("foobar"),
+		Name: "foobar",
 	},
 	// This sets the per-retry timeout
 	option.WithRequestTimeout(20*time.Second),
@@ -241,7 +335,7 @@ client.Projects.New(
 ### File uploads
 
 Request parameters that correspond to file uploads in multipart requests are typed as
-`param.Field[io.Reader]`. The contents of the `io.Reader` will by default be sent as a multipart form
+`io.Reader`. The contents of the `io.Reader` will by default be sent as a multipart form
 part with the file name of "anonymous_file" and content-type of "application/octet-stream".
 
 The file name and content-type can be customized by implementing `Name() string` or `ContentType()
@@ -269,7 +363,7 @@ client := braintrust.NewClient(
 client.Projects.New(
 	context.TODO(),
 	braintrust.ProjectNewParams{
-		Name: braintrust.F("foobar"),
+		Name: "foobar",
 	},
 	option.WithMaxRetries(5),
 )
@@ -286,7 +380,7 @@ var response *http.Response
 project, err := client.Projects.New(
 	context.TODO(),
 	braintrust.ProjectNewParams{
-		Name: braintrust.F("foobar"),
+		Name: "foobar",
 	},
 	option.WithResponseInto(&response),
 )
@@ -332,10 +426,10 @@ or the `option.WithJSONSet()` methods.
 
 ```go
 params := FooNewParams{
-    ID:   braintrust.F("id_xxxx"),
-    Data: braintrust.F(FooNewParamsData{
-        FirstName: braintrust.F("John"),
-    }),
+    ID:   "id_xxxx",
+    Data: FooNewParamsData{
+        FirstName: braintrust.String("John"),
+    },
 }
 client.Foo.New(context.Background(), params, option.WithJSONSet("data.last_name", "Doe"))
 ```

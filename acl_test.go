@@ -27,13 +27,13 @@ func TestACLNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ACLs.New(context.TODO(), braintrust.ACLNewParams{
-		ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType:         braintrust.F(shared.ACLObjectTypeOrganization),
-		GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Permission:         braintrust.F(shared.PermissionCreate),
-		RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
-		RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		ObjectID:           "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		ObjectType:         shared.ACLObjectTypeOrganization,
+		GroupID:            braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		Permission:         shared.PermissionCreate,
+		RestrictObjectType: shared.ACLObjectTypeOrganization,
+		RoleID:             braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		UserID:             braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -79,12 +79,14 @@ func TestACLListWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ACLs.List(context.TODO(), braintrust.ACLListParams{
-		ObjectID:      braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType:    braintrust.F(shared.ACLObjectTypeOrganization),
-		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:           braintrust.F[braintrust.ACLListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
-		Limit:         braintrust.F(int64(0)),
-		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		ObjectID:     "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		ObjectType:   shared.ACLObjectTypeOrganization,
+		EndingBefore: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		IDs: braintrust.ACLListParamsIDsUnion{
+			OfString: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		},
+		Limit:         braintrust.Int(0),
+		StartingAfter: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -130,24 +132,24 @@ func TestACLBatchUpdateWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ACLs.BatchUpdate(context.TODO(), braintrust.ACLBatchUpdateParams{
-		AddACLs: braintrust.F([]braintrust.ACLBatchUpdateParamsAddACL{{
-			ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ObjectType:         braintrust.F(shared.ACLObjectTypeOrganization),
-			GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			Permission:         braintrust.F(shared.PermissionCreate),
-			RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
-			RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		}}),
-		RemoveACLs: braintrust.F([]braintrust.ACLBatchUpdateParamsRemoveACL{{
-			ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ObjectType:         braintrust.F(shared.ACLObjectTypeOrganization),
-			GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			Permission:         braintrust.F(shared.PermissionCreate),
-			RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
-			RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		}}),
+		AddACLs: []braintrust.ACLBatchUpdateParamsAddACL{{
+			ObjectID:           "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+			ObjectType:         shared.ACLObjectTypeOrganization,
+			GroupID:            braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Permission:         shared.PermissionCreate,
+			RestrictObjectType: shared.ACLObjectTypeOrganization,
+			RoleID:             braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			UserID:             braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		}},
+		RemoveACLs: []braintrust.ACLBatchUpdateParamsRemoveACL{{
+			ObjectID:           "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+			ObjectType:         shared.ACLObjectTypeOrganization,
+			GroupID:            braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Permission:         shared.PermissionCreate,
+			RestrictObjectType: shared.ACLObjectTypeOrganization,
+			RoleID:             braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			UserID:             braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		}},
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -171,13 +173,13 @@ func TestACLFindAndDeleteWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.ACLs.FindAndDelete(context.TODO(), braintrust.ACLFindAndDeleteParams{
-		ObjectID:           braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ObjectType:         braintrust.F(shared.ACLObjectTypeOrganization),
-		GroupID:            braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Permission:         braintrust.F(shared.PermissionCreate),
-		RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
-		RoleID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		UserID:             braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		ObjectID:           "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		ObjectType:         shared.ACLObjectTypeOrganization,
+		GroupID:            braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		Permission:         shared.PermissionCreate,
+		RestrictObjectType: shared.ACLObjectTypeOrganization,
+		RoleID:             braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		UserID:             braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error

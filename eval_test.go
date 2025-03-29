@@ -27,59 +27,67 @@ func TestEvalNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Evals.New(context.TODO(), braintrust.EvalNewParams{
-		Data: braintrust.F[braintrust.EvalNewParamsDataUnion](braintrust.EvalNewParamsDataDatasetID{
-			DatasetID: braintrust.F("dataset_id"),
-			InternalBtql: braintrust.F(map[string]interface{}{
-				"foo": "bar",
-			}),
-		}),
-		ProjectID: braintrust.F("project_id"),
-		Scores: braintrust.F([]braintrust.EvalNewParamsScoreUnion{braintrust.EvalNewParamsScoresFunctionID{
-			FunctionID: braintrust.F("function_id"),
-			Version:    braintrust.F("version"),
-		}}),
-		Task: braintrust.F[braintrust.EvalNewParamsTaskUnion](braintrust.EvalNewParamsTaskFunctionID{
-			FunctionID: braintrust.F("function_id"),
-			Version:    braintrust.F("version"),
-		}),
-		BaseExperimentID:   braintrust.F("base_experiment_id"),
-		BaseExperimentName: braintrust.F("base_experiment_name"),
-		ExperimentName:     braintrust.F("experiment_name"),
-		GitMetadataSettings: braintrust.F(braintrust.EvalNewParamsGitMetadataSettings{
-			Collect: braintrust.F(braintrust.EvalNewParamsGitMetadataSettingsCollectAll),
-			Fields:  braintrust.F([]braintrust.EvalNewParamsGitMetadataSettingsField{braintrust.EvalNewParamsGitMetadataSettingsFieldCommit}),
-		}),
-		IsPublic:       braintrust.F(true),
-		MaxConcurrency: braintrust.F(0.000000),
-		Metadata: braintrust.F(map[string]interface{}{
+		Data: braintrust.EvalNewParamsDataUnion{
+			OfDatasetID: &braintrust.EvalNewParamsDataDatasetID{
+				DatasetID: "dataset_id",
+				InternalBtql: map[string]interface{}{
+					"foo": "bar",
+				},
+			},
+		},
+		ProjectID: "project_id",
+		Scores: []braintrust.EvalNewParamsScoreUnion{{
+			OfFunctionID: &braintrust.EvalNewParamsScoreFunctionID{
+				FunctionID: "function_id",
+				Version:    braintrust.String("version"),
+			},
+		}},
+		Task: braintrust.EvalNewParamsTaskUnion{
+			OfFunctionID: &braintrust.EvalNewParamsTaskFunctionID{
+				FunctionID: "function_id",
+				Version:    braintrust.String("version"),
+			},
+		},
+		BaseExperimentID:   braintrust.String("base_experiment_id"),
+		BaseExperimentName: braintrust.String("base_experiment_name"),
+		ExperimentName:     braintrust.String("experiment_name"),
+		GitMetadataSettings: braintrust.EvalNewParamsGitMetadataSettings{
+			Collect: "all",
+			Fields:  []string{"commit"},
+		},
+		IsPublic:       braintrust.Bool(true),
+		MaxConcurrency: braintrust.Float(0),
+		Metadata: map[string]interface{}{
 			"foo": "bar",
-		}),
-		Parent: braintrust.F[braintrust.EvalNewParamsParentUnion](braintrust.EvalNewParamsParentSpanParentStruct{
-			ObjectID:   braintrust.F("object_id"),
-			ObjectType: braintrust.F(braintrust.EvalNewParamsParentSpanParentStructObjectTypeProjectLogs),
-			PropagatedEvent: braintrust.F(map[string]interface{}{
-				"foo": "bar",
-			}),
-			RowIDs: braintrust.F(braintrust.EvalNewParamsParentSpanParentStructRowIDs{
-				ID:         braintrust.F("id"),
-				RootSpanID: braintrust.F("root_span_id"),
-				SpanID:     braintrust.F("span_id"),
-			}),
-		}),
-		RepoInfo: braintrust.F(shared.RepoInfoParam{
-			AuthorEmail:   braintrust.F("author_email"),
-			AuthorName:    braintrust.F("author_name"),
-			Branch:        braintrust.F("branch"),
-			Commit:        braintrust.F("commit"),
-			CommitMessage: braintrust.F("commit_message"),
-			CommitTime:    braintrust.F("commit_time"),
-			Dirty:         braintrust.F(true),
-			GitDiff:       braintrust.F("git_diff"),
-			Tag:           braintrust.F("tag"),
-		}),
-		Stream:     braintrust.F(true),
-		Timeout:    braintrust.F(0.000000),
-		TrialCount: braintrust.F(0.000000),
+		},
+		Parent: braintrust.EvalNewParamsParentUnion{
+			OfSpanParentStruct: &braintrust.EvalNewParamsParentSpanParentStruct{
+				ObjectID:   "object_id",
+				ObjectType: "project_logs",
+				PropagatedEvent: map[string]interface{}{
+					"foo": "bar",
+				},
+				RowIDs: braintrust.EvalNewParamsParentSpanParentStructRowIDs{
+					ID:         "id",
+					RootSpanID: "root_span_id",
+					SpanID:     "span_id",
+				},
+			},
+		},
+		RepoInfo: shared.RepoInfoParam{
+			AuthorEmail:   braintrust.String("author_email"),
+			AuthorName:    braintrust.String("author_name"),
+			Branch:        braintrust.String("branch"),
+			Commit:        braintrust.String("commit"),
+			CommitMessage: braintrust.String("commit_message"),
+			CommitTime:    braintrust.String("commit_time"),
+			Dirty:         braintrust.Bool(true),
+			GitDiff:       braintrust.String("git_diff"),
+			Tag:           braintrust.String("tag"),
+		},
+		Stream:     braintrust.Bool(true),
+		Timeout:    braintrust.Float(0),
+		TrialCount: braintrust.Float(0),
 	})
 	if err != nil {
 		var apierr *braintrust.Error

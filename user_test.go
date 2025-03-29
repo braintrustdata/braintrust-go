@@ -11,7 +11,6 @@ import (
 	"github.com/braintrustdata/braintrust-go"
 	"github.com/braintrustdata/braintrust-go/internal/testutil"
 	"github.com/braintrustdata/braintrust-go/option"
-	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 func TestUserGet(t *testing.T) {
@@ -49,14 +48,22 @@ func TestUserListWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Users.List(context.TODO(), braintrust.UserListParams{
-		Email:         braintrust.F[braintrust.UserListParamsEmailUnion](shared.UnionString("string")),
-		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		FamilyName:    braintrust.F[braintrust.UserListParamsFamilyNameUnion](shared.UnionString("string")),
-		GivenName:     braintrust.F[braintrust.UserListParamsGivenNameUnion](shared.UnionString("string")),
-		IDs:           braintrust.F[braintrust.UserListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
-		Limit:         braintrust.F(int64(0)),
-		OrgName:       braintrust.F("org_name"),
-		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		Email: braintrust.UserListParamsEmailUnion{
+			OfString: braintrust.String("string"),
+		},
+		EndingBefore: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		FamilyName: braintrust.UserListParamsFamilyNameUnion{
+			OfString: braintrust.String("string"),
+		},
+		GivenName: braintrust.UserListParamsGivenNameUnion{
+			OfString: braintrust.String("string"),
+		},
+		IDs: braintrust.UserListParamsIDsUnion{
+			OfString: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		},
+		Limit:         braintrust.Int(0),
+		OrgName:       braintrust.String("org_name"),
+		StartingAfter: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error

@@ -10,12 +10,11 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/pagination"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -32,8 +31,8 @@ type ViewService struct {
 // NewViewService generates a new service that applies the given options to each
 // request. These options are applied after the parent client's options (if there
 // is one), and before any request-specific options.
-func NewViewService(opts ...option.RequestOption) (r *ViewService) {
-	r = &ViewService{}
+func NewViewService(opts ...option.RequestOption) (r ViewService) {
+	r = ViewService{}
 	r.Options = opts
 	return
 }
@@ -121,26 +120,38 @@ func (r *ViewService) Replace(ctx context.Context, body ViewReplaceParams, opts 
 }
 
 type ViewNewParams struct {
-	// Name of the view
-	Name param.Field[string] `json:"name,required"`
-	// The id of the object the view applies to
-	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
-	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
 	// Type of table that the view corresponds to.
-	ViewType param.Field[ViewNewParamsViewType] `json:"view_type,required"`
+	//
+	// Any of "projects", "experiments", "experiment", "playgrounds", "playground",
+	// "datasets", "dataset", "prompts", "tools", "scorers", "logs".
+	ViewType ViewNewParamsViewType `json:"view_type,omitzero,required"`
+	// Name of the view
+	Name string `json:"name,required"`
+	// The id of the object the view applies to
+	ObjectID string `json:"object_id,required" format:"uuid"`
+	// The object type that the ACL applies to
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	ObjectType shared.ACLObjectType `json:"object_type,omitzero,required"`
 	// Date of role deletion, or null if the role is still active
-	DeletedAt param.Field[time.Time] `json:"deleted_at" format:"date-time"`
-	// Options for the view in the app
-	Options param.Field[shared.ViewOptionsParam] `json:"options"`
+	DeletedAt param.Opt[time.Time] `json:"deleted_at,omitzero" format:"date-time"`
 	// Identifies the user who created the view
-	UserID param.Field[string] `json:"user_id" format:"uuid"`
+	UserID param.Opt[string] `json:"user_id,omitzero" format:"uuid"`
+	// Options for the view in the app
+	Options shared.ViewOptionsParam `json:"options,omitzero"`
 	// The view definition
-	ViewData param.Field[shared.ViewDataParam] `json:"view_data"`
+	ViewData shared.ViewDataParam `json:"view_data,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f ViewNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r ViewNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ViewNewParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 // Type of table that the view corresponds to.
@@ -160,20 +171,20 @@ const (
 	ViewNewParamsViewTypeLogs        ViewNewParamsViewType = "logs"
 )
 
-func (r ViewNewParamsViewType) IsKnown() bool {
-	switch r {
-	case ViewNewParamsViewTypeProjects, ViewNewParamsViewTypeExperiments, ViewNewParamsViewTypeExperiment, ViewNewParamsViewTypePlaygrounds, ViewNewParamsViewTypePlayground, ViewNewParamsViewTypeDatasets, ViewNewParamsViewTypeDataset, ViewNewParamsViewTypePrompts, ViewNewParamsViewTypeTools, ViewNewParamsViewTypeScorers, ViewNewParamsViewTypeLogs:
-		return true
-	}
-	return false
-}
-
 type ViewGetParams struct {
 	// The id of the object the ACL applies to
-	ObjectID param.Field[string] `query:"object_id,required" format:"uuid"`
+	ObjectID string `query:"object_id,required" format:"uuid" json:"-"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `query:"object_type,required"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	ObjectType shared.ACLObjectType `query:"object_type,omitzero,required" json:"-"`
+	paramObj
 }
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f ViewGetParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [ViewGetParams]'s query parameters as `url.Values`.
 func (r ViewGetParams) URLQuery() (v url.Values) {
@@ -185,23 +196,35 @@ func (r ViewGetParams) URLQuery() (v url.Values) {
 
 type ViewUpdateParams struct {
 	// The id of the object the view applies to
-	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	ObjectType shared.ACLObjectType `json:"object_type,omitzero,required"`
 	// Name of the view
-	Name param.Field[string] `json:"name"`
-	// Options for the view in the app
-	Options param.Field[shared.ViewOptionsParam] `json:"options"`
+	Name param.Opt[string] `json:"name,omitzero"`
 	// Identifies the user who created the view
-	UserID param.Field[string] `json:"user_id" format:"uuid"`
+	UserID param.Opt[string] `json:"user_id,omitzero" format:"uuid"`
+	// Options for the view in the app
+	Options shared.ViewOptionsParam `json:"options,omitzero"`
 	// The view definition
-	ViewData param.Field[shared.ViewDataParam] `json:"view_data"`
+	ViewData shared.ViewDataParam `json:"view_data,omitzero"`
 	// Type of table that the view corresponds to.
-	ViewType param.Field[ViewUpdateParamsViewType] `json:"view_type"`
+	//
+	// Any of "projects", "experiments", "experiment", "playgrounds", "playground",
+	// "datasets", "dataset", "prompts", "tools", "scorers", "logs".
+	ViewType ViewUpdateParamsViewType `json:"view_type,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f ViewUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r ViewUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ViewUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 // Type of table that the view corresponds to.
@@ -221,41 +244,44 @@ const (
 	ViewUpdateParamsViewTypeLogs        ViewUpdateParamsViewType = "logs"
 )
 
-func (r ViewUpdateParamsViewType) IsKnown() bool {
-	switch r {
-	case ViewUpdateParamsViewTypeProjects, ViewUpdateParamsViewTypeExperiments, ViewUpdateParamsViewTypeExperiment, ViewUpdateParamsViewTypePlaygrounds, ViewUpdateParamsViewTypePlayground, ViewUpdateParamsViewTypeDatasets, ViewUpdateParamsViewTypeDataset, ViewUpdateParamsViewTypePrompts, ViewUpdateParamsViewTypeTools, ViewUpdateParamsViewTypeScorers, ViewUpdateParamsViewTypeLogs:
-		return true
-	}
-	return false
-}
-
 type ViewListParams struct {
 	// The id of the object the ACL applies to
-	ObjectID param.Field[string] `query:"object_id,required" format:"uuid"`
+	ObjectID string `query:"object_id,required" format:"uuid" json:"-"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `query:"object_type,required"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	ObjectType shared.ACLObjectType `query:"object_type,omitzero,required" json:"-"`
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
-	// Filter search results to a particular set of object IDs. To specify a list of
-	// IDs, include the query param multiple times
-	IDs param.Field[ViewListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	EndingBefore param.Opt[string] `query:"ending_before,omitzero" format:"uuid" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Opt[string] `query:"starting_after,omitzero" format:"uuid" json:"-"`
 	// Name of the view to search for
-	ViewName param.Field[string] `query:"view_name"`
+	ViewName param.Opt[string] `query:"view_name,omitzero" json:"-"`
 	// Type of table that the view corresponds to.
-	ViewType param.Field[shared.ViewType] `query:"view_type"`
+	//
+	// Any of "projects", "experiments", "experiment", "playgrounds", "playground",
+	// "datasets", "dataset", "prompts", "tools", "scorers", "logs".
+	ViewType shared.ViewType `query:"view_type,omitzero" json:"-"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs ViewListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
+	paramObj
 }
+
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f ViewListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [ViewListParams]'s query parameters as `url.Values`.
 func (r ViewListParams) URLQuery() (v url.Values) {
@@ -265,50 +291,84 @@ func (r ViewListParams) URLQuery() (v url.Values) {
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [ViewListParamsIDsArray].
-type ViewListParamsIDsUnion interface {
-	ImplementsViewListParamsIDsUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type ViewListParamsIDsUnion struct {
+	OfString            param.Opt[string] `json:",omitzero,inline"`
+	OfViewListsIDsArray []string          `json:",omitzero,inline"`
+	paramUnion
 }
 
-type ViewListParamsIDsArray []string
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (u ViewListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
+func (u ViewListParamsIDsUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion[ViewListParamsIDsUnion](u.OfString, u.OfViewListsIDsArray)
+}
 
-func (r ViewListParamsIDsArray) ImplementsViewListParamsIDsUnion() {}
+func (u *ViewListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfViewListsIDsArray) {
+		return &u.OfViewListsIDsArray
+	}
+	return nil
+}
 
 type ViewDeleteParams struct {
 	// The id of the object the view applies to
-	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	ObjectType shared.ACLObjectType `json:"object_type,omitzero,required"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f ViewDeleteParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r ViewDeleteParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ViewDeleteParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 type ViewReplaceParams struct {
-	// Name of the view
-	Name param.Field[string] `json:"name,required"`
-	// The id of the object the view applies to
-	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
-	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
 	// Type of table that the view corresponds to.
-	ViewType param.Field[ViewReplaceParamsViewType] `json:"view_type,required"`
+	//
+	// Any of "projects", "experiments", "experiment", "playgrounds", "playground",
+	// "datasets", "dataset", "prompts", "tools", "scorers", "logs".
+	ViewType ViewReplaceParamsViewType `json:"view_type,omitzero,required"`
+	// Name of the view
+	Name string `json:"name,required"`
+	// The id of the object the view applies to
+	ObjectID string `json:"object_id,required" format:"uuid"`
+	// The object type that the ACL applies to
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	ObjectType shared.ACLObjectType `json:"object_type,omitzero,required"`
 	// Date of role deletion, or null if the role is still active
-	DeletedAt param.Field[time.Time] `json:"deleted_at" format:"date-time"`
-	// Options for the view in the app
-	Options param.Field[shared.ViewOptionsParam] `json:"options"`
+	DeletedAt param.Opt[time.Time] `json:"deleted_at,omitzero" format:"date-time"`
 	// Identifies the user who created the view
-	UserID param.Field[string] `json:"user_id" format:"uuid"`
+	UserID param.Opt[string] `json:"user_id,omitzero" format:"uuid"`
+	// Options for the view in the app
+	Options shared.ViewOptionsParam `json:"options,omitzero"`
 	// The view definition
-	ViewData param.Field[shared.ViewDataParam] `json:"view_data"`
+	ViewData shared.ViewDataParam `json:"view_data,omitzero"`
+	paramObj
 }
 
+// IsPresent returns true if the field's value is not omitted and not the JSON
+// "null". To check if this field is omitted, use [param.IsOmitted].
+func (f ViewReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
+
 func (r ViewReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ViewReplaceParams
+	return param.MarshalObject(r, (*shadow)(&r))
 }
 
 // Type of table that the view corresponds to.
@@ -327,11 +387,3 @@ const (
 	ViewReplaceParamsViewTypeScorers     ViewReplaceParamsViewType = "scorers"
 	ViewReplaceParamsViewTypeLogs        ViewReplaceParamsViewType = "logs"
 )
-
-func (r ViewReplaceParamsViewType) IsKnown() bool {
-	switch r {
-	case ViewReplaceParamsViewTypeProjects, ViewReplaceParamsViewTypeExperiments, ViewReplaceParamsViewTypeExperiment, ViewReplaceParamsViewTypePlaygrounds, ViewReplaceParamsViewTypePlayground, ViewReplaceParamsViewTypeDatasets, ViewReplaceParamsViewTypeDataset, ViewReplaceParamsViewTypePrompts, ViewReplaceParamsViewTypeTools, ViewReplaceParamsViewTypeScorers, ViewReplaceParamsViewTypeLogs:
-		return true
-	}
-	return false
-}
