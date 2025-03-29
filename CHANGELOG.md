@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.8.0 (2025-03-29)
+
+Full Changelog: [v0.7.0...v0.8.0](https://github.com/braintrustdata/braintrust-go/compare/v0.7.0...v0.8.0)
+
+### Features
+
+* **api:** manual updates ([#143](https://github.com/braintrustdata/braintrust-go/issues/143)) ([0ad70ec](https://github.com/braintrustdata/braintrust-go/commit/0ad70ec11f4b7d4c54d5273ae259c377cffc7819))
+
+
+### Bug Fixes
+
+* **test:** return early after test failure ([#141](https://github.com/braintrustdata/braintrust-go/issues/141)) ([37c95eb](https://github.com/braintrustdata/braintrust-go/commit/37c95ebb24d4a6a415d882ae0e9ac741ba0085a4))
+
+
+### Chores
+
+* add request options to client tests ([#140](https://github.com/braintrustdata/braintrust-go/issues/140)) ([13d2104](https://github.com/braintrustdata/braintrust-go/commit/13d210467e84ee86d33e142a0cd844abe0885841))
+* **docs:** improve security documentation ([#138](https://github.com/braintrustdata/braintrust-go/issues/138)) ([b8d2249](https://github.com/braintrustdata/braintrust-go/commit/b8d2249f32bd44f1463a03830906f6e53529ae92))
+* fix typos ([#142](https://github.com/braintrustdata/braintrust-go/issues/142)) ([6019d95](https://github.com/braintrustdata/braintrust-go/commit/6019d95f5d92016e03b4cbd20bb5d69602511fbf))
+
 ## 0.7.0 (2025-03-14)
 
 Full Changelog: [v0.6.0...v0.7.0](https://github.com/braintrustdata/braintrust-go/compare/v0.6.0...v0.7.0)
