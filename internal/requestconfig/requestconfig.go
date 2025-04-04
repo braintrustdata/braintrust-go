@@ -22,7 +22,6 @@ import (
 	"github.com/braintrustdata/braintrust-go/internal/apierror"
 	"github.com/braintrustdata/braintrust-go/internal/apiform"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 )
 
 func getDefaultHeaders() map[string]string {
@@ -116,7 +115,11 @@ func NewRequestConfig(ctx context.Context, method string, u string, body interfa
 	}
 	if body, ok := body.(apiquery.Queryer); ok {
 		hasSerializationFunc = true
-		params := body.URLQuery().Encode()
+		q, err := body.URLQuery()
+		if err != nil {
+			return nil, err
+		}
+		params := q.Encode()
 		if params != "" {
 			u = u + "?" + params
 		}
@@ -185,13 +188,6 @@ func NewRequestConfig(ctx context.Context, method string, u string, body interfa
 	return &cfg, nil
 }
 
-func UseDefaultParam[T any](dst *param.Field[T], src *T) {
-	if !dst.Present && src != nil {
-		dst.Value = *src
-		dst.Present = true
-	}
-}
-
 // RequestConfig represents all the state related to one request.
 //
 // Editing the variables inside RequestConfig directly is unstable api. Prefer
@@ -241,7 +237,7 @@ func shouldRetry(req *http.Request, res *http.Response) bool {
 		return true
 	}
 
-	// If the header explictly wants a retry behavior, respect that over the
+	// If the header explicitly wants a retry behavior, respect that over the
 	// http status code.
 	if res.Header.Get("x-should-retry") == "true" {
 		return true

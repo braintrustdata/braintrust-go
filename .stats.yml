@@ -1,2 +1,4 @@
 configured_endpoints: 110
 openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/manugoyal%2Fbraintrust-sdk-f0d64ce0e0efde75f9c171f7f3c3d4a72f00a77abb3bc5a7d65b7be1e715689b.yml
+openapi_spec_hash: a027e48cc6aea2fab3cbdd38f4081119
+config_hash: 1ea10787f4def6c54a53f0e6f776f0a5

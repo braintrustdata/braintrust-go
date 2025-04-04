@@ -9,28 +9,33 @@ import (
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
+	"github.com/braintrustdata/braintrust-go/packages/param"
+	"github.com/braintrustdata/braintrust-go/packages/resp"
 )
 
+// aliased to make [param.APIUnion] private when embedding
+type paramUnion = param.APIUnion
+
+// aliased to make [param.APIObject] private when embedding
+type paramObj = param.APIObject
+
 type ListObjects[T any] struct {
-	Objects []T             `json:"objects"`
-	JSON    listObjectsJSON `json:"-"`
-	cfg     *requestconfig.RequestConfig
-	res     *http.Response
+	Objects []T `json:"objects"`
+	// Metadata for the response, check the presence of optional fields with the
+	// [resp.Field.IsPresent] method.
+	JSON struct {
+		Objects     resp.Field
+		ExtraFields map[string]resp.Field
+		raw         string
+	} `json:"-"`
+	cfg *requestconfig.RequestConfig
+	res *http.Response
 }
 
-// listObjectsJSON contains the JSON metadata for the struct [ListObjects[T]]
-type listObjectsJSON struct {
-	Objects     apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ListObjects[T]) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ListObjects[T]) RawJSON() string { return r.JSON.raw }
+func (r *ListObjects[T]) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r listObjectsJSON) RawJSON() string {
-	return r.raw
 }
 
 // GetNextPage returns the next page as defined by this pagination style. When
@@ -70,6 +75,7 @@ type ListObjectsAutoPager[T any] struct {
 	idx  int
 	run  int
 	err  error
+	paramObj
 }
 
 func NewListObjectsAutoPager[T any](page *ListObjects[T], err error) *ListObjectsAutoPager[T] {
