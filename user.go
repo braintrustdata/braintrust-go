@@ -110,7 +110,7 @@ type UserListParams struct {
 func (f UserListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [UserListParams]'s query parameters as `url.Values`.
-func (r UserListParams) URLQuery() (v url.Values) {
+func (r UserListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -121,17 +121,14 @@ func (r UserListParams) URLQuery() (v url.Values) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type UserListParamsEmailUnion struct {
-	OfString              param.Opt[string] `json:",omitzero,inline"`
-	OfUserListsEmailArray []string          `json:",omitzero,inline"`
+	OfString              param.Opt[string] `query:",omitzero,inline"`
+	OfUserListsEmailArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
 // IsPresent returns true if the field's value is not omitted and not the JSON
 // "null". To check if this field is omitted, use [param.IsOmitted].
 func (u UserListParamsEmailUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
-func (u UserListParamsEmailUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[UserListParamsEmailUnion](u.OfString, u.OfUserListsEmailArray)
-}
 
 func (u *UserListParamsEmailUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -146,17 +143,14 @@ func (u *UserListParamsEmailUnion) asAny() any {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type UserListParamsFamilyNameUnion struct {
-	OfString                   param.Opt[string] `json:",omitzero,inline"`
-	OfUserListsFamilyNameArray []string          `json:",omitzero,inline"`
+	OfString                   param.Opt[string] `query:",omitzero,inline"`
+	OfUserListsFamilyNameArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
 // IsPresent returns true if the field's value is not omitted and not the JSON
 // "null". To check if this field is omitted, use [param.IsOmitted].
 func (u UserListParamsFamilyNameUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
-func (u UserListParamsFamilyNameUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[UserListParamsFamilyNameUnion](u.OfString, u.OfUserListsFamilyNameArray)
-}
 
 func (u *UserListParamsFamilyNameUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -171,17 +165,14 @@ func (u *UserListParamsFamilyNameUnion) asAny() any {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type UserListParamsGivenNameUnion struct {
-	OfString                  param.Opt[string] `json:",omitzero,inline"`
-	OfUserListsGivenNameArray []string          `json:",omitzero,inline"`
+	OfString                  param.Opt[string] `query:",omitzero,inline"`
+	OfUserListsGivenNameArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
 // IsPresent returns true if the field's value is not omitted and not the JSON
 // "null". To check if this field is omitted, use [param.IsOmitted].
 func (u UserListParamsGivenNameUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
-func (u UserListParamsGivenNameUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[UserListParamsGivenNameUnion](u.OfString, u.OfUserListsGivenNameArray)
-}
 
 func (u *UserListParamsGivenNameUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -196,17 +187,14 @@ func (u *UserListParamsGivenNameUnion) asAny() any {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type UserListParamsIDsUnion struct {
-	OfString            param.Opt[string] `json:",omitzero,inline"`
-	OfUserListsIDsArray []string          `json:",omitzero,inline"`
+	OfString            param.Opt[string] `query:",omitzero,inline"`
+	OfUserListsIDsArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
 // IsPresent returns true if the field's value is not omitted and not the JSON
 // "null". To check if this field is omitted, use [param.IsOmitted].
 func (u UserListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
-func (u UserListParamsIDsUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[UserListParamsIDsUnion](u.OfString, u.OfUserListsIDsArray)
-}
 
 func (u *UserListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {

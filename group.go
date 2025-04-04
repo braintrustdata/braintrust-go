@@ -201,7 +201,7 @@ type GroupListParams struct {
 func (f GroupListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [GroupListParams]'s query parameters as `url.Values`.
-func (r GroupListParams) URLQuery() (v url.Values) {
+func (r GroupListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -212,17 +212,14 @@ func (r GroupListParams) URLQuery() (v url.Values) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type GroupListParamsIDsUnion struct {
-	OfString             param.Opt[string] `json:",omitzero,inline"`
-	OfGroupListsIDsArray []string          `json:",omitzero,inline"`
+	OfString             param.Opt[string] `query:",omitzero,inline"`
+	OfGroupListsIDsArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
 // IsPresent returns true if the field's value is not omitted and not the JSON
 // "null". To check if this field is omitted, use [param.IsOmitted].
 func (u GroupListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
-func (u GroupListParamsIDsUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[GroupListParamsIDsUnion](u.OfString, u.OfGroupListsIDsArray)
-}
 
 func (u *GroupListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {

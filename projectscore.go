@@ -261,7 +261,7 @@ type ProjectScoreListParams struct {
 func (f ProjectScoreListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [ProjectScoreListParams]'s query parameters as `url.Values`.
-func (r ProjectScoreListParams) URLQuery() (v url.Values) {
+func (r ProjectScoreListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -272,17 +272,14 @@ func (r ProjectScoreListParams) URLQuery() (v url.Values) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type ProjectScoreListParamsIDsUnion struct {
-	OfString                    param.Opt[string] `json:",omitzero,inline"`
-	OfProjectScoreListsIDsArray []string          `json:",omitzero,inline"`
+	OfString                    param.Opt[string] `query:",omitzero,inline"`
+	OfProjectScoreListsIDsArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
 // IsPresent returns true if the field's value is not omitted and not the JSON
 // "null". To check if this field is omitted, use [param.IsOmitted].
 func (u ProjectScoreListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
-func (u ProjectScoreListParamsIDsUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[ProjectScoreListParamsIDsUnion](u.OfString, u.OfProjectScoreListsIDsArray)
-}
 
 func (u *ProjectScoreListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -299,8 +296,8 @@ func (u *ProjectScoreListParamsIDsUnion) asAny() any {
 type ProjectScoreListParamsScoreTypeUnion struct {
 	// Check if union is this variant with
 	// !param.IsOmitted(union.OfProjectScoreTypeSingle)
-	OfProjectScoreTypeSingle          param.Opt[shared.ProjectScoreType] `json:",omitzero,inline"`
-	OfProjectScoreListsScoreTypeArray []string                           `json:",omitzero,inline"`
+	OfProjectScoreTypeSingle          param.Opt[shared.ProjectScoreType] `query:",omitzero,inline"`
+	OfProjectScoreListsScoreTypeArray []string                           `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -308,9 +305,6 @@ type ProjectScoreListParamsScoreTypeUnion struct {
 // "null". To check if this field is omitted, use [param.IsOmitted].
 func (u ProjectScoreListParamsScoreTypeUnion) IsPresent() bool {
 	return !param.IsOmitted(u) && !u.IsNull()
-}
-func (u ProjectScoreListParamsScoreTypeUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[ProjectScoreListParamsScoreTypeUnion](u.OfProjectScoreTypeSingle, u.OfProjectScoreListsScoreTypeArray)
 }
 
 func (u *ProjectScoreListParamsScoreTypeUnion) asAny() any {

@@ -148,7 +148,7 @@ type OrganizationListParams struct {
 func (f OrganizationListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [OrganizationListParams]'s query parameters as `url.Values`.
-func (r OrganizationListParams) URLQuery() (v url.Values) {
+func (r OrganizationListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -159,17 +159,14 @@ func (r OrganizationListParams) URLQuery() (v url.Values) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type OrganizationListParamsIDsUnion struct {
-	OfString                    param.Opt[string] `json:",omitzero,inline"`
-	OfOrganizationListsIDsArray []string          `json:",omitzero,inline"`
+	OfString                    param.Opt[string] `query:",omitzero,inline"`
+	OfOrganizationListsIDsArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
 // IsPresent returns true if the field's value is not omitted and not the JSON
 // "null". To check if this field is omitted, use [param.IsOmitted].
 func (u OrganizationListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
-func (u OrganizationListParamsIDsUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[OrganizationListParamsIDsUnion](u.OfString, u.OfOrganizationListsIDsArray)
-}
 
 func (u *OrganizationListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
