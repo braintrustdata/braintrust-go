@@ -247,7 +247,7 @@ type DatasetListParams struct {
 func (f DatasetListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [DatasetListParams]'s query parameters as `url.Values`.
-func (r DatasetListParams) URLQuery() (v url.Values) {
+func (r DatasetListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -258,17 +258,14 @@ func (r DatasetListParams) URLQuery() (v url.Values) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type DatasetListParamsIDsUnion struct {
-	OfString               param.Opt[string] `json:",omitzero,inline"`
-	OfDatasetListsIDsArray []string          `json:",omitzero,inline"`
+	OfString               param.Opt[string] `query:",omitzero,inline"`
+	OfDatasetListsIDsArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
 // IsPresent returns true if the field's value is not omitted and not the JSON
 // "null". To check if this field is omitted, use [param.IsOmitted].
 func (u DatasetListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
-func (u DatasetListParamsIDsUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[DatasetListParamsIDsUnion](u.OfString, u.OfDatasetListsIDsArray)
-}
 
 func (u *DatasetListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -346,7 +343,7 @@ type DatasetFetchParams struct {
 func (f DatasetFetchParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [DatasetFetchParams]'s query parameters as `url.Values`.
-func (r DatasetFetchParams) URLQuery() (v url.Values) {
+func (r DatasetFetchParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -442,7 +439,7 @@ type DatasetSummarizeParams struct {
 func (f DatasetSummarizeParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [DatasetSummarizeParams]'s query parameters as `url.Values`.
-func (r DatasetSummarizeParams) URLQuery() (v url.Values) {
+func (r DatasetSummarizeParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,

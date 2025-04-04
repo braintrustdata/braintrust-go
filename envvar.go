@@ -192,7 +192,7 @@ type EnvVarListParams struct {
 func (f EnvVarListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [EnvVarListParams]'s query parameters as `url.Values`.
-func (r EnvVarListParams) URLQuery() (v url.Values) {
+func (r EnvVarListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -203,17 +203,14 @@ func (r EnvVarListParams) URLQuery() (v url.Values) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type EnvVarListParamsIDsUnion struct {
-	OfString              param.Opt[string] `json:",omitzero,inline"`
-	OfEnvVarListsIDsArray []string          `json:",omitzero,inline"`
+	OfString              param.Opt[string] `query:",omitzero,inline"`
+	OfEnvVarListsIDsArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
 // IsPresent returns true if the field's value is not omitted and not the JSON
 // "null". To check if this field is omitted, use [param.IsOmitted].
 func (u EnvVarListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
-func (u EnvVarListParamsIDsUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[EnvVarListParamsIDsUnion](u.OfString, u.OfEnvVarListsIDsArray)
-}
 
 func (u *EnvVarListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {

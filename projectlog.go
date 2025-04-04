@@ -154,7 +154,7 @@ type ProjectLogFetchParams struct {
 func (f ProjectLogFetchParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [ProjectLogFetchParams]'s query parameters as `url.Values`.
-func (r ProjectLogFetchParams) URLQuery() (v url.Values) {
+func (r ProjectLogFetchParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
