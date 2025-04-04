@@ -199,7 +199,7 @@ type AISecretListParams struct {
 func (f AISecretListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [AISecretListParams]'s query parameters as `url.Values`.
-func (r AISecretListParams) URLQuery() (v url.Values) {
+func (r AISecretListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -210,8 +210,8 @@ func (r AISecretListParams) URLQuery() (v url.Values) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type AISecretListParamsAISecretTypeUnion struct {
-	OfString                         param.Opt[string] `json:",omitzero,inline"`
-	OfAISecretListsAISecretTypeArray []string          `json:",omitzero,inline"`
+	OfString                         param.Opt[string] `query:",omitzero,inline"`
+	OfAISecretListsAISecretTypeArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -219,9 +219,6 @@ type AISecretListParamsAISecretTypeUnion struct {
 // "null". To check if this field is omitted, use [param.IsOmitted].
 func (u AISecretListParamsAISecretTypeUnion) IsPresent() bool {
 	return !param.IsOmitted(u) && !u.IsNull()
-}
-func (u AISecretListParamsAISecretTypeUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[AISecretListParamsAISecretTypeUnion](u.OfString, u.OfAISecretListsAISecretTypeArray)
 }
 
 func (u *AISecretListParamsAISecretTypeUnion) asAny() any {
@@ -237,17 +234,14 @@ func (u *AISecretListParamsAISecretTypeUnion) asAny() any {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type AISecretListParamsIDsUnion struct {
-	OfString                param.Opt[string] `json:",omitzero,inline"`
-	OfAISecretListsIDsArray []string          `json:",omitzero,inline"`
+	OfString                param.Opt[string] `query:",omitzero,inline"`
+	OfAISecretListsIDsArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
 // IsPresent returns true if the field's value is not omitted and not the JSON
 // "null". To check if this field is omitted, use [param.IsOmitted].
 func (u AISecretListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
-func (u AISecretListParamsIDsUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[AISecretListParamsIDsUnion](u.OfString, u.OfAISecretListsIDsArray)
-}
 
 func (u *AISecretListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {

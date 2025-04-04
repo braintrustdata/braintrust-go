@@ -278,7 +278,7 @@ type ExperimentListParams struct {
 func (f ExperimentListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [ExperimentListParams]'s query parameters as `url.Values`.
-func (r ExperimentListParams) URLQuery() (v url.Values) {
+func (r ExperimentListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -289,17 +289,14 @@ func (r ExperimentListParams) URLQuery() (v url.Values) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type ExperimentListParamsIDsUnion struct {
-	OfString                  param.Opt[string] `json:",omitzero,inline"`
-	OfExperimentListsIDsArray []string          `json:",omitzero,inline"`
+	OfString                  param.Opt[string] `query:",omitzero,inline"`
+	OfExperimentListsIDsArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
 // IsPresent returns true if the field's value is not omitted and not the JSON
 // "null". To check if this field is omitted, use [param.IsOmitted].
 func (u ExperimentListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
-func (u ExperimentListParamsIDsUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[ExperimentListParamsIDsUnion](u.OfString, u.OfExperimentListsIDsArray)
-}
 
 func (u *ExperimentListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -377,7 +374,7 @@ type ExperimentFetchParams struct {
 func (f ExperimentFetchParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [ExperimentFetchParams]'s query parameters as `url.Values`.
-func (r ExperimentFetchParams) URLQuery() (v url.Values) {
+func (r ExperimentFetchParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -479,7 +476,7 @@ func (f ExperimentSummarizeParams) IsPresent() bool { return !param.IsOmitted(f)
 
 // URLQuery serializes [ExperimentSummarizeParams]'s query parameters as
 // `url.Values`.
-func (r ExperimentSummarizeParams) URLQuery() (v url.Values) {
+func (r ExperimentSummarizeParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
