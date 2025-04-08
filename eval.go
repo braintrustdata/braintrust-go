@@ -788,8 +788,10 @@ func (r EvalNewParamsTaskInlinePrompt) MarshalJSON() (data []byte, err error) {
 // The property Collect is required.
 type EvalNewParamsGitMetadataSettings struct {
 	// Any of "all", "none", "some".
-	Collect string   `json:"collect,omitzero,required"`
-	Fields  []string `json:"fields,omitzero"`
+	Collect string `json:"collect,omitzero,required"`
+	// Any of "commit", "branch", "tag", "dirty", "author_name", "author_email",
+	// "commit_message", "commit_time", "git_diff".
+	Fields []string `json:"fields,omitzero"`
 	paramObj
 }
 
