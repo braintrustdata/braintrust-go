@@ -132,7 +132,7 @@ func (r *FunctionService) Replace(ctx context.Context, body FunctionReplaceParam
 	return
 }
 
-type FunctionInvokeResponse = interface{}
+type FunctionInvokeResponse = any
 
 type FunctionNewParams struct {
 	FunctionData FunctionNewParamsFunctionDataUnion `json:"function_data,omitzero,required"`
@@ -344,20 +344,16 @@ func (u FunctionNewParamsFunctionDataCodeDataUnion) GetType() *string {
 // Or use AsAny() to get the underlying value
 func (u FunctionNewParamsFunctionDataCodeDataUnion) GetRuntimeContext() (res functionNewParamsFunctionDataCodeDataUnionRuntimeContext) {
 	if vt := u.OfBundle; vt != nil {
-		res.ofCodeBundleRuntimeContext = &vt.RuntimeContext
+		res.any = &vt.RuntimeContext
 	} else if vt := u.OfInline; vt != nil {
-		res.ofFunctionNewsFunctionDataCodeDataInlineRuntimeContext = &vt.RuntimeContext
+		res.any = &vt.RuntimeContext
 	}
 	return
 }
 
-// Only one field can be non-zero.
-//
-// Use [param.IsOmitted] to confirm if a field is set.
-type functionNewParamsFunctionDataCodeDataUnionRuntimeContext struct {
-	ofCodeBundleRuntimeContext                             *shared.CodeBundleRuntimeContextParam
-	ofFunctionNewsFunctionDataCodeDataInlineRuntimeContext *FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext
-}
+// Can have the runtime types [*shared.CodeBundleRuntimeContextParam],
+// [*FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext]
+type functionNewParamsFunctionDataCodeDataUnionRuntimeContext struct{ any }
 
 // Use the following switch statement to get the type of the union:
 //
@@ -367,20 +363,14 @@ type functionNewParamsFunctionDataCodeDataUnionRuntimeContext struct {
 //	default:
 //	    fmt.Errorf("not present")
 //	}
-func (u functionNewParamsFunctionDataCodeDataUnionRuntimeContext) AsAny() any {
-	if !param.IsOmitted(u.ofCodeBundleRuntimeContext) {
-		return u.ofCodeBundleRuntimeContext
-	} else if !param.IsOmitted(u.ofFunctionNewsFunctionDataCodeDataInlineRuntimeContext) {
-		return u.ofFunctionNewsFunctionDataCodeDataInlineRuntimeContext
-	}
-	return nil
-}
+func (u functionNewParamsFunctionDataCodeDataUnionRuntimeContext) AsAny() any { return u.any }
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u functionNewParamsFunctionDataCodeDataUnionRuntimeContext) GetRuntime() *string {
-	if vt := u.ofCodeBundleRuntimeContext; vt != nil {
+	switch vt := u.any.(type) {
+	case *shared.CodeBundleRuntimeContextParam:
 		return (*string)(&vt.Runtime)
-	} else if vt := u.ofFunctionNewsFunctionDataCodeDataInlineRuntimeContext; vt != nil {
+	case *FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext:
 		return (*string)(&vt.Runtime)
 	}
 	return nil
@@ -388,9 +378,10 @@ func (u functionNewParamsFunctionDataCodeDataUnionRuntimeContext) GetRuntime() *
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u functionNewParamsFunctionDataCodeDataUnionRuntimeContext) GetVersion() *string {
-	if vt := u.ofCodeBundleRuntimeContext; vt != nil {
+	switch vt := u.any.(type) {
+	case *shared.CodeBundleRuntimeContextParam:
 		return (*string)(&vt.Version)
-	} else if vt := u.ofFunctionNewsFunctionDataCodeDataInlineRuntimeContext; vt != nil {
+	case *FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext:
 		return (*string)(&vt.Version)
 	}
 	return nil
@@ -481,8 +472,8 @@ func init() {
 
 // JSON schema for the function's parameters and return type
 type FunctionNewParamsFunctionSchema struct {
-	Parameters interface{} `json:"parameters,omitzero"`
-	Returns    interface{} `json:"returns,omitzero"`
+	Parameters any `json:"parameters,omitzero"`
+	Returns    any `json:"returns,omitzero"`
 	paramObj
 }
 
@@ -727,20 +718,16 @@ func (u FunctionUpdateParamsFunctionDataCodeDataUnion) GetType() *string {
 // Or use AsAny() to get the underlying value
 func (u FunctionUpdateParamsFunctionDataCodeDataUnion) GetRuntimeContext() (res functionUpdateParamsFunctionDataCodeDataUnionRuntimeContext) {
 	if vt := u.OfBundle; vt != nil {
-		res.ofCodeBundleRuntimeContext = &vt.RuntimeContext
+		res.any = &vt.RuntimeContext
 	} else if vt := u.OfInline; vt != nil {
-		res.ofFunctionUpdatesFunctionDataCodeDataInlineRuntimeContext = &vt.RuntimeContext
+		res.any = &vt.RuntimeContext
 	}
 	return
 }
 
-// Only one field can be non-zero.
-//
-// Use [param.IsOmitted] to confirm if a field is set.
-type functionUpdateParamsFunctionDataCodeDataUnionRuntimeContext struct {
-	ofCodeBundleRuntimeContext                                *shared.CodeBundleRuntimeContextParam
-	ofFunctionUpdatesFunctionDataCodeDataInlineRuntimeContext *FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext
-}
+// Can have the runtime types [*shared.CodeBundleRuntimeContextParam],
+// [*FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext]
+type functionUpdateParamsFunctionDataCodeDataUnionRuntimeContext struct{ any }
 
 // Use the following switch statement to get the type of the union:
 //
@@ -750,20 +737,14 @@ type functionUpdateParamsFunctionDataCodeDataUnionRuntimeContext struct {
 //	default:
 //	    fmt.Errorf("not present")
 //	}
-func (u functionUpdateParamsFunctionDataCodeDataUnionRuntimeContext) AsAny() any {
-	if !param.IsOmitted(u.ofCodeBundleRuntimeContext) {
-		return u.ofCodeBundleRuntimeContext
-	} else if !param.IsOmitted(u.ofFunctionUpdatesFunctionDataCodeDataInlineRuntimeContext) {
-		return u.ofFunctionUpdatesFunctionDataCodeDataInlineRuntimeContext
-	}
-	return nil
-}
+func (u functionUpdateParamsFunctionDataCodeDataUnionRuntimeContext) AsAny() any { return u.any }
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u functionUpdateParamsFunctionDataCodeDataUnionRuntimeContext) GetRuntime() *string {
-	if vt := u.ofCodeBundleRuntimeContext; vt != nil {
+	switch vt := u.any.(type) {
+	case *shared.CodeBundleRuntimeContextParam:
 		return (*string)(&vt.Runtime)
-	} else if vt := u.ofFunctionUpdatesFunctionDataCodeDataInlineRuntimeContext; vt != nil {
+	case *FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext:
 		return (*string)(&vt.Runtime)
 	}
 	return nil
@@ -771,9 +752,10 @@ func (u functionUpdateParamsFunctionDataCodeDataUnionRuntimeContext) GetRuntime(
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u functionUpdateParamsFunctionDataCodeDataUnionRuntimeContext) GetVersion() *string {
-	if vt := u.ofCodeBundleRuntimeContext; vt != nil {
+	switch vt := u.any.(type) {
+	case *shared.CodeBundleRuntimeContextParam:
 		return (*string)(&vt.Version)
-	} else if vt := u.ofFunctionUpdatesFunctionDataCodeDataInlineRuntimeContext; vt != nil {
+	case *FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext:
 		return (*string)(&vt.Version)
 	}
 	return nil
@@ -939,15 +921,15 @@ type FunctionInvokeParams struct {
 	// The version of the function
 	Version param.Opt[string] `json:"version,omitzero"`
 	// Any relevant metadata
-	Metadata map[string]interface{} `json:"metadata,omitzero"`
+	Metadata map[string]any `json:"metadata,omitzero"`
 	// The mode format of the returned value (defaults to 'auto')
 	//
 	// Any of "auto", "parallel".
 	Mode FunctionInvokeParamsMode `json:"mode,omitzero"`
 	// The expected output of the function
-	Expected interface{} `json:"expected,omitzero"`
+	Expected any `json:"expected,omitzero"`
 	// Argument to the function, which can be any JSON serializable value
-	Input interface{} `json:"input,omitzero"`
+	Input any `json:"input,omitzero"`
 	// If the function is an LLM, additional messages to pass along to it
 	Messages []FunctionInvokeParamsMessageUnion `json:"messages,omitzero"`
 	// Options for tracing the function call
@@ -1067,28 +1049,24 @@ func (u FunctionInvokeParamsMessageUnion) GetName() *string {
 // Or use AsAny() to get the underlying value
 func (u FunctionInvokeParamsMessageUnion) GetContent() (res functionInvokeParamsMessageUnionContent) {
 	if vt := u.OfSystem; vt != nil && vt.Content.IsPresent() {
-		res.ofString = &vt.Content.Value
+		res.any = &vt.Content.Value
 	} else if vt := u.OfUser; vt != nil {
-		res.ofFunctionInvokesMessageUserContent = &vt.Content
+		res.any = vt.Content.asAny()
 	} else if vt := u.OfAssistant; vt != nil && vt.Content.IsPresent() {
-		res.ofString = &vt.Content.Value
+		res.any = &vt.Content.Value
 	} else if vt := u.OfTool; vt != nil && vt.Content.IsPresent() {
-		res.ofString = &vt.Content.Value
+		res.any = &vt.Content.Value
 	} else if vt := u.OfFunction; vt != nil && vt.Content.IsPresent() {
-		res.ofString = &vt.Content.Value
+		res.any = &vt.Content.Value
 	} else if vt := u.OfFallback; vt != nil && vt.Content.IsPresent() {
-		res.ofString = &vt.Content.Value
+		res.any = &vt.Content.Value
 	}
 	return
 }
 
-// Only one field can be non-zero.
-//
-// Use [param.IsOmitted] to confirm if a field is set.
-type functionInvokeParamsMessageUnionContent struct {
-	ofString                            *string
-	ofFunctionInvokesMessageUserContent *FunctionInvokeParamsMessageUserContentUnion
-}
+// Can have the runtime types [*string],
+// [\*[]FunctionInvokeParamsMessageUserContentArrayItemUnion]
+type functionInvokeParamsMessageUnionContent struct{ any }
 
 // Use the following switch statement to get the type of the union:
 //
@@ -1098,22 +1076,7 @@ type functionInvokeParamsMessageUnionContent struct {
 //	default:
 //	    fmt.Errorf("not present")
 //	}
-func (u functionInvokeParamsMessageUnionContent) AsAny() any {
-	if !param.IsOmitted(u.ofString) {
-		return u.ofString
-	} else if !param.IsOmitted(u.ofFunctionInvokesMessageUserContent) {
-		return u.ofFunctionInvokesMessageUserContent.asAny()
-	} else if !param.IsOmitted(u.ofString) {
-		return u.ofString
-	} else if !param.IsOmitted(u.ofString) {
-		return u.ofString
-	} else if !param.IsOmitted(u.ofString) {
-		return u.ofString
-	} else if !param.IsOmitted(u.ofString) {
-		return u.ofString
-	}
-	return nil
-}
+func (u functionInvokeParamsMessageUnionContent) AsAny() any { return u.any }
 
 // The property Role is required.
 type FunctionInvokeParamsMessageSystem struct {
@@ -1392,38 +1355,6 @@ func (u *FunctionInvokeParamsParentUnion) asAny() any {
 	return nil
 }
 
-// Returns a pointer to the underlying variant's property, if present.
-func (u FunctionInvokeParamsParentUnion) GetObjectID() *string {
-	if vt := u.OfSpanParentStruct; vt != nil {
-		return &vt.ObjectID
-	}
-	return nil
-}
-
-// Returns a pointer to the underlying variant's property, if present.
-func (u FunctionInvokeParamsParentUnion) GetObjectType() *string {
-	if vt := u.OfSpanParentStruct; vt != nil {
-		return &vt.ObjectType
-	}
-	return nil
-}
-
-// Returns a pointer to the underlying variant's property, if present.
-func (u FunctionInvokeParamsParentUnion) GetPropagatedEvent() map[string]interface{} {
-	if vt := u.OfSpanParentStruct; vt != nil {
-		return vt.PropagatedEvent
-	}
-	return nil
-}
-
-// Returns a pointer to the underlying variant's property, if present.
-func (u FunctionInvokeParamsParentUnion) GetRowIDs() *FunctionInvokeParamsParentSpanParentStructRowIDs {
-	if vt := u.OfSpanParentStruct; vt != nil {
-		return &vt.RowIDs
-	}
-	return nil
-}
-
 // Span parent properties
 //
 // The properties ObjectID, ObjectType are required.
@@ -1433,7 +1364,7 @@ type FunctionInvokeParamsParentSpanParentStruct struct {
 	// Any of "project_logs", "experiment", "playground_logs".
 	ObjectType string `json:"object_type,omitzero,required"`
 	// Include these properties in every span created under this parent
-	PropagatedEvent map[string]interface{} `json:"propagated_event,omitzero"`
+	PropagatedEvent map[string]any `json:"propagated_event,omitzero"`
 	// Identifiers for the row to to log a subspan under
 	RowIDs FunctionInvokeParamsParentSpanParentStructRowIDs `json:"row_ids,omitzero"`
 	paramObj
@@ -1688,20 +1619,16 @@ func (u FunctionReplaceParamsFunctionDataCodeDataUnion) GetType() *string {
 // Or use AsAny() to get the underlying value
 func (u FunctionReplaceParamsFunctionDataCodeDataUnion) GetRuntimeContext() (res functionReplaceParamsFunctionDataCodeDataUnionRuntimeContext) {
 	if vt := u.OfBundle; vt != nil {
-		res.ofCodeBundleRuntimeContext = &vt.RuntimeContext
+		res.any = &vt.RuntimeContext
 	} else if vt := u.OfInline; vt != nil {
-		res.ofFunctionReplacesFunctionDataCodeDataInlineRuntimeContext = &vt.RuntimeContext
+		res.any = &vt.RuntimeContext
 	}
 	return
 }
 
-// Only one field can be non-zero.
-//
-// Use [param.IsOmitted] to confirm if a field is set.
-type functionReplaceParamsFunctionDataCodeDataUnionRuntimeContext struct {
-	ofCodeBundleRuntimeContext                                 *shared.CodeBundleRuntimeContextParam
-	ofFunctionReplacesFunctionDataCodeDataInlineRuntimeContext *FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext
-}
+// Can have the runtime types [*shared.CodeBundleRuntimeContextParam],
+// [*FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext]
+type functionReplaceParamsFunctionDataCodeDataUnionRuntimeContext struct{ any }
 
 // Use the following switch statement to get the type of the union:
 //
@@ -1711,20 +1638,14 @@ type functionReplaceParamsFunctionDataCodeDataUnionRuntimeContext struct {
 //	default:
 //	    fmt.Errorf("not present")
 //	}
-func (u functionReplaceParamsFunctionDataCodeDataUnionRuntimeContext) AsAny() any {
-	if !param.IsOmitted(u.ofCodeBundleRuntimeContext) {
-		return u.ofCodeBundleRuntimeContext
-	} else if !param.IsOmitted(u.ofFunctionReplacesFunctionDataCodeDataInlineRuntimeContext) {
-		return u.ofFunctionReplacesFunctionDataCodeDataInlineRuntimeContext
-	}
-	return nil
-}
+func (u functionReplaceParamsFunctionDataCodeDataUnionRuntimeContext) AsAny() any { return u.any }
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u functionReplaceParamsFunctionDataCodeDataUnionRuntimeContext) GetRuntime() *string {
-	if vt := u.ofCodeBundleRuntimeContext; vt != nil {
+	switch vt := u.any.(type) {
+	case *shared.CodeBundleRuntimeContextParam:
 		return (*string)(&vt.Runtime)
-	} else if vt := u.ofFunctionReplacesFunctionDataCodeDataInlineRuntimeContext; vt != nil {
+	case *FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext:
 		return (*string)(&vt.Runtime)
 	}
 	return nil
@@ -1732,9 +1653,10 @@ func (u functionReplaceParamsFunctionDataCodeDataUnionRuntimeContext) GetRuntime
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u functionReplaceParamsFunctionDataCodeDataUnionRuntimeContext) GetVersion() *string {
-	if vt := u.ofCodeBundleRuntimeContext; vt != nil {
+	switch vt := u.any.(type) {
+	case *shared.CodeBundleRuntimeContextParam:
 		return (*string)(&vt.Version)
-	} else if vt := u.ofFunctionReplacesFunctionDataCodeDataInlineRuntimeContext; vt != nil {
+	case *FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext:
 		return (*string)(&vt.Version)
 	}
 	return nil
@@ -1825,8 +1747,8 @@ func init() {
 
 // JSON schema for the function's parameters and return type
 type FunctionReplaceParamsFunctionSchema struct {
-	Parameters interface{} `json:"parameters,omitzero"`
-	Returns    interface{} `json:"returns,omitzero"`
+	Parameters any `json:"parameters,omitzero"`
+	Returns    any `json:"returns,omitzero"`
 	paramObj
 }
 

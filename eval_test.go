@@ -30,7 +30,7 @@ func TestEvalNewWithOptionalParams(t *testing.T) {
 		Data: braintrust.EvalNewParamsDataUnion{
 			OfDatasetID: &braintrust.EvalNewParamsDataDatasetID{
 				DatasetID: "dataset_id",
-				InternalBtql: map[string]interface{}{
+				InternalBtql: map[string]any{
 					"foo": "bar",
 				},
 			},
@@ -57,14 +57,14 @@ func TestEvalNewWithOptionalParams(t *testing.T) {
 		},
 		IsPublic:       braintrust.Bool(true),
 		MaxConcurrency: braintrust.Float(0),
-		Metadata: map[string]interface{}{
+		Metadata: map[string]any{
 			"foo": "bar",
 		},
 		Parent: braintrust.EvalNewParamsParentUnion{
 			OfSpanParentStruct: &braintrust.EvalNewParamsParentSpanParentStruct{
 				ObjectID:   "object_id",
 				ObjectType: "project_logs",
-				PropagatedEvent: map[string]interface{}{
+				PropagatedEvent: map[string]any{
 					"foo": "bar",
 				},
 				RowIDs: braintrust.EvalNewParamsParentSpanParentStructRowIDs{

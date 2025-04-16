@@ -181,7 +181,7 @@ type DatasetNewParams struct {
 	// Textual description of the dataset
 	Description param.Opt[string] `json:"description,omitzero"`
 	// User-controlled metadata about the dataset
-	Metadata map[string]interface{} `json:"metadata,omitzero"`
+	Metadata map[string]any `json:"metadata,omitzero"`
 	paramObj
 }
 
@@ -200,7 +200,7 @@ type DatasetUpdateParams struct {
 	// Name of the dataset. Within a project, dataset names are unique
 	Name param.Opt[string] `json:"name,omitzero"`
 	// User-controlled metadata about the dataset
-	Metadata map[string]interface{} `json:"metadata,omitzero"`
+	Metadata map[string]any `json:"metadata,omitzero"`
 	paramObj
 }
 

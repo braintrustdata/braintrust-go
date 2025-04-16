@@ -197,7 +197,7 @@ type ExperimentNewParams struct {
 	// anybody inside or outside the organization
 	Public param.Opt[bool] `json:"public,omitzero"`
 	// User-controlled metadata about the experiment
-	Metadata map[string]interface{} `json:"metadata,omitzero"`
+	Metadata map[string]any `json:"metadata,omitzero"`
 	// Metadata about the state of the repo when the experiment was created
 	RepoInfo shared.RepoInfoParam `json:"repo_info,omitzero"`
 	paramObj
@@ -229,7 +229,7 @@ type ExperimentUpdateParams struct {
 	// anybody inside or outside the organization
 	Public param.Opt[bool] `json:"public,omitzero"`
 	// User-controlled metadata about the experiment
-	Metadata map[string]interface{} `json:"metadata,omitzero"`
+	Metadata map[string]any `json:"metadata,omitzero"`
 	// Metadata about the state of the repo when the experiment was created
 	RepoInfo shared.RepoInfoParam `json:"repo_info,omitzero"`
 	paramObj

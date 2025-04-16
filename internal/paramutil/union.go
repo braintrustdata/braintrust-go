@@ -1,11 +1,12 @@
-package param
+package paramutil
 
 import (
 	"fmt"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"reflect"
 )
 
-var paramUnionType = reflect.TypeOf(APIUnion{})
+var paramUnionType = reflect.TypeOf(param.APIUnion{})
 
 // VariantFromUnion can be used to extract the present variant from a param union type.
 // A param union type is a struct with an embedded field of [APIUnion].

@@ -48,10 +48,10 @@ func TestViewNewWithOptionalParams(t *testing.T) {
 		UserID: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ViewData: shared.ViewDataParam{
 			Search: shared.ViewDataSearchParam{
-				Filter: []interface{}{map[string]interface{}{}},
-				Match:  []interface{}{map[string]interface{}{}},
-				Sort:   []interface{}{map[string]interface{}{}},
-				Tag:    []interface{}{map[string]interface{}{}},
+				Filter: []any{map[string]interface{}{}},
+				Match:  []any{map[string]interface{}{}},
+				Sort:   []any{map[string]interface{}{}},
+				Tag:    []any{map[string]interface{}{}},
 			},
 		},
 	})
@@ -127,10 +127,10 @@ func TestViewUpdateWithOptionalParams(t *testing.T) {
 			UserID: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 			ViewData: shared.ViewDataParam{
 				Search: shared.ViewDataSearchParam{
-					Filter: []interface{}{map[string]interface{}{}},
-					Match:  []interface{}{map[string]interface{}{}},
-					Sort:   []interface{}{map[string]interface{}{}},
-					Tag:    []interface{}{map[string]interface{}{}},
+					Filter: []any{map[string]interface{}{}},
+					Match:  []any{map[string]interface{}{}},
+					Sort:   []any{map[string]interface{}{}},
+					Tag:    []any{map[string]interface{}{}},
 				},
 			},
 			ViewType: braintrust.ViewUpdateParamsViewTypeProjects,
@@ -240,10 +240,10 @@ func TestViewReplaceWithOptionalParams(t *testing.T) {
 		UserID: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		ViewData: shared.ViewDataParam{
 			Search: shared.ViewDataSearchParam{
-				Filter: []interface{}{map[string]interface{}{}},
-				Match:  []interface{}{map[string]interface{}{}},
-				Sort:   []interface{}{map[string]interface{}{}},
-				Tag:    []interface{}{map[string]interface{}{}},
+				Filter: []any{map[string]interface{}{}},
+				Match:  []any{map[string]interface{}{}},
+				Sort:   []any{map[string]interface{}{}},
+				Tag:    []any{map[string]interface{}{}},
 			},
 		},
 	})

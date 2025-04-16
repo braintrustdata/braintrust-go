@@ -306,7 +306,7 @@ func TestFunctionInvokeWithOptionalParams(t *testing.T) {
 					Name:    braintrust.String("name"),
 				},
 			}},
-			Metadata: map[string]interface{}{
+			Metadata: map[string]any{
 				"foo": "bar",
 			},
 			Mode: braintrust.FunctionInvokeParamsModeAuto,
@@ -314,7 +314,7 @@ func TestFunctionInvokeWithOptionalParams(t *testing.T) {
 				OfSpanParentStruct: &braintrust.FunctionInvokeParamsParentSpanParentStruct{
 					ObjectID:   "object_id",
 					ObjectType: "project_logs",
-					PropagatedEvent: map[string]interface{}{
+					PropagatedEvent: map[string]any{
 						"foo": "bar",
 					},
 					RowIDs: braintrust.FunctionInvokeParamsParentSpanParentStructRowIDs{

@@ -31,7 +31,7 @@ func TestDatasetNewWithOptionalParams(t *testing.T) {
 		Name:        "x",
 		ProjectID:   "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		Description: braintrust.String("description"),
-		Metadata: map[string]interface{}{
+		Metadata: map[string]any{
 			"foo": "bar",
 		},
 	})
@@ -83,7 +83,7 @@ func TestDatasetUpdateWithOptionalParams(t *testing.T) {
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.DatasetUpdateParams{
 			Description: braintrust.String("description"),
-			Metadata: map[string]interface{}{
+			Metadata: map[string]any{
 				"foo": "bar",
 			},
 			Name: braintrust.String("name"),
@@ -172,7 +172,7 @@ func TestDatasetFeedback(t *testing.T) {
 			Feedback: []shared.FeedbackDatasetItemParam{{
 				ID:      "id",
 				Comment: braintrust.String("comment"),
-				Metadata: map[string]interface{}{
+				Metadata: map[string]any{
 					"foo": "bar",
 				},
 				Source: shared.FeedbackDatasetItemSourceApp,

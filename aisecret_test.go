@@ -27,7 +27,7 @@ func TestAISecretNewWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.AISecrets.New(context.TODO(), braintrust.AISecretNewParams{
 		Name: "name",
-		Metadata: map[string]interface{}{
+		Metadata: map[string]any{
 			"foo": "bar",
 		},
 		OrgName: braintrust.String("org_name"),
@@ -81,7 +81,7 @@ func TestAISecretUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.AISecretUpdateParams{
-			Metadata: map[string]interface{}{
+			Metadata: map[string]any{
 				"foo": "bar",
 			},
 			Name:   braintrust.String("name"),
@@ -193,7 +193,7 @@ func TestAISecretReplaceWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.AISecrets.Replace(context.TODO(), braintrust.AISecretReplaceParams{
 		Name: "name",
-		Metadata: map[string]interface{}{
+		Metadata: map[string]any{
 			"foo": "bar",
 		},
 		OrgName: braintrust.String("org_name"),
