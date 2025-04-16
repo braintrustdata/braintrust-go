@@ -37,10 +37,13 @@ type Client struct {
 	Evals         EvalService
 }
 
-// DefaultClientOptions read from the environment (BRAINTRUST_API_KEY). This should
-// be used to initialize new clients.
+// DefaultClientOptions read from the environment (BRAINTRUST_API_KEY,
+// BRAINTRUST_BASE_URL). This should be used to initialize new clients.
 func DefaultClientOptions() []option.RequestOption {
 	defaults := []option.RequestOption{option.WithEnvironmentProduction()}
+	if o, ok := os.LookupEnv("BRAINTRUST_BASE_URL"); ok {
+		defaults = append(defaults, option.WithBaseURL(o))
+	}
 	if o, ok := os.LookupEnv("BRAINTRUST_API_KEY"); ok {
 		defaults = append(defaults, option.WithAPIKey(o))
 	}
@@ -48,9 +51,9 @@ func DefaultClientOptions() []option.RequestOption {
 }
 
 // NewClient generates a new client with the default option read from the
-// environment (BRAINTRUST_API_KEY). The option passed in as arguments are applied
-// after these default arguments, and all option will be passed down to the
-// services and requests that this client makes.
+// environment (BRAINTRUST_API_KEY, BRAINTRUST_BASE_URL). The option passed in as
+// arguments are applied after these default arguments, and all option will be
+// passed down to the services and requests that this client makes.
 func NewClient(opts ...option.RequestOption) (r Client) {
 	opts = append(DefaultClientOptions(), opts...)
 
