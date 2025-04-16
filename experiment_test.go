@@ -34,7 +34,7 @@ func TestExperimentNewWithOptionalParams(t *testing.T) {
 		DatasetVersion: braintrust.String("dataset_version"),
 		Description:    braintrust.String("description"),
 		EnsureNew:      braintrust.Bool(true),
-		Metadata: map[string]interface{}{
+		Metadata: map[string]any{
 			"foo": "bar",
 		},
 		Name:   braintrust.String("x"),
@@ -102,7 +102,7 @@ func TestExperimentUpdateWithOptionalParams(t *testing.T) {
 			DatasetID:      braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 			DatasetVersion: braintrust.String("dataset_version"),
 			Description:    braintrust.String("description"),
-			Metadata: map[string]interface{}{
+			Metadata: map[string]any{
 				"foo": "bar",
 			},
 			Name:   braintrust.String("name"),
@@ -204,7 +204,7 @@ func TestExperimentFeedback(t *testing.T) {
 				ID:       "id",
 				Comment:  braintrust.String("comment"),
 				Expected: map[string]interface{}{},
-				Metadata: map[string]interface{}{
+				Metadata: map[string]any{
 					"foo": "bar",
 				},
 				Scores: map[string]float64{

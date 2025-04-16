@@ -86,7 +86,7 @@ type EvalNewParams struct {
 	RepoInfo shared.RepoInfoParam `json:"repo_info,omitzero"`
 	// Optional experiment-level metadata to store about the evaluation. You can later
 	// use this to slice & dice across experiments.
-	Metadata map[string]interface{} `json:"metadata,omitzero"`
+	Metadata map[string]any `json:"metadata,omitzero"`
 	// Options for tracing the evaluation
 	Parent EvalNewParamsParentUnion `json:"parent,omitzero"`
 	paramObj
@@ -154,7 +154,7 @@ func (u EvalNewParamsDataUnion) GetProjectName() *string {
 }
 
 // Returns a pointer to the underlying variant's property, if present.
-func (u EvalNewParamsDataUnion) GetData() []interface{} {
+func (u EvalNewParamsDataUnion) GetData() []any {
 	if vt := u.OfDatasetRows; vt != nil {
 		return vt.Data
 	}
@@ -162,7 +162,7 @@ func (u EvalNewParamsDataUnion) GetData() []interface{} {
 }
 
 // Returns a pointer to the underlying variant's InternalBtql property, if present.
-func (u EvalNewParamsDataUnion) GetInternalBtql() map[string]interface{} {
+func (u EvalNewParamsDataUnion) GetInternalBtql() map[string]any {
 	if vt := u.OfDatasetID; vt != nil {
 		return vt.InternalBtql
 	} else if vt := u.OfProjectDatasetName; vt != nil {
@@ -175,8 +175,8 @@ func (u EvalNewParamsDataUnion) GetInternalBtql() map[string]interface{} {
 //
 // The property DatasetID is required.
 type EvalNewParamsDataDatasetID struct {
-	DatasetID    string                 `json:"dataset_id,required"`
-	InternalBtql map[string]interface{} `json:"_internal_btql,omitzero"`
+	DatasetID    string         `json:"dataset_id,required"`
+	InternalBtql map[string]any `json:"_internal_btql,omitzero"`
 	paramObj
 }
 
@@ -192,9 +192,9 @@ func (r EvalNewParamsDataDatasetID) MarshalJSON() (data []byte, err error) {
 //
 // The properties DatasetName, ProjectName are required.
 type EvalNewParamsDataProjectDatasetName struct {
-	DatasetName  string                 `json:"dataset_name,required"`
-	ProjectName  string                 `json:"project_name,required"`
-	InternalBtql map[string]interface{} `json:"_internal_btql,omitzero"`
+	DatasetName  string         `json:"dataset_name,required"`
+	ProjectName  string         `json:"project_name,required"`
+	InternalBtql map[string]any `json:"_internal_btql,omitzero"`
 	paramObj
 }
 
@@ -212,7 +212,7 @@ func (r EvalNewParamsDataProjectDatasetName) MarshalJSON() (data []byte, err err
 //
 // The property Data is required.
 type EvalNewParamsDataDatasetRows struct {
-	Data []interface{} `json:"data,omitzero,required"`
+	Data []any `json:"data,omitzero,required"`
 	paramObj
 }
 
@@ -834,38 +834,6 @@ func (u *EvalNewParamsParentUnion) asAny() any {
 	return nil
 }
 
-// Returns a pointer to the underlying variant's property, if present.
-func (u EvalNewParamsParentUnion) GetObjectID() *string {
-	if vt := u.OfSpanParentStruct; vt != nil {
-		return &vt.ObjectID
-	}
-	return nil
-}
-
-// Returns a pointer to the underlying variant's property, if present.
-func (u EvalNewParamsParentUnion) GetObjectType() *string {
-	if vt := u.OfSpanParentStruct; vt != nil {
-		return &vt.ObjectType
-	}
-	return nil
-}
-
-// Returns a pointer to the underlying variant's property, if present.
-func (u EvalNewParamsParentUnion) GetPropagatedEvent() map[string]interface{} {
-	if vt := u.OfSpanParentStruct; vt != nil {
-		return vt.PropagatedEvent
-	}
-	return nil
-}
-
-// Returns a pointer to the underlying variant's property, if present.
-func (u EvalNewParamsParentUnion) GetRowIDs() *EvalNewParamsParentSpanParentStructRowIDs {
-	if vt := u.OfSpanParentStruct; vt != nil {
-		return &vt.RowIDs
-	}
-	return nil
-}
-
 // Span parent properties
 //
 // The properties ObjectID, ObjectType are required.
@@ -875,7 +843,7 @@ type EvalNewParamsParentSpanParentStruct struct {
 	// Any of "project_logs", "experiment", "playground_logs".
 	ObjectType string `json:"object_type,omitzero,required"`
 	// Include these properties in every span created under this parent
-	PropagatedEvent map[string]interface{} `json:"propagated_event,omitzero"`
+	PropagatedEvent map[string]any `json:"propagated_event,omitzero"`
 	// Identifiers for the row to to log a subspan under
 	RowIDs EvalNewParamsParentSpanParentStructRowIDs `json:"row_ids,omitzero"`
 	paramObj

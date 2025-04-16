@@ -35,7 +35,7 @@ func TestProjectLogFeedback(t *testing.T) {
 				ID:       "id",
 				Comment:  braintrust.String("comment"),
 				Expected: map[string]interface{}{},
-				Metadata: map[string]interface{}{
+				Metadata: map[string]any{
 					"foo": "bar",
 				},
 				Scores: map[string]float64{

@@ -5,7 +5,6 @@ package braintrust
 import (
 	"github.com/braintrustdata/braintrust-go/internal/apierror"
 	"github.com/braintrustdata/braintrust-go/packages/param"
-	"github.com/braintrustdata/braintrust-go/packages/resp"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -1136,13 +1135,3 @@ const ViewTypeScorers = shared.ViewTypeScorers
 
 // Equals "logs"
 const ViewTypeLogs = shared.ViewTypeLogs
-
-func toParam[T comparable](value T, meta resp.Field) param.Opt[T] {
-	if meta.IsPresent() {
-		return param.NewOpt(value)
-	}
-	if meta.IsExplicitNull() {
-		return param.NullOpt[T]()
-	}
-	return param.Opt[T]{}
-}

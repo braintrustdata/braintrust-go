@@ -135,9 +135,9 @@ type AISecretNewParams struct {
 	OrgName param.Opt[string] `json:"org_name,omitzero"`
 	// Secret value. If omitted in a PUT request, the existing secret value will be
 	// left intact, not replaced with null.
-	Secret   param.Opt[string]      `json:"secret,omitzero"`
-	Type     param.Opt[string]      `json:"type,omitzero"`
-	Metadata map[string]interface{} `json:"metadata,omitzero"`
+	Secret   param.Opt[string] `json:"secret,omitzero"`
+	Type     param.Opt[string] `json:"type,omitzero"`
+	Metadata map[string]any    `json:"metadata,omitzero"`
 	paramObj
 }
 
@@ -152,10 +152,10 @@ func (r AISecretNewParams) MarshalJSON() (data []byte, err error) {
 
 type AISecretUpdateParams struct {
 	// Name of the AI secret
-	Name     param.Opt[string]      `json:"name,omitzero"`
-	Secret   param.Opt[string]      `json:"secret,omitzero"`
-	Type     param.Opt[string]      `json:"type,omitzero"`
-	Metadata map[string]interface{} `json:"metadata,omitzero"`
+	Name     param.Opt[string] `json:"name,omitzero"`
+	Secret   param.Opt[string] `json:"secret,omitzero"`
+	Type     param.Opt[string] `json:"type,omitzero"`
+	Metadata map[string]any    `json:"metadata,omitzero"`
 	paramObj
 }
 
@@ -280,9 +280,9 @@ type AISecretReplaceParams struct {
 	OrgName param.Opt[string] `json:"org_name,omitzero"`
 	// Secret value. If omitted in a PUT request, the existing secret value will be
 	// left intact, not replaced with null.
-	Secret   param.Opt[string]      `json:"secret,omitzero"`
-	Type     param.Opt[string]      `json:"type,omitzero"`
-	Metadata map[string]interface{} `json:"metadata,omitzero"`
+	Secret   param.Opt[string] `json:"secret,omitzero"`
+	Type     param.Opt[string] `json:"type,omitzero"`
+	Metadata map[string]any    `json:"metadata,omitzero"`
 	paramObj
 }
 
