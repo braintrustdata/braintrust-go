@@ -2,6 +2,7 @@ package apiform
 
 import (
 	"bytes"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"mime/multipart"
 	"strings"
 	"testing"
@@ -17,6 +18,13 @@ type Primitives struct {
 	D float64 `form:"d"`
 	E float32 `form:"e"`
 	F []int   `form:"f"`
+}
+
+// These aliases are necessary to bypass the cache.
+// This only relevant during testing.
+type int_ int
+type PrimitivesBrackets struct {
+	F []int_ `form:"f"`
 }
 
 type PrimitivePointers struct {
@@ -38,8 +46,8 @@ type DateTime struct {
 }
 
 type AdditionalProperties struct {
-	A      bool                   `form:"a"`
-	Extras map[string]interface{} `form:"-,extras"`
+	A      bool           `form:"a"`
+	Extras map[string]any `form:"-,extras"`
 }
 
 type TypedAdditionalProperties struct {
@@ -49,8 +57,8 @@ type TypedAdditionalProperties struct {
 
 type EmbeddedStructs struct {
 	AdditionalProperties
-	A      *int                   `form:"number2"`
-	Extras map[string]interface{} `form:"-,extras"`
+	A      *int           `form:"number2"`
+	Extras map[string]any `form:"-,extras"`
 }
 
 type Recursive struct {
@@ -59,7 +67,7 @@ type Recursive struct {
 }
 
 type UnknownStruct struct {
-	Unknown interface{} `form:"unknown"`
+	Unknown any `form:"unknown"`
 }
 
 type UnionStruct struct {
@@ -96,9 +104,26 @@ func (UnionTime) union() {}
 type ReaderStruct struct {
 }
 
+type NamedEnum string
+
+const NamedEnumFoo NamedEnum = "foo"
+
+type StructUnionWrapper struct {
+	Union StructUnion `form:"union"`
+}
+
+type StructUnion struct {
+	OfInt    param.Opt[int64]     `form:",omitzero,inline"`
+	OfString param.Opt[string]    `form:",omitzero,inline"`
+	OfEnum   param.Opt[NamedEnum] `form:",omitzero,inline"`
+	OfA      UnionStructA         `form:",omitzero,inline"`
+	OfB      UnionStructB         `form:",omitzero,inline"`
+	param.APIUnion
+}
+
 var tests = map[string]struct {
 	buf string
-	val interface{}
+	val any
 }{
 	"map_string": {
 		`--xxx
@@ -125,7 +150,7 @@ Content-Disposition: form-data; name="c"
 false
 --xxx--
 `,
-		map[string]interface{}{"a": float64(1), "b": "str", "c": false},
+		map[string]any{"a": float64(1), "b": "str", "c": false},
 	},
 
 	"primitive_struct": {
@@ -168,6 +193,27 @@ Content-Disposition: form-data; name="f.3"
 --xxx--
 `,
 		Primitives{A: false, B: 237628372683, C: uint(654), D: 9999.43, E: 43.76, F: []int{1, 2, 3, 4}},
+	},
+	"primitive_struct,brackets": {
+		`--xxx
+Content-Disposition: form-data; name="f[]"
+
+1
+--xxx
+Content-Disposition: form-data; name="f[]"
+
+2
+--xxx
+Content-Disposition: form-data; name="f[]"
+
+3
+--xxx
+Content-Disposition: form-data; name="f[]"
+
+4
+--xxx--
+`,
+		PrimitivesBrackets{F: []int_{1, 2, 3, 4}},
 	},
 
 	"slices": {
@@ -213,7 +259,6 @@ Content-Disposition: form-data; name="slices.0.f.3"
 			Slice: []Primitives{{A: false, B: 237628372683, C: uint(654), D: 9999.43, E: 43.76, F: []int{1, 2, 3, 4}}},
 		},
 	},
-
 	"primitive_pointer_struct": {
 		`--xxx
 Content-Disposition: form-data; name="a"
@@ -301,7 +346,7 @@ true
 `,
 		AdditionalProperties{
 			A: true,
-			Extras: map[string]interface{}{
+			Extras: map[string]any{
 				"bar": "value",
 				"foo": true,
 			},
@@ -342,9 +387,21 @@ bar
 --xxx--
 `,
 		UnknownStruct{
-			Unknown: map[string]interface{}{
+			Unknown: map[string]any{
 				"foo": "bar",
 			},
+		},
+	},
+
+	"struct_union_integer": {
+		`--xxx
+Content-Disposition: form-data; name="union"
+
+12
+--xxx--
+`,
+		StructUnionWrapper{
+			Union: StructUnion{OfInt: param.NewOpt[int64](12)},
 		},
 	},
 
@@ -357,6 +414,30 @@ Content-Disposition: form-data; name="union"
 `,
 		UnionStruct{
 			Union: UnionInteger(12),
+		},
+	},
+
+	"struct_union_struct_discriminated_a": {
+		`--xxx
+Content-Disposition: form-data; name="union.a"
+
+foo
+--xxx
+Content-Disposition: form-data; name="union.b"
+
+bar
+--xxx
+Content-Disposition: form-data; name="union.type"
+
+typeA
+--xxx--
+`,
+		StructUnionWrapper{
+			Union: StructUnion{OfA: UnionStructA{
+				Type: "typeA",
+				A:    "foo",
+				B:    "bar",
+			}},
 		},
 	},
 
@@ -382,6 +463,25 @@ typeA
 				A:    "foo",
 				B:    "bar",
 			},
+		},
+	},
+
+	"struct_union_struct_discriminated_b": {
+		`--xxx
+Content-Disposition: form-data; name="union.a"
+
+foo
+--xxx
+Content-Disposition: form-data; name="union.type"
+
+typeB
+--xxx--
+`,
+		StructUnionWrapper{
+			Union: StructUnion{OfB: UnionStructB{
+				Type: "typeB",
+				A:    "foo",
+			}},
 		},
 	},
 
@@ -423,7 +523,13 @@ func TestEncode(t *testing.T) {
 			buf := bytes.NewBuffer(nil)
 			writer := multipart.NewWriter(buf)
 			writer.SetBoundary("xxx")
-			err := Marshal(test.val, writer)
+
+			var arrayFmt string = "indices:dots"
+			if tags := strings.Split(name, ","); len(tags) > 1 {
+				arrayFmt = tags[1]
+			}
+
+			err := MarshalWithSettings(test.val, writer, arrayFmt)
 			if err != nil {
 				t.Errorf("serialization of %v failed with error %v", test.val, err)
 			}
