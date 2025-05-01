@@ -49,7 +49,10 @@ func (r *ListObjects[T]) GetNextPage() (res *ListObjects[T], err error) {
 	cfg := r.cfg.Clone(r.cfg.Context)
 	value := reflect.ValueOf(items[len(items)-1])
 	field := value.FieldByName("ID")
-	cfg.Apply(option.WithQuery("starting_after", field.Interface().(string)))
+	err = cfg.Apply(option.WithQuery("starting_after", field.Interface().(string)))
+	if err != nil {
+		return nil, err
+	}
 	var raw *http.Response
 	cfg.ResponseInto = &raw
 	cfg.ResponseBodyInto = &res
