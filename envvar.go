@@ -203,8 +203,8 @@ func (r EnvVarListParams) URLQuery() (v url.Values, err error) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type EnvVarListParamsIDsUnion struct {
-	OfString              param.Opt[string] `query:",omitzero,inline"`
-	OfEnvVarListsIDsArray []string          `query:",omitzero,inline"`
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -215,8 +215,8 @@ func (u EnvVarListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) 
 func (u *EnvVarListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfEnvVarListsIDsArray) {
-		return &u.OfEnvVarListsIDsArray
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
 	}
 	return nil
 }

@@ -204,8 +204,8 @@ func (r ProjectTagListParams) URLQuery() (v url.Values, err error) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type ProjectTagListParamsIDsUnion struct {
-	OfString                  param.Opt[string] `query:",omitzero,inline"`
-	OfProjectTagListsIDsArray []string          `query:",omitzero,inline"`
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -216,8 +216,8 @@ func (u ProjectTagListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted
 func (u *ProjectTagListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfProjectTagListsIDsArray) {
-		return &u.OfProjectTagListsIDsArray
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
 	}
 	return nil
 }

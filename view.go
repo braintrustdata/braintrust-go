@@ -295,8 +295,8 @@ func (r ViewListParams) URLQuery() (v url.Values, err error) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type ViewListParamsIDsUnion struct {
-	OfString            param.Opt[string] `query:",omitzero,inline"`
-	OfViewListsIDsArray []string          `query:",omitzero,inline"`
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -307,8 +307,8 @@ func (u ViewListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) &&
 func (u *ViewListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfViewListsIDsArray) {
-		return &u.OfViewListsIDsArray
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
 	}
 	return nil
 }

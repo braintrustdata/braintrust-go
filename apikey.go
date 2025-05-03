@@ -154,8 +154,8 @@ func (r APIKeyListParams) URLQuery() (v url.Values, err error) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type APIKeyListParamsIDsUnion struct {
-	OfString              param.Opt[string] `query:",omitzero,inline"`
-	OfAPIKeyListsIDsArray []string          `query:",omitzero,inline"`
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -166,8 +166,8 @@ func (u APIKeyListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) 
 func (u *APIKeyListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfAPIKeyListsIDsArray) {
-		return &u.OfAPIKeyListsIDsArray
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
 	}
 	return nil
 }
