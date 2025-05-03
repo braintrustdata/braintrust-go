@@ -206,8 +206,8 @@ func (r SpanIframeListParams) URLQuery() (v url.Values, err error) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type SpanIframeListParamsIDsUnion struct {
-	OfString                  param.Opt[string] `query:",omitzero,inline"`
-	OfSpanIframeListsIDsArray []string          `query:",omitzero,inline"`
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -218,8 +218,8 @@ func (u SpanIframeListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted
 func (u *SpanIframeListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfSpanIframeListsIDsArray) {
-		return &u.OfSpanIframeListsIDsArray
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
 	}
 	return nil
 }

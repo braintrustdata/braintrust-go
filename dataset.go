@@ -258,8 +258,8 @@ func (r DatasetListParams) URLQuery() (v url.Values, err error) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type DatasetListParamsIDsUnion struct {
-	OfString               param.Opt[string] `query:",omitzero,inline"`
-	OfDatasetListsIDsArray []string          `query:",omitzero,inline"`
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -270,8 +270,8 @@ func (u DatasetListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u)
 func (u *DatasetListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfDatasetListsIDsArray) {
-		return &u.OfDatasetListsIDsArray
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
 	}
 	return nil
 }

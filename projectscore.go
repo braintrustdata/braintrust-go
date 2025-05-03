@@ -272,8 +272,8 @@ func (r ProjectScoreListParams) URLQuery() (v url.Values, err error) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type ProjectScoreListParamsIDsUnion struct {
-	OfString                    param.Opt[string] `query:",omitzero,inline"`
-	OfProjectScoreListsIDsArray []string          `query:",omitzero,inline"`
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -284,8 +284,8 @@ func (u ProjectScoreListParamsIDsUnion) IsPresent() bool { return !param.IsOmitt
 func (u *ProjectScoreListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfProjectScoreListsIDsArray) {
-		return &u.OfProjectScoreListsIDsArray
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
 	}
 	return nil
 }
@@ -296,8 +296,8 @@ func (u *ProjectScoreListParamsIDsUnion) asAny() any {
 type ProjectScoreListParamsScoreTypeUnion struct {
 	// Check if union is this variant with
 	// !param.IsOmitted(union.OfProjectScoreTypeSingle)
-	OfProjectScoreTypeSingle          param.Opt[shared.ProjectScoreType] `query:",omitzero,inline"`
-	OfProjectScoreListsScoreTypeArray []string                           `query:",omitzero,inline"`
+	OfProjectScoreTypeSingle param.Opt[shared.ProjectScoreType] `query:",omitzero,inline"`
+	OfProjectScoreTypeArray  []string                           `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -310,8 +310,8 @@ func (u ProjectScoreListParamsScoreTypeUnion) IsPresent() bool {
 func (u *ProjectScoreListParamsScoreTypeUnion) asAny() any {
 	if !param.IsOmitted(u.OfProjectScoreTypeSingle) {
 		return &u.OfProjectScoreTypeSingle
-	} else if !param.IsOmitted(u.OfProjectScoreListsScoreTypeArray) {
-		return &u.OfProjectScoreListsScoreTypeArray
+	} else if !param.IsOmitted(u.OfProjectScoreTypeArray) {
+		return &u.OfProjectScoreTypeArray
 	}
 	return nil
 }

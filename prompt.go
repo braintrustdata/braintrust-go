@@ -230,8 +230,8 @@ func (r PromptListParams) URLQuery() (v url.Values, err error) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type PromptListParamsIDsUnion struct {
-	OfString              param.Opt[string] `query:",omitzero,inline"`
-	OfPromptListsIDsArray []string          `query:",omitzero,inline"`
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -242,8 +242,8 @@ func (u PromptListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) 
 func (u *PromptListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfPromptListsIDsArray) {
-		return &u.OfPromptListsIDsArray
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
 	}
 	return nil
 }

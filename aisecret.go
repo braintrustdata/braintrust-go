@@ -210,8 +210,8 @@ func (r AISecretListParams) URLQuery() (v url.Values, err error) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type AISecretListParamsAISecretTypeUnion struct {
-	OfString                         param.Opt[string] `query:",omitzero,inline"`
-	OfAISecretListsAISecretTypeArray []string          `query:",omitzero,inline"`
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -224,8 +224,8 @@ func (u AISecretListParamsAISecretTypeUnion) IsPresent() bool {
 func (u *AISecretListParamsAISecretTypeUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfAISecretListsAISecretTypeArray) {
-		return &u.OfAISecretListsAISecretTypeArray
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
 	}
 	return nil
 }
@@ -234,8 +234,8 @@ func (u *AISecretListParamsAISecretTypeUnion) asAny() any {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type AISecretListParamsIDsUnion struct {
-	OfString                param.Opt[string] `query:",omitzero,inline"`
-	OfAISecretListsIDsArray []string          `query:",omitzero,inline"`
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -246,8 +246,8 @@ func (u AISecretListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u
 func (u *AISecretListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfAISecretListsIDsArray) {
-		return &u.OfAISecretListsIDsArray
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
 	}
 	return nil
 }

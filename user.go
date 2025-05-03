@@ -121,8 +121,8 @@ func (r UserListParams) URLQuery() (v url.Values, err error) {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type UserListParamsEmailUnion struct {
-	OfString              param.Opt[string] `query:",omitzero,inline"`
-	OfUserListsEmailArray []string          `query:",omitzero,inline"`
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -133,8 +133,8 @@ func (u UserListParamsEmailUnion) IsPresent() bool { return !param.IsOmitted(u) 
 func (u *UserListParamsEmailUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfUserListsEmailArray) {
-		return &u.OfUserListsEmailArray
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
 	}
 	return nil
 }
@@ -143,8 +143,8 @@ func (u *UserListParamsEmailUnion) asAny() any {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type UserListParamsFamilyNameUnion struct {
-	OfString                   param.Opt[string] `query:",omitzero,inline"`
-	OfUserListsFamilyNameArray []string          `query:",omitzero,inline"`
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -155,8 +155,8 @@ func (u UserListParamsFamilyNameUnion) IsPresent() bool { return !param.IsOmitte
 func (u *UserListParamsFamilyNameUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfUserListsFamilyNameArray) {
-		return &u.OfUserListsFamilyNameArray
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
 	}
 	return nil
 }
@@ -165,8 +165,8 @@ func (u *UserListParamsFamilyNameUnion) asAny() any {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type UserListParamsGivenNameUnion struct {
-	OfString                  param.Opt[string] `query:",omitzero,inline"`
-	OfUserListsGivenNameArray []string          `query:",omitzero,inline"`
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -177,8 +177,8 @@ func (u UserListParamsGivenNameUnion) IsPresent() bool { return !param.IsOmitted
 func (u *UserListParamsGivenNameUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfUserListsGivenNameArray) {
-		return &u.OfUserListsGivenNameArray
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
 	}
 	return nil
 }
@@ -187,8 +187,8 @@ func (u *UserListParamsGivenNameUnion) asAny() any {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type UserListParamsIDsUnion struct {
-	OfString            param.Opt[string] `query:",omitzero,inline"`
-	OfUserListsIDsArray []string          `query:",omitzero,inline"`
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
 
@@ -199,8 +199,8 @@ func (u UserListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) &&
 func (u *UserListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
-	} else if !param.IsOmitted(u.OfUserListsIDsArray) {
-		return &u.OfUserListsIDsArray
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
 	}
 	return nil
 }
