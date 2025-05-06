@@ -137,10 +137,6 @@ type ProjectScoreNewParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectScoreNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r ProjectScoreNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectScoreNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -155,11 +151,6 @@ type ProjectScoreNewParamsCategoriesUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u ProjectScoreNewParamsCategoriesUnion) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u ProjectScoreNewParamsCategoriesUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[ProjectScoreNewParamsCategoriesUnion](u.OfCategorical, u.OfMinimum)
 }
@@ -189,10 +180,6 @@ type ProjectScoreUpdateParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectScoreUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r ProjectScoreUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectScoreUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -207,11 +194,6 @@ type ProjectScoreUpdateParamsCategoriesUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u ProjectScoreUpdateParamsCategoriesUnion) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u ProjectScoreUpdateParamsCategoriesUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[ProjectScoreUpdateParamsCategoriesUnion](u.OfCategorical, u.OfMinimum)
 }
@@ -256,10 +238,6 @@ type ProjectScoreListParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectScoreListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 // URLQuery serializes [ProjectScoreListParams]'s query parameters as `url.Values`.
 func (r ProjectScoreListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
@@ -276,10 +254,6 @@ type ProjectScoreListParamsIDsUnion struct {
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u ProjectScoreListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 
 func (u *ProjectScoreListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -299,12 +273,6 @@ type ProjectScoreListParamsScoreTypeUnion struct {
 	OfProjectScoreTypeSingle param.Opt[shared.ProjectScoreType] `query:",omitzero,inline"`
 	OfProjectScoreTypeArray  []string                           `query:",omitzero,inline"`
 	paramUnion
-}
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u ProjectScoreListParamsScoreTypeUnion) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
 }
 
 func (u *ProjectScoreListParamsScoreTypeUnion) asAny() any {
@@ -334,10 +302,6 @@ type ProjectScoreReplaceParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectScoreReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r ProjectScoreReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectScoreReplaceParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -352,11 +316,6 @@ type ProjectScoreReplaceParamsCategoriesUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u ProjectScoreReplaceParamsCategoriesUnion) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u ProjectScoreReplaceParamsCategoriesUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[ProjectScoreReplaceParamsCategoriesUnion](u.OfCategorical, u.OfMinimum)
 }

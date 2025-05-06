@@ -104,10 +104,6 @@ type APIKeyNewParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f APIKeyNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r APIKeyNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow APIKeyNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -138,10 +134,6 @@ type APIKeyListParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f APIKeyListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 // URLQuery serializes [APIKeyListParams]'s query parameters as `url.Values`.
 func (r APIKeyListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
@@ -158,10 +150,6 @@ type APIKeyListParamsIDsUnion struct {
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u APIKeyListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 
 func (u *APIKeyListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {

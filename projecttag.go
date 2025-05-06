@@ -131,10 +131,6 @@ type ProjectTagNewParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectTagNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r ProjectTagNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectTagNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -149,10 +145,6 @@ type ProjectTagUpdateParams struct {
 	Name param.Opt[string] `json:"name,omitzero"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectTagUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r ProjectTagUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectTagUpdateParams
@@ -188,10 +180,6 @@ type ProjectTagListParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectTagListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 // URLQuery serializes [ProjectTagListParams]'s query parameters as `url.Values`.
 func (r ProjectTagListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
@@ -208,10 +196,6 @@ type ProjectTagListParamsIDsUnion struct {
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u ProjectTagListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 
 func (u *ProjectTagListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -233,10 +217,6 @@ type ProjectTagReplaceParams struct {
 	Description param.Opt[string] `json:"description,omitzero"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectTagReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r ProjectTagReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectTagReplaceParams

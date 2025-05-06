@@ -105,10 +105,6 @@ type UserListParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f UserListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 // URLQuery serializes [UserListParams]'s query parameters as `url.Values`.
 func (r UserListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
@@ -125,10 +121,6 @@ type UserListParamsEmailUnion struct {
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u UserListParamsEmailUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 
 func (u *UserListParamsEmailUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -148,10 +140,6 @@ type UserListParamsFamilyNameUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u UserListParamsFamilyNameUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
-
 func (u *UserListParamsFamilyNameUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
@@ -170,10 +158,6 @@ type UserListParamsGivenNameUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u UserListParamsGivenNameUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
-
 func (u *UserListParamsGivenNameUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
@@ -191,10 +175,6 @@ type UserListParamsIDsUnion struct {
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u UserListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 
 func (u *UserListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {

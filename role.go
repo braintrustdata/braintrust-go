@@ -137,10 +137,6 @@ type RoleNewParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f RoleNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r RoleNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow RoleNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -164,9 +160,6 @@ type RoleNewParamsMemberPermission struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f RoleNewParamsMemberPermission) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r RoleNewParamsMemberPermission) MarshalJSON() (data []byte, err error) {
 	type shadow RoleNewParamsMemberPermission
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -187,10 +180,6 @@ type RoleUpdateParams struct {
 	RemoveMemberRoles []string `json:"remove_member_roles,omitzero" format:"uuid"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f RoleUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r RoleUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow RoleUpdateParams
@@ -215,11 +204,6 @@ type RoleUpdateParamsAddMemberPermission struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f RoleUpdateParamsAddMemberPermission) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r RoleUpdateParamsAddMemberPermission) MarshalJSON() (data []byte, err error) {
 	type shadow RoleUpdateParamsAddMemberPermission
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -243,11 +227,6 @@ type RoleUpdateParamsRemoveMemberPermission struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f RoleUpdateParamsRemoveMemberPermission) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r RoleUpdateParamsRemoveMemberPermission) MarshalJSON() (data []byte, err error) {
 	type shadow RoleUpdateParamsRemoveMemberPermission
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -278,10 +257,6 @@ type RoleListParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f RoleListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 // URLQuery serializes [RoleListParams]'s query parameters as `url.Values`.
 func (r RoleListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
@@ -298,10 +273,6 @@ type RoleListParamsIDsUnion struct {
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u RoleListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 
 func (u *RoleListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -331,10 +302,6 @@ type RoleReplaceParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f RoleReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r RoleReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow RoleReplaceParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -358,11 +325,6 @@ type RoleReplaceParamsMemberPermission struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f RoleReplaceParamsMemberPermission) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r RoleReplaceParamsMemberPermission) MarshalJSON() (data []byte, err error) {
 	type shadow RoleReplaceParamsMemberPermission
 	return param.MarshalObject(r, (*shadow)(&r))

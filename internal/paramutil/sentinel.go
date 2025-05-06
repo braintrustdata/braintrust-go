@@ -1,4 +1,4 @@
-package param
+package paramutil
 
 import (
 	"github.com/braintrustdata/braintrust-go/internal/encoding/json/sentinel"

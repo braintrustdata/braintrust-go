@@ -106,8 +106,7 @@ func (r *EnvVarService) Replace(ctx context.Context, body EnvVarReplaceParams, o
 type EnvVarListResponse struct {
 	// A list of env_var objects
 	Objects []shared.EnvVar `json:"objects,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Objects     resp.Field
 		ExtraFields map[string]resp.Field
@@ -135,10 +134,6 @@ type EnvVarNewParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f EnvVarNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r EnvVarNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow EnvVarNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -160,10 +155,6 @@ type EnvVarUpdateParams struct {
 	Value param.Opt[string] `json:"value,omitzero"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f EnvVarUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r EnvVarUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow EnvVarUpdateParams
@@ -187,10 +178,6 @@ type EnvVarListParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f EnvVarListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 // URLQuery serializes [EnvVarListParams]'s query parameters as `url.Values`.
 func (r EnvVarListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
@@ -207,10 +194,6 @@ type EnvVarListParamsIDsUnion struct {
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u EnvVarListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 
 func (u *EnvVarListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -234,10 +217,6 @@ type EnvVarReplaceParams struct {
 	Value param.Opt[string] `json:"value,omitzero"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f EnvVarReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r EnvVarReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow EnvVarReplaceParams

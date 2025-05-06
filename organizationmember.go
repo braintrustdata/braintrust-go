@@ -57,10 +57,6 @@ type OrganizationMemberUpdateParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f OrganizationMemberUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r OrganizationMemberUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow OrganizationMemberUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -85,11 +81,6 @@ type OrganizationMemberUpdateParamsInviteUsers struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f OrganizationMemberUpdateParamsInviteUsers) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r OrganizationMemberUpdateParamsInviteUsers) MarshalJSON() (data []byte, err error) {
 	type shadow OrganizationMemberUpdateParamsInviteUsers
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -104,11 +95,6 @@ type OrganizationMemberUpdateParamsRemoveUsers struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f OrganizationMemberUpdateParamsRemoveUsers) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r OrganizationMemberUpdateParamsRemoveUsers) MarshalJSON() (data []byte, err error) {
 	type shadow OrganizationMemberUpdateParamsRemoveUsers
 	return param.MarshalObject(r, (*shadow)(&r))

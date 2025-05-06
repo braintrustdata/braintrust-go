@@ -21,8 +21,7 @@ type paramObj = param.APIObject
 
 type ListObjects[T any] struct {
 	Objects []T `json:"objects"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Objects     resp.Field
 		ExtraFields map[string]resp.Field
