@@ -93,10 +93,6 @@ type ProjectLogFeedbackParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectLogFeedbackParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r ProjectLogFeedbackParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectLogFeedbackParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -148,10 +144,6 @@ type ProjectLogFetchParams struct {
 	Version param.Opt[string] `query:"version,omitzero" json:"-"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectLogFetchParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [ProjectLogFetchParams]'s query parameters as `url.Values`.
 func (r ProjectLogFetchParams) URLQuery() (v url.Values, err error) {
@@ -214,10 +206,6 @@ type ProjectLogFetchPostParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectLogFetchPostParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r ProjectLogFetchPostParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectLogFetchPostParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -228,10 +216,6 @@ type ProjectLogInsertParams struct {
 	Events []shared.InsertProjectLogsEventParam `json:"events,omitzero,required"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectLogInsertParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r ProjectLogInsertParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectLogInsertParams

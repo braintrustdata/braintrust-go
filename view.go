@@ -145,10 +145,6 @@ type ViewNewParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ViewNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r ViewNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow ViewNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -182,10 +178,6 @@ type ViewGetParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ViewGetParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 // URLQuery serializes [ViewGetParams]'s query parameters as `url.Values`.
 func (r ViewGetParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
@@ -217,10 +209,6 @@ type ViewUpdateParams struct {
 	ViewType ViewUpdateParamsViewType `json:"view_type,omitzero"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ViewUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r ViewUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow ViewUpdateParams
@@ -279,10 +267,6 @@ type ViewListParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ViewListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 // URLQuery serializes [ViewListParams]'s query parameters as `url.Values`.
 func (r ViewListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
@@ -299,10 +283,6 @@ type ViewListParamsIDsUnion struct {
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u ViewListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 
 func (u *ViewListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -323,10 +303,6 @@ type ViewDeleteParams struct {
 	ObjectType shared.ACLObjectType `json:"object_type,omitzero,required"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ViewDeleteParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r ViewDeleteParams) MarshalJSON() (data []byte, err error) {
 	type shadow ViewDeleteParams
@@ -358,10 +334,6 @@ type ViewReplaceParams struct {
 	ViewData shared.ViewDataParam `json:"view_data,omitzero"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ViewReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r ViewReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow ViewReplaceParams

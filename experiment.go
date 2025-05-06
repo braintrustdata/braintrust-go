@@ -203,10 +203,6 @@ type ExperimentNewParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ExperimentNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r ExperimentNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow ExperimentNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -234,10 +230,6 @@ type ExperimentUpdateParams struct {
 	RepoInfo shared.RepoInfoParam `json:"repo_info,omitzero"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ExperimentUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r ExperimentUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow ExperimentUpdateParams
@@ -273,10 +265,6 @@ type ExperimentListParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ExperimentListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 // URLQuery serializes [ExperimentListParams]'s query parameters as `url.Values`.
 func (r ExperimentListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
@@ -294,10 +282,6 @@ type ExperimentListParamsIDsUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u ExperimentListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
-
 func (u *ExperimentListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
@@ -312,10 +296,6 @@ type ExperimentFeedbackParams struct {
 	Feedback []shared.FeedbackExperimentItemParam `json:"feedback,omitzero,required"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ExperimentFeedbackParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r ExperimentFeedbackParams) MarshalJSON() (data []byte, err error) {
 	type shadow ExperimentFeedbackParams
@@ -368,10 +348,6 @@ type ExperimentFetchParams struct {
 	Version param.Opt[string] `query:"version,omitzero" json:"-"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ExperimentFetchParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [ExperimentFetchParams]'s query parameters as `url.Values`.
 func (r ExperimentFetchParams) URLQuery() (v url.Values, err error) {
@@ -434,10 +410,6 @@ type ExperimentFetchPostParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ExperimentFetchPostParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r ExperimentFetchPostParams) MarshalJSON() (data []byte, err error) {
 	type shadow ExperimentFetchPostParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -448,10 +420,6 @@ type ExperimentInsertParams struct {
 	Events []shared.InsertExperimentEventParam `json:"events,omitzero,required"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ExperimentInsertParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r ExperimentInsertParams) MarshalJSON() (data []byte, err error) {
 	type shadow ExperimentInsertParams
@@ -469,10 +437,6 @@ type ExperimentSummarizeParams struct {
 	ComparisonExperimentID param.Opt[string] `query:"comparison_experiment_id,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ExperimentSummarizeParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [ExperimentSummarizeParams]'s query parameters as
 // `url.Values`.

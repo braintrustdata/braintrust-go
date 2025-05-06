@@ -137,10 +137,6 @@ type GroupNewParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f GroupNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r GroupNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow GroupNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -161,10 +157,6 @@ type GroupUpdateParams struct {
 	RemoveMemberUsers []string `json:"remove_member_users,omitzero" format:"uuid"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f GroupUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r GroupUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow GroupUpdateParams
@@ -196,10 +188,6 @@ type GroupListParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f GroupListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 // URLQuery serializes [GroupListParams]'s query parameters as `url.Values`.
 func (r GroupListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
@@ -216,10 +204,6 @@ type GroupListParamsIDsUnion struct {
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u GroupListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 
 func (u *GroupListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -248,10 +232,6 @@ type GroupReplaceParams struct {
 	MemberUsers []string `json:"member_users,omitzero" format:"uuid"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f GroupReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r GroupReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow GroupReplaceParams

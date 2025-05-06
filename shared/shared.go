@@ -31,8 +31,7 @@ type AISecret struct {
 	Type          string         `json:"type,nullable"`
 	// Date of last AI secret update
 	UpdatedAt time.Time `json:"updated_at,nullable" format:"date-time"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID            resp.Field
 		Name          resp.Field
@@ -98,8 +97,7 @@ type ACL struct {
 	// Id of the user the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID                 resp.Field
 		ObjectOrgID        resp.Field
@@ -145,8 +143,7 @@ type ACLBatchUpdateResponse struct {
 	// `restrict_object_type` in the ACL, as part of a direct permission grant or as
 	// part of a role.
 	RemovedACLs []ACL `json:"removed_acls,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		AddedACLs   resp.Field
 		RemovedACLs resp.Field
@@ -190,8 +187,7 @@ type APIKey struct {
 	OrgID string `json:"org_id,nullable" format:"uuid"`
 	// Unique identifier for the user
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID          resp.Field
 		Name        resp.Field
@@ -214,8 +210,7 @@ type ChatCompletionContentPartImage struct {
 	ImageURL ChatCompletionContentPartImageImageURL `json:"image_url,required"`
 	// Any of "image_url".
 	Type ChatCompletionContentPartImageType `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ImageURL    resp.Field
 		Type        resp.Field
@@ -235,17 +230,16 @@ func (r *ChatCompletionContentPartImage) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// ChatCompletionContentPartImageParam.IsOverridden()
+// ChatCompletionContentPartImageParam.Overrides()
 func (r ChatCompletionContentPartImage) ToParam() ChatCompletionContentPartImageParam {
-	return param.OverrideObj[ChatCompletionContentPartImageParam](r.RawJSON())
+	return param.Override[ChatCompletionContentPartImageParam](r.RawJSON())
 }
 
 type ChatCompletionContentPartImageImageURL struct {
 	URL string `json:"url,required"`
 	// Any of "auto", "low", "high".
 	Detail ChatCompletionContentPartImageImageURLDetail `json:"detail"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		URL         resp.Field
 		Detail      resp.Field
@@ -282,11 +276,6 @@ type ChatCompletionContentPartImageParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ChatCompletionContentPartImageParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r ChatCompletionContentPartImageParam) MarshalJSON() (data []byte, err error) {
 	type shadow ChatCompletionContentPartImageParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -300,11 +289,6 @@ type ChatCompletionContentPartImageImageURLParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ChatCompletionContentPartImageImageURLParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r ChatCompletionContentPartImageImageURLParam) MarshalJSON() (data []byte, err error) {
 	type shadow ChatCompletionContentPartImageImageURLParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -314,8 +298,7 @@ type ChatCompletionContentPartText struct {
 	// Any of "text".
 	Type ChatCompletionContentPartTextType `json:"type,required"`
 	Text string                            `json:"text"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Type        resp.Field
 		Text        resp.Field
@@ -335,9 +318,9 @@ func (r *ChatCompletionContentPartText) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// ChatCompletionContentPartTextParam.IsOverridden()
+// ChatCompletionContentPartTextParam.Overrides()
 func (r ChatCompletionContentPartText) ToParam() ChatCompletionContentPartTextParam {
-	return param.OverrideObj[ChatCompletionContentPartTextParam](r.RawJSON())
+	return param.Override[ChatCompletionContentPartTextParam](r.RawJSON())
 }
 
 type ChatCompletionContentPartTextType string
@@ -354,11 +337,6 @@ type ChatCompletionContentPartTextParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ChatCompletionContentPartTextParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r ChatCompletionContentPartTextParam) MarshalJSON() (data []byte, err error) {
 	type shadow ChatCompletionContentPartTextParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -369,8 +347,7 @@ type ChatCompletionMessageToolCall struct {
 	Function ChatCompletionMessageToolCallFunction `json:"function,required"`
 	// Any of "function".
 	Type ChatCompletionMessageToolCallType `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID          resp.Field
 		Function    resp.Field
@@ -391,16 +368,15 @@ func (r *ChatCompletionMessageToolCall) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// ChatCompletionMessageToolCallParam.IsOverridden()
+// ChatCompletionMessageToolCallParam.Overrides()
 func (r ChatCompletionMessageToolCall) ToParam() ChatCompletionMessageToolCallParam {
-	return param.OverrideObj[ChatCompletionMessageToolCallParam](r.RawJSON())
+	return param.Override[ChatCompletionMessageToolCallParam](r.RawJSON())
 }
 
 type ChatCompletionMessageToolCallFunction struct {
 	Arguments string `json:"arguments,required"`
 	Name      string `json:"name,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Arguments   resp.Field
 		Name        resp.Field
@@ -430,11 +406,6 @@ type ChatCompletionMessageToolCallParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ChatCompletionMessageToolCallParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r ChatCompletionMessageToolCallParam) MarshalJSON() (data []byte, err error) {
 	type shadow ChatCompletionMessageToolCallParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -447,11 +418,6 @@ type ChatCompletionMessageToolCallFunctionParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ChatCompletionMessageToolCallFunctionParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r ChatCompletionMessageToolCallFunctionParam) MarshalJSON() (data []byte, err error) {
 	type shadow ChatCompletionMessageToolCallFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -463,8 +429,7 @@ type CodeBundle struct {
 	RuntimeContext CodeBundleRuntimeContext `json:"runtime_context,required"`
 	// A preview of the code
 	Preview string `json:"preview,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		BundleID       resp.Field
 		Location       resp.Field
@@ -485,9 +450,9 @@ func (r *CodeBundle) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// CodeBundleParam.IsOverridden()
+// CodeBundleParam.Overrides()
 func (r CodeBundle) ToParam() CodeBundleParam {
-	return param.OverrideObj[CodeBundleParam](r.RawJSON())
+	return param.Override[CodeBundleParam](r.RawJSON())
 }
 
 // CodeBundleLocationUnion contains all possible properties and values from
@@ -533,8 +498,7 @@ type CodeBundleLocationExperiment struct {
 	Position CodeBundleLocationExperimentPositionUnion `json:"position,required"`
 	// Any of "experiment".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		EvalName    resp.Field
 		Position    resp.Field
@@ -586,8 +550,7 @@ func (r *CodeBundleLocationExperimentPositionUnion) UnmarshalJSON(data []byte) e
 type CodeBundleLocationExperimentPositionType struct {
 	// Any of "task".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Type        resp.Field
 		ExtraFields map[string]resp.Field
@@ -605,8 +568,7 @@ type CodeBundleLocationExperimentPositionScorer struct {
 	Index int64 `json:"index,required"`
 	// Any of "scorer".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Index       resp.Field
 		Type        resp.Field
@@ -625,8 +587,7 @@ type CodeBundleLocationFunction struct {
 	Index int64 `json:"index,required"`
 	// Any of "function".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Index       resp.Field
 		Type        resp.Field
@@ -645,8 +606,7 @@ type CodeBundleRuntimeContext struct {
 	// Any of "node", "python".
 	Runtime string `json:"runtime,required"`
 	Version string `json:"version,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Runtime     resp.Field
 		Version     resp.Field
@@ -671,9 +631,6 @@ type CodeBundleParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f CodeBundleParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r CodeBundleParam) MarshalJSON() (data []byte, err error) {
 	type shadow CodeBundleParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -688,9 +645,6 @@ type CodeBundleLocationUnionParam struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u CodeBundleLocationUnionParam) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 func (u CodeBundleLocationUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[CodeBundleLocationUnionParam](u.OfExperiment, u.OfFunction)
 }
@@ -747,11 +701,6 @@ type CodeBundleLocationExperimentParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f CodeBundleLocationExperimentParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r CodeBundleLocationExperimentParam) MarshalJSON() (data []byte, err error) {
 	type shadow CodeBundleLocationExperimentParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -772,11 +721,6 @@ type CodeBundleLocationExperimentPositionUnionParam struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u CodeBundleLocationExperimentPositionUnionParam) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u CodeBundleLocationExperimentPositionUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[CodeBundleLocationExperimentPositionUnionParam](u.OfCodeBundleLocationExperimentPositionType, u.OfScorer)
 }
@@ -815,11 +759,6 @@ type CodeBundleLocationExperimentPositionTypeParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f CodeBundleLocationExperimentPositionTypeParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r CodeBundleLocationExperimentPositionTypeParam) MarshalJSON() (data []byte, err error) {
 	type shadow CodeBundleLocationExperimentPositionTypeParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -839,11 +778,6 @@ type CodeBundleLocationExperimentPositionScorerParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f CodeBundleLocationExperimentPositionScorerParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r CodeBundleLocationExperimentPositionScorerParam) MarshalJSON() (data []byte, err error) {
 	type shadow CodeBundleLocationExperimentPositionScorerParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -863,9 +797,6 @@ type CodeBundleLocationFunctionParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f CodeBundleLocationFunctionParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r CodeBundleLocationFunctionParam) MarshalJSON() (data []byte, err error) {
 	type shadow CodeBundleLocationFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -885,9 +816,6 @@ type CodeBundleRuntimeContextParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f CodeBundleRuntimeContextParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r CodeBundleRuntimeContextParam) MarshalJSON() (data []byte, err error) {
 	type shadow CodeBundleRuntimeContextParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -913,8 +841,7 @@ type CreateAPIKeyOutput struct {
 	OrgID string `json:"org_id,nullable" format:"uuid"`
 	// Unique identifier for the user
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID          resp.Field
 		Key         resp.Field
@@ -938,8 +865,7 @@ func (r *CreateAPIKeyOutput) UnmarshalJSON(data []byte) error {
 type DataSummary struct {
 	// Total number of records in the dataset
 	TotalRecords int64 `json:"total_records,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		TotalRecords resp.Field
 		ExtraFields  map[string]resp.Field
@@ -970,8 +896,7 @@ type Dataset struct {
 	Metadata map[string]any `json:"metadata,nullable"`
 	// Identifies the user who created the dataset
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID          resp.Field
 		Name        resp.Field
@@ -1032,8 +957,7 @@ type DatasetEvent struct {
 	Origin ObjectReference `json:"origin,nullable"`
 	// A list of tags to log
 	Tags []string `json:"tags,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID          resp.Field
 		XactID      resp.Field
@@ -1068,8 +992,7 @@ type DatasetEventMetadata struct {
 	// The model used for this example
 	Model       string         `json:"model,nullable"`
 	ExtraFields map[string]any `json:",extras"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Model       resp.Field
 		ExtraFields map[string]resp.Field
@@ -1098,8 +1021,7 @@ type EnvVar struct {
 	Created time.Time `json:"created,nullable" format:"date-time"`
 	// Date the environment variable was last used
 	Used time.Time `json:"used,nullable" format:"date-time"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID          resp.Field
 		Name        resp.Field
@@ -1159,8 +1081,7 @@ type Experiment struct {
 	RepoInfo RepoInfo `json:"repo_info,nullable"`
 	// Identifies the user who created the experiment
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID             resp.Field
 		Name           resp.Field
@@ -1267,8 +1188,7 @@ type ExperimentEvent struct {
 	SpanParents []string `json:"span_parents,nullable"`
 	// A list of tags to log
 	Tags []string `json:"tags,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID             resp.Field
 		XactID         resp.Field
@@ -1313,8 +1233,7 @@ type ExperimentEventContext struct {
 	// Line of code where the experiment event was created
 	CallerLineno int64          `json:"caller_lineno,nullable"`
 	ExtraFields  map[string]any `json:",extras"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		CallerFilename     resp.Field
 		CallerFunctionname resp.Field
@@ -1339,8 +1258,7 @@ type ExperimentEventMetadata struct {
 	// The model used for this example
 	Model       string         `json:"model,nullable"`
 	ExtraFields map[string]any `json:",extras"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Model       resp.Field
 		ExtraFields map[string]resp.Field
@@ -1379,8 +1297,7 @@ type ExperimentEventMetrics struct {
 	// The total number of tokens in the input and output of the experiment event.
 	Tokens      int64              `json:"tokens,nullable"`
 	ExtraFields map[string]float64 `json:",extras"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		CallerFilename     resp.Field
 		CallerFunctionname resp.Field
@@ -1422,9 +1339,6 @@ type FeedbackDatasetItemParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FeedbackDatasetItemParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r FeedbackDatasetItemParam) MarshalJSON() (data []byte, err error) {
 	type shadow FeedbackDatasetItemParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1466,9 +1380,6 @@ type FeedbackExperimentItemParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FeedbackExperimentItemParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r FeedbackExperimentItemParam) MarshalJSON() (data []byte, err error) {
 	type shadow FeedbackExperimentItemParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1510,9 +1421,6 @@ type FeedbackProjectLogsItemParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FeedbackProjectLogsItemParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r FeedbackProjectLogsItemParam) MarshalJSON() (data []byte, err error) {
 	type shadow FeedbackProjectLogsItemParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1530,8 +1438,7 @@ const (
 type FeedbackResponseSchema struct {
 	// Any of "success".
 	Status FeedbackResponseSchemaStatus `json:"status,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Status      resp.Field
 		ExtraFields map[string]resp.Field
@@ -1559,8 +1466,7 @@ type FetchDatasetEventsResponse struct {
 	// Pass this string directly as the `cursor` param to your next fetch request to
 	// get the next page of results. Not provided if the returned result set is empty.
 	Cursor string `json:"cursor,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Events      resp.Field
 		Cursor      resp.Field
@@ -1583,8 +1489,7 @@ type FetchExperimentEventsResponse struct {
 	// Pass this string directly as the `cursor` param to your next fetch request to
 	// get the next page of results. Not provided if the returned result set is empty.
 	Cursor string `json:"cursor,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Events      resp.Field
 		Cursor      resp.Field
@@ -1607,8 +1512,7 @@ type FetchProjectLogsEventsResponse struct {
 	// Pass this string directly as the `cursor` param to your next fetch request to
 	// get the next page of results. Not provided if the returned result set is empty.
 	Cursor string `json:"cursor,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Events      resp.Field
 		Cursor      resp.Field
@@ -1659,8 +1563,7 @@ type Function struct {
 	PromptData PromptData `json:"prompt_data,nullable"`
 	// A list of tags for the prompt
 	Tags []string `json:"tags,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID             resp.Field
 		XactID         resp.Field
@@ -1733,8 +1636,7 @@ func (r *FunctionFunctionDataUnion) UnmarshalJSON(data []byte) error {
 type FunctionFunctionDataPrompt struct {
 	// Any of "prompt".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Type        resp.Field
 		ExtraFields map[string]resp.Field
@@ -1752,8 +1654,7 @@ type FunctionFunctionDataCode struct {
 	Data FunctionFunctionDataCodeDataUnion `json:"data,required"`
 	// Any of "code".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Data        resp.Field
 		Type        resp.Field
@@ -1837,8 +1738,7 @@ func (r *FunctionFunctionDataCodeDataUnionRuntimeContext) UnmarshalJSON(data []b
 type FunctionFunctionDataCodeDataBundle struct {
 	// Any of "bundle".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Type        resp.Field
 		ExtraFields map[string]resp.Field
@@ -1858,8 +1758,7 @@ type FunctionFunctionDataCodeDataInline struct {
 	RuntimeContext FunctionFunctionDataCodeDataInlineRuntimeContext `json:"runtime_context,required"`
 	// Any of "inline".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Code           resp.Field
 		RuntimeContext resp.Field
@@ -1879,8 +1778,7 @@ type FunctionFunctionDataCodeDataInlineRuntimeContext struct {
 	// Any of "node", "python".
 	Runtime string `json:"runtime,required"`
 	Version string `json:"version,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Runtime     resp.Field
 		Version     resp.Field
@@ -1899,8 +1797,7 @@ type FunctionFunctionDataGlobal struct {
 	Name string `json:"name,required"`
 	// Any of "global".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Name        resp.Field
 		Type        resp.Field
@@ -1926,8 +1823,7 @@ const (
 type FunctionFunctionSchema struct {
 	Parameters any `json:"parameters"`
 	Returns    any `json:"returns"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Parameters  resp.Field
 		Returns     resp.Field
@@ -1962,8 +1858,7 @@ type FunctionOrigin struct {
 	// The function exists for internal purposes and should not be displayed in the
 	// list of functions.
 	Internal bool `json:"internal,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ObjectID    resp.Field
 		ObjectType  resp.Field
@@ -2007,8 +1902,7 @@ type Group struct {
 	MemberUsers []string `json:"member_users,nullable" format:"uuid"`
 	// Identifies the user who created the group
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID           resp.Field
 		Name         resp.Field
@@ -2152,9 +2046,6 @@ type InsertDatasetEventParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f InsertDatasetEventParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r InsertDatasetEventParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertDatasetEventParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -2168,24 +2059,20 @@ func (r InsertDatasetEventParam) MarshalJSON() (data []byte, err error) {
 type InsertDatasetEventMetadataParam struct {
 	// The model used for this example
 	Model       param.Opt[string] `json:"model,omitzero"`
-	ExtraFields map[string]any    `json:"-,extras"`
+	ExtraFields map[string]any    `json:"-"`
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f InsertDatasetEventMetadataParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r InsertDatasetEventMetadataParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertDatasetEventMetadataParam
-	return param.MarshalObject(r, (*shadow)(&r))
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
 }
 
 type InsertEventsResponse struct {
 	// The ids of all rows that were inserted, aligning one-to-one with the rows
 	// provided as input
 	RowIDs []string `json:"row_ids,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		RowIDs      resp.Field
 		ExtraFields map[string]resp.Field
@@ -2357,9 +2244,6 @@ type InsertExperimentEventParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f InsertExperimentEventParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r InsertExperimentEventParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertExperimentEventParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -2376,18 +2260,13 @@ type InsertExperimentEventContextParam struct {
 	CallerFunctionname param.Opt[string] `json:"caller_functionname,omitzero"`
 	// Line of code where the experiment event was created
 	CallerLineno param.Opt[int64] `json:"caller_lineno,omitzero"`
-	ExtraFields  map[string]any   `json:"-,extras"`
+	ExtraFields  map[string]any   `json:"-"`
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f InsertExperimentEventContextParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r InsertExperimentEventContextParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertExperimentEventContextParam
-	return param.MarshalObject(r, (*shadow)(&r))
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
 }
 
 // A dictionary with additional data about the test example, model outputs, or just
@@ -2398,18 +2277,13 @@ func (r InsertExperimentEventContextParam) MarshalJSON() (data []byte, err error
 type InsertExperimentEventMetadataParam struct {
 	// The model used for this example
 	Model       param.Opt[string] `json:"model,omitzero"`
-	ExtraFields map[string]any    `json:"-,extras"`
+	ExtraFields map[string]any    `json:"-"`
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f InsertExperimentEventMetadataParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r InsertExperimentEventMetadataParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertExperimentEventMetadataParam
-	return param.MarshalObject(r, (*shadow)(&r))
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
 }
 
 // Metrics are numerical measurements tracking the execution of the code that
@@ -2436,18 +2310,13 @@ type InsertExperimentEventMetricsParam struct {
 	CallerFunctionname any `json:"caller_functionname,omitzero"`
 	// This metric is deprecated
 	CallerLineno any                `json:"caller_lineno,omitzero"`
-	ExtraFields  map[string]float64 `json:"-,extras"`
+	ExtraFields  map[string]float64 `json:"-"`
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f InsertExperimentEventMetricsParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r InsertExperimentEventMetricsParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertExperimentEventMetricsParam
-	return param.MarshalObject(r, (*shadow)(&r))
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
 }
 
 // A project logs event
@@ -2604,9 +2473,6 @@ type InsertProjectLogsEventParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f InsertProjectLogsEventParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r InsertProjectLogsEventParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertProjectLogsEventParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -2623,18 +2489,13 @@ type InsertProjectLogsEventContextParam struct {
 	CallerFunctionname param.Opt[string] `json:"caller_functionname,omitzero"`
 	// Line of code where the project logs event was created
 	CallerLineno param.Opt[int64] `json:"caller_lineno,omitzero"`
-	ExtraFields  map[string]any   `json:"-,extras"`
+	ExtraFields  map[string]any   `json:"-"`
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f InsertProjectLogsEventContextParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r InsertProjectLogsEventContextParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertProjectLogsEventContextParam
-	return param.MarshalObject(r, (*shadow)(&r))
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
 }
 
 // A dictionary with additional data about the test example, model outputs, or just
@@ -2645,18 +2506,13 @@ func (r InsertProjectLogsEventContextParam) MarshalJSON() (data []byte, err erro
 type InsertProjectLogsEventMetadataParam struct {
 	// The model used for this example
 	Model       param.Opt[string] `json:"model,omitzero"`
-	ExtraFields map[string]any    `json:"-,extras"`
+	ExtraFields map[string]any    `json:"-"`
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f InsertProjectLogsEventMetadataParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r InsertProjectLogsEventMetadataParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertProjectLogsEventMetadataParam
-	return param.MarshalObject(r, (*shadow)(&r))
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
 }
 
 // Metrics are numerical measurements tracking the execution of the code that
@@ -2683,18 +2539,13 @@ type InsertProjectLogsEventMetricsParam struct {
 	CallerFunctionname any `json:"caller_functionname,omitzero"`
 	// This metric is deprecated
 	CallerLineno any                `json:"caller_lineno,omitzero"`
-	ExtraFields  map[string]float64 `json:"-,extras"`
+	ExtraFields  map[string]float64 `json:"-"`
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f InsertProjectLogsEventMetricsParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r InsertProjectLogsEventMetricsParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertProjectLogsEventMetricsParam
-	return param.MarshalObject(r, (*shadow)(&r))
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
 }
 
 // Summary of a metric's performance
@@ -2711,8 +2562,7 @@ type MetricSummary struct {
 	Unit string `json:"unit,required"`
 	// Difference in metric between the current and comparison experiment
 	Diff float64 `json:"diff"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Improvements resp.Field
 		Metric       resp.Field
@@ -2746,8 +2596,7 @@ type ObjectReference struct {
 	ObjectType ObjectReferenceObjectType `json:"object_type,required"`
 	// Created timestamp of the original event. Used to help sort in the UI
 	Created string `json:"created,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID          resp.Field
 		XactID      resp.Field
@@ -2769,9 +2618,9 @@ func (r *ObjectReference) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// ObjectReferenceParam.IsOverridden()
+// ObjectReferenceParam.Overrides()
 func (r ObjectReference) ToParam() ObjectReferenceParam {
-	return param.OverrideObj[ObjectReferenceParam](r.RawJSON())
+	return param.Override[ObjectReferenceParam](r.RawJSON())
 }
 
 // Type of the object the event is originating from.
@@ -2806,9 +2655,6 @@ type ObjectReferenceParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ObjectReferenceParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r ObjectReferenceParam) MarshalJSON() (data []byte, err error) {
 	type shadow ObjectReferenceParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -2823,8 +2669,7 @@ type OnlineScoreConfig struct {
 	ApplyToRootSpan bool `json:"apply_to_root_span,nullable"`
 	// Trigger online scoring on any spans with a name in this list
 	ApplyToSpanNames []string `json:"apply_to_span_names,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		SamplingRate     resp.Field
 		Scorers          resp.Field
@@ -2845,9 +2690,9 @@ func (r *OnlineScoreConfig) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// OnlineScoreConfigParam.IsOverridden()
+// OnlineScoreConfigParam.Overrides()
 func (r OnlineScoreConfig) ToParam() OnlineScoreConfigParam {
-	return param.OverrideObj[OnlineScoreConfigParam](r.RawJSON())
+	return param.Override[OnlineScoreConfigParam](r.RawJSON())
 }
 
 // OnlineScoreConfigScorerUnion contains all possible properties and values from
@@ -2889,8 +2734,7 @@ type OnlineScoreConfigScorerFunction struct {
 	ID string `json:"id,required"`
 	// Any of "function".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID          resp.Field
 		Type        resp.Field
@@ -2909,8 +2753,7 @@ type OnlineScoreConfigScorerGlobal struct {
 	Name string `json:"name,required"`
 	// Any of "global".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Name        resp.Field
 		Type        resp.Field
@@ -2938,9 +2781,6 @@ type OnlineScoreConfigParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f OnlineScoreConfigParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r OnlineScoreConfigParam) MarshalJSON() (data []byte, err error) {
 	type shadow OnlineScoreConfigParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -2955,11 +2795,6 @@ type OnlineScoreConfigScorerUnionParam struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u OnlineScoreConfigScorerUnionParam) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u OnlineScoreConfigScorerUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[OnlineScoreConfigScorerUnionParam](u.OfFunction, u.OfGlobal)
 }
@@ -3007,11 +2842,6 @@ type OnlineScoreConfigScorerFunctionParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f OnlineScoreConfigScorerFunctionParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r OnlineScoreConfigScorerFunctionParam) MarshalJSON() (data []byte, err error) {
 	type shadow OnlineScoreConfigScorerFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -3031,11 +2861,6 @@ type OnlineScoreConfigScorerGlobalParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f OnlineScoreConfigScorerGlobalParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r OnlineScoreConfigScorerGlobalParam) MarshalJSON() (data []byte, err error) {
 	type shadow OnlineScoreConfigScorerGlobalParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -3058,8 +2883,7 @@ type Organization struct {
 	IsUniversalAPI bool      `json:"is_universal_api,nullable"`
 	ProxyURL       string    `json:"proxy_url,nullable"`
 	RealtimeURL    string    `json:"realtime_url,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID             resp.Field
 		Name           resp.Field
@@ -3087,8 +2911,7 @@ type PatchOrganizationMembersOutput struct {
 	// If invite emails failed to send for some reason, the patch operation will still
 	// complete, but we will return an error message here
 	SendEmailError string `json:"send_email_error,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		OrgID          resp.Field
 		Status         resp.Field
@@ -3141,8 +2964,7 @@ type Project struct {
 	Settings  ProjectSettings `json:"settings,nullable"`
 	// Identifies the user who created the project
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID          resp.Field
 		Name        resp.Field
@@ -3242,8 +3064,7 @@ type ProjectLogsEvent struct {
 	SpanParents []string `json:"span_parents,nullable"`
 	// A list of tags to log
 	Tags []string `json:"tags,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID             resp.Field
 		XactID         resp.Field
@@ -3296,8 +3117,7 @@ type ProjectLogsEventContext struct {
 	// Line of code where the project logs event was created
 	CallerLineno int64          `json:"caller_lineno,nullable"`
 	ExtraFields  map[string]any `json:",extras"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		CallerFilename     resp.Field
 		CallerFunctionname resp.Field
@@ -3322,8 +3142,7 @@ type ProjectLogsEventMetadata struct {
 	// The model used for this example
 	Model       string         `json:"model,nullable"`
 	ExtraFields map[string]any `json:",extras"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Model       resp.Field
 		ExtraFields map[string]resp.Field
@@ -3362,8 +3181,7 @@ type ProjectLogsEventMetrics struct {
 	// The total number of tokens in the input and output of the project logs event.
 	Tokens      int64              `json:"tokens,nullable"`
 	ExtraFields map[string]float64 `json:",extras"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		CallerFilename     resp.Field
 		CallerFunctionname resp.Field
@@ -3409,8 +3227,7 @@ type ProjectScore struct {
 	// An optional LexoRank-based string that sets the sort position for the score in
 	// the UI
 	Position string `json:"position,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID          resp.Field
 		Name        resp.Field
@@ -3476,8 +3293,7 @@ type ProjectScoreCategory struct {
 	Name string `json:"name,required"`
 	// Numerical value of the category. Must be between 0 and 1, inclusive
 	Value float64 `json:"value,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Name        resp.Field
 		Value       resp.Field
@@ -3496,9 +3312,9 @@ func (r *ProjectScoreCategory) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// ProjectScoreCategoryParam.IsOverridden()
+// ProjectScoreCategoryParam.Overrides()
 func (r ProjectScoreCategory) ToParam() ProjectScoreCategoryParam {
-	return param.OverrideObj[ProjectScoreCategoryParam](r.RawJSON())
+	return param.Override[ProjectScoreCategoryParam](r.RawJSON())
 }
 
 // For categorical-type project scores, defines a single category
@@ -3512,9 +3328,6 @@ type ProjectScoreCategoryParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectScoreCategoryParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r ProjectScoreCategoryParam) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectScoreCategoryParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -3524,8 +3337,7 @@ type ProjectScoreConfig struct {
 	Destination string            `json:"destination,nullable"`
 	MultiSelect bool              `json:"multi_select,nullable"`
 	Online      OnlineScoreConfig `json:"online,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Destination resp.Field
 		MultiSelect resp.Field
@@ -3545,9 +3357,9 @@ func (r *ProjectScoreConfig) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// ProjectScoreConfigParam.IsOverridden()
+// ProjectScoreConfigParam.Overrides()
 func (r ProjectScoreConfig) ToParam() ProjectScoreConfigParam {
-	return param.OverrideObj[ProjectScoreConfigParam](r.RawJSON())
+	return param.Override[ProjectScoreConfigParam](r.RawJSON())
 }
 
 type ProjectScoreConfigParam struct {
@@ -3557,9 +3369,6 @@ type ProjectScoreConfigParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectScoreConfigParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r ProjectScoreConfigParam) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectScoreConfigParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -3585,8 +3394,7 @@ type ProjectSettings struct {
 	ComparisonKey string `json:"comparison_key,nullable"`
 	// The order of the fields to display in the trace view
 	SpanFieldOrder []ProjectSettingsSpanFieldOrder `json:"spanFieldOrder,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		BaselineExperimentID resp.Field
 		ComparisonKey        resp.Field
@@ -3606,9 +3414,9 @@ func (r *ProjectSettings) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// ProjectSettingsParam.IsOverridden()
+// ProjectSettingsParam.Overrides()
 func (r ProjectSettings) ToParam() ProjectSettingsParam {
-	return param.OverrideObj[ProjectSettingsParam](r.RawJSON())
+	return param.Override[ProjectSettingsParam](r.RawJSON())
 }
 
 type ProjectSettingsSpanFieldOrder struct {
@@ -3617,8 +3425,7 @@ type ProjectSettingsSpanFieldOrder struct {
 	Position   string `json:"position,required"`
 	// Any of "full", "two_column".
 	Layout ProjectSettingsSpanFieldOrderLayout `json:"layout,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ColumnID    resp.Field
 		ObjectType  resp.Field
@@ -3652,9 +3459,6 @@ type ProjectSettingsParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectSettingsParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r ProjectSettingsParam) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectSettingsParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -3670,11 +3474,6 @@ type ProjectSettingsSpanFieldOrderParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ProjectSettingsSpanFieldOrderParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r ProjectSettingsSpanFieldOrderParam) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectSettingsSpanFieldOrderParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -3696,8 +3495,7 @@ type ProjectTag struct {
 	Created time.Time `json:"created,nullable" format:"date-time"`
 	// Textual description of the project tag
 	Description string `json:"description,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID          resp.Field
 		Name        resp.Field
@@ -3749,8 +3547,7 @@ type Prompt struct {
 	PromptData PromptData `json:"prompt_data,nullable"`
 	// A list of tags for the prompt
 	Tags []string `json:"tags,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID           resp.Field
 		XactID       resp.Field
@@ -3799,8 +3596,7 @@ type PromptData struct {
 	Parser        PromptDataParser              `json:"parser,nullable"`
 	Prompt        PromptDataPromptUnion         `json:"prompt,nullable"`
 	ToolFunctions []PromptDataToolFunctionUnion `json:"tool_functions,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Options       resp.Field
 		Origin        resp.Field
@@ -3822,17 +3618,16 @@ func (r *PromptData) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// PromptDataParam.IsOverridden()
+// PromptDataParam.Overrides()
 func (r PromptData) ToParam() PromptDataParam {
-	return param.OverrideObj[PromptDataParam](r.RawJSON())
+	return param.Override[PromptDataParam](r.RawJSON())
 }
 
 type PromptDataOrigin struct {
 	ProjectID     string `json:"project_id"`
 	PromptID      string `json:"prompt_id"`
 	PromptVersion string `json:"prompt_version"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ProjectID     resp.Field
 		PromptID      resp.Field
@@ -3853,8 +3648,7 @@ type PromptDataParser struct {
 	// Any of "llm_classifier".
 	Type   string `json:"type,required"`
 	UseCot bool   `json:"use_cot,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ChoiceScores resp.Field
 		Type         resp.Field
@@ -3912,8 +3706,7 @@ type PromptDataPromptCompletion struct {
 	Content string `json:"content,required"`
 	// Any of "completion".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Content     resp.Field
 		Type        resp.Field
@@ -3933,8 +3726,7 @@ type PromptDataPromptChat struct {
 	// Any of "chat".
 	Type  string `json:"type,required"`
 	Tools string `json:"tools"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Messages    resp.Field
 		Type        resp.Field
@@ -4048,8 +3840,7 @@ type PromptDataPromptChatMessageSystem struct {
 	Role    string `json:"role,required"`
 	Content string `json:"content"`
 	Name    string `json:"name"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Role        resp.Field
 		Content     resp.Field
@@ -4070,8 +3861,7 @@ type PromptDataPromptChatMessageUser struct {
 	Role    string                                      `json:"role,required"`
 	Content PromptDataPromptChatMessageUserContentUnion `json:"content"`
 	Name    string                                      `json:"name"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Role        resp.Field
 		Content     resp.Field
@@ -4167,8 +3957,7 @@ type PromptDataPromptChatMessageAssistant struct {
 	FunctionCall PromptDataPromptChatMessageAssistantFunctionCall `json:"function_call,nullable"`
 	Name         string                                           `json:"name,nullable"`
 	ToolCalls    []ChatCompletionMessageToolCall                  `json:"tool_calls,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Role         resp.Field
 		Content      resp.Field
@@ -4189,8 +3978,7 @@ func (r *PromptDataPromptChatMessageAssistant) UnmarshalJSON(data []byte) error 
 type PromptDataPromptChatMessageAssistantFunctionCall struct {
 	Arguments string `json:"arguments,required"`
 	Name      string `json:"name,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Arguments   resp.Field
 		Name        resp.Field
@@ -4210,8 +3998,7 @@ type PromptDataPromptChatMessageTool struct {
 	Role       string `json:"role,required"`
 	Content    string `json:"content"`
 	ToolCallID string `json:"tool_call_id"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Role        resp.Field
 		Content     resp.Field
@@ -4232,8 +4019,7 @@ type PromptDataPromptChatMessageFunction struct {
 	// Any of "function".
 	Role    string `json:"role,required"`
 	Content string `json:"content"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Name        resp.Field
 		Role        resp.Field
@@ -4253,8 +4039,7 @@ type PromptDataPromptChatMessageFallback struct {
 	// Any of "model".
 	Role    string `json:"role,required"`
 	Content string `json:"content,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Role        resp.Field
 		Content     resp.Field
@@ -4308,8 +4093,7 @@ type PromptDataToolFunctionFunction struct {
 	ID string `json:"id,required"`
 	// Any of "function".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID          resp.Field
 		Type        resp.Field
@@ -4328,8 +4112,7 @@ type PromptDataToolFunctionGlobal struct {
 	Name string `json:"name,required"`
 	// Any of "global".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Name        resp.Field
 		Type        resp.Field
@@ -4354,9 +4137,6 @@ type PromptDataParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptDataParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r PromptDataParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -4369,9 +4149,6 @@ type PromptDataOriginParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptDataOriginParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r PromptDataOriginParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataOriginParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -4386,9 +4163,6 @@ type PromptDataParserParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptDataParserParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r PromptDataParserParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataParserParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -4409,9 +4183,6 @@ type PromptDataPromptUnionParam struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u PromptDataPromptUnionParam) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 func (u PromptDataPromptUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptDataPromptUnionParam](u.OfCompletion, u.OfChat)
 }
@@ -4443,7 +4214,7 @@ func (u PromptDataPromptUnionParam) GetMessages() []PromptDataPromptChatMessageU
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u PromptDataPromptUnionParam) GetTools() *string {
-	if vt := u.OfChat; vt != nil && vt.Tools.IsPresent() {
+	if vt := u.OfChat; vt != nil && vt.Tools.Valid() {
 		return &vt.Tools.Value
 	}
 	return nil
@@ -4467,9 +4238,6 @@ type PromptDataPromptCompletionParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptDataPromptCompletionParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r PromptDataPromptCompletionParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataPromptCompletionParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -4490,9 +4258,6 @@ type PromptDataPromptChatParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptDataPromptChatParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r PromptDataPromptChatParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataPromptChatParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -4517,11 +4282,6 @@ type PromptDataPromptChatMessageUnionParam struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u PromptDataPromptChatMessageUnionParam) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u PromptDataPromptChatMessageUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptDataPromptChatMessageUnionParam](u.OfSystem,
 		u.OfUser,
@@ -4566,7 +4326,7 @@ func (u PromptDataPromptChatMessageUnionParam) GetToolCalls() []ChatCompletionMe
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u PromptDataPromptChatMessageUnionParam) GetToolCallID() *string {
-	if vt := u.OfTool; vt != nil && vt.ToolCallID.IsPresent() {
+	if vt := u.OfTool; vt != nil && vt.ToolCallID.Valid() {
 		return &vt.ToolCallID.Value
 	}
 	return nil
@@ -4592,11 +4352,11 @@ func (u PromptDataPromptChatMessageUnionParam) GetRole() *string {
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u PromptDataPromptChatMessageUnionParam) GetName() *string {
-	if vt := u.OfSystem; vt != nil && vt.Name.IsPresent() {
+	if vt := u.OfSystem; vt != nil && vt.Name.Valid() {
 		return &vt.Name.Value
-	} else if vt := u.OfUser; vt != nil && vt.Name.IsPresent() {
+	} else if vt := u.OfUser; vt != nil && vt.Name.Valid() {
 		return &vt.Name.Value
-	} else if vt := u.OfAssistant; vt != nil && vt.Name.IsPresent() {
+	} else if vt := u.OfAssistant; vt != nil && vt.Name.Valid() {
 		return &vt.Name.Value
 	} else if vt := u.OfFunction; vt != nil {
 		return (*string)(&vt.Name)
@@ -4608,17 +4368,17 @@ func (u PromptDataPromptChatMessageUnionParam) GetName() *string {
 //
 // Or use AsAny() to get the underlying value
 func (u PromptDataPromptChatMessageUnionParam) GetContent() (res promptDataPromptChatMessageUnionParamContent) {
-	if vt := u.OfSystem; vt != nil && vt.Content.IsPresent() {
+	if vt := u.OfSystem; vt != nil && vt.Content.Valid() {
 		res.any = &vt.Content.Value
 	} else if vt := u.OfUser; vt != nil {
 		res.any = vt.Content.asAny()
-	} else if vt := u.OfAssistant; vt != nil && vt.Content.IsPresent() {
+	} else if vt := u.OfAssistant; vt != nil && vt.Content.Valid() {
 		res.any = &vt.Content.Value
-	} else if vt := u.OfTool; vt != nil && vt.Content.IsPresent() {
+	} else if vt := u.OfTool; vt != nil && vt.Content.Valid() {
 		res.any = &vt.Content.Value
-	} else if vt := u.OfFunction; vt != nil && vt.Content.IsPresent() {
+	} else if vt := u.OfFunction; vt != nil && vt.Content.Valid() {
 		res.any = &vt.Content.Value
-	} else if vt := u.OfFallback; vt != nil && vt.Content.IsPresent() {
+	} else if vt := u.OfFallback; vt != nil && vt.Content.Valid() {
 		res.any = &vt.Content.Value
 	}
 	return
@@ -4647,11 +4407,6 @@ type PromptDataPromptChatMessageSystemParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptDataPromptChatMessageSystemParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptDataPromptChatMessageSystemParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataPromptChatMessageSystemParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -4672,11 +4427,6 @@ type PromptDataPromptChatMessageUserParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptDataPromptChatMessageUserParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptDataPromptChatMessageUserParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataPromptChatMessageUserParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -4697,11 +4447,6 @@ type PromptDataPromptChatMessageUserContentUnionParam struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u PromptDataPromptChatMessageUserContentUnionParam) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u PromptDataPromptChatMessageUserContentUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptDataPromptChatMessageUserContentUnionParam](u.OfString, u.OfArray)
 }
@@ -4724,11 +4469,6 @@ type PromptDataPromptChatMessageUserContentArrayItemUnionParam struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u PromptDataPromptChatMessageUserContentArrayItemUnionParam) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u PromptDataPromptChatMessageUserContentArrayItemUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptDataPromptChatMessageUserContentArrayItemUnionParam](u.OfText, u.OfImageURL)
 }
@@ -4744,7 +4484,7 @@ func (u *PromptDataPromptChatMessageUserContentArrayItemUnionParam) asAny() any 
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u PromptDataPromptChatMessageUserContentArrayItemUnionParam) GetText() *string {
-	if vt := u.OfText; vt != nil && vt.Text.IsPresent() {
+	if vt := u.OfText; vt != nil && vt.Text.Valid() {
 		return &vt.Text.Value
 	}
 	return nil
@@ -4779,11 +4519,6 @@ type PromptDataPromptChatMessageAssistantParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptDataPromptChatMessageAssistantParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptDataPromptChatMessageAssistantParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataPromptChatMessageAssistantParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -4802,11 +4537,6 @@ type PromptDataPromptChatMessageAssistantFunctionCallParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptDataPromptChatMessageAssistantFunctionCallParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptDataPromptChatMessageAssistantFunctionCallParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataPromptChatMessageAssistantFunctionCallParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -4821,11 +4551,6 @@ type PromptDataPromptChatMessageToolParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptDataPromptChatMessageToolParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptDataPromptChatMessageToolParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataPromptChatMessageToolParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -4846,11 +4571,6 @@ type PromptDataPromptChatMessageFunctionParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptDataPromptChatMessageFunctionParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptDataPromptChatMessageFunctionParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataPromptChatMessageFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -4870,11 +4590,6 @@ type PromptDataPromptChatMessageFallbackParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptDataPromptChatMessageFallbackParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptDataPromptChatMessageFallbackParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataPromptChatMessageFallbackParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -4895,9 +4610,6 @@ type PromptDataToolFunctionUnionParam struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u PromptDataToolFunctionUnionParam) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 func (u PromptDataToolFunctionUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptDataToolFunctionUnionParam](u.OfFunction, u.OfGlobal)
 }
@@ -4945,11 +4657,6 @@ type PromptDataToolFunctionFunctionParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptDataToolFunctionFunctionParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptDataToolFunctionFunctionParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataToolFunctionFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -4969,11 +4676,6 @@ type PromptDataToolFunctionGlobalParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptDataToolFunctionGlobalParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptDataToolFunctionGlobalParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataToolFunctionGlobalParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -4989,8 +4691,7 @@ type PromptOptions struct {
 	Model    string                   `json:"model"`
 	Params   PromptOptionsParamsUnion `json:"params"`
 	Position string                   `json:"position"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Model       resp.Field
 		Params      resp.Field
@@ -5010,9 +4711,9 @@ func (r *PromptOptions) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// PromptOptionsParam.IsOverridden()
+// PromptOptionsParam.Overrides()
 func (r PromptOptions) ToParam() PromptOptionsParam {
-	return param.OverrideObj[PromptOptionsParam](r.RawJSON())
+	return param.Override[PromptOptionsParam](r.RawJSON())
 }
 
 // PromptOptionsParamsUnion contains all possible properties and values from
@@ -5123,8 +4824,7 @@ type PromptOptionsParamsOpenAIModelParams struct {
 	ToolChoice      PromptOptionsParamsOpenAIModelParamsToolChoiceUnion     `json:"tool_choice"`
 	TopP            float64                                                 `json:"top_p"`
 	UseCache        bool                                                    `json:"use_cache"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		FrequencyPenalty    resp.Field
 		FunctionCall        resp.Field
@@ -5199,8 +4899,7 @@ const (
 
 type PromptOptionsParamsOpenAIModelParamsFunctionCallFunction struct {
 	Name string `json:"name,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Name        resp.Field
 		ExtraFields map[string]resp.Field
@@ -5258,8 +4957,7 @@ func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatUnion) UnmarshalJSON(
 type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject struct {
 	// Any of "json_object".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Type        resp.Field
 		ExtraFields map[string]resp.Field
@@ -5279,8 +4977,7 @@ type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema struct {
 	JsonSchema PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema `json:"json_schema,required"`
 	// Any of "json_schema".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		JsonSchema  resp.Field
 		Type        resp.Field
@@ -5302,8 +4999,7 @@ type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema stru
 	Description string `json:"description"`
 	Schema      string `json:"schema"`
 	Strict      bool   `json:"strict,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Name        resp.Field
 		Description resp.Field
@@ -5325,8 +5021,7 @@ func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema)
 type PromptOptionsParamsOpenAIModelParamsResponseFormatText struct {
 	// Any of "text".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Type        resp.Field
 		ExtraFields map[string]resp.Field
@@ -5396,8 +5091,7 @@ type PromptOptionsParamsOpenAIModelParamsToolChoiceFunction struct {
 	Function PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction `json:"function,required"`
 	// Any of "function".
 	Type string `json:"type,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Function    resp.Field
 		Type        resp.Field
@@ -5414,8 +5108,7 @@ func (r *PromptOptionsParamsOpenAIModelParamsToolChoiceFunction) UnmarshalJSON(d
 
 type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction struct {
 	Name string `json:"name,required"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Name        resp.Field
 		ExtraFields map[string]resp.Field
@@ -5440,8 +5133,7 @@ type PromptOptionsParamsAnthropicModelParams struct {
 	TopK              float64  `json:"top_k"`
 	TopP              float64  `json:"top_p"`
 	UseCache          bool     `json:"use_cache"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		MaxTokens         resp.Field
 		Temperature       resp.Field
@@ -5467,8 +5159,7 @@ type PromptOptionsParamsGoogleModelParams struct {
 	TopK            float64 `json:"topK"`
 	TopP            float64 `json:"topP"`
 	UseCache        bool    `json:"use_cache"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		MaxOutputTokens resp.Field
 		Temperature     resp.Field
@@ -5490,8 +5181,7 @@ type PromptOptionsParamsWindowAIModelParams struct {
 	Temperature float64 `json:"temperature"`
 	TopK        float64 `json:"topK"`
 	UseCache    bool    `json:"use_cache"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Temperature resp.Field
 		TopK        resp.Field
@@ -5509,8 +5199,7 @@ func (r *PromptOptionsParamsWindowAIModelParams) UnmarshalJSON(data []byte) erro
 
 type PromptOptionsParamsJsCompletionParams struct {
 	UseCache bool `json:"use_cache"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		UseCache    resp.Field
 		ExtraFields map[string]resp.Field
@@ -5531,9 +5220,6 @@ type PromptOptionsParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptOptionsParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r PromptOptionsParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -5551,9 +5237,6 @@ type PromptOptionsParamsUnionParam struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u PromptOptionsParamsUnionParam) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 func (u PromptOptionsParamsUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptOptionsParamsUnionParam](u.OfOpenAIModels,
 		u.OfAnthropicModels,
@@ -5579,7 +5262,7 @@ func (u *PromptOptionsParamsUnionParam) asAny() any {
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u PromptOptionsParamsUnionParam) GetFrequencyPenalty() *float64 {
-	if vt := u.OfOpenAIModels; vt != nil && vt.FrequencyPenalty.IsPresent() {
+	if vt := u.OfOpenAIModels; vt != nil && vt.FrequencyPenalty.Valid() {
 		return &vt.FrequencyPenalty.Value
 	}
 	return nil
@@ -5595,7 +5278,7 @@ func (u PromptOptionsParamsUnionParam) GetFunctionCall() *PromptOptionsParamsOpe
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u PromptOptionsParamsUnionParam) GetMaxCompletionTokens() *float64 {
-	if vt := u.OfOpenAIModels; vt != nil && vt.MaxCompletionTokens.IsPresent() {
+	if vt := u.OfOpenAIModels; vt != nil && vt.MaxCompletionTokens.Valid() {
 		return &vt.MaxCompletionTokens.Value
 	}
 	return nil
@@ -5603,7 +5286,7 @@ func (u PromptOptionsParamsUnionParam) GetMaxCompletionTokens() *float64 {
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u PromptOptionsParamsUnionParam) GetN() *float64 {
-	if vt := u.OfOpenAIModels; vt != nil && vt.N.IsPresent() {
+	if vt := u.OfOpenAIModels; vt != nil && vt.N.Valid() {
 		return &vt.N.Value
 	}
 	return nil
@@ -5611,7 +5294,7 @@ func (u PromptOptionsParamsUnionParam) GetN() *float64 {
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u PromptOptionsParamsUnionParam) GetPresencePenalty() *float64 {
-	if vt := u.OfOpenAIModels; vt != nil && vt.PresencePenalty.IsPresent() {
+	if vt := u.OfOpenAIModels; vt != nil && vt.PresencePenalty.Valid() {
 		return &vt.PresencePenalty.Value
 	}
 	return nil
@@ -5651,7 +5334,7 @@ func (u PromptOptionsParamsUnionParam) GetToolChoice() *PromptOptionsParamsOpenA
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u PromptOptionsParamsUnionParam) GetMaxTokensToSample() *float64 {
-	if vt := u.OfAnthropicModels; vt != nil && vt.MaxTokensToSample.IsPresent() {
+	if vt := u.OfAnthropicModels; vt != nil && vt.MaxTokensToSample.Valid() {
 		return &vt.MaxTokensToSample.Value
 	}
 	return nil
@@ -5667,7 +5350,7 @@ func (u PromptOptionsParamsUnionParam) GetStopSequences() []string {
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u PromptOptionsParamsUnionParam) GetMaxOutputTokens() *float64 {
-	if vt := u.OfGoogleModels; vt != nil && vt.MaxOutputTokens.IsPresent() {
+	if vt := u.OfGoogleModels; vt != nil && vt.MaxOutputTokens.Valid() {
 		return &vt.MaxOutputTokens.Value
 	}
 	return nil
@@ -5675,7 +5358,7 @@ func (u PromptOptionsParamsUnionParam) GetMaxOutputTokens() *float64 {
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u PromptOptionsParamsUnionParam) GetMaxTokens() *float64 {
-	if vt := u.OfOpenAIModels; vt != nil && vt.MaxTokens.IsPresent() {
+	if vt := u.OfOpenAIModels; vt != nil && vt.MaxTokens.Valid() {
 		return &vt.MaxTokens.Value
 	} else if vt := u.OfAnthropicModels; vt != nil {
 		return (*float64)(&vt.MaxTokens)
@@ -5685,13 +5368,13 @@ func (u PromptOptionsParamsUnionParam) GetMaxTokens() *float64 {
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u PromptOptionsParamsUnionParam) GetTemperature() *float64 {
-	if vt := u.OfOpenAIModels; vt != nil && vt.Temperature.IsPresent() {
+	if vt := u.OfOpenAIModels; vt != nil && vt.Temperature.Valid() {
 		return &vt.Temperature.Value
 	} else if vt := u.OfAnthropicModels; vt != nil {
 		return (*float64)(&vt.Temperature)
-	} else if vt := u.OfGoogleModels; vt != nil && vt.Temperature.IsPresent() {
+	} else if vt := u.OfGoogleModels; vt != nil && vt.Temperature.Valid() {
 		return &vt.Temperature.Value
-	} else if vt := u.OfWindowAIModels; vt != nil && vt.Temperature.IsPresent() {
+	} else if vt := u.OfWindowAIModels; vt != nil && vt.Temperature.Valid() {
 		return &vt.Temperature.Value
 	}
 	return nil
@@ -5699,11 +5382,11 @@ func (u PromptOptionsParamsUnionParam) GetTemperature() *float64 {
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u PromptOptionsParamsUnionParam) GetTopP() *float64 {
-	if vt := u.OfOpenAIModels; vt != nil && vt.TopP.IsPresent() {
+	if vt := u.OfOpenAIModels; vt != nil && vt.TopP.Valid() {
 		return &vt.TopP.Value
-	} else if vt := u.OfAnthropicModels; vt != nil && vt.TopP.IsPresent() {
+	} else if vt := u.OfAnthropicModels; vt != nil && vt.TopP.Valid() {
 		return &vt.TopP.Value
-	} else if vt := u.OfGoogleModels; vt != nil && vt.TopP.IsPresent() {
+	} else if vt := u.OfGoogleModels; vt != nil && vt.TopP.Valid() {
 		return &vt.TopP.Value
 	}
 	return nil
@@ -5711,15 +5394,15 @@ func (u PromptOptionsParamsUnionParam) GetTopP() *float64 {
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u PromptOptionsParamsUnionParam) GetUseCache() *bool {
-	if vt := u.OfOpenAIModels; vt != nil && vt.UseCache.IsPresent() {
+	if vt := u.OfOpenAIModels; vt != nil && vt.UseCache.Valid() {
 		return &vt.UseCache.Value
-	} else if vt := u.OfAnthropicModels; vt != nil && vt.UseCache.IsPresent() {
+	} else if vt := u.OfAnthropicModels; vt != nil && vt.UseCache.Valid() {
 		return &vt.UseCache.Value
-	} else if vt := u.OfGoogleModels; vt != nil && vt.UseCache.IsPresent() {
+	} else if vt := u.OfGoogleModels; vt != nil && vt.UseCache.Valid() {
 		return &vt.UseCache.Value
-	} else if vt := u.OfWindowAIModels; vt != nil && vt.UseCache.IsPresent() {
+	} else if vt := u.OfWindowAIModels; vt != nil && vt.UseCache.Valid() {
 		return &vt.UseCache.Value
-	} else if vt := u.OfJsCompletions; vt != nil && vt.UseCache.IsPresent() {
+	} else if vt := u.OfJsCompletions; vt != nil && vt.UseCache.Valid() {
 		return &vt.UseCache.Value
 	}
 	return nil
@@ -5727,11 +5410,11 @@ func (u PromptOptionsParamsUnionParam) GetUseCache() *bool {
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u PromptOptionsParamsUnionParam) GetTopK() *float64 {
-	if vt := u.OfAnthropicModels; vt != nil && vt.TopK.IsPresent() {
+	if vt := u.OfAnthropicModels; vt != nil && vt.TopK.Valid() {
 		return &vt.TopK.Value
-	} else if vt := u.OfGoogleModels; vt != nil && vt.TopK.IsPresent() {
+	} else if vt := u.OfGoogleModels; vt != nil && vt.TopK.Valid() {
 		return &vt.TopK.Value
-	} else if vt := u.OfWindowAIModels; vt != nil && vt.TopK.IsPresent() {
+	} else if vt := u.OfWindowAIModels; vt != nil && vt.TopK.Valid() {
 		return &vt.TopK.Value
 	}
 	return nil
@@ -5756,11 +5439,6 @@ type PromptOptionsParamsOpenAIModelParamsParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptOptionsParamsOpenAIModelParamsParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptOptionsParamsOpenAIModelParamsParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParamsOpenAIModelParamsParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -5783,11 +5461,6 @@ type PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam](u.OfPromptOptionssOpenAIModelParamsFunctionCallString, u.OfFunction)
 }
@@ -5807,11 +5480,6 @@ type PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -5827,11 +5495,6 @@ type PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam](u.OfJsonObject, u.OfJsonSchema, u.OfText)
 }
@@ -5874,11 +5537,6 @@ type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -5898,11 +5556,6 @@ type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -5923,11 +5576,6 @@ type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -5940,11 +5588,6 @@ type PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -5967,11 +5610,6 @@ type PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam](u.OfPromptOptionssOpenAIModelParamsToolChoiceString, u.OfFunction)
 }
@@ -5993,11 +5631,6 @@ type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -6015,11 +5648,6 @@ type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam struct 
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -6038,11 +5666,6 @@ type PromptOptionsParamsAnthropicModelParamsParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptOptionsParamsAnthropicModelParamsParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptOptionsParamsAnthropicModelParamsParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParamsAnthropicModelParamsParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -6057,11 +5680,6 @@ type PromptOptionsParamsGoogleModelParamsParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptOptionsParamsGoogleModelParamsParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptOptionsParamsGoogleModelParamsParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParamsGoogleModelParamsParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -6074,11 +5692,6 @@ type PromptOptionsParamsWindowAIModelParamsParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptOptionsParamsWindowAIModelParamsParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptOptionsParamsWindowAIModelParamsParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParamsWindowAIModelParamsParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -6089,11 +5702,6 @@ type PromptOptionsParamsJsCompletionParamsParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptOptionsParamsJsCompletionParamsParam) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r PromptOptionsParamsJsCompletionParamsParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParamsJsCompletionParamsParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -6120,8 +5728,7 @@ type RepoInfo struct {
 	GitDiff string `json:"git_diff,nullable"`
 	// Name of the tag on the most recent commit
 	Tag string `json:"tag,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		AuthorEmail   resp.Field
 		AuthorName    resp.Field
@@ -6147,9 +5754,9 @@ func (r *RepoInfo) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// RepoInfoParam.IsOverridden()
+// RepoInfoParam.Overrides()
 func (r RepoInfo) ToParam() RepoInfoParam {
-	return param.OverrideObj[RepoInfoParam](r.RawJSON())
+	return param.Override[RepoInfoParam](r.RawJSON())
 }
 
 // Metadata about the state of the repo when the experiment was created
@@ -6176,9 +5783,6 @@ type RepoInfoParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f RepoInfoParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r RepoInfoParam) MarshalJSON() (data []byte, err error) {
 	type shadow RepoInfoParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -6215,8 +5819,7 @@ type Role struct {
 	OrgID string `json:"org_id,nullable" format:"uuid"`
 	// Identifies the user who created the role
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID                resp.Field
 		Name              resp.Field
@@ -6252,8 +5855,7 @@ type RoleMemberPermission struct {
 	// Any of "organization", "project", "experiment", "dataset", "prompt",
 	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
 	RestrictObjectType ACLObjectType `json:"restrict_object_type,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Permission         resp.Field
 		RestrictObjectType resp.Field
@@ -6280,8 +5882,7 @@ type ScoreSummary struct {
 	Score float64 `json:"score,required"`
 	// Difference in score between the current and comparison experiment
 	Diff float64 `json:"diff"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Improvements resp.Field
 		Name         resp.Field
@@ -6308,8 +5909,7 @@ type SpanAttributes struct {
 	// Any of "llm", "score", "function", "eval", "task", "tool".
 	Type        SpanType       `json:"type,nullable"`
 	ExtraFields map[string]any `json:",extras"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Name        resp.Field
 		Type        resp.Field
@@ -6328,9 +5928,9 @@ func (r *SpanAttributes) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// SpanAttributesParam.IsOverridden()
+// SpanAttributesParam.Overrides()
 func (r SpanAttributes) ToParam() SpanAttributesParam {
-	return param.OverrideObj[SpanAttributesParam](r.RawJSON())
+	return param.Override[SpanAttributesParam](r.RawJSON())
 }
 
 // Human-identifying attributes of the span, such as name, type, etc.
@@ -6341,16 +5941,13 @@ type SpanAttributesParam struct {
 	//
 	// Any of "llm", "score", "function", "eval", "task", "tool".
 	Type        SpanType       `json:"type,omitzero"`
-	ExtraFields map[string]any `json:"-,extras"`
+	ExtraFields map[string]any `json:"-"`
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f SpanAttributesParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r SpanAttributesParam) MarshalJSON() (data []byte, err error) {
 	type shadow SpanAttributesParam
-	return param.MarshalObject(r, (*shadow)(&r))
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
 }
 
 type SpanIFrame struct {
@@ -6373,8 +5970,7 @@ type SpanIFrame struct {
 	PostMessage bool `json:"post_message,nullable"`
 	// Identifies the user who created the span iframe
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID          resp.Field
 		Name        resp.Field
@@ -6420,8 +6016,7 @@ type SummarizeDatasetResponse struct {
 	ProjectURL string `json:"project_url,required" format:"uri"`
 	// Summary of a dataset's data
 	DataSummary DataSummary `json:"data_summary,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		DatasetName resp.Field
 		DatasetURL  resp.Field
@@ -6455,8 +6050,7 @@ type SummarizeExperimentResponse struct {
 	Metrics map[string]MetricSummary `json:"metrics,nullable"`
 	// Summary of the experiment's scores
 	Scores map[string]ScoreSummary `json:"scores,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ExperimentName           resp.Field
 		ExperimentURL            resp.Field
@@ -6489,8 +6083,7 @@ type User struct {
 	FamilyName string `json:"family_name,nullable"`
 	// Given name of the user
 	GivenName string `json:"given_name,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID          resp.Field
 		AvatarURL   resp.Field
@@ -6536,8 +6129,7 @@ type View struct {
 	UserID string `json:"user_id,nullable" format:"uuid"`
 	// The view definition
 	ViewData ViewData `json:"view_data,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ID          resp.Field
 		Name        resp.Field
@@ -6580,8 +6172,7 @@ const (
 // The view definition
 type ViewData struct {
 	Search ViewDataSearch `json:"search,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Search      resp.Field
 		ExtraFields map[string]resp.Field
@@ -6599,9 +6190,9 @@ func (r *ViewData) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// ViewDataParam.IsOverridden()
+// ViewDataParam.Overrides()
 func (r ViewData) ToParam() ViewDataParam {
-	return param.OverrideObj[ViewDataParam](r.RawJSON())
+	return param.Override[ViewDataParam](r.RawJSON())
 }
 
 // The view definition
@@ -6610,9 +6201,6 @@ type ViewDataParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ViewDataParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r ViewDataParam) MarshalJSON() (data []byte, err error) {
 	type shadow ViewDataParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -6623,8 +6211,7 @@ type ViewDataSearch struct {
 	Match  []any `json:"match,nullable"`
 	Sort   []any `json:"sort,nullable"`
 	Tag    []any `json:"tag,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		Filter      resp.Field
 		Match       resp.Field
@@ -6645,9 +6232,9 @@ func (r *ViewDataSearch) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// ViewDataSearchParam.IsOverridden()
+// ViewDataSearchParam.Overrides()
 func (r ViewDataSearch) ToParam() ViewDataSearchParam {
-	return param.OverrideObj[ViewDataSearchParam](r.RawJSON())
+	return param.Override[ViewDataSearchParam](r.RawJSON())
 }
 
 type ViewDataSearchParam struct {
@@ -6658,9 +6245,6 @@ type ViewDataSearchParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ViewDataSearchParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r ViewDataSearchParam) MarshalJSON() (data []byte, err error) {
 	type shadow ViewDataSearchParam
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -6674,8 +6258,7 @@ type ViewOptions struct {
 	Grouping         string             `json:"grouping,nullable"`
 	Layout           string             `json:"layout,nullable"`
 	RowHeight        string             `json:"rowHeight,nullable"`
-	// Metadata for the response, check the presence of optional fields with the
-	// [resp.Field.IsPresent] method.
+	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
 	JSON struct {
 		ColumnOrder      resp.Field
 		ColumnSizing     resp.Field
@@ -6698,9 +6281,9 @@ func (r *ViewOptions) UnmarshalJSON(data []byte) error {
 //
 // Warning: the fields of the param type will not be present. ToParam should only
 // be used at the last possible moment before sending a request. Test for this with
-// ViewOptionsParam.IsOverridden()
+// ViewOptionsParam.Overrides()
 func (r ViewOptions) ToParam() ViewOptionsParam {
-	return param.OverrideObj[ViewOptionsParam](r.RawJSON())
+	return param.Override[ViewOptionsParam](r.RawJSON())
 }
 
 // Options for the view in the app
@@ -6714,9 +6297,6 @@ type ViewOptionsParam struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ViewOptionsParam) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r ViewOptionsParam) MarshalJSON() (data []byte, err error) {
 	type shadow ViewOptionsParam
 	return param.MarshalObject(r, (*shadow)(&r))

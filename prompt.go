@@ -137,10 +137,6 @@ type PromptNewParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r PromptNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow PromptNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -168,10 +164,6 @@ type PromptUpdateParams struct {
 	Tags []string `json:"tags,omitzero"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r PromptUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow PromptUpdateParams
@@ -214,10 +206,6 @@ type PromptListParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 // URLQuery serializes [PromptListParams]'s query parameters as `url.Values`.
 func (r PromptListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
@@ -234,10 +222,6 @@ type PromptListParamsIDsUnion struct {
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u PromptListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 
 func (u *PromptListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -265,10 +249,6 @@ type PromptReplaceParams struct {
 	Tags []string `json:"tags,omitzero"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f PromptReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r PromptReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow PromptReplaceParams

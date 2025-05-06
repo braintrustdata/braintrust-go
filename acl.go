@@ -144,10 +144,6 @@ type ACLNewParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ACLNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r ACLNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow ACLNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -181,10 +177,6 @@ type ACLListParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ACLListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 // URLQuery serializes [ACLListParams]'s query parameters as `url.Values`.
 func (r ACLListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
@@ -201,10 +193,6 @@ type ACLListParamsIDsUnion struct {
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u ACLListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 
 func (u *ACLListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -240,10 +228,6 @@ type ACLBatchUpdateParams struct {
 	RemoveACLs []ACLBatchUpdateParamsRemoveACL `json:"remove_acls,omitzero"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ACLBatchUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r ACLBatchUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow ACLBatchUpdateParams
@@ -294,9 +278,6 @@ type ACLBatchUpdateParamsAddACL struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ACLBatchUpdateParamsAddACL) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r ACLBatchUpdateParamsAddACL) MarshalJSON() (data []byte, err error) {
 	type shadow ACLBatchUpdateParamsAddACL
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -346,9 +327,6 @@ type ACLBatchUpdateParamsRemoveACL struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ACLBatchUpdateParamsRemoveACL) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r ACLBatchUpdateParamsRemoveACL) MarshalJSON() (data []byte, err error) {
 	type shadow ACLBatchUpdateParamsRemoveACL
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -385,10 +363,6 @@ type ACLFindAndDeleteParams struct {
 	RestrictObjectType shared.ACLObjectType `json:"restrict_object_type,omitzero"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f ACLFindAndDeleteParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r ACLFindAndDeleteParams) MarshalJSON() (data []byte, err error) {
 	type shadow ACLFindAndDeleteParams

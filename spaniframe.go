@@ -134,10 +134,6 @@ type SpanIframeNewParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f SpanIframeNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r SpanIframeNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow SpanIframeNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -155,10 +151,6 @@ type SpanIframeUpdateParams struct {
 	URL param.Opt[string] `json:"url,omitzero"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f SpanIframeUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r SpanIframeUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow SpanIframeUpdateParams
@@ -190,10 +182,6 @@ type SpanIframeListParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f SpanIframeListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 // URLQuery serializes [SpanIframeListParams]'s query parameters as `url.Values`.
 func (r SpanIframeListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
@@ -210,10 +198,6 @@ type SpanIframeListParamsIDsUnion struct {
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u SpanIframeListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 
 func (u *SpanIframeListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -238,10 +222,6 @@ type SpanIframeReplaceParams struct {
 	PostMessage param.Opt[bool] `json:"post_message,omitzero"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f SpanIframeReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r SpanIframeReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow SpanIframeReplaceParams

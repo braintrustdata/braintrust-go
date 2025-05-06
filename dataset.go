@@ -185,10 +185,6 @@ type DatasetNewParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f DatasetNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r DatasetNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow DatasetNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -203,10 +199,6 @@ type DatasetUpdateParams struct {
 	Metadata map[string]any `json:"metadata,omitzero"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f DatasetUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r DatasetUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow DatasetUpdateParams
@@ -242,10 +234,6 @@ type DatasetListParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f DatasetListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 // URLQuery serializes [DatasetListParams]'s query parameters as `url.Values`.
 func (r DatasetListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
@@ -263,10 +251,6 @@ type DatasetListParamsIDsUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u DatasetListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
-
 func (u *DatasetListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
 		return &u.OfString.Value
@@ -281,10 +265,6 @@ type DatasetFeedbackParams struct {
 	Feedback []shared.FeedbackDatasetItemParam `json:"feedback,omitzero,required"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f DatasetFeedbackParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r DatasetFeedbackParams) MarshalJSON() (data []byte, err error) {
 	type shadow DatasetFeedbackParams
@@ -337,10 +317,6 @@ type DatasetFetchParams struct {
 	Version param.Opt[string] `query:"version,omitzero" json:"-"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f DatasetFetchParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [DatasetFetchParams]'s query parameters as `url.Values`.
 func (r DatasetFetchParams) URLQuery() (v url.Values, err error) {
@@ -403,10 +379,6 @@ type DatasetFetchPostParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f DatasetFetchPostParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r DatasetFetchPostParams) MarshalJSON() (data []byte, err error) {
 	type shadow DatasetFetchPostParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -417,10 +389,6 @@ type DatasetInsertParams struct {
 	Events []shared.InsertDatasetEventParam `json:"events,omitzero,required"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f DatasetInsertParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 func (r DatasetInsertParams) MarshalJSON() (data []byte, err error) {
 	type shadow DatasetInsertParams
@@ -433,10 +401,6 @@ type DatasetSummarizeParams struct {
 	SummarizeData param.Opt[bool] `query:"summarize_data,omitzero" json:"-"`
 	paramObj
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f DatasetSummarizeParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 
 // URLQuery serializes [DatasetSummarizeParams]'s query parameters as `url.Values`.
 func (r DatasetSummarizeParams) URLQuery() (v url.Values, err error) {

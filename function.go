@@ -156,10 +156,6 @@ type FunctionNewParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionNewParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r FunctionNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -175,11 +171,6 @@ type FunctionNewParamsFunctionDataUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u FunctionNewParamsFunctionDataUnion) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u FunctionNewParamsFunctionDataUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionNewParamsFunctionDataUnion](u.OfPrompt, u.OfCode, u.OfGlobal)
 }
@@ -230,11 +221,6 @@ type FunctionNewParamsFunctionDataPrompt struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionNewParamsFunctionDataPrompt) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionNewParamsFunctionDataPrompt) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionNewParamsFunctionDataPrompt
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -254,11 +240,6 @@ type FunctionNewParamsFunctionDataCode struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionNewParamsFunctionDataCode) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionNewParamsFunctionDataCode) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionNewParamsFunctionDataCode
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -279,11 +260,6 @@ type FunctionNewParamsFunctionDataCodeDataUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u FunctionNewParamsFunctionDataCodeDataUnion) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u FunctionNewParamsFunctionDataCodeDataUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionNewParamsFunctionDataCodeDataUnion](u.OfBundle, u.OfInline)
 }
@@ -315,7 +291,7 @@ func (u FunctionNewParamsFunctionDataCodeDataUnion) GetLocation() *shared.CodeBu
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u FunctionNewParamsFunctionDataCodeDataUnion) GetPreview() *string {
-	if vt := u.OfBundle; vt != nil && vt.Preview.IsPresent() {
+	if vt := u.OfBundle; vt != nil && vt.Preview.Valid() {
 		return &vt.Preview.Value
 	}
 	return nil
@@ -406,11 +382,6 @@ type FunctionNewParamsFunctionDataCodeDataInline struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionNewParamsFunctionDataCodeDataInline) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionNewParamsFunctionDataCodeDataInline) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionNewParamsFunctionDataCodeDataInline
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -430,11 +401,6 @@ type FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -454,11 +420,6 @@ type FunctionNewParamsFunctionDataGlobal struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionNewParamsFunctionDataGlobal) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionNewParamsFunctionDataGlobal) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionNewParamsFunctionDataGlobal
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -477,9 +438,6 @@ type FunctionNewParamsFunctionSchema struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionNewParamsFunctionSchema) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r FunctionNewParamsFunctionSchema) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionNewParamsFunctionSchema
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -509,9 +467,6 @@ type FunctionNewParamsOrigin struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionNewParamsOrigin) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r FunctionNewParamsOrigin) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionNewParamsOrigin
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -530,10 +485,6 @@ type FunctionUpdateParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionUpdateParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r FunctionUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -549,11 +500,6 @@ type FunctionUpdateParamsFunctionDataUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u FunctionUpdateParamsFunctionDataUnion) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u FunctionUpdateParamsFunctionDataUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionUpdateParamsFunctionDataUnion](u.OfPrompt, u.OfCode, u.OfGlobal)
 }
@@ -604,11 +550,6 @@ type FunctionUpdateParamsFunctionDataPrompt struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionUpdateParamsFunctionDataPrompt) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionUpdateParamsFunctionDataPrompt) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionUpdateParamsFunctionDataPrompt
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -628,11 +569,6 @@ type FunctionUpdateParamsFunctionDataCode struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionUpdateParamsFunctionDataCode) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionUpdateParamsFunctionDataCode) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionUpdateParamsFunctionDataCode
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -653,11 +589,6 @@ type FunctionUpdateParamsFunctionDataCodeDataUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u FunctionUpdateParamsFunctionDataCodeDataUnion) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u FunctionUpdateParamsFunctionDataCodeDataUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionUpdateParamsFunctionDataCodeDataUnion](u.OfBundle, u.OfInline)
 }
@@ -689,7 +620,7 @@ func (u FunctionUpdateParamsFunctionDataCodeDataUnion) GetLocation() *shared.Cod
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u FunctionUpdateParamsFunctionDataCodeDataUnion) GetPreview() *string {
-	if vt := u.OfBundle; vt != nil && vt.Preview.IsPresent() {
+	if vt := u.OfBundle; vt != nil && vt.Preview.Valid() {
 		return &vt.Preview.Value
 	}
 	return nil
@@ -780,11 +711,6 @@ type FunctionUpdateParamsFunctionDataCodeDataInline struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionUpdateParamsFunctionDataCodeDataInline) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionUpdateParamsFunctionDataCodeDataInline) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionUpdateParamsFunctionDataCodeDataInline
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -804,11 +730,6 @@ type FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -828,11 +749,6 @@ type FunctionUpdateParamsFunctionDataGlobal struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionUpdateParamsFunctionDataGlobal) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionUpdateParamsFunctionDataGlobal) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionUpdateParamsFunctionDataGlobal
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -880,10 +796,6 @@ type FunctionListParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionListParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 // URLQuery serializes [FunctionListParams]'s query parameters as `url.Values`.
 func (r FunctionListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
@@ -900,10 +812,6 @@ type FunctionListParamsIDsUnion struct {
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
-
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u FunctionListParamsIDsUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 
 func (u *FunctionListParamsIDsUnion) asAny() any {
 	if !param.IsOmitted(u.OfString) {
@@ -937,10 +845,6 @@ type FunctionInvokeParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionInvokeParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r FunctionInvokeParams) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionInvokeParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -959,9 +863,6 @@ type FunctionInvokeParamsMessageUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u FunctionInvokeParamsMessageUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 func (u FunctionInvokeParamsMessageUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionInvokeParamsMessageUnion](u.OfSystem,
 		u.OfUser,
@@ -1006,7 +907,7 @@ func (u FunctionInvokeParamsMessageUnion) GetToolCalls() []shared.ChatCompletion
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u FunctionInvokeParamsMessageUnion) GetToolCallID() *string {
-	if vt := u.OfTool; vt != nil && vt.ToolCallID.IsPresent() {
+	if vt := u.OfTool; vt != nil && vt.ToolCallID.Valid() {
 		return &vt.ToolCallID.Value
 	}
 	return nil
@@ -1032,11 +933,11 @@ func (u FunctionInvokeParamsMessageUnion) GetRole() *string {
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u FunctionInvokeParamsMessageUnion) GetName() *string {
-	if vt := u.OfSystem; vt != nil && vt.Name.IsPresent() {
+	if vt := u.OfSystem; vt != nil && vt.Name.Valid() {
 		return &vt.Name.Value
-	} else if vt := u.OfUser; vt != nil && vt.Name.IsPresent() {
+	} else if vt := u.OfUser; vt != nil && vt.Name.Valid() {
 		return &vt.Name.Value
-	} else if vt := u.OfAssistant; vt != nil && vt.Name.IsPresent() {
+	} else if vt := u.OfAssistant; vt != nil && vt.Name.Valid() {
 		return &vt.Name.Value
 	} else if vt := u.OfFunction; vt != nil {
 		return (*string)(&vt.Name)
@@ -1048,17 +949,17 @@ func (u FunctionInvokeParamsMessageUnion) GetName() *string {
 //
 // Or use AsAny() to get the underlying value
 func (u FunctionInvokeParamsMessageUnion) GetContent() (res functionInvokeParamsMessageUnionContent) {
-	if vt := u.OfSystem; vt != nil && vt.Content.IsPresent() {
+	if vt := u.OfSystem; vt != nil && vt.Content.Valid() {
 		res.any = &vt.Content.Value
 	} else if vt := u.OfUser; vt != nil {
 		res.any = vt.Content.asAny()
-	} else if vt := u.OfAssistant; vt != nil && vt.Content.IsPresent() {
+	} else if vt := u.OfAssistant; vt != nil && vt.Content.Valid() {
 		res.any = &vt.Content.Value
-	} else if vt := u.OfTool; vt != nil && vt.Content.IsPresent() {
+	} else if vt := u.OfTool; vt != nil && vt.Content.Valid() {
 		res.any = &vt.Content.Value
-	} else if vt := u.OfFunction; vt != nil && vt.Content.IsPresent() {
+	} else if vt := u.OfFunction; vt != nil && vt.Content.Valid() {
 		res.any = &vt.Content.Value
-	} else if vt := u.OfFallback; vt != nil && vt.Content.IsPresent() {
+	} else if vt := u.OfFallback; vt != nil && vt.Content.Valid() {
 		res.any = &vt.Content.Value
 	}
 	return
@@ -1087,11 +988,6 @@ type FunctionInvokeParamsMessageSystem struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionInvokeParamsMessageSystem) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionInvokeParamsMessageSystem) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionInvokeParamsMessageSystem
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1112,9 +1008,6 @@ type FunctionInvokeParamsMessageUser struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionInvokeParamsMessageUser) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r FunctionInvokeParamsMessageUser) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionInvokeParamsMessageUser
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1135,11 +1028,6 @@ type FunctionInvokeParamsMessageUserContentUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u FunctionInvokeParamsMessageUserContentUnion) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u FunctionInvokeParamsMessageUserContentUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionInvokeParamsMessageUserContentUnion](u.OfString, u.OfArray)
 }
@@ -1162,11 +1050,6 @@ type FunctionInvokeParamsMessageUserContentArrayItemUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u FunctionInvokeParamsMessageUserContentArrayItemUnion) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u FunctionInvokeParamsMessageUserContentArrayItemUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionInvokeParamsMessageUserContentArrayItemUnion](u.OfText, u.OfImageURL)
 }
@@ -1182,7 +1065,7 @@ func (u *FunctionInvokeParamsMessageUserContentArrayItemUnion) asAny() any {
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u FunctionInvokeParamsMessageUserContentArrayItemUnion) GetText() *string {
-	if vt := u.OfText; vt != nil && vt.Text.IsPresent() {
+	if vt := u.OfText; vt != nil && vt.Text.Valid() {
 		return &vt.Text.Value
 	}
 	return nil
@@ -1217,11 +1100,6 @@ type FunctionInvokeParamsMessageAssistant struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionInvokeParamsMessageAssistant) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionInvokeParamsMessageAssistant) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionInvokeParamsMessageAssistant
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1240,11 +1118,6 @@ type FunctionInvokeParamsMessageAssistantFunctionCall struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionInvokeParamsMessageAssistantFunctionCall) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionInvokeParamsMessageAssistantFunctionCall) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionInvokeParamsMessageAssistantFunctionCall
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1259,9 +1132,6 @@ type FunctionInvokeParamsMessageTool struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionInvokeParamsMessageTool) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r FunctionInvokeParamsMessageTool) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionInvokeParamsMessageTool
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1282,11 +1152,6 @@ type FunctionInvokeParamsMessageFunction struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionInvokeParamsMessageFunction) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionInvokeParamsMessageFunction) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionInvokeParamsMessageFunction
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1306,11 +1171,6 @@ type FunctionInvokeParamsMessageFallback struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionInvokeParamsMessageFallback) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionInvokeParamsMessageFallback) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionInvokeParamsMessageFallback
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1339,9 +1199,6 @@ type FunctionInvokeParamsParentUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u FunctionInvokeParamsParentUnion) IsPresent() bool { return !param.IsOmitted(u) && !u.IsNull() }
 func (u FunctionInvokeParamsParentUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionInvokeParamsParentUnion](u.OfSpanParentStruct, u.OfString)
 }
@@ -1370,11 +1227,6 @@ type FunctionInvokeParamsParentSpanParentStruct struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionInvokeParamsParentSpanParentStruct) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionInvokeParamsParentSpanParentStruct) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionInvokeParamsParentSpanParentStruct
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1399,11 +1251,6 @@ type FunctionInvokeParamsParentSpanParentStructRowIDs struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionInvokeParamsParentSpanParentStructRowIDs) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionInvokeParamsParentSpanParentStructRowIDs) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionInvokeParamsParentSpanParentStructRowIDs
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1431,10 +1278,6 @@ type FunctionReplaceParams struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionReplaceParams) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
-
 func (r FunctionReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionReplaceParams
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1450,11 +1293,6 @@ type FunctionReplaceParamsFunctionDataUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u FunctionReplaceParamsFunctionDataUnion) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u FunctionReplaceParamsFunctionDataUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionReplaceParamsFunctionDataUnion](u.OfPrompt, u.OfCode, u.OfGlobal)
 }
@@ -1505,11 +1343,6 @@ type FunctionReplaceParamsFunctionDataPrompt struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionReplaceParamsFunctionDataPrompt) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionReplaceParamsFunctionDataPrompt) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionReplaceParamsFunctionDataPrompt
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1529,11 +1362,6 @@ type FunctionReplaceParamsFunctionDataCode struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionReplaceParamsFunctionDataCode) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionReplaceParamsFunctionDataCode) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionReplaceParamsFunctionDataCode
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1554,11 +1382,6 @@ type FunctionReplaceParamsFunctionDataCodeDataUnion struct {
 	paramUnion
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (u FunctionReplaceParamsFunctionDataCodeDataUnion) IsPresent() bool {
-	return !param.IsOmitted(u) && !u.IsNull()
-}
 func (u FunctionReplaceParamsFunctionDataCodeDataUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionReplaceParamsFunctionDataCodeDataUnion](u.OfBundle, u.OfInline)
 }
@@ -1590,7 +1413,7 @@ func (u FunctionReplaceParamsFunctionDataCodeDataUnion) GetLocation() *shared.Co
 
 // Returns a pointer to the underlying variant's property, if present.
 func (u FunctionReplaceParamsFunctionDataCodeDataUnion) GetPreview() *string {
-	if vt := u.OfBundle; vt != nil && vt.Preview.IsPresent() {
+	if vt := u.OfBundle; vt != nil && vt.Preview.Valid() {
 		return &vt.Preview.Value
 	}
 	return nil
@@ -1681,11 +1504,6 @@ type FunctionReplaceParamsFunctionDataCodeDataInline struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionReplaceParamsFunctionDataCodeDataInline) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionReplaceParamsFunctionDataCodeDataInline) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionReplaceParamsFunctionDataCodeDataInline
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1705,11 +1523,6 @@ type FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1729,11 +1542,6 @@ type FunctionReplaceParamsFunctionDataGlobal struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionReplaceParamsFunctionDataGlobal) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionReplaceParamsFunctionDataGlobal) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionReplaceParamsFunctionDataGlobal
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1752,11 +1560,6 @@ type FunctionReplaceParamsFunctionSchema struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionReplaceParamsFunctionSchema) IsPresent() bool {
-	return !param.IsOmitted(f) && !f.IsNull()
-}
 func (r FunctionReplaceParamsFunctionSchema) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionReplaceParamsFunctionSchema
 	return param.MarshalObject(r, (*shadow)(&r))
@@ -1786,9 +1589,6 @@ type FunctionReplaceParamsOrigin struct {
 	paramObj
 }
 
-// IsPresent returns true if the field's value is not omitted and not the JSON
-// "null". To check if this field is omitted, use [param.IsOmitted].
-func (f FunctionReplaceParamsOrigin) IsPresent() bool { return !param.IsOmitted(f) && !f.IsNull() }
 func (r FunctionReplaceParamsOrigin) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionReplaceParamsOrigin
 	return param.MarshalObject(r, (*shadow)(&r))
