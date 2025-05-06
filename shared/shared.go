@@ -8,7 +8,7 @@ import (
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/packages/param"
-	"github.com/braintrustdata/braintrust-go/packages/resp"
+	"github.com/braintrustdata/braintrust-go/packages/respjson"
 )
 
 // aliased to make [param.APIUnion] private when embedding
@@ -31,17 +31,17 @@ type AISecret struct {
 	Type          string         `json:"type,nullable"`
 	// Date of last AI secret update
 	UpdatedAt time.Time `json:"updated_at,nullable" format:"date-time"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID            resp.Field
-		Name          resp.Field
-		OrgID         resp.Field
-		Created       resp.Field
-		Metadata      resp.Field
-		PreviewSecret resp.Field
-		Type          resp.Field
-		UpdatedAt     resp.Field
-		ExtraFields   map[string]resp.Field
+		ID            respjson.Field
+		Name          respjson.Field
+		OrgID         respjson.Field
+		Created       respjson.Field
+		Metadata      respjson.Field
+		PreviewSecret respjson.Field
+		Type          respjson.Field
+		UpdatedAt     respjson.Field
+		ExtraFields   map[string]respjson.Field
 		raw           string
 	} `json:"-"`
 }
@@ -97,19 +97,19 @@ type ACL struct {
 	// Id of the user the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID                 resp.Field
-		ObjectOrgID        resp.Field
-		ObjectID           resp.Field
-		ObjectType         resp.Field
-		Created            resp.Field
-		GroupID            resp.Field
-		Permission         resp.Field
-		RestrictObjectType resp.Field
-		RoleID             resp.Field
-		UserID             resp.Field
-		ExtraFields        map[string]resp.Field
+		ID                 respjson.Field
+		ObjectOrgID        respjson.Field
+		ObjectID           respjson.Field
+		ObjectType         respjson.Field
+		Created            respjson.Field
+		GroupID            respjson.Field
+		Permission         respjson.Field
+		RestrictObjectType respjson.Field
+		RoleID             respjson.Field
+		UserID             respjson.Field
+		ExtraFields        map[string]respjson.Field
 		raw                string
 	} `json:"-"`
 }
@@ -143,11 +143,11 @@ type ACLBatchUpdateResponse struct {
 	// `restrict_object_type` in the ACL, as part of a direct permission grant or as
 	// part of a role.
 	RemovedACLs []ACL `json:"removed_acls,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		AddedACLs   resp.Field
-		RemovedACLs resp.Field
-		ExtraFields map[string]resp.Field
+		AddedACLs   respjson.Field
+		RemovedACLs respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -187,15 +187,15 @@ type APIKey struct {
 	OrgID string `json:"org_id,nullable" format:"uuid"`
 	// Unique identifier for the user
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          resp.Field
-		Name        resp.Field
-		PreviewName resp.Field
-		Created     resp.Field
-		OrgID       resp.Field
-		UserID      resp.Field
-		ExtraFields map[string]resp.Field
+		ID          respjson.Field
+		Name        respjson.Field
+		PreviewName respjson.Field
+		Created     respjson.Field
+		OrgID       respjson.Field
+		UserID      respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -210,11 +210,11 @@ type ChatCompletionContentPartImage struct {
 	ImageURL ChatCompletionContentPartImageImageURL `json:"image_url,required"`
 	// Any of "image_url".
 	Type ChatCompletionContentPartImageType `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ImageURL    resp.Field
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		ImageURL    respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -239,11 +239,11 @@ type ChatCompletionContentPartImageImageURL struct {
 	URL string `json:"url,required"`
 	// Any of "auto", "low", "high".
 	Detail ChatCompletionContentPartImageImageURLDetail `json:"detail"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		URL         resp.Field
-		Detail      resp.Field
-		ExtraFields map[string]resp.Field
+		URL         respjson.Field
+		Detail      respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -298,11 +298,11 @@ type ChatCompletionContentPartText struct {
 	// Any of "text".
 	Type ChatCompletionContentPartTextType `json:"type,required"`
 	Text string                            `json:"text"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Type        resp.Field
-		Text        resp.Field
-		ExtraFields map[string]resp.Field
+		Type        respjson.Field
+		Text        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -347,12 +347,12 @@ type ChatCompletionMessageToolCall struct {
 	Function ChatCompletionMessageToolCallFunction `json:"function,required"`
 	// Any of "function".
 	Type ChatCompletionMessageToolCallType `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          resp.Field
-		Function    resp.Field
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		ID          respjson.Field
+		Function    respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -376,11 +376,11 @@ func (r ChatCompletionMessageToolCall) ToParam() ChatCompletionMessageToolCallPa
 type ChatCompletionMessageToolCallFunction struct {
 	Arguments string `json:"arguments,required"`
 	Name      string `json:"name,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Arguments   resp.Field
-		Name        resp.Field
-		ExtraFields map[string]resp.Field
+		Arguments   respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -429,13 +429,13 @@ type CodeBundle struct {
 	RuntimeContext CodeBundleRuntimeContext `json:"runtime_context,required"`
 	// A preview of the code
 	Preview string `json:"preview,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		BundleID       resp.Field
-		Location       resp.Field
-		RuntimeContext resp.Field
-		Preview        resp.Field
-		ExtraFields    map[string]resp.Field
+		BundleID       respjson.Field
+		Location       respjson.Field
+		RuntimeContext respjson.Field
+		Preview        respjson.Field
+		ExtraFields    map[string]respjson.Field
 		raw            string
 	} `json:"-"`
 }
@@ -468,10 +468,10 @@ type CodeBundleLocationUnion struct {
 	// This field is from variant [CodeBundleLocationFunction].
 	Index int64 `json:"index"`
 	JSON  struct {
-		EvalName resp.Field
-		Position resp.Field
-		Type     resp.Field
-		Index    resp.Field
+		EvalName respjson.Field
+		Position respjson.Field
+		Type     respjson.Field
+		Index    respjson.Field
 		raw      string
 	} `json:"-"`
 }
@@ -498,12 +498,12 @@ type CodeBundleLocationExperiment struct {
 	Position CodeBundleLocationExperimentPositionUnion `json:"position,required"`
 	// Any of "experiment".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		EvalName    resp.Field
-		Position    resp.Field
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		EvalName    respjson.Field
+		Position    respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -524,8 +524,8 @@ type CodeBundleLocationExperimentPositionUnion struct {
 	// This field is from variant [CodeBundleLocationExperimentPositionScorer].
 	Index int64 `json:"index"`
 	JSON  struct {
-		Type  resp.Field
-		Index resp.Field
+		Type  respjson.Field
+		Index respjson.Field
 		raw   string
 	} `json:"-"`
 }
@@ -550,10 +550,10 @@ func (r *CodeBundleLocationExperimentPositionUnion) UnmarshalJSON(data []byte) e
 type CodeBundleLocationExperimentPositionType struct {
 	// Any of "task".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -568,11 +568,11 @@ type CodeBundleLocationExperimentPositionScorer struct {
 	Index int64 `json:"index,required"`
 	// Any of "scorer".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Index       resp.Field
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		Index       respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -587,11 +587,11 @@ type CodeBundleLocationFunction struct {
 	Index int64 `json:"index,required"`
 	// Any of "function".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Index       resp.Field
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		Index       respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -606,11 +606,11 @@ type CodeBundleRuntimeContext struct {
 	// Any of "node", "python".
 	Runtime string `json:"runtime,required"`
 	Version string `json:"version,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Runtime     resp.Field
-		Version     resp.Field
-		ExtraFields map[string]resp.Field
+		Runtime     respjson.Field
+		Version     respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -841,16 +841,16 @@ type CreateAPIKeyOutput struct {
 	OrgID string `json:"org_id,nullable" format:"uuid"`
 	// Unique identifier for the user
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          resp.Field
-		Key         resp.Field
-		Name        resp.Field
-		PreviewName resp.Field
-		Created     resp.Field
-		OrgID       resp.Field
-		UserID      resp.Field
-		ExtraFields map[string]resp.Field
+		ID          respjson.Field
+		Key         respjson.Field
+		Name        respjson.Field
+		PreviewName respjson.Field
+		Created     respjson.Field
+		OrgID       respjson.Field
+		UserID      respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -865,10 +865,10 @@ func (r *CreateAPIKeyOutput) UnmarshalJSON(data []byte) error {
 type DataSummary struct {
 	// Total number of records in the dataset
 	TotalRecords int64 `json:"total_records,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		TotalRecords resp.Field
-		ExtraFields  map[string]resp.Field
+		TotalRecords respjson.Field
+		ExtraFields  map[string]respjson.Field
 		raw          string
 	} `json:"-"`
 }
@@ -896,17 +896,17 @@ type Dataset struct {
 	Metadata map[string]any `json:"metadata,nullable"`
 	// Identifies the user who created the dataset
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          resp.Field
-		Name        resp.Field
-		ProjectID   resp.Field
-		Created     resp.Field
-		DeletedAt   resp.Field
-		Description resp.Field
-		Metadata    resp.Field
-		UserID      resp.Field
-		ExtraFields map[string]resp.Field
+		ID          respjson.Field
+		Name        respjson.Field
+		ProjectID   respjson.Field
+		Created     respjson.Field
+		DeletedAt   respjson.Field
+		Description respjson.Field
+		Metadata    respjson.Field
+		UserID      respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -957,22 +957,22 @@ type DatasetEvent struct {
 	Origin ObjectReference `json:"origin,nullable"`
 	// A list of tags to log
 	Tags []string `json:"tags,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          resp.Field
-		XactID      resp.Field
-		Created     resp.Field
-		DatasetID   resp.Field
-		ProjectID   resp.Field
-		RootSpanID  resp.Field
-		SpanID      resp.Field
-		Expected    resp.Field
-		Input       resp.Field
-		IsRoot      resp.Field
-		Metadata    resp.Field
-		Origin      resp.Field
-		Tags        resp.Field
-		ExtraFields map[string]resp.Field
+		ID          respjson.Field
+		XactID      respjson.Field
+		Created     respjson.Field
+		DatasetID   respjson.Field
+		ProjectID   respjson.Field
+		RootSpanID  respjson.Field
+		SpanID      respjson.Field
+		Expected    respjson.Field
+		Input       respjson.Field
+		IsRoot      respjson.Field
+		Metadata    respjson.Field
+		Origin      respjson.Field
+		Tags        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -992,10 +992,10 @@ type DatasetEventMetadata struct {
 	// The model used for this example
 	Model       string         `json:"model,nullable"`
 	ExtraFields map[string]any `json:",extras"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Model       resp.Field
-		ExtraFields map[string]resp.Field
+		Model       respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -1021,15 +1021,15 @@ type EnvVar struct {
 	Created time.Time `json:"created,nullable" format:"date-time"`
 	// Date the environment variable was last used
 	Used time.Time `json:"used,nullable" format:"date-time"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          resp.Field
-		Name        resp.Field
-		ObjectID    resp.Field
-		ObjectType  resp.Field
-		Created     resp.Field
-		Used        resp.Field
-		ExtraFields map[string]resp.Field
+		ID          respjson.Field
+		Name        respjson.Field
+		ObjectID    respjson.Field
+		ObjectType  respjson.Field
+		Created     respjson.Field
+		Used        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -1081,23 +1081,23 @@ type Experiment struct {
 	RepoInfo RepoInfo `json:"repo_info,nullable"`
 	// Identifies the user who created the experiment
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID             resp.Field
-		Name           resp.Field
-		ProjectID      resp.Field
-		Public         resp.Field
-		BaseExpID      resp.Field
-		Commit         resp.Field
-		Created        resp.Field
-		DatasetID      resp.Field
-		DatasetVersion resp.Field
-		DeletedAt      resp.Field
-		Description    resp.Field
-		Metadata       resp.Field
-		RepoInfo       resp.Field
-		UserID         resp.Field
-		ExtraFields    map[string]resp.Field
+		ID             respjson.Field
+		Name           respjson.Field
+		ProjectID      respjson.Field
+		Public         respjson.Field
+		BaseExpID      respjson.Field
+		Commit         respjson.Field
+		Created        respjson.Field
+		DatasetID      respjson.Field
+		DatasetVersion respjson.Field
+		DeletedAt      respjson.Field
+		Description    respjson.Field
+		Metadata       respjson.Field
+		RepoInfo       respjson.Field
+		UserID         respjson.Field
+		ExtraFields    map[string]respjson.Field
 		raw            string
 	} `json:"-"`
 }
@@ -1188,29 +1188,29 @@ type ExperimentEvent struct {
 	SpanParents []string `json:"span_parents,nullable"`
 	// A list of tags to log
 	Tags []string `json:"tags,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID             resp.Field
-		XactID         resp.Field
-		Created        resp.Field
-		ExperimentID   resp.Field
-		ProjectID      resp.Field
-		RootSpanID     resp.Field
-		SpanID         resp.Field
-		Context        resp.Field
-		Error          resp.Field
-		Expected       resp.Field
-		Input          resp.Field
-		IsRoot         resp.Field
-		Metadata       resp.Field
-		Metrics        resp.Field
-		Origin         resp.Field
-		Output         resp.Field
-		Scores         resp.Field
-		SpanAttributes resp.Field
-		SpanParents    resp.Field
-		Tags           resp.Field
-		ExtraFields    map[string]resp.Field
+		ID             respjson.Field
+		XactID         respjson.Field
+		Created        respjson.Field
+		ExperimentID   respjson.Field
+		ProjectID      respjson.Field
+		RootSpanID     respjson.Field
+		SpanID         respjson.Field
+		Context        respjson.Field
+		Error          respjson.Field
+		Expected       respjson.Field
+		Input          respjson.Field
+		IsRoot         respjson.Field
+		Metadata       respjson.Field
+		Metrics        respjson.Field
+		Origin         respjson.Field
+		Output         respjson.Field
+		Scores         respjson.Field
+		SpanAttributes respjson.Field
+		SpanParents    respjson.Field
+		Tags           respjson.Field
+		ExtraFields    map[string]respjson.Field
 		raw            string
 	} `json:"-"`
 }
@@ -1233,12 +1233,12 @@ type ExperimentEventContext struct {
 	// Line of code where the experiment event was created
 	CallerLineno int64          `json:"caller_lineno,nullable"`
 	ExtraFields  map[string]any `json:",extras"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		CallerFilename     resp.Field
-		CallerFunctionname resp.Field
-		CallerLineno       resp.Field
-		ExtraFields        map[string]resp.Field
+		CallerFilename     respjson.Field
+		CallerFunctionname respjson.Field
+		CallerLineno       respjson.Field
+		ExtraFields        map[string]respjson.Field
 		raw                string
 	} `json:"-"`
 }
@@ -1258,10 +1258,10 @@ type ExperimentEventMetadata struct {
 	// The model used for this example
 	Model       string         `json:"model,nullable"`
 	ExtraFields map[string]any `json:",extras"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Model       resp.Field
-		ExtraFields map[string]resp.Field
+		Model       respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -1297,17 +1297,17 @@ type ExperimentEventMetrics struct {
 	// The total number of tokens in the input and output of the experiment event.
 	Tokens      int64              `json:"tokens,nullable"`
 	ExtraFields map[string]float64 `json:",extras"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		CallerFilename     resp.Field
-		CallerFunctionname resp.Field
-		CallerLineno       resp.Field
-		CompletionTokens   resp.Field
-		End                resp.Field
-		PromptTokens       resp.Field
-		Start              resp.Field
-		Tokens             resp.Field
-		ExtraFields        map[string]resp.Field
+		CallerFilename     respjson.Field
+		CallerFunctionname respjson.Field
+		CallerLineno       respjson.Field
+		CompletionTokens   respjson.Field
+		End                respjson.Field
+		PromptTokens       respjson.Field
+		Start              respjson.Field
+		Tokens             respjson.Field
+		ExtraFields        map[string]respjson.Field
 		raw                string
 	} `json:"-"`
 }
@@ -1438,10 +1438,10 @@ const (
 type FeedbackResponseSchema struct {
 	// Any of "success".
 	Status FeedbackResponseSchemaStatus `json:"status,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Status      resp.Field
-		ExtraFields map[string]resp.Field
+		Status      respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -1466,11 +1466,11 @@ type FetchDatasetEventsResponse struct {
 	// Pass this string directly as the `cursor` param to your next fetch request to
 	// get the next page of results. Not provided if the returned result set is empty.
 	Cursor string `json:"cursor,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Events      resp.Field
-		Cursor      resp.Field
-		ExtraFields map[string]resp.Field
+		Events      respjson.Field
+		Cursor      respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -1489,11 +1489,11 @@ type FetchExperimentEventsResponse struct {
 	// Pass this string directly as the `cursor` param to your next fetch request to
 	// get the next page of results. Not provided if the returned result set is empty.
 	Cursor string `json:"cursor,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Events      resp.Field
-		Cursor      resp.Field
-		ExtraFields map[string]resp.Field
+		Events      respjson.Field
+		Cursor      respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -1512,11 +1512,11 @@ type FetchProjectLogsEventsResponse struct {
 	// Pass this string directly as the `cursor` param to your next fetch request to
 	// get the next page of results. Not provided if the returned result set is empty.
 	Cursor string `json:"cursor,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Events      resp.Field
-		Cursor      resp.Field
-		ExtraFields map[string]resp.Field
+		Events      respjson.Field
+		Cursor      respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -1563,25 +1563,25 @@ type Function struct {
 	PromptData PromptData `json:"prompt_data,nullable"`
 	// A list of tags for the prompt
 	Tags []string `json:"tags,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID             resp.Field
-		XactID         resp.Field
-		FunctionData   resp.Field
-		LogID          resp.Field
-		Name           resp.Field
-		OrgID          resp.Field
-		ProjectID      resp.Field
-		Slug           resp.Field
-		Created        resp.Field
-		Description    resp.Field
-		FunctionSchema resp.Field
-		FunctionType   resp.Field
-		Metadata       resp.Field
-		Origin         resp.Field
-		PromptData     resp.Field
-		Tags           resp.Field
-		ExtraFields    map[string]resp.Field
+		ID             respjson.Field
+		XactID         respjson.Field
+		FunctionData   respjson.Field
+		LogID          respjson.Field
+		Name           respjson.Field
+		OrgID          respjson.Field
+		ProjectID      respjson.Field
+		Slug           respjson.Field
+		Created        respjson.Field
+		Description    respjson.Field
+		FunctionSchema respjson.Field
+		FunctionType   respjson.Field
+		Metadata       respjson.Field
+		Origin         respjson.Field
+		PromptData     respjson.Field
+		Tags           respjson.Field
+		ExtraFields    map[string]respjson.Field
 		raw            string
 	} `json:"-"`
 }
@@ -1604,9 +1604,9 @@ type FunctionFunctionDataUnion struct {
 	// This field is from variant [FunctionFunctionDataGlobal].
 	Name string `json:"name"`
 	JSON struct {
-		Type resp.Field
-		Data resp.Field
-		Name resp.Field
+		Type respjson.Field
+		Data respjson.Field
+		Name respjson.Field
 		raw  string
 	} `json:"-"`
 }
@@ -1636,10 +1636,10 @@ func (r *FunctionFunctionDataUnion) UnmarshalJSON(data []byte) error {
 type FunctionFunctionDataPrompt struct {
 	// Any of "prompt".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -1654,11 +1654,11 @@ type FunctionFunctionDataCode struct {
 	Data FunctionFunctionDataCodeDataUnion `json:"data,required"`
 	// Any of "code".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Data        resp.Field
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		Data        respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -1687,12 +1687,12 @@ type FunctionFunctionDataCodeDataUnion struct {
 	// This field is from variant [FunctionFunctionDataCodeDataInline].
 	Code string `json:"code"`
 	JSON struct {
-		BundleID       resp.Field
-		Location       resp.Field
-		RuntimeContext resp.Field
-		Preview        resp.Field
-		Type           resp.Field
-		Code           resp.Field
+		BundleID       respjson.Field
+		Location       respjson.Field
+		RuntimeContext respjson.Field
+		Preview        respjson.Field
+		Type           respjson.Field
+		Code           respjson.Field
 		raw            string
 	} `json:"-"`
 }
@@ -1725,8 +1725,8 @@ type FunctionFunctionDataCodeDataUnionRuntimeContext struct {
 	Runtime string `json:"runtime"`
 	Version string `json:"version"`
 	JSON    struct {
-		Runtime resp.Field
-		Version resp.Field
+		Runtime respjson.Field
+		Version respjson.Field
 		raw     string
 	} `json:"-"`
 }
@@ -1738,10 +1738,10 @@ func (r *FunctionFunctionDataCodeDataUnionRuntimeContext) UnmarshalJSON(data []b
 type FunctionFunctionDataCodeDataBundle struct {
 	// Any of "bundle".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 	CodeBundle
@@ -1758,12 +1758,12 @@ type FunctionFunctionDataCodeDataInline struct {
 	RuntimeContext FunctionFunctionDataCodeDataInlineRuntimeContext `json:"runtime_context,required"`
 	// Any of "inline".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Code           resp.Field
-		RuntimeContext resp.Field
-		Type           resp.Field
-		ExtraFields    map[string]resp.Field
+		Code           respjson.Field
+		RuntimeContext respjson.Field
+		Type           respjson.Field
+		ExtraFields    map[string]respjson.Field
 		raw            string
 	} `json:"-"`
 }
@@ -1778,11 +1778,11 @@ type FunctionFunctionDataCodeDataInlineRuntimeContext struct {
 	// Any of "node", "python".
 	Runtime string `json:"runtime,required"`
 	Version string `json:"version,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Runtime     resp.Field
-		Version     resp.Field
-		ExtraFields map[string]resp.Field
+		Runtime     respjson.Field
+		Version     respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -1797,11 +1797,11 @@ type FunctionFunctionDataGlobal struct {
 	Name string `json:"name,required"`
 	// Any of "global".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Name        resp.Field
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		Name        respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -1823,11 +1823,11 @@ const (
 type FunctionFunctionSchema struct {
 	Parameters any `json:"parameters"`
 	Returns    any `json:"returns"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Parameters  resp.Field
-		Returns     resp.Field
-		ExtraFields map[string]resp.Field
+		Parameters  respjson.Field
+		Returns     respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -1858,12 +1858,12 @@ type FunctionOrigin struct {
 	// The function exists for internal purposes and should not be displayed in the
 	// list of functions.
 	Internal bool `json:"internal,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ObjectID    resp.Field
-		ObjectType  resp.Field
-		Internal    resp.Field
-		ExtraFields map[string]resp.Field
+		ObjectID    respjson.Field
+		ObjectType  respjson.Field
+		Internal    respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -1902,18 +1902,18 @@ type Group struct {
 	MemberUsers []string `json:"member_users,nullable" format:"uuid"`
 	// Identifies the user who created the group
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID           resp.Field
-		Name         resp.Field
-		OrgID        resp.Field
-		Created      resp.Field
-		DeletedAt    resp.Field
-		Description  resp.Field
-		MemberGroups resp.Field
-		MemberUsers  resp.Field
-		UserID       resp.Field
-		ExtraFields  map[string]resp.Field
+		ID           respjson.Field
+		Name         respjson.Field
+		OrgID        respjson.Field
+		Created      respjson.Field
+		DeletedAt    respjson.Field
+		Description  respjson.Field
+		MemberGroups respjson.Field
+		MemberUsers  respjson.Field
+		UserID       respjson.Field
+		ExtraFields  map[string]respjson.Field
 		raw          string
 	} `json:"-"`
 }
@@ -2072,10 +2072,10 @@ type InsertEventsResponse struct {
 	// The ids of all rows that were inserted, aligning one-to-one with the rows
 	// provided as input
 	RowIDs []string `json:"row_ids,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		RowIDs      resp.Field
-		ExtraFields map[string]resp.Field
+		RowIDs      respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -2562,15 +2562,15 @@ type MetricSummary struct {
 	Unit string `json:"unit,required"`
 	// Difference in metric between the current and comparison experiment
 	Diff float64 `json:"diff"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Improvements resp.Field
-		Metric       resp.Field
-		Name         resp.Field
-		Regressions  resp.Field
-		Unit         resp.Field
-		Diff         resp.Field
-		ExtraFields  map[string]resp.Field
+		Improvements respjson.Field
+		Metric       respjson.Field
+		Name         respjson.Field
+		Regressions  respjson.Field
+		Unit         respjson.Field
+		Diff         respjson.Field
+		ExtraFields  map[string]respjson.Field
 		raw          string
 	} `json:"-"`
 }
@@ -2596,14 +2596,14 @@ type ObjectReference struct {
 	ObjectType ObjectReferenceObjectType `json:"object_type,required"`
 	// Created timestamp of the original event. Used to help sort in the UI
 	Created string `json:"created,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          resp.Field
-		XactID      resp.Field
-		ObjectID    resp.Field
-		ObjectType  resp.Field
-		Created     resp.Field
-		ExtraFields map[string]resp.Field
+		ID          respjson.Field
+		XactID      respjson.Field
+		ObjectID    respjson.Field
+		ObjectType  respjson.Field
+		Created     respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -2669,13 +2669,13 @@ type OnlineScoreConfig struct {
 	ApplyToRootSpan bool `json:"apply_to_root_span,nullable"`
 	// Trigger online scoring on any spans with a name in this list
 	ApplyToSpanNames []string `json:"apply_to_span_names,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		SamplingRate     resp.Field
-		Scorers          resp.Field
-		ApplyToRootSpan  resp.Field
-		ApplyToSpanNames resp.Field
-		ExtraFields      map[string]resp.Field
+		SamplingRate     respjson.Field
+		Scorers          respjson.Field
+		ApplyToRootSpan  respjson.Field
+		ApplyToSpanNames respjson.Field
+		ExtraFields      map[string]respjson.Field
 		raw              string
 	} `json:"-"`
 }
@@ -2706,9 +2706,9 @@ type OnlineScoreConfigScorerUnion struct {
 	// This field is from variant [OnlineScoreConfigScorerGlobal].
 	Name string `json:"name"`
 	JSON struct {
-		ID   resp.Field
-		Type resp.Field
-		Name resp.Field
+		ID   respjson.Field
+		Type respjson.Field
+		Name respjson.Field
 		raw  string
 	} `json:"-"`
 }
@@ -2734,11 +2734,11 @@ type OnlineScoreConfigScorerFunction struct {
 	ID string `json:"id,required"`
 	// Any of "function".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          resp.Field
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		ID          respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -2753,11 +2753,11 @@ type OnlineScoreConfigScorerGlobal struct {
 	Name string `json:"name,required"`
 	// Any of "global".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Name        resp.Field
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		Name        respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -2883,16 +2883,16 @@ type Organization struct {
 	IsUniversalAPI bool      `json:"is_universal_api,nullable"`
 	ProxyURL       string    `json:"proxy_url,nullable"`
 	RealtimeURL    string    `json:"realtime_url,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID             resp.Field
-		Name           resp.Field
-		APIURL         resp.Field
-		Created        resp.Field
-		IsUniversalAPI resp.Field
-		ProxyURL       resp.Field
-		RealtimeURL    resp.Field
-		ExtraFields    map[string]resp.Field
+		ID             respjson.Field
+		Name           respjson.Field
+		APIURL         respjson.Field
+		Created        respjson.Field
+		IsUniversalAPI respjson.Field
+		ProxyURL       respjson.Field
+		RealtimeURL    respjson.Field
+		ExtraFields    map[string]respjson.Field
 		raw            string
 	} `json:"-"`
 }
@@ -2911,12 +2911,12 @@ type PatchOrganizationMembersOutput struct {
 	// If invite emails failed to send for some reason, the patch operation will still
 	// complete, but we will return an error message here
 	SendEmailError string `json:"send_email_error,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		OrgID          resp.Field
-		Status         resp.Field
-		SendEmailError resp.Field
-		ExtraFields    map[string]resp.Field
+		OrgID          respjson.Field
+		Status         respjson.Field
+		SendEmailError respjson.Field
+		ExtraFields    map[string]respjson.Field
 		raw            string
 	} `json:"-"`
 }
@@ -2964,16 +2964,16 @@ type Project struct {
 	Settings  ProjectSettings `json:"settings,nullable"`
 	// Identifies the user who created the project
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          resp.Field
-		Name        resp.Field
-		OrgID       resp.Field
-		Created     resp.Field
-		DeletedAt   resp.Field
-		Settings    resp.Field
-		UserID      resp.Field
-		ExtraFields map[string]resp.Field
+		ID          respjson.Field
+		Name        respjson.Field
+		OrgID       respjson.Field
+		Created     respjson.Field
+		DeletedAt   respjson.Field
+		Settings    respjson.Field
+		UserID      respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -3064,30 +3064,30 @@ type ProjectLogsEvent struct {
 	SpanParents []string `json:"span_parents,nullable"`
 	// A list of tags to log
 	Tags []string `json:"tags,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID             resp.Field
-		XactID         resp.Field
-		Created        resp.Field
-		LogID          resp.Field
-		OrgID          resp.Field
-		ProjectID      resp.Field
-		RootSpanID     resp.Field
-		SpanID         resp.Field
-		Context        resp.Field
-		Error          resp.Field
-		Expected       resp.Field
-		Input          resp.Field
-		IsRoot         resp.Field
-		Metadata       resp.Field
-		Metrics        resp.Field
-		Origin         resp.Field
-		Output         resp.Field
-		Scores         resp.Field
-		SpanAttributes resp.Field
-		SpanParents    resp.Field
-		Tags           resp.Field
-		ExtraFields    map[string]resp.Field
+		ID             respjson.Field
+		XactID         respjson.Field
+		Created        respjson.Field
+		LogID          respjson.Field
+		OrgID          respjson.Field
+		ProjectID      respjson.Field
+		RootSpanID     respjson.Field
+		SpanID         respjson.Field
+		Context        respjson.Field
+		Error          respjson.Field
+		Expected       respjson.Field
+		Input          respjson.Field
+		IsRoot         respjson.Field
+		Metadata       respjson.Field
+		Metrics        respjson.Field
+		Origin         respjson.Field
+		Output         respjson.Field
+		Scores         respjson.Field
+		SpanAttributes respjson.Field
+		SpanParents    respjson.Field
+		Tags           respjson.Field
+		ExtraFields    map[string]respjson.Field
 		raw            string
 	} `json:"-"`
 }
@@ -3117,12 +3117,12 @@ type ProjectLogsEventContext struct {
 	// Line of code where the project logs event was created
 	CallerLineno int64          `json:"caller_lineno,nullable"`
 	ExtraFields  map[string]any `json:",extras"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		CallerFilename     resp.Field
-		CallerFunctionname resp.Field
-		CallerLineno       resp.Field
-		ExtraFields        map[string]resp.Field
+		CallerFilename     respjson.Field
+		CallerFunctionname respjson.Field
+		CallerLineno       respjson.Field
+		ExtraFields        map[string]respjson.Field
 		raw                string
 	} `json:"-"`
 }
@@ -3142,10 +3142,10 @@ type ProjectLogsEventMetadata struct {
 	// The model used for this example
 	Model       string         `json:"model,nullable"`
 	ExtraFields map[string]any `json:",extras"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Model       resp.Field
-		ExtraFields map[string]resp.Field
+		Model       respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -3181,17 +3181,17 @@ type ProjectLogsEventMetrics struct {
 	// The total number of tokens in the input and output of the project logs event.
 	Tokens      int64              `json:"tokens,nullable"`
 	ExtraFields map[string]float64 `json:",extras"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		CallerFilename     resp.Field
-		CallerFunctionname resp.Field
-		CallerLineno       resp.Field
-		CompletionTokens   resp.Field
-		End                resp.Field
-		PromptTokens       resp.Field
-		Start              resp.Field
-		Tokens             resp.Field
-		ExtraFields        map[string]resp.Field
+		CallerFilename     respjson.Field
+		CallerFunctionname respjson.Field
+		CallerLineno       respjson.Field
+		CompletionTokens   respjson.Field
+		End                respjson.Field
+		PromptTokens       respjson.Field
+		Start              respjson.Field
+		Tokens             respjson.Field
+		ExtraFields        map[string]respjson.Field
 		raw                string
 	} `json:"-"`
 }
@@ -3227,19 +3227,19 @@ type ProjectScore struct {
 	// An optional LexoRank-based string that sets the sort position for the score in
 	// the UI
 	Position string `json:"position,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          resp.Field
-		Name        resp.Field
-		ProjectID   resp.Field
-		ScoreType   resp.Field
-		UserID      resp.Field
-		Categories  resp.Field
-		Config      resp.Field
-		Created     resp.Field
-		Description resp.Field
-		Position    resp.Field
-		ExtraFields map[string]resp.Field
+		ID          respjson.Field
+		Name        respjson.Field
+		ProjectID   respjson.Field
+		ScoreType   respjson.Field
+		UserID      respjson.Field
+		Categories  respjson.Field
+		Config      respjson.Field
+		Created     respjson.Field
+		Description respjson.Field
+		Position    respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -3264,8 +3264,8 @@ type ProjectScoreCategoriesUnion struct {
 	// This field will be present if the value is a [[]string] instead of an object.
 	OfMinimum []string `json:",inline"`
 	JSON      struct {
-		OfCategorical resp.Field
-		OfMinimum     resp.Field
+		OfCategorical respjson.Field
+		OfMinimum     respjson.Field
 		raw           string
 	} `json:"-"`
 }
@@ -3293,11 +3293,11 @@ type ProjectScoreCategory struct {
 	Name string `json:"name,required"`
 	// Numerical value of the category. Must be between 0 and 1, inclusive
 	Value float64 `json:"value,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Name        resp.Field
-		Value       resp.Field
-		ExtraFields map[string]resp.Field
+		Name        respjson.Field
+		Value       respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -3337,12 +3337,12 @@ type ProjectScoreConfig struct {
 	Destination string            `json:"destination,nullable"`
 	MultiSelect bool              `json:"multi_select,nullable"`
 	Online      OnlineScoreConfig `json:"online,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Destination resp.Field
-		MultiSelect resp.Field
-		Online      resp.Field
-		ExtraFields map[string]resp.Field
+		Destination respjson.Field
+		MultiSelect respjson.Field
+		Online      respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -3394,12 +3394,12 @@ type ProjectSettings struct {
 	ComparisonKey string `json:"comparison_key,nullable"`
 	// The order of the fields to display in the trace view
 	SpanFieldOrder []ProjectSettingsSpanFieldOrder `json:"spanFieldOrder,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		BaselineExperimentID resp.Field
-		ComparisonKey        resp.Field
-		SpanFieldOrder       resp.Field
-		ExtraFields          map[string]resp.Field
+		BaselineExperimentID respjson.Field
+		ComparisonKey        respjson.Field
+		SpanFieldOrder       respjson.Field
+		ExtraFields          map[string]respjson.Field
 		raw                  string
 	} `json:"-"`
 }
@@ -3425,13 +3425,13 @@ type ProjectSettingsSpanFieldOrder struct {
 	Position   string `json:"position,required"`
 	// Any of "full", "two_column".
 	Layout ProjectSettingsSpanFieldOrderLayout `json:"layout,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ColumnID    resp.Field
-		ObjectType  resp.Field
-		Position    resp.Field
-		Layout      resp.Field
-		ExtraFields map[string]resp.Field
+		ColumnID    respjson.Field
+		ObjectType  respjson.Field
+		Position    respjson.Field
+		Layout      respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -3495,16 +3495,16 @@ type ProjectTag struct {
 	Created time.Time `json:"created,nullable" format:"date-time"`
 	// Textual description of the project tag
 	Description string `json:"description,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          resp.Field
-		Name        resp.Field
-		ProjectID   resp.Field
-		UserID      resp.Field
-		Color       resp.Field
-		Created     resp.Field
-		Description resp.Field
-		ExtraFields map[string]resp.Field
+		ID          respjson.Field
+		Name        respjson.Field
+		ProjectID   respjson.Field
+		UserID      respjson.Field
+		Color       respjson.Field
+		Created     respjson.Field
+		Description respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -3547,22 +3547,22 @@ type Prompt struct {
 	PromptData PromptData `json:"prompt_data,nullable"`
 	// A list of tags for the prompt
 	Tags []string `json:"tags,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID           resp.Field
-		XactID       resp.Field
-		LogID        resp.Field
-		Name         resp.Field
-		OrgID        resp.Field
-		ProjectID    resp.Field
-		Slug         resp.Field
-		Created      resp.Field
-		Description  resp.Field
-		FunctionType resp.Field
-		Metadata     resp.Field
-		PromptData   resp.Field
-		Tags         resp.Field
-		ExtraFields  map[string]resp.Field
+		ID           respjson.Field
+		XactID       respjson.Field
+		LogID        respjson.Field
+		Name         respjson.Field
+		OrgID        respjson.Field
+		ProjectID    respjson.Field
+		Slug         respjson.Field
+		Created      respjson.Field
+		Description  respjson.Field
+		FunctionType respjson.Field
+		Metadata     respjson.Field
+		PromptData   respjson.Field
+		Tags         respjson.Field
+		ExtraFields  map[string]respjson.Field
 		raw          string
 	} `json:"-"`
 }
@@ -3596,14 +3596,14 @@ type PromptData struct {
 	Parser        PromptDataParser              `json:"parser,nullable"`
 	Prompt        PromptDataPromptUnion         `json:"prompt,nullable"`
 	ToolFunctions []PromptDataToolFunctionUnion `json:"tool_functions,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Options       resp.Field
-		Origin        resp.Field
-		Parser        resp.Field
-		Prompt        resp.Field
-		ToolFunctions resp.Field
-		ExtraFields   map[string]resp.Field
+		Options       respjson.Field
+		Origin        respjson.Field
+		Parser        respjson.Field
+		Prompt        respjson.Field
+		ToolFunctions respjson.Field
+		ExtraFields   map[string]respjson.Field
 		raw           string
 	} `json:"-"`
 }
@@ -3627,12 +3627,12 @@ type PromptDataOrigin struct {
 	ProjectID     string `json:"project_id"`
 	PromptID      string `json:"prompt_id"`
 	PromptVersion string `json:"prompt_version"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ProjectID     resp.Field
-		PromptID      resp.Field
-		PromptVersion resp.Field
-		ExtraFields   map[string]resp.Field
+		ProjectID     respjson.Field
+		PromptID      respjson.Field
+		PromptVersion respjson.Field
+		ExtraFields   map[string]respjson.Field
 		raw           string
 	} `json:"-"`
 }
@@ -3648,12 +3648,12 @@ type PromptDataParser struct {
 	// Any of "llm_classifier".
 	Type   string `json:"type,required"`
 	UseCot bool   `json:"use_cot,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ChoiceScores resp.Field
-		Type         resp.Field
-		UseCot       resp.Field
-		ExtraFields  map[string]resp.Field
+		ChoiceScores respjson.Field
+		Type         respjson.Field
+		UseCot       respjson.Field
+		ExtraFields  map[string]respjson.Field
 		raw          string
 	} `json:"-"`
 }
@@ -3677,10 +3677,10 @@ type PromptDataPromptUnion struct {
 	// This field is from variant [PromptDataPromptChat].
 	Tools string `json:"tools"`
 	JSON  struct {
-		Content  resp.Field
-		Type     resp.Field
-		Messages resp.Field
-		Tools    resp.Field
+		Content  respjson.Field
+		Type     respjson.Field
+		Messages respjson.Field
+		Tools    respjson.Field
 		raw      string
 	} `json:"-"`
 }
@@ -3706,11 +3706,11 @@ type PromptDataPromptCompletion struct {
 	Content string `json:"content,required"`
 	// Any of "completion".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Content     resp.Field
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		Content     respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -3726,12 +3726,12 @@ type PromptDataPromptChat struct {
 	// Any of "chat".
 	Type  string `json:"type,required"`
 	Tools string `json:"tools"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Messages    resp.Field
-		Type        resp.Field
-		Tools       resp.Field
-		ExtraFields map[string]resp.Field
+		Messages    respjson.Field
+		Type        respjson.Field
+		Tools       respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -3762,12 +3762,12 @@ type PromptDataPromptChatMessageUnion struct {
 	// This field is from variant [PromptDataPromptChatMessageTool].
 	ToolCallID string `json:"tool_call_id"`
 	JSON       struct {
-		Role         resp.Field
-		Content      resp.Field
-		Name         resp.Field
-		FunctionCall resp.Field
-		ToolCalls    resp.Field
-		ToolCallID   resp.Field
+		Role         respjson.Field
+		Content      respjson.Field
+		Name         respjson.Field
+		FunctionCall respjson.Field
+		ToolCalls    respjson.Field
+		ToolCallID   respjson.Field
 		raw          string
 	} `json:"-"`
 }
@@ -3825,8 +3825,8 @@ type PromptDataPromptChatMessageUnionContent struct {
 	// [[]PromptDataPromptChatMessageUserContentArrayItemUnion] instead of an object.
 	OfArray []PromptDataPromptChatMessageUserContentArrayItemUnion `json:",inline"`
 	JSON    struct {
-		OfString resp.Field
-		OfArray  resp.Field
+		OfString respjson.Field
+		OfArray  respjson.Field
 		raw      string
 	} `json:"-"`
 }
@@ -3840,12 +3840,12 @@ type PromptDataPromptChatMessageSystem struct {
 	Role    string `json:"role,required"`
 	Content string `json:"content"`
 	Name    string `json:"name"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Role        resp.Field
-		Content     resp.Field
-		Name        resp.Field
-		ExtraFields map[string]resp.Field
+		Role        respjson.Field
+		Content     respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -3861,12 +3861,12 @@ type PromptDataPromptChatMessageUser struct {
 	Role    string                                      `json:"role,required"`
 	Content PromptDataPromptChatMessageUserContentUnion `json:"content"`
 	Name    string                                      `json:"name"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Role        resp.Field
-		Content     resp.Field
-		Name        resp.Field
-		ExtraFields map[string]resp.Field
+		Role        respjson.Field
+		Content     respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -3891,8 +3891,8 @@ type PromptDataPromptChatMessageUserContentUnion struct {
 	// [[]PromptDataPromptChatMessageUserContentArrayItemUnion] instead of an object.
 	OfArray []PromptDataPromptChatMessageUserContentArrayItemUnion `json:",inline"`
 	JSON    struct {
-		OfString resp.Field
-		OfArray  resp.Field
+		OfString respjson.Field
+		OfArray  respjson.Field
 		raw      string
 	} `json:"-"`
 }
@@ -3926,9 +3926,9 @@ type PromptDataPromptChatMessageUserContentArrayItemUnion struct {
 	// This field is from variant [ChatCompletionContentPartImage].
 	ImageURL ChatCompletionContentPartImageImageURL `json:"image_url"`
 	JSON     struct {
-		Type     resp.Field
-		Text     resp.Field
-		ImageURL resp.Field
+		Type     respjson.Field
+		Text     respjson.Field
+		ImageURL respjson.Field
 		raw      string
 	} `json:"-"`
 }
@@ -3957,14 +3957,14 @@ type PromptDataPromptChatMessageAssistant struct {
 	FunctionCall PromptDataPromptChatMessageAssistantFunctionCall `json:"function_call,nullable"`
 	Name         string                                           `json:"name,nullable"`
 	ToolCalls    []ChatCompletionMessageToolCall                  `json:"tool_calls,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Role         resp.Field
-		Content      resp.Field
-		FunctionCall resp.Field
-		Name         resp.Field
-		ToolCalls    resp.Field
-		ExtraFields  map[string]resp.Field
+		Role         respjson.Field
+		Content      respjson.Field
+		FunctionCall respjson.Field
+		Name         respjson.Field
+		ToolCalls    respjson.Field
+		ExtraFields  map[string]respjson.Field
 		raw          string
 	} `json:"-"`
 }
@@ -3978,11 +3978,11 @@ func (r *PromptDataPromptChatMessageAssistant) UnmarshalJSON(data []byte) error 
 type PromptDataPromptChatMessageAssistantFunctionCall struct {
 	Arguments string `json:"arguments,required"`
 	Name      string `json:"name,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Arguments   resp.Field
-		Name        resp.Field
-		ExtraFields map[string]resp.Field
+		Arguments   respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -3998,12 +3998,12 @@ type PromptDataPromptChatMessageTool struct {
 	Role       string `json:"role,required"`
 	Content    string `json:"content"`
 	ToolCallID string `json:"tool_call_id"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Role        resp.Field
-		Content     resp.Field
-		ToolCallID  resp.Field
-		ExtraFields map[string]resp.Field
+		Role        respjson.Field
+		Content     respjson.Field
+		ToolCallID  respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -4019,12 +4019,12 @@ type PromptDataPromptChatMessageFunction struct {
 	// Any of "function".
 	Role    string `json:"role,required"`
 	Content string `json:"content"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Name        resp.Field
-		Role        resp.Field
-		Content     resp.Field
-		ExtraFields map[string]resp.Field
+		Name        respjson.Field
+		Role        respjson.Field
+		Content     respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -4039,11 +4039,11 @@ type PromptDataPromptChatMessageFallback struct {
 	// Any of "model".
 	Role    string `json:"role,required"`
 	Content string `json:"content,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Role        resp.Field
-		Content     resp.Field
-		ExtraFields map[string]resp.Field
+		Role        respjson.Field
+		Content     respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -4065,9 +4065,9 @@ type PromptDataToolFunctionUnion struct {
 	// This field is from variant [PromptDataToolFunctionGlobal].
 	Name string `json:"name"`
 	JSON struct {
-		ID   resp.Field
-		Type resp.Field
-		Name resp.Field
+		ID   respjson.Field
+		Type respjson.Field
+		Name respjson.Field
 		raw  string
 	} `json:"-"`
 }
@@ -4093,11 +4093,11 @@ type PromptDataToolFunctionFunction struct {
 	ID string `json:"id,required"`
 	// Any of "function".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          resp.Field
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		ID          respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -4112,11 +4112,11 @@ type PromptDataToolFunctionGlobal struct {
 	Name string `json:"name,required"`
 	// Any of "global".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Name        resp.Field
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		Name        respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -4691,12 +4691,12 @@ type PromptOptions struct {
 	Model    string                   `json:"model"`
 	Params   PromptOptionsParamsUnion `json:"params"`
 	Position string                   `json:"position"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Model       resp.Field
-		Params      resp.Field
-		Position    resp.Field
-		ExtraFields map[string]resp.Field
+		Model       respjson.Field
+		Params      respjson.Field
+		Position    respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -4755,23 +4755,23 @@ type PromptOptionsParamsUnion struct {
 	// This field is from variant [PromptOptionsParamsGoogleModelParams].
 	MaxOutputTokens float64 `json:"maxOutputTokens"`
 	JSON            struct {
-		FrequencyPenalty    resp.Field
-		FunctionCall        resp.Field
-		MaxCompletionTokens resp.Field
-		MaxTokens           resp.Field
-		N                   resp.Field
-		PresencePenalty     resp.Field
-		ReasoningEffort     resp.Field
-		ResponseFormat      resp.Field
-		Stop                resp.Field
-		Temperature         resp.Field
-		ToolChoice          resp.Field
-		TopP                resp.Field
-		UseCache            resp.Field
-		MaxTokensToSample   resp.Field
-		StopSequences       resp.Field
-		TopK                resp.Field
-		MaxOutputTokens     resp.Field
+		FrequencyPenalty    respjson.Field
+		FunctionCall        respjson.Field
+		MaxCompletionTokens respjson.Field
+		MaxTokens           respjson.Field
+		N                   respjson.Field
+		PresencePenalty     respjson.Field
+		ReasoningEffort     respjson.Field
+		ResponseFormat      respjson.Field
+		Stop                respjson.Field
+		Temperature         respjson.Field
+		ToolChoice          respjson.Field
+		TopP                respjson.Field
+		UseCache            respjson.Field
+		MaxTokensToSample   respjson.Field
+		StopSequences       respjson.Field
+		TopK                respjson.Field
+		MaxOutputTokens     respjson.Field
 		raw                 string
 	} `json:"-"`
 }
@@ -4824,22 +4824,22 @@ type PromptOptionsParamsOpenAIModelParams struct {
 	ToolChoice      PromptOptionsParamsOpenAIModelParamsToolChoiceUnion     `json:"tool_choice"`
 	TopP            float64                                                 `json:"top_p"`
 	UseCache        bool                                                    `json:"use_cache"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		FrequencyPenalty    resp.Field
-		FunctionCall        resp.Field
-		MaxCompletionTokens resp.Field
-		MaxTokens           resp.Field
-		N                   resp.Field
-		PresencePenalty     resp.Field
-		ReasoningEffort     resp.Field
-		ResponseFormat      resp.Field
-		Stop                resp.Field
-		Temperature         resp.Field
-		ToolChoice          resp.Field
-		TopP                resp.Field
-		UseCache            resp.Field
-		ExtraFields         map[string]resp.Field
+		FrequencyPenalty    respjson.Field
+		FunctionCall        respjson.Field
+		MaxCompletionTokens respjson.Field
+		MaxTokens           respjson.Field
+		N                   respjson.Field
+		PresencePenalty     respjson.Field
+		ReasoningEffort     respjson.Field
+		ResponseFormat      respjson.Field
+		Stop                respjson.Field
+		Temperature         respjson.Field
+		ToolChoice          respjson.Field
+		TopP                respjson.Field
+		UseCache            respjson.Field
+		ExtraFields         map[string]respjson.Field
 		raw                 string
 	} `json:"-"`
 }
@@ -4867,8 +4867,8 @@ type PromptOptionsParamsOpenAIModelParamsFunctionCallUnion struct {
 	// [PromptOptionsParamsOpenAIModelParamsFunctionCallFunction].
 	Name string `json:"name"`
 	JSON struct {
-		OfPromptOptionssOpenAIModelParamsFunctionCallString resp.Field
-		Name                                                resp.Field
+		OfPromptOptionssOpenAIModelParamsFunctionCallString respjson.Field
+		Name                                                respjson.Field
 		raw                                                 string
 	} `json:"-"`
 }
@@ -4899,10 +4899,10 @@ const (
 
 type PromptOptionsParamsOpenAIModelParamsFunctionCallFunction struct {
 	Name string `json:"name,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Name        resp.Field
-		ExtraFields map[string]resp.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -4926,8 +4926,8 @@ type PromptOptionsParamsOpenAIModelParamsResponseFormatUnion struct {
 	// [PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema].
 	JsonSchema PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema `json:"json_schema"`
 	JSON       struct {
-		Type       resp.Field
-		JsonSchema resp.Field
+		Type       respjson.Field
+		JsonSchema respjson.Field
 		raw        string
 	} `json:"-"`
 }
@@ -4957,10 +4957,10 @@ func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatUnion) UnmarshalJSON(
 type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject struct {
 	// Any of "json_object".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -4977,11 +4977,11 @@ type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema struct {
 	JsonSchema PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema `json:"json_schema,required"`
 	// Any of "json_schema".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		JsonSchema  resp.Field
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		JsonSchema  respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -4999,13 +4999,13 @@ type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema stru
 	Description string `json:"description"`
 	Schema      string `json:"schema"`
 	Strict      bool   `json:"strict,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Name        resp.Field
-		Description resp.Field
-		Schema      resp.Field
-		Strict      resp.Field
-		ExtraFields map[string]resp.Field
+		Name        respjson.Field
+		Description respjson.Field
+		Schema      respjson.Field
+		Strict      respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -5021,10 +5021,10 @@ func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema)
 type PromptOptionsParamsOpenAIModelParamsResponseFormatText struct {
 	// Any of "text".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -5055,9 +5055,9 @@ type PromptOptionsParamsOpenAIModelParamsToolChoiceUnion struct {
 	// [PromptOptionsParamsOpenAIModelParamsToolChoiceFunction].
 	Type string `json:"type"`
 	JSON struct {
-		OfPromptOptionssOpenAIModelParamsToolChoiceString resp.Field
-		Function                                          resp.Field
-		Type                                              resp.Field
+		OfPromptOptionssOpenAIModelParamsToolChoiceString respjson.Field
+		Function                                          respjson.Field
+		Type                                              respjson.Field
 		raw                                               string
 	} `json:"-"`
 }
@@ -5091,11 +5091,11 @@ type PromptOptionsParamsOpenAIModelParamsToolChoiceFunction struct {
 	Function PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction `json:"function,required"`
 	// Any of "function".
 	Type string `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Function    resp.Field
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		Function    respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -5108,10 +5108,10 @@ func (r *PromptOptionsParamsOpenAIModelParamsToolChoiceFunction) UnmarshalJSON(d
 
 type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction struct {
 	Name string `json:"name,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Name        resp.Field
-		ExtraFields map[string]resp.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -5133,16 +5133,16 @@ type PromptOptionsParamsAnthropicModelParams struct {
 	TopK              float64  `json:"top_k"`
 	TopP              float64  `json:"top_p"`
 	UseCache          bool     `json:"use_cache"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		MaxTokens         resp.Field
-		Temperature       resp.Field
-		MaxTokensToSample resp.Field
-		StopSequences     resp.Field
-		TopK              resp.Field
-		TopP              resp.Field
-		UseCache          resp.Field
-		ExtraFields       map[string]resp.Field
+		MaxTokens         respjson.Field
+		Temperature       respjson.Field
+		MaxTokensToSample respjson.Field
+		StopSequences     respjson.Field
+		TopK              respjson.Field
+		TopP              respjson.Field
+		UseCache          respjson.Field
+		ExtraFields       map[string]respjson.Field
 		raw               string
 	} `json:"-"`
 }
@@ -5159,14 +5159,14 @@ type PromptOptionsParamsGoogleModelParams struct {
 	TopK            float64 `json:"topK"`
 	TopP            float64 `json:"topP"`
 	UseCache        bool    `json:"use_cache"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		MaxOutputTokens resp.Field
-		Temperature     resp.Field
-		TopK            resp.Field
-		TopP            resp.Field
-		UseCache        resp.Field
-		ExtraFields     map[string]resp.Field
+		MaxOutputTokens respjson.Field
+		Temperature     respjson.Field
+		TopK            respjson.Field
+		TopP            respjson.Field
+		UseCache        respjson.Field
+		ExtraFields     map[string]respjson.Field
 		raw             string
 	} `json:"-"`
 }
@@ -5181,12 +5181,12 @@ type PromptOptionsParamsWindowAIModelParams struct {
 	Temperature float64 `json:"temperature"`
 	TopK        float64 `json:"topK"`
 	UseCache    bool    `json:"use_cache"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Temperature resp.Field
-		TopK        resp.Field
-		UseCache    resp.Field
-		ExtraFields map[string]resp.Field
+		Temperature respjson.Field
+		TopK        respjson.Field
+		UseCache    respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -5199,10 +5199,10 @@ func (r *PromptOptionsParamsWindowAIModelParams) UnmarshalJSON(data []byte) erro
 
 type PromptOptionsParamsJsCompletionParams struct {
 	UseCache bool `json:"use_cache"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		UseCache    resp.Field
-		ExtraFields map[string]resp.Field
+		UseCache    respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -5728,18 +5728,18 @@ type RepoInfo struct {
 	GitDiff string `json:"git_diff,nullable"`
 	// Name of the tag on the most recent commit
 	Tag string `json:"tag,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		AuthorEmail   resp.Field
-		AuthorName    resp.Field
-		Branch        resp.Field
-		Commit        resp.Field
-		CommitMessage resp.Field
-		CommitTime    resp.Field
-		Dirty         resp.Field
-		GitDiff       resp.Field
-		Tag           resp.Field
-		ExtraFields   map[string]resp.Field
+		AuthorEmail   respjson.Field
+		AuthorName    respjson.Field
+		Branch        respjson.Field
+		Commit        respjson.Field
+		CommitMessage respjson.Field
+		CommitTime    respjson.Field
+		Dirty         respjson.Field
+		GitDiff       respjson.Field
+		Tag           respjson.Field
+		ExtraFields   map[string]respjson.Field
 		raw           string
 	} `json:"-"`
 }
@@ -5819,18 +5819,18 @@ type Role struct {
 	OrgID string `json:"org_id,nullable" format:"uuid"`
 	// Identifies the user who created the role
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID                resp.Field
-		Name              resp.Field
-		Created           resp.Field
-		DeletedAt         resp.Field
-		Description       resp.Field
-		MemberPermissions resp.Field
-		MemberRoles       resp.Field
-		OrgID             resp.Field
-		UserID            resp.Field
-		ExtraFields       map[string]resp.Field
+		ID                respjson.Field
+		Name              respjson.Field
+		Created           respjson.Field
+		DeletedAt         respjson.Field
+		Description       respjson.Field
+		MemberPermissions respjson.Field
+		MemberRoles       respjson.Field
+		OrgID             respjson.Field
+		UserID            respjson.Field
+		ExtraFields       map[string]respjson.Field
 		raw               string
 	} `json:"-"`
 }
@@ -5855,11 +5855,11 @@ type RoleMemberPermission struct {
 	// Any of "organization", "project", "experiment", "dataset", "prompt",
 	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
 	RestrictObjectType ACLObjectType `json:"restrict_object_type,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Permission         resp.Field
-		RestrictObjectType resp.Field
-		ExtraFields        map[string]resp.Field
+		Permission         respjson.Field
+		RestrictObjectType respjson.Field
+		ExtraFields        map[string]respjson.Field
 		raw                string
 	} `json:"-"`
 }
@@ -5882,14 +5882,14 @@ type ScoreSummary struct {
 	Score float64 `json:"score,required"`
 	// Difference in score between the current and comparison experiment
 	Diff float64 `json:"diff"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Improvements resp.Field
-		Name         resp.Field
-		Regressions  resp.Field
-		Score        resp.Field
-		Diff         resp.Field
-		ExtraFields  map[string]resp.Field
+		Improvements respjson.Field
+		Name         respjson.Field
+		Regressions  respjson.Field
+		Score        respjson.Field
+		Diff         respjson.Field
+		ExtraFields  map[string]respjson.Field
 		raw          string
 	} `json:"-"`
 }
@@ -5909,11 +5909,11 @@ type SpanAttributes struct {
 	// Any of "llm", "score", "function", "eval", "task", "tool".
 	Type        SpanType       `json:"type,nullable"`
 	ExtraFields map[string]any `json:",extras"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Name        resp.Field
-		Type        resp.Field
-		ExtraFields map[string]resp.Field
+		Name        respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -5970,18 +5970,18 @@ type SpanIFrame struct {
 	PostMessage bool `json:"post_message,nullable"`
 	// Identifies the user who created the span iframe
 	UserID string `json:"user_id,nullable" format:"uuid"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          resp.Field
-		Name        resp.Field
-		ProjectID   resp.Field
-		URL         resp.Field
-		Created     resp.Field
-		DeletedAt   resp.Field
-		Description resp.Field
-		PostMessage resp.Field
-		UserID      resp.Field
-		ExtraFields map[string]resp.Field
+		ID          respjson.Field
+		Name        respjson.Field
+		ProjectID   respjson.Field
+		URL         respjson.Field
+		Created     respjson.Field
+		DeletedAt   respjson.Field
+		Description respjson.Field
+		PostMessage respjson.Field
+		UserID      respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -6016,14 +6016,14 @@ type SummarizeDatasetResponse struct {
 	ProjectURL string `json:"project_url,required" format:"uri"`
 	// Summary of a dataset's data
 	DataSummary DataSummary `json:"data_summary,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		DatasetName resp.Field
-		DatasetURL  resp.Field
-		ProjectName resp.Field
-		ProjectURL  resp.Field
-		DataSummary resp.Field
-		ExtraFields map[string]resp.Field
+		DatasetName respjson.Field
+		DatasetURL  respjson.Field
+		ProjectName respjson.Field
+		ProjectURL  respjson.Field
+		DataSummary respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -6050,16 +6050,16 @@ type SummarizeExperimentResponse struct {
 	Metrics map[string]MetricSummary `json:"metrics,nullable"`
 	// Summary of the experiment's scores
 	Scores map[string]ScoreSummary `json:"scores,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ExperimentName           resp.Field
-		ExperimentURL            resp.Field
-		ProjectName              resp.Field
-		ProjectURL               resp.Field
-		ComparisonExperimentName resp.Field
-		Metrics                  resp.Field
-		Scores                   resp.Field
-		ExtraFields              map[string]resp.Field
+		ExperimentName           respjson.Field
+		ExperimentURL            respjson.Field
+		ProjectName              respjson.Field
+		ProjectURL               respjson.Field
+		ComparisonExperimentName respjson.Field
+		Metrics                  respjson.Field
+		Scores                   respjson.Field
+		ExtraFields              map[string]respjson.Field
 		raw                      string
 	} `json:"-"`
 }
@@ -6083,15 +6083,15 @@ type User struct {
 	FamilyName string `json:"family_name,nullable"`
 	// Given name of the user
 	GivenName string `json:"given_name,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          resp.Field
-		AvatarURL   resp.Field
-		Created     resp.Field
-		Email       resp.Field
-		FamilyName  resp.Field
-		GivenName   resp.Field
-		ExtraFields map[string]resp.Field
+		ID          respjson.Field
+		AvatarURL   respjson.Field
+		Created     respjson.Field
+		Email       respjson.Field
+		FamilyName  respjson.Field
+		GivenName   respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -6129,19 +6129,19 @@ type View struct {
 	UserID string `json:"user_id,nullable" format:"uuid"`
 	// The view definition
 	ViewData ViewData `json:"view_data,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          resp.Field
-		Name        resp.Field
-		ObjectID    resp.Field
-		ObjectType  resp.Field
-		ViewType    resp.Field
-		Created     resp.Field
-		DeletedAt   resp.Field
-		Options     resp.Field
-		UserID      resp.Field
-		ViewData    resp.Field
-		ExtraFields map[string]resp.Field
+		ID          respjson.Field
+		Name        respjson.Field
+		ObjectID    respjson.Field
+		ObjectType  respjson.Field
+		ViewType    respjson.Field
+		Created     respjson.Field
+		DeletedAt   respjson.Field
+		Options     respjson.Field
+		UserID      respjson.Field
+		ViewData    respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -6172,10 +6172,10 @@ const (
 // The view definition
 type ViewData struct {
 	Search ViewDataSearch `json:"search,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Search      resp.Field
-		ExtraFields map[string]resp.Field
+		Search      respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -6211,13 +6211,13 @@ type ViewDataSearch struct {
 	Match  []any `json:"match,nullable"`
 	Sort   []any `json:"sort,nullable"`
 	Tag    []any `json:"tag,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Filter      resp.Field
-		Match       resp.Field
-		Sort        resp.Field
-		Tag         resp.Field
-		ExtraFields map[string]resp.Field
+		Filter      respjson.Field
+		Match       respjson.Field
+		Sort        respjson.Field
+		Tag         respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
@@ -6258,15 +6258,15 @@ type ViewOptions struct {
 	Grouping         string             `json:"grouping,nullable"`
 	Layout           string             `json:"layout,nullable"`
 	RowHeight        string             `json:"rowHeight,nullable"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ColumnOrder      resp.Field
-		ColumnSizing     resp.Field
-		ColumnVisibility resp.Field
-		Grouping         resp.Field
-		Layout           resp.Field
-		RowHeight        resp.Field
-		ExtraFields      map[string]resp.Field
+		ColumnOrder      respjson.Field
+		ColumnSizing     respjson.Field
+		ColumnVisibility respjson.Field
+		Grouping         respjson.Field
+		Layout           respjson.Field
+		RowHeight        respjson.Field
+		ExtraFields      map[string]respjson.Field
 		raw              string
 	} `json:"-"`
 }

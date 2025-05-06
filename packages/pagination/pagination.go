@@ -10,7 +10,7 @@ import (
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/param"
-	"github.com/braintrustdata/braintrust-go/packages/resp"
+	"github.com/braintrustdata/braintrust-go/packages/respjson"
 )
 
 // aliased to make [param.APIUnion] private when embedding
@@ -21,10 +21,10 @@ type paramObj = param.APIObject
 
 type ListObjects[T any] struct {
 	Objects []T `json:"objects"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Objects     resp.Field
-		ExtraFields map[string]resp.Field
+		Objects     respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 	cfg *requestconfig.RequestConfig
