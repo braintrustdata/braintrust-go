@@ -14,7 +14,7 @@ import (
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/param"
-	"github.com/braintrustdata/braintrust-go/packages/resp"
+	"github.com/braintrustdata/braintrust-go/packages/respjson"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -106,10 +106,10 @@ func (r *EnvVarService) Replace(ctx context.Context, body EnvVarReplaceParams, o
 type EnvVarListResponse struct {
 	// A list of env_var objects
 	Objects []shared.EnvVar `json:"objects,required"`
-	// JSON contains metadata for fields, check presence with [resp.Field.Valid].
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Objects     resp.Field
-		ExtraFields map[string]resp.Field
+		Objects     respjson.Field
+		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
