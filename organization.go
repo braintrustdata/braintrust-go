@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -114,6 +115,9 @@ type OrganizationUpdateParams struct {
 func (r OrganizationUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow OrganizationUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OrganizationUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type OrganizationListParams struct {

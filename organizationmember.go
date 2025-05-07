@@ -6,6 +6,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/param"
@@ -61,6 +62,9 @@ func (r OrganizationMemberUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow OrganizationMemberUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *OrganizationMemberUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Users to invite to the organization
 type OrganizationMemberUpdateParamsInviteUsers struct {
@@ -85,6 +89,9 @@ func (r OrganizationMemberUpdateParamsInviteUsers) MarshalJSON() (data []byte, e
 	type shadow OrganizationMemberUpdateParamsInviteUsers
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *OrganizationMemberUpdateParamsInviteUsers) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Users to remove from the organization
 type OrganizationMemberUpdateParamsRemoveUsers struct {
@@ -98,4 +105,7 @@ type OrganizationMemberUpdateParamsRemoveUsers struct {
 func (r OrganizationMemberUpdateParamsRemoveUsers) MarshalJSON() (data []byte, err error) {
 	type shadow OrganizationMemberUpdateParamsRemoveUsers
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OrganizationMemberUpdateParamsRemoveUsers) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -107,6 +108,9 @@ type APIKeyNewParams struct {
 func (r APIKeyNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow APIKeyNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *APIKeyNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type APIKeyListParams struct {

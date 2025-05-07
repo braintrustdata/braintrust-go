@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -141,6 +142,9 @@ func (r GroupNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow GroupNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *GroupNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type GroupUpdateParams struct {
 	// Textual description of the group
@@ -161,6 +165,9 @@ type GroupUpdateParams struct {
 func (r GroupUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow GroupUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *GroupUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type GroupListParams struct {
@@ -236,4 +243,7 @@ type GroupReplaceParams struct {
 func (r GroupReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow GroupReplaceParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *GroupReplaceParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

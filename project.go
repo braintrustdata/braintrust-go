@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -124,6 +125,9 @@ func (r ProjectNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ProjectNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type ProjectUpdateParams struct {
 	// Name of the project
@@ -137,6 +141,9 @@ type ProjectUpdateParams struct {
 func (r ProjectUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ProjectUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ProjectListParams struct {

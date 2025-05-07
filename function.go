@@ -160,6 +160,9 @@ func (r FunctionNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Only one field can be non-zero.
 //
@@ -173,6 +176,9 @@ type FunctionNewParamsFunctionDataUnion struct {
 
 func (u FunctionNewParamsFunctionDataUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionNewParamsFunctionDataUnion](u.OfPrompt, u.OfCode, u.OfGlobal)
+}
+func (u *FunctionNewParamsFunctionDataUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *FunctionNewParamsFunctionDataUnion) asAny() any {
@@ -225,10 +231,13 @@ func (r FunctionNewParamsFunctionDataPrompt) MarshalJSON() (data []byte, err err
 	type shadow FunctionNewParamsFunctionDataPrompt
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionNewParamsFunctionDataPrompt) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionNewParamsFunctionDataPrompt](
-		"Type", false, "prompt",
+		"type", "prompt",
 	)
 }
 
@@ -244,10 +253,13 @@ func (r FunctionNewParamsFunctionDataCode) MarshalJSON() (data []byte, err error
 	type shadow FunctionNewParamsFunctionDataCode
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionNewParamsFunctionDataCode) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionNewParamsFunctionDataCode](
-		"Type", false, "code",
+		"type", "code",
 	)
 }
 
@@ -262,6 +274,9 @@ type FunctionNewParamsFunctionDataCodeDataUnion struct {
 
 func (u FunctionNewParamsFunctionDataCodeDataUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionNewParamsFunctionDataCodeDataUnion](u.OfBundle, u.OfInline)
+}
+func (u *FunctionNewParamsFunctionDataCodeDataUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *FunctionNewParamsFunctionDataCodeDataUnion) asAny() any {
@@ -386,10 +401,13 @@ func (r FunctionNewParamsFunctionDataCodeDataInline) MarshalJSON() (data []byte,
 	type shadow FunctionNewParamsFunctionDataCodeDataInline
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionNewParamsFunctionDataCodeDataInline) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionNewParamsFunctionDataCodeDataInline](
-		"Type", false, "inline",
+		"type", "inline",
 	)
 }
 
@@ -405,10 +423,13 @@ func (r FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext) MarshalJSON()
 	type shadow FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionNewParamsFunctionDataCodeDataInlineRuntimeContext](
-		"Runtime", false, "node", "python",
+		"runtime", "node", "python",
 	)
 }
 
@@ -424,10 +445,13 @@ func (r FunctionNewParamsFunctionDataGlobal) MarshalJSON() (data []byte, err err
 	type shadow FunctionNewParamsFunctionDataGlobal
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionNewParamsFunctionDataGlobal) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionNewParamsFunctionDataGlobal](
-		"Type", false, "global",
+		"type", "global",
 	)
 }
 
@@ -441,6 +465,9 @@ type FunctionNewParamsFunctionSchema struct {
 func (r FunctionNewParamsFunctionSchema) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionNewParamsFunctionSchema
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *FunctionNewParamsFunctionSchema) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type FunctionNewParamsFunctionType string
@@ -471,6 +498,9 @@ func (r FunctionNewParamsOrigin) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionNewParamsOrigin
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionNewParamsOrigin) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type FunctionUpdateParams struct {
 	// Textual description of the prompt
@@ -489,6 +519,9 @@ func (r FunctionUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Only one field can be non-zero.
 //
@@ -502,6 +535,9 @@ type FunctionUpdateParamsFunctionDataUnion struct {
 
 func (u FunctionUpdateParamsFunctionDataUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionUpdateParamsFunctionDataUnion](u.OfPrompt, u.OfCode, u.OfGlobal)
+}
+func (u *FunctionUpdateParamsFunctionDataUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *FunctionUpdateParamsFunctionDataUnion) asAny() any {
@@ -554,10 +590,13 @@ func (r FunctionUpdateParamsFunctionDataPrompt) MarshalJSON() (data []byte, err 
 	type shadow FunctionUpdateParamsFunctionDataPrompt
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionUpdateParamsFunctionDataPrompt) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionUpdateParamsFunctionDataPrompt](
-		"Type", false, "prompt",
+		"type", "prompt",
 	)
 }
 
@@ -573,10 +612,13 @@ func (r FunctionUpdateParamsFunctionDataCode) MarshalJSON() (data []byte, err er
 	type shadow FunctionUpdateParamsFunctionDataCode
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionUpdateParamsFunctionDataCode) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionUpdateParamsFunctionDataCode](
-		"Type", false, "code",
+		"type", "code",
 	)
 }
 
@@ -591,6 +633,9 @@ type FunctionUpdateParamsFunctionDataCodeDataUnion struct {
 
 func (u FunctionUpdateParamsFunctionDataCodeDataUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionUpdateParamsFunctionDataCodeDataUnion](u.OfBundle, u.OfInline)
+}
+func (u *FunctionUpdateParamsFunctionDataCodeDataUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *FunctionUpdateParamsFunctionDataCodeDataUnion) asAny() any {
@@ -715,10 +760,13 @@ func (r FunctionUpdateParamsFunctionDataCodeDataInline) MarshalJSON() (data []by
 	type shadow FunctionUpdateParamsFunctionDataCodeDataInline
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionUpdateParamsFunctionDataCodeDataInline) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionUpdateParamsFunctionDataCodeDataInline](
-		"Type", false, "inline",
+		"type", "inline",
 	)
 }
 
@@ -734,10 +782,13 @@ func (r FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext) MarshalJSO
 	type shadow FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionUpdateParamsFunctionDataCodeDataInlineRuntimeContext](
-		"Runtime", false, "node", "python",
+		"runtime", "node", "python",
 	)
 }
 
@@ -753,10 +804,13 @@ func (r FunctionUpdateParamsFunctionDataGlobal) MarshalJSON() (data []byte, err 
 	type shadow FunctionUpdateParamsFunctionDataGlobal
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionUpdateParamsFunctionDataGlobal) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionUpdateParamsFunctionDataGlobal](
-		"Type", false, "global",
+		"type", "global",
 	)
 }
 
@@ -849,6 +903,9 @@ func (r FunctionInvokeParams) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionInvokeParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionInvokeParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Only one field can be non-zero.
 //
@@ -870,6 +927,9 @@ func (u FunctionInvokeParamsMessageUnion) MarshalJSON() ([]byte, error) {
 		u.OfTool,
 		u.OfFunction,
 		u.OfFallback)
+}
+func (u *FunctionInvokeParamsMessageUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *FunctionInvokeParamsMessageUnion) asAny() any {
@@ -992,10 +1052,13 @@ func (r FunctionInvokeParamsMessageSystem) MarshalJSON() (data []byte, err error
 	type shadow FunctionInvokeParamsMessageSystem
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionInvokeParamsMessageSystem) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionInvokeParamsMessageSystem](
-		"Role", false, "system",
+		"role", "system",
 	)
 }
 
@@ -1012,10 +1075,13 @@ func (r FunctionInvokeParamsMessageUser) MarshalJSON() (data []byte, err error) 
 	type shadow FunctionInvokeParamsMessageUser
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionInvokeParamsMessageUser) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionInvokeParamsMessageUser](
-		"Role", false, "user",
+		"role", "user",
 	)
 }
 
@@ -1030,6 +1096,9 @@ type FunctionInvokeParamsMessageUserContentUnion struct {
 
 func (u FunctionInvokeParamsMessageUserContentUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionInvokeParamsMessageUserContentUnion](u.OfString, u.OfArray)
+}
+func (u *FunctionInvokeParamsMessageUserContentUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *FunctionInvokeParamsMessageUserContentUnion) asAny() any {
@@ -1052,6 +1121,9 @@ type FunctionInvokeParamsMessageUserContentArrayItemUnion struct {
 
 func (u FunctionInvokeParamsMessageUserContentArrayItemUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionInvokeParamsMessageUserContentArrayItemUnion](u.OfText, u.OfImageURL)
+}
+func (u *FunctionInvokeParamsMessageUserContentArrayItemUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *FunctionInvokeParamsMessageUserContentArrayItemUnion) asAny() any {
@@ -1104,10 +1176,13 @@ func (r FunctionInvokeParamsMessageAssistant) MarshalJSON() (data []byte, err er
 	type shadow FunctionInvokeParamsMessageAssistant
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionInvokeParamsMessageAssistant) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionInvokeParamsMessageAssistant](
-		"Role", false, "assistant",
+		"role", "assistant",
 	)
 }
 
@@ -1121,6 +1196,9 @@ type FunctionInvokeParamsMessageAssistantFunctionCall struct {
 func (r FunctionInvokeParamsMessageAssistantFunctionCall) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionInvokeParamsMessageAssistantFunctionCall
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *FunctionInvokeParamsMessageAssistantFunctionCall) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // The property Role is required.
@@ -1136,10 +1214,13 @@ func (r FunctionInvokeParamsMessageTool) MarshalJSON() (data []byte, err error) 
 	type shadow FunctionInvokeParamsMessageTool
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionInvokeParamsMessageTool) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionInvokeParamsMessageTool](
-		"Role", false, "tool",
+		"role", "tool",
 	)
 }
 
@@ -1156,10 +1237,13 @@ func (r FunctionInvokeParamsMessageFunction) MarshalJSON() (data []byte, err err
 	type shadow FunctionInvokeParamsMessageFunction
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionInvokeParamsMessageFunction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionInvokeParamsMessageFunction](
-		"Role", false, "function",
+		"role", "function",
 	)
 }
 
@@ -1175,10 +1259,13 @@ func (r FunctionInvokeParamsMessageFallback) MarshalJSON() (data []byte, err err
 	type shadow FunctionInvokeParamsMessageFallback
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionInvokeParamsMessageFallback) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionInvokeParamsMessageFallback](
-		"Role", false, "model",
+		"role", "model",
 	)
 }
 
@@ -1201,6 +1288,9 @@ type FunctionInvokeParamsParentUnion struct {
 
 func (u FunctionInvokeParamsParentUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionInvokeParamsParentUnion](u.OfSpanParentStruct, u.OfString)
+}
+func (u *FunctionInvokeParamsParentUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *FunctionInvokeParamsParentUnion) asAny() any {
@@ -1231,10 +1321,13 @@ func (r FunctionInvokeParamsParentSpanParentStruct) MarshalJSON() (data []byte, 
 	type shadow FunctionInvokeParamsParentSpanParentStruct
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionInvokeParamsParentSpanParentStruct) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionInvokeParamsParentSpanParentStruct](
-		"ObjectType", false, "project_logs", "experiment", "playground_logs",
+		"object_type", "project_logs", "experiment", "playground_logs",
 	)
 }
 
@@ -1254,6 +1347,9 @@ type FunctionInvokeParamsParentSpanParentStructRowIDs struct {
 func (r FunctionInvokeParamsParentSpanParentStructRowIDs) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionInvokeParamsParentSpanParentStructRowIDs
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *FunctionInvokeParamsParentSpanParentStructRowIDs) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type FunctionReplaceParams struct {
@@ -1282,6 +1378,9 @@ func (r FunctionReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionReplaceParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionReplaceParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Only one field can be non-zero.
 //
@@ -1295,6 +1394,9 @@ type FunctionReplaceParamsFunctionDataUnion struct {
 
 func (u FunctionReplaceParamsFunctionDataUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionReplaceParamsFunctionDataUnion](u.OfPrompt, u.OfCode, u.OfGlobal)
+}
+func (u *FunctionReplaceParamsFunctionDataUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *FunctionReplaceParamsFunctionDataUnion) asAny() any {
@@ -1347,10 +1449,13 @@ func (r FunctionReplaceParamsFunctionDataPrompt) MarshalJSON() (data []byte, err
 	type shadow FunctionReplaceParamsFunctionDataPrompt
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionReplaceParamsFunctionDataPrompt) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionReplaceParamsFunctionDataPrompt](
-		"Type", false, "prompt",
+		"type", "prompt",
 	)
 }
 
@@ -1366,10 +1471,13 @@ func (r FunctionReplaceParamsFunctionDataCode) MarshalJSON() (data []byte, err e
 	type shadow FunctionReplaceParamsFunctionDataCode
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionReplaceParamsFunctionDataCode) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionReplaceParamsFunctionDataCode](
-		"Type", false, "code",
+		"type", "code",
 	)
 }
 
@@ -1384,6 +1492,9 @@ type FunctionReplaceParamsFunctionDataCodeDataUnion struct {
 
 func (u FunctionReplaceParamsFunctionDataCodeDataUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[FunctionReplaceParamsFunctionDataCodeDataUnion](u.OfBundle, u.OfInline)
+}
+func (u *FunctionReplaceParamsFunctionDataCodeDataUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *FunctionReplaceParamsFunctionDataCodeDataUnion) asAny() any {
@@ -1508,10 +1619,13 @@ func (r FunctionReplaceParamsFunctionDataCodeDataInline) MarshalJSON() (data []b
 	type shadow FunctionReplaceParamsFunctionDataCodeDataInline
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionReplaceParamsFunctionDataCodeDataInline) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionReplaceParamsFunctionDataCodeDataInline](
-		"Type", false, "inline",
+		"type", "inline",
 	)
 }
 
@@ -1527,10 +1641,13 @@ func (r FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext) MarshalJS
 	type shadow FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionReplaceParamsFunctionDataCodeDataInlineRuntimeContext](
-		"Runtime", false, "node", "python",
+		"runtime", "node", "python",
 	)
 }
 
@@ -1546,10 +1663,13 @@ func (r FunctionReplaceParamsFunctionDataGlobal) MarshalJSON() (data []byte, err
 	type shadow FunctionReplaceParamsFunctionDataGlobal
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FunctionReplaceParamsFunctionDataGlobal) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[FunctionReplaceParamsFunctionDataGlobal](
-		"Type", false, "global",
+		"type", "global",
 	)
 }
 
@@ -1563,6 +1683,9 @@ type FunctionReplaceParamsFunctionSchema struct {
 func (r FunctionReplaceParamsFunctionSchema) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionReplaceParamsFunctionSchema
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *FunctionReplaceParamsFunctionSchema) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type FunctionReplaceParamsFunctionType string
@@ -1592,4 +1715,7 @@ type FunctionReplaceParamsOrigin struct {
 func (r FunctionReplaceParamsOrigin) MarshalJSON() (data []byte, err error) {
 	type shadow FunctionReplaceParamsOrigin
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *FunctionReplaceParamsOrigin) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

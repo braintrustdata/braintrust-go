@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -141,6 +142,9 @@ func (r ProjectScoreNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectScoreNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ProjectScoreNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Only one field can be non-zero.
 //
@@ -153,6 +157,9 @@ type ProjectScoreNewParamsCategoriesUnion struct {
 
 func (u ProjectScoreNewParamsCategoriesUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[ProjectScoreNewParamsCategoriesUnion](u.OfCategorical, u.OfMinimum)
+}
+func (u *ProjectScoreNewParamsCategoriesUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *ProjectScoreNewParamsCategoriesUnion) asAny() any {
@@ -184,6 +191,9 @@ func (r ProjectScoreUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectScoreUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ProjectScoreUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Only one field can be non-zero.
 //
@@ -196,6 +206,9 @@ type ProjectScoreUpdateParamsCategoriesUnion struct {
 
 func (u ProjectScoreUpdateParamsCategoriesUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[ProjectScoreUpdateParamsCategoriesUnion](u.OfCategorical, u.OfMinimum)
+}
+func (u *ProjectScoreUpdateParamsCategoriesUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *ProjectScoreUpdateParamsCategoriesUnion) asAny() any {
@@ -306,6 +319,9 @@ func (r ProjectScoreReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectScoreReplaceParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ProjectScoreReplaceParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Only one field can be non-zero.
 //
@@ -318,6 +334,9 @@ type ProjectScoreReplaceParamsCategoriesUnion struct {
 
 func (u ProjectScoreReplaceParamsCategoriesUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[ProjectScoreReplaceParamsCategoriesUnion](u.OfCategorical, u.OfMinimum)
+}
+func (u *ProjectScoreReplaceParamsCategoriesUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *ProjectScoreReplaceParamsCategoriesUnion) asAny() any {

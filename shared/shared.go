@@ -280,6 +280,9 @@ func (r ChatCompletionContentPartImageParam) MarshalJSON() (data []byte, err err
 	type shadow ChatCompletionContentPartImageParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ChatCompletionContentPartImageParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // The property URL is required.
 type ChatCompletionContentPartImageImageURLParam struct {
@@ -292,6 +295,9 @@ type ChatCompletionContentPartImageImageURLParam struct {
 func (r ChatCompletionContentPartImageImageURLParam) MarshalJSON() (data []byte, err error) {
 	type shadow ChatCompletionContentPartImageImageURLParam
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ChatCompletionContentPartImageImageURLParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ChatCompletionContentPartText struct {
@@ -340,6 +346,9 @@ type ChatCompletionContentPartTextParam struct {
 func (r ChatCompletionContentPartTextParam) MarshalJSON() (data []byte, err error) {
 	type shadow ChatCompletionContentPartTextParam
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ChatCompletionContentPartTextParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ChatCompletionMessageToolCall struct {
@@ -410,6 +419,9 @@ func (r ChatCompletionMessageToolCallParam) MarshalJSON() (data []byte, err erro
 	type shadow ChatCompletionMessageToolCallParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ChatCompletionMessageToolCallParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // The properties Arguments, Name are required.
 type ChatCompletionMessageToolCallFunctionParam struct {
@@ -421,6 +433,9 @@ type ChatCompletionMessageToolCallFunctionParam struct {
 func (r ChatCompletionMessageToolCallFunctionParam) MarshalJSON() (data []byte, err error) {
 	type shadow ChatCompletionMessageToolCallFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ChatCompletionMessageToolCallFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type CodeBundle struct {
@@ -635,6 +650,9 @@ func (r CodeBundleParam) MarshalJSON() (data []byte, err error) {
 	type shadow CodeBundleParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *CodeBundleParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Only one field can be non-zero.
 //
@@ -647,6 +665,9 @@ type CodeBundleLocationUnionParam struct {
 
 func (u CodeBundleLocationUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[CodeBundleLocationUnionParam](u.OfExperiment, u.OfFunction)
+}
+func (u *CodeBundleLocationUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *CodeBundleLocationUnionParam) asAny() any {
@@ -705,10 +726,13 @@ func (r CodeBundleLocationExperimentParam) MarshalJSON() (data []byte, err error
 	type shadow CodeBundleLocationExperimentParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *CodeBundleLocationExperimentParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[CodeBundleLocationExperimentParam](
-		"Type", false, "experiment",
+		"type", "experiment",
 	)
 }
 
@@ -723,6 +747,9 @@ type CodeBundleLocationExperimentPositionUnionParam struct {
 
 func (u CodeBundleLocationExperimentPositionUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[CodeBundleLocationExperimentPositionUnionParam](u.OfCodeBundleLocationExperimentPositionType, u.OfScorer)
+}
+func (u *CodeBundleLocationExperimentPositionUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *CodeBundleLocationExperimentPositionUnionParam) asAny() any {
@@ -763,10 +790,13 @@ func (r CodeBundleLocationExperimentPositionTypeParam) MarshalJSON() (data []byt
 	type shadow CodeBundleLocationExperimentPositionTypeParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *CodeBundleLocationExperimentPositionTypeParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[CodeBundleLocationExperimentPositionTypeParam](
-		"Type", false, "task",
+		"type", "task",
 	)
 }
 
@@ -782,10 +812,13 @@ func (r CodeBundleLocationExperimentPositionScorerParam) MarshalJSON() (data []b
 	type shadow CodeBundleLocationExperimentPositionScorerParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *CodeBundleLocationExperimentPositionScorerParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[CodeBundleLocationExperimentPositionScorerParam](
-		"Type", false, "scorer",
+		"type", "scorer",
 	)
 }
 
@@ -801,10 +834,13 @@ func (r CodeBundleLocationFunctionParam) MarshalJSON() (data []byte, err error) 
 	type shadow CodeBundleLocationFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *CodeBundleLocationFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[CodeBundleLocationFunctionParam](
-		"Type", false, "function",
+		"type", "function",
 	)
 }
 
@@ -820,10 +856,13 @@ func (r CodeBundleRuntimeContextParam) MarshalJSON() (data []byte, err error) {
 	type shadow CodeBundleRuntimeContextParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *CodeBundleRuntimeContextParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[CodeBundleRuntimeContextParam](
-		"Runtime", false, "node", "python",
+		"runtime", "node", "python",
 	)
 }
 
@@ -1343,6 +1382,9 @@ func (r FeedbackDatasetItemParam) MarshalJSON() (data []byte, err error) {
 	type shadow FeedbackDatasetItemParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FeedbackDatasetItemParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // The source of the feedback. Must be one of "external" (default), "app", or "api"
 type FeedbackDatasetItemSource string
@@ -1384,6 +1426,9 @@ func (r FeedbackExperimentItemParam) MarshalJSON() (data []byte, err error) {
 	type shadow FeedbackExperimentItemParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *FeedbackExperimentItemParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // The source of the feedback. Must be one of "external" (default), "app", or "api"
 type FeedbackExperimentItemSource string
@@ -1424,6 +1469,9 @@ type FeedbackProjectLogsItemParam struct {
 func (r FeedbackProjectLogsItemParam) MarshalJSON() (data []byte, err error) {
 	type shadow FeedbackProjectLogsItemParam
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *FeedbackProjectLogsItemParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // The source of the feedback. Must be one of "external" (default), "app", or "api"
@@ -2050,6 +2098,9 @@ func (r InsertDatasetEventParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertDatasetEventParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *InsertDatasetEventParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // A dictionary with additional data about the test example, model outputs, or just
 // about anything else that's relevant, that you can use to help find and analyze
@@ -2066,6 +2117,9 @@ type InsertDatasetEventMetadataParam struct {
 func (r InsertDatasetEventMetadataParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertDatasetEventMetadataParam
 	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *InsertDatasetEventMetadataParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type InsertEventsResponse struct {
@@ -2248,6 +2302,9 @@ func (r InsertExperimentEventParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertExperimentEventParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *InsertExperimentEventParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Context is additional information about the code that produced the experiment
 // event. It is essentially the textual counterpart to `metrics`. Use the
@@ -2268,6 +2325,9 @@ func (r InsertExperimentEventContextParam) MarshalJSON() (data []byte, err error
 	type shadow InsertExperimentEventContextParam
 	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
 }
+func (r *InsertExperimentEventContextParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // A dictionary with additional data about the test example, model outputs, or just
 // about anything else that's relevant, that you can use to help find and analyze
@@ -2284,6 +2344,9 @@ type InsertExperimentEventMetadataParam struct {
 func (r InsertExperimentEventMetadataParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertExperimentEventMetadataParam
 	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *InsertExperimentEventMetadataParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Metrics are numerical measurements tracking the execution of the code that
@@ -2317,6 +2380,9 @@ type InsertExperimentEventMetricsParam struct {
 func (r InsertExperimentEventMetricsParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertExperimentEventMetricsParam
 	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *InsertExperimentEventMetricsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // A project logs event
@@ -2477,6 +2543,9 @@ func (r InsertProjectLogsEventParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertProjectLogsEventParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *InsertProjectLogsEventParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Context is additional information about the code that produced the project logs
 // event. It is essentially the textual counterpart to `metrics`. Use the
@@ -2497,6 +2566,9 @@ func (r InsertProjectLogsEventContextParam) MarshalJSON() (data []byte, err erro
 	type shadow InsertProjectLogsEventContextParam
 	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
 }
+func (r *InsertProjectLogsEventContextParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // A dictionary with additional data about the test example, model outputs, or just
 // about anything else that's relevant, that you can use to help find and analyze
@@ -2513,6 +2585,9 @@ type InsertProjectLogsEventMetadataParam struct {
 func (r InsertProjectLogsEventMetadataParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertProjectLogsEventMetadataParam
 	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *InsertProjectLogsEventMetadataParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Metrics are numerical measurements tracking the execution of the code that
@@ -2546,6 +2621,9 @@ type InsertProjectLogsEventMetricsParam struct {
 func (r InsertProjectLogsEventMetricsParam) MarshalJSON() (data []byte, err error) {
 	type shadow InsertProjectLogsEventMetricsParam
 	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *InsertProjectLogsEventMetricsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Summary of a metric's performance
@@ -2658,6 +2736,9 @@ type ObjectReferenceParam struct {
 func (r ObjectReferenceParam) MarshalJSON() (data []byte, err error) {
 	type shadow ObjectReferenceParam
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ObjectReferenceParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type OnlineScoreConfig struct {
@@ -2785,6 +2866,9 @@ func (r OnlineScoreConfigParam) MarshalJSON() (data []byte, err error) {
 	type shadow OnlineScoreConfigParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *OnlineScoreConfigParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Only one field can be non-zero.
 //
@@ -2797,6 +2881,9 @@ type OnlineScoreConfigScorerUnionParam struct {
 
 func (u OnlineScoreConfigScorerUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[OnlineScoreConfigScorerUnionParam](u.OfFunction, u.OfGlobal)
+}
+func (u *OnlineScoreConfigScorerUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *OnlineScoreConfigScorerUnionParam) asAny() any {
@@ -2846,10 +2933,13 @@ func (r OnlineScoreConfigScorerFunctionParam) MarshalJSON() (data []byte, err er
 	type shadow OnlineScoreConfigScorerFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *OnlineScoreConfigScorerFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[OnlineScoreConfigScorerFunctionParam](
-		"Type", false, "function",
+		"type", "function",
 	)
 }
 
@@ -2865,10 +2955,13 @@ func (r OnlineScoreConfigScorerGlobalParam) MarshalJSON() (data []byte, err erro
 	type shadow OnlineScoreConfigScorerGlobalParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *OnlineScoreConfigScorerGlobalParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[OnlineScoreConfigScorerGlobalParam](
-		"Type", false, "global",
+		"type", "global",
 	)
 }
 
@@ -3332,6 +3425,9 @@ func (r ProjectScoreCategoryParam) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectScoreCategoryParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ProjectScoreCategoryParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type ProjectScoreConfig struct {
 	Destination string            `json:"destination,nullable"`
@@ -3372,6 +3468,9 @@ type ProjectScoreConfigParam struct {
 func (r ProjectScoreConfigParam) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectScoreConfigParam
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ProjectScoreConfigParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // The type of the configured score
@@ -3463,6 +3562,9 @@ func (r ProjectSettingsParam) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectSettingsParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ProjectSettingsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // The properties ColumnID, ObjectType, Position are required.
 type ProjectSettingsSpanFieldOrderParam struct {
@@ -3477,6 +3579,9 @@ type ProjectSettingsSpanFieldOrderParam struct {
 func (r ProjectSettingsSpanFieldOrderParam) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectSettingsSpanFieldOrderParam
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ProjectSettingsSpanFieldOrderParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // A project tag is a user-configured tag for tracking and filtering your
@@ -4141,6 +4246,9 @@ func (r PromptDataParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptDataParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type PromptDataOriginParam struct {
 	ProjectID     param.Opt[string] `json:"project_id,omitzero"`
@@ -4152,6 +4260,9 @@ type PromptDataOriginParam struct {
 func (r PromptDataOriginParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataOriginParam
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataOriginParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // The properties ChoiceScores, Type, UseCot are required.
@@ -4167,10 +4278,13 @@ func (r PromptDataParserParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataParserParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptDataParserParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptDataParserParam](
-		"Type", false, "llm_classifier",
+		"type", "llm_classifier",
 	)
 }
 
@@ -4185,6 +4299,9 @@ type PromptDataPromptUnionParam struct {
 
 func (u PromptDataPromptUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptDataPromptUnionParam](u.OfCompletion, u.OfChat)
+}
+func (u *PromptDataPromptUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *PromptDataPromptUnionParam) asAny() any {
@@ -4242,10 +4359,13 @@ func (r PromptDataPromptCompletionParam) MarshalJSON() (data []byte, err error) 
 	type shadow PromptDataPromptCompletionParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptDataPromptCompletionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptDataPromptCompletionParam](
-		"Type", false, "completion",
+		"type", "completion",
 	)
 }
 
@@ -4262,10 +4382,13 @@ func (r PromptDataPromptChatParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataPromptChatParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptDataPromptChatParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptDataPromptChatParam](
-		"Type", false, "chat",
+		"type", "chat",
 	)
 }
 
@@ -4289,6 +4412,9 @@ func (u PromptDataPromptChatMessageUnionParam) MarshalJSON() ([]byte, error) {
 		u.OfTool,
 		u.OfFunction,
 		u.OfFallback)
+}
+func (u *PromptDataPromptChatMessageUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *PromptDataPromptChatMessageUnionParam) asAny() any {
@@ -4411,10 +4537,13 @@ func (r PromptDataPromptChatMessageSystemParam) MarshalJSON() (data []byte, err 
 	type shadow PromptDataPromptChatMessageSystemParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptDataPromptChatMessageSystemParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptDataPromptChatMessageSystemParam](
-		"Role", false, "system",
+		"role", "system",
 	)
 }
 
@@ -4431,10 +4560,13 @@ func (r PromptDataPromptChatMessageUserParam) MarshalJSON() (data []byte, err er
 	type shadow PromptDataPromptChatMessageUserParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptDataPromptChatMessageUserParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptDataPromptChatMessageUserParam](
-		"Role", false, "user",
+		"role", "user",
 	)
 }
 
@@ -4449,6 +4581,9 @@ type PromptDataPromptChatMessageUserContentUnionParam struct {
 
 func (u PromptDataPromptChatMessageUserContentUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptDataPromptChatMessageUserContentUnionParam](u.OfString, u.OfArray)
+}
+func (u *PromptDataPromptChatMessageUserContentUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *PromptDataPromptChatMessageUserContentUnionParam) asAny() any {
@@ -4471,6 +4606,9 @@ type PromptDataPromptChatMessageUserContentArrayItemUnionParam struct {
 
 func (u PromptDataPromptChatMessageUserContentArrayItemUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptDataPromptChatMessageUserContentArrayItemUnionParam](u.OfText, u.OfImageURL)
+}
+func (u *PromptDataPromptChatMessageUserContentArrayItemUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *PromptDataPromptChatMessageUserContentArrayItemUnionParam) asAny() any {
@@ -4523,10 +4661,13 @@ func (r PromptDataPromptChatMessageAssistantParam) MarshalJSON() (data []byte, e
 	type shadow PromptDataPromptChatMessageAssistantParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptDataPromptChatMessageAssistantParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptDataPromptChatMessageAssistantParam](
-		"Role", false, "assistant",
+		"role", "assistant",
 	)
 }
 
@@ -4540,6 +4681,9 @@ type PromptDataPromptChatMessageAssistantFunctionCallParam struct {
 func (r PromptDataPromptChatMessageAssistantFunctionCallParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptDataPromptChatMessageAssistantFunctionCallParam
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataPromptChatMessageAssistantFunctionCallParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // The property Role is required.
@@ -4555,10 +4699,13 @@ func (r PromptDataPromptChatMessageToolParam) MarshalJSON() (data []byte, err er
 	type shadow PromptDataPromptChatMessageToolParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptDataPromptChatMessageToolParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptDataPromptChatMessageToolParam](
-		"Role", false, "tool",
+		"role", "tool",
 	)
 }
 
@@ -4575,10 +4722,13 @@ func (r PromptDataPromptChatMessageFunctionParam) MarshalJSON() (data []byte, er
 	type shadow PromptDataPromptChatMessageFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptDataPromptChatMessageFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptDataPromptChatMessageFunctionParam](
-		"Role", false, "function",
+		"role", "function",
 	)
 }
 
@@ -4594,10 +4744,13 @@ func (r PromptDataPromptChatMessageFallbackParam) MarshalJSON() (data []byte, er
 	type shadow PromptDataPromptChatMessageFallbackParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptDataPromptChatMessageFallbackParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptDataPromptChatMessageFallbackParam](
-		"Role", false, "model",
+		"role", "model",
 	)
 }
 
@@ -4612,6 +4765,9 @@ type PromptDataToolFunctionUnionParam struct {
 
 func (u PromptDataToolFunctionUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptDataToolFunctionUnionParam](u.OfFunction, u.OfGlobal)
+}
+func (u *PromptDataToolFunctionUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *PromptDataToolFunctionUnionParam) asAny() any {
@@ -4661,10 +4817,13 @@ func (r PromptDataToolFunctionFunctionParam) MarshalJSON() (data []byte, err err
 	type shadow PromptDataToolFunctionFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptDataToolFunctionFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptDataToolFunctionFunctionParam](
-		"Type", false, "function",
+		"type", "function",
 	)
 }
 
@@ -4680,10 +4839,13 @@ func (r PromptDataToolFunctionGlobalParam) MarshalJSON() (data []byte, err error
 	type shadow PromptDataToolFunctionGlobalParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptDataToolFunctionGlobalParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptDataToolFunctionGlobalParam](
-		"Type", false, "global",
+		"type", "global",
 	)
 }
 
@@ -5224,6 +5386,9 @@ func (r PromptOptionsParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptOptionsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Only one field can be non-zero.
 //
@@ -5243,6 +5408,9 @@ func (u PromptOptionsParamsUnionParam) MarshalJSON() ([]byte, error) {
 		u.OfGoogleModels,
 		u.OfWindowAIModels,
 		u.OfJsCompletions)
+}
+func (u *PromptOptionsParamsUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *PromptOptionsParamsUnionParam) asAny() any {
@@ -5443,10 +5611,13 @@ func (r PromptOptionsParamsOpenAIModelParamsParam) MarshalJSON() (data []byte, e
 	type shadow PromptOptionsParamsOpenAIModelParamsParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptOptionsParamsOpenAIModelParamsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptOptionsParamsOpenAIModelParamsParam](
-		"ReasoningEffort", false, "low", "medium", "high",
+		"reasoning_effort", "low", "medium", "high",
 	)
 }
 
@@ -5463,6 +5634,9 @@ type PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam struct {
 
 func (u PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam](u.OfPromptOptionssOpenAIModelParamsFunctionCallString, u.OfFunction)
+}
+func (u *PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam) asAny() any {
@@ -5484,6 +5658,9 @@ func (r PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) MarshalJS
 	type shadow PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Only one field can be non-zero.
 //
@@ -5497,6 +5674,9 @@ type PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam struct {
 
 func (u PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam](u.OfJsonObject, u.OfJsonSchema, u.OfText)
+}
+func (u *PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam) asAny() any {
@@ -5541,10 +5721,13 @@ func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam) Marsh
 	type shadow PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam](
-		"Type", false, "json_object",
+		"type", "json_object",
 	)
 }
 
@@ -5560,10 +5743,13 @@ func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam) Marsh
 	type shadow PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam](
-		"Type", false, "json_schema",
+		"type", "json_schema",
 	)
 }
 
@@ -5580,6 +5766,9 @@ func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaPa
 	type shadow PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // The property Type is required.
 type PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam struct {
@@ -5592,10 +5781,13 @@ func (r PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam) MarshalJSON
 	type shadow PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam](
-		"Type", false, "text",
+		"type", "text",
 	)
 }
 
@@ -5612,6 +5804,9 @@ type PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam struct {
 
 func (u PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam](u.OfPromptOptionssOpenAIModelParamsToolChoiceString, u.OfFunction)
+}
+func (u *PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam) asAny() any {
@@ -5635,10 +5830,13 @@ func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) MarshalJSON
 	type shadow PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam](
-		"Type", false, "function",
+		"type", "function",
 	)
 }
 
@@ -5651,6 +5849,9 @@ type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam struct 
 func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // The properties MaxTokens, Temperature are required.
@@ -5670,6 +5871,9 @@ func (r PromptOptionsParamsAnthropicModelParamsParam) MarshalJSON() (data []byte
 	type shadow PromptOptionsParamsAnthropicModelParamsParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptOptionsParamsAnthropicModelParamsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type PromptOptionsParamsGoogleModelParamsParam struct {
 	MaxOutputTokens param.Opt[float64] `json:"maxOutputTokens,omitzero"`
@@ -5684,6 +5888,9 @@ func (r PromptOptionsParamsGoogleModelParamsParam) MarshalJSON() (data []byte, e
 	type shadow PromptOptionsParamsGoogleModelParamsParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptOptionsParamsGoogleModelParamsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type PromptOptionsParamsWindowAIModelParamsParam struct {
 	Temperature param.Opt[float64] `json:"temperature,omitzero"`
@@ -5696,6 +5903,9 @@ func (r PromptOptionsParamsWindowAIModelParamsParam) MarshalJSON() (data []byte,
 	type shadow PromptOptionsParamsWindowAIModelParamsParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptOptionsParamsWindowAIModelParamsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type PromptOptionsParamsJsCompletionParamsParam struct {
 	UseCache param.Opt[bool] `json:"use_cache,omitzero"`
@@ -5705,6 +5915,9 @@ type PromptOptionsParamsJsCompletionParamsParam struct {
 func (r PromptOptionsParamsJsCompletionParamsParam) MarshalJSON() (data []byte, err error) {
 	type shadow PromptOptionsParamsJsCompletionParamsParam
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptOptionsParamsJsCompletionParamsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Metadata about the state of the repo when the experiment was created
@@ -5786,6 +5999,9 @@ type RepoInfoParam struct {
 func (r RepoInfoParam) MarshalJSON() (data []byte, err error) {
 	type shadow RepoInfoParam
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *RepoInfoParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // A role is a collection of permissions which can be granted as part of an ACL
@@ -5948,6 +6164,9 @@ type SpanAttributesParam struct {
 func (r SpanAttributesParam) MarshalJSON() (data []byte, err error) {
 	type shadow SpanAttributesParam
 	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *SpanAttributesParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type SpanIFrame struct {
@@ -6205,6 +6424,9 @@ func (r ViewDataParam) MarshalJSON() (data []byte, err error) {
 	type shadow ViewDataParam
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ViewDataParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type ViewDataSearch struct {
 	Filter []any `json:"filter,nullable"`
@@ -6248,6 +6470,9 @@ type ViewDataSearchParam struct {
 func (r ViewDataSearchParam) MarshalJSON() (data []byte, err error) {
 	type shadow ViewDataSearchParam
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ViewDataSearchParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Options for the view in the app
@@ -6300,6 +6525,9 @@ type ViewOptionsParam struct {
 func (r ViewOptionsParam) MarshalJSON() (data []byte, err error) {
 	type shadow ViewOptionsParam
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ViewOptionsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Type of table that the view corresponds to.

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -141,6 +142,9 @@ func (r PromptNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow PromptNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *PromptNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type PromptNewParamsFunctionType string
 
@@ -168,6 +172,9 @@ type PromptUpdateParams struct {
 func (r PromptUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow PromptUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type PromptListParams struct {
@@ -253,6 +260,9 @@ type PromptReplaceParams struct {
 func (r PromptReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow PromptReplaceParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptReplaceParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type PromptReplaceParamsFunctionType string

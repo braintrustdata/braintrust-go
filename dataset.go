@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -189,6 +190,9 @@ func (r DatasetNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow DatasetNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *DatasetNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type DatasetUpdateParams struct {
 	// Textual description of the dataset
@@ -203,6 +207,9 @@ type DatasetUpdateParams struct {
 func (r DatasetUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow DatasetUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *DatasetUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type DatasetListParams struct {
@@ -269,6 +276,9 @@ type DatasetFeedbackParams struct {
 func (r DatasetFeedbackParams) MarshalJSON() (data []byte, err error) {
 	type shadow DatasetFeedbackParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *DatasetFeedbackParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type DatasetFetchParams struct {
@@ -383,6 +393,9 @@ func (r DatasetFetchPostParams) MarshalJSON() (data []byte, err error) {
 	type shadow DatasetFetchPostParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *DatasetFetchPostParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type DatasetInsertParams struct {
 	// A list of dataset events to insert
@@ -393,6 +406,9 @@ type DatasetInsertParams struct {
 func (r DatasetInsertParams) MarshalJSON() (data []byte, err error) {
 	type shadow DatasetInsertParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *DatasetInsertParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type DatasetSummarizeParams struct {
