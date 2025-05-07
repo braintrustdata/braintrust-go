@@ -11,7 +11,6 @@ import (
 	"github.com/braintrustdata/braintrust-go"
 	"github.com/braintrustdata/braintrust-go/internal/testutil"
 	"github.com/braintrustdata/braintrust-go/option"
-	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 func TestOrganizationGet(t *testing.T) {
@@ -52,11 +51,11 @@ func TestOrganizationUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.OrganizationUpdateParams{
-			APIURL:         braintrust.F("api_url"),
-			IsUniversalAPI: braintrust.F(true),
-			Name:           braintrust.F("name"),
-			ProxyURL:       braintrust.F("proxy_url"),
-			RealtimeURL:    braintrust.F("realtime_url"),
+			APIURL:         braintrust.String("api_url"),
+			IsUniversalAPI: braintrust.Bool(true),
+			Name:           braintrust.String("name"),
+			ProxyURL:       braintrust.String("proxy_url"),
+			RealtimeURL:    braintrust.String("realtime_url"),
 		},
 	)
 	if err != nil {
@@ -81,11 +80,13 @@ func TestOrganizationListWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Organizations.List(context.TODO(), braintrust.OrganizationListParams{
-		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:           braintrust.F[braintrust.OrganizationListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
-		Limit:         braintrust.F(int64(0)),
-		OrgName:       braintrust.F("org_name"),
-		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		EndingBefore: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		IDs: braintrust.OrganizationListParamsIDsUnion{
+			OfString: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		},
+		Limit:         braintrust.Int(0),
+		OrgName:       braintrust.String("org_name"),
+		StartingAfter: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error

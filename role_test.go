@@ -27,14 +27,14 @@ func TestRoleNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Roles.New(context.TODO(), braintrust.RoleNewParams{
-		Name:        braintrust.F("x"),
-		Description: braintrust.F("description"),
-		MemberPermissions: braintrust.F([]braintrust.RoleNewParamsMemberPermission{{
-			Permission:         braintrust.F(shared.PermissionCreate),
-			RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
-		}}),
-		MemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
-		OrgName:     braintrust.F("org_name"),
+		Name:        "x",
+		Description: braintrust.String("description"),
+		MemberPermissions: []braintrust.RoleNewParamsMemberPermission{{
+			Permission:         shared.PermissionCreate,
+			RestrictObjectType: shared.ACLObjectTypeOrganization,
+		}},
+		MemberRoles: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+		OrgName:     braintrust.String("org_name"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -83,18 +83,18 @@ func TestRoleUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.RoleUpdateParams{
-			AddMemberPermissions: braintrust.F([]braintrust.RoleUpdateParamsAddMemberPermission{{
-				Permission:         braintrust.F(shared.PermissionCreate),
-				RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
-			}}),
-			AddMemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
-			Description:    braintrust.F("description"),
-			Name:           braintrust.F("x"),
-			RemoveMemberPermissions: braintrust.F([]braintrust.RoleUpdateParamsRemoveMemberPermission{{
-				Permission:         braintrust.F(shared.PermissionCreate),
-				RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
-			}}),
-			RemoveMemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
+			AddMemberPermissions: []braintrust.RoleUpdateParamsAddMemberPermission{{
+				Permission:         shared.PermissionCreate,
+				RestrictObjectType: shared.ACLObjectTypeOrganization,
+			}},
+			AddMemberRoles: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+			Description:    braintrust.String("description"),
+			Name:           braintrust.String("x"),
+			RemoveMemberPermissions: []braintrust.RoleUpdateParamsRemoveMemberPermission{{
+				Permission:         shared.PermissionCreate,
+				RestrictObjectType: shared.ACLObjectTypeOrganization,
+			}},
+			RemoveMemberRoles: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
 		},
 	)
 	if err != nil {
@@ -119,12 +119,14 @@ func TestRoleListWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Roles.List(context.TODO(), braintrust.RoleListParams{
-		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:           braintrust.F[braintrust.RoleListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
-		Limit:         braintrust.F(int64(0)),
-		OrgName:       braintrust.F("org_name"),
-		RoleName:      braintrust.F("role_name"),
-		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		EndingBefore: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		IDs: braintrust.RoleListParamsIDsUnion{
+			OfString: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		},
+		Limit:         braintrust.Int(0),
+		OrgName:       braintrust.String("org_name"),
+		RoleName:      braintrust.String("role_name"),
+		StartingAfter: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -170,14 +172,14 @@ func TestRoleReplaceWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Roles.Replace(context.TODO(), braintrust.RoleReplaceParams{
-		Name:        braintrust.F("x"),
-		Description: braintrust.F("description"),
-		MemberPermissions: braintrust.F([]braintrust.RoleReplaceParamsMemberPermission{{
-			Permission:         braintrust.F(shared.PermissionCreate),
-			RestrictObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
-		}}),
-		MemberRoles: braintrust.F([]string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"}),
-		OrgName:     braintrust.F("org_name"),
+		Name:        "x",
+		Description: braintrust.String("description"),
+		MemberPermissions: []braintrust.RoleReplaceParamsMemberPermission{{
+			Permission:         shared.PermissionCreate,
+			RestrictObjectType: shared.ACLObjectTypeOrganization,
+		}},
+		MemberRoles: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+		OrgName:     braintrust.String("org_name"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error

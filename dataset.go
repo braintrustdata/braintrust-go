@@ -11,10 +11,10 @@ import (
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/pagination"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -31,8 +31,8 @@ type DatasetService struct {
 // NewDatasetService generates a new service that applies the given options to each
 // request. These options are applied after the parent client's options (if there
 // is one), and before any request-specific options.
-func NewDatasetService(opts ...option.RequestOption) (r *DatasetService) {
-	r = &DatasetService{}
+func NewDatasetService(opts ...option.RequestOption) (r DatasetService) {
+	r = DatasetService{}
 	r.Options = opts
 	return
 }
@@ -176,87 +176,109 @@ func (r *DatasetService) Summarize(ctx context.Context, datasetID string, query 
 
 type DatasetNewParams struct {
 	// Name of the dataset. Within a project, dataset names are unique
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Unique identifier for the project that the dataset belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	ProjectID string `json:"project_id,required" format:"uuid"`
 	// Textual description of the dataset
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
 	// User-controlled metadata about the dataset
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
+	Metadata map[string]any `json:"metadata,omitzero"`
+	paramObj
 }
 
 func (r DatasetNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow DatasetNewParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *DatasetNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type DatasetUpdateParams struct {
 	// Textual description of the dataset
-	Description param.Field[string] `json:"description"`
-	// User-controlled metadata about the dataset
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
+	Description param.Opt[string] `json:"description,omitzero"`
 	// Name of the dataset. Within a project, dataset names are unique
-	Name param.Field[string] `json:"name"`
+	Name param.Opt[string] `json:"name,omitzero"`
+	// User-controlled metadata about the dataset
+	Metadata map[string]any `json:"metadata,omitzero"`
+	paramObj
 }
 
 func (r DatasetUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow DatasetUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *DatasetUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type DatasetListParams struct {
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Name of the dataset to search for
-	DatasetName param.Field[string] `query:"dataset_name"`
+	DatasetName param.Opt[string] `query:"dataset_name,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
-	// Filter search results to a particular set of object IDs. To specify a list of
-	// IDs, include the query param multiple times
-	IDs param.Field[DatasetListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	EndingBefore param.Opt[string] `query:"ending_before,omitzero" format:"uuid" json:"-"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Opt[string] `query:"org_name,omitzero" json:"-"`
 	// Project id
-	ProjectID param.Field[string] `query:"project_id" format:"uuid"`
+	ProjectID param.Opt[string] `query:"project_id,omitzero" format:"uuid" json:"-"`
 	// Name of the project to search for
-	ProjectName param.Field[string] `query:"project_name"`
+	ProjectName param.Opt[string] `query:"project_name,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Opt[string] `query:"starting_after,omitzero" format:"uuid" json:"-"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs DatasetListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
+	paramObj
 }
 
 // URLQuery serializes [DatasetListParams]'s query parameters as `url.Values`.
-func (r DatasetListParams) URLQuery() (v url.Values) {
+func (r DatasetListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [DatasetListParamsIDsArray].
-type DatasetListParamsIDsUnion interface {
-	ImplementsDatasetListParamsIDsUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type DatasetListParamsIDsUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
 }
 
-type DatasetListParamsIDsArray []string
-
-func (r DatasetListParamsIDsArray) ImplementsDatasetListParamsIDsUnion() {}
+func (u *DatasetListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
+	}
+	return nil
+}
 
 type DatasetFeedbackParams struct {
 	// A list of dataset feedback items
-	Feedback param.Field[[]shared.FeedbackDatasetItemParam] `json:"feedback,required"`
+	Feedback []shared.FeedbackDatasetItemParam `json:"feedback,omitzero,required"`
+	paramObj
 }
 
 func (r DatasetFeedbackParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow DatasetFeedbackParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *DatasetFeedbackParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type DatasetFetchParams struct {
@@ -274,7 +296,7 @@ type DatasetFetchParams struct {
 	// The `limit` parameter controls the number of full traces to return. So you may
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
-	Limit param.Field[int64] `query:"limit"`
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -285,7 +307,7 @@ type DatasetFetchParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxRootSpanID param.Field[string] `query:"max_root_span_id"`
+	MaxRootSpanID param.Opt[string] `query:"max_root_span_id,omitzero" json:"-"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -296,17 +318,18 @@ type DatasetFetchParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxXactID param.Field[string] `query:"max_xact_id"`
+	MaxXactID param.Opt[string] `query:"max_xact_id,omitzero" json:"-"`
 	// Retrieve a snapshot of events from a past time
 	//
 	// The version id is essentially a filter on the latest event transaction id. You
 	// can use the `max_xact_id` returned by a past fetch as the version to reproduce
 	// that exact fetch.
-	Version param.Field[string] `query:"version"`
+	Version param.Opt[string] `query:"version,omitzero" json:"-"`
+	paramObj
 }
 
 // URLQuery serializes [DatasetFetchParams]'s query parameters as `url.Values`.
-func (r DatasetFetchParams) URLQuery() (v url.Values) {
+func (r DatasetFetchParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -319,7 +342,7 @@ type DatasetFetchPostParams struct {
 	//
 	// The string can be obtained directly from the `cursor` property of the previous
 	// fetch query
-	Cursor param.Field[string] `json:"cursor"`
+	Cursor param.Opt[string] `json:"cursor,omitzero"`
 	// limit the number of traces fetched
 	//
 	// Fetch queries may be paginated if the total result size is expected to be large
@@ -334,7 +357,7 @@ type DatasetFetchPostParams struct {
 	// The `limit` parameter controls the number of full traces to return. So you may
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
-	Limit param.Field[int64] `json:"limit"`
+	Limit param.Opt[int64] `json:"limit,omitzero"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -345,7 +368,7 @@ type DatasetFetchPostParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxRootSpanID param.Field[string] `json:"max_root_span_id"`
+	MaxRootSpanID param.Opt[string] `json:"max_root_span_id,omitzero"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -356,36 +379,47 @@ type DatasetFetchPostParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxXactID param.Field[string] `json:"max_xact_id"`
+	MaxXactID param.Opt[string] `json:"max_xact_id,omitzero"`
 	// Retrieve a snapshot of events from a past time
 	//
 	// The version id is essentially a filter on the latest event transaction id. You
 	// can use the `max_xact_id` returned by a past fetch as the version to reproduce
 	// that exact fetch.
-	Version param.Field[string] `json:"version"`
+	Version param.Opt[string] `json:"version,omitzero"`
+	paramObj
 }
 
 func (r DatasetFetchPostParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow DatasetFetchPostParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *DatasetFetchPostParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type DatasetInsertParams struct {
 	// A list of dataset events to insert
-	Events param.Field[[]shared.InsertDatasetEventParam] `json:"events,required"`
+	Events []shared.InsertDatasetEventParam `json:"events,omitzero,required"`
+	paramObj
 }
 
 func (r DatasetInsertParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow DatasetInsertParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *DatasetInsertParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type DatasetSummarizeParams struct {
 	// Whether to summarize the data. If false (or omitted), only the metadata will be
 	// returned.
-	SummarizeData param.Field[bool] `query:"summarize_data"`
+	SummarizeData param.Opt[bool] `query:"summarize_data,omitzero" json:"-"`
+	paramObj
 }
 
 // URLQuery serializes [DatasetSummarizeParams]'s query parameters as `url.Values`.
-func (r DatasetSummarizeParams) URLQuery() (v url.Values) {
+func (r DatasetSummarizeParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,

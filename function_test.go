@@ -27,67 +27,81 @@ func TestFunctionNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Functions.New(context.TODO(), braintrust.FunctionNewParams{
-		FunctionData: braintrust.F[braintrust.FunctionNewParamsFunctionDataUnion](braintrust.FunctionNewParamsFunctionDataPrompt{
-			Type: braintrust.F(braintrust.FunctionNewParamsFunctionDataPromptTypePrompt),
-		}),
-		Name:        braintrust.F("x"),
-		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Slug:        braintrust.F("x"),
-		Description: braintrust.F("description"),
-		FunctionSchema: braintrust.F(braintrust.FunctionNewParamsFunctionSchema{
-			Parameters: braintrust.F[any](map[string]interface{}{}),
-			Returns:    braintrust.F[any](map[string]interface{}{}),
-		}),
-		FunctionType: braintrust.F(braintrust.FunctionNewParamsFunctionTypeLlm),
-		Origin: braintrust.F(braintrust.FunctionNewParamsOrigin{
-			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
-			Internal:   braintrust.F(true),
-		}),
-		PromptData: braintrust.F(shared.PromptDataParam{
-			Options: braintrust.F(shared.PromptOptionsParam{
-				Model: braintrust.F("model"),
-				Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsOpenAIModelParamsParam{
-					FrequencyPenalty:    braintrust.F(0.000000),
-					FunctionCall:        braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam](shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString(shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto)),
-					MaxCompletionTokens: braintrust.F(0.000000),
-					MaxTokens:           braintrust.F(0.000000),
-					N:                   braintrust.F(0.000000),
-					PresencePenalty:     braintrust.F(0.000000),
-					ReasoningEffort:     braintrust.F(shared.PromptOptionsParamsOpenAIModelParamsReasoningEffortLow),
-					ResponseFormat: braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam](shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam{
-						Type: braintrust.F(shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject),
-					}),
-					Stop:        braintrust.F([]string{"string"}),
-					Temperature: braintrust.F(0.000000),
-					ToolChoice:  braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam](shared.PromptOptionsParamsOpenAIModelParamsToolChoiceString(shared.PromptOptionsParamsOpenAIModelParamsToolChoiceStringAuto)),
-					TopP:        braintrust.F(0.000000),
-					UseCache:    braintrust.F(true),
-				}),
-				Position: braintrust.F("position"),
-			}),
-			Origin: braintrust.F(shared.PromptDataOriginParam{
-				ProjectID:     braintrust.F("project_id"),
-				PromptID:      braintrust.F("prompt_id"),
-				PromptVersion: braintrust.F("prompt_version"),
-			}),
-			Parser: braintrust.F(shared.PromptDataParserParam{
-				ChoiceScores: braintrust.F(map[string]float64{
-					"foo": 0.000000,
-				}),
-				Type:   braintrust.F(shared.PromptDataParserTypeLlmClassifier),
-				UseCot: braintrust.F(true),
-			}),
-			Prompt: braintrust.F[shared.PromptDataPromptUnionParam](shared.PromptDataPromptCompletionParam{
-				Content: braintrust.F("content"),
-				Type:    braintrust.F(shared.PromptDataPromptCompletionTypeCompletion),
-			}),
-			ToolFunctions: braintrust.F([]shared.PromptDataToolFunctionsUnionParam{shared.PromptDataToolFunctionsFunctionParam{
-				ID:   braintrust.F("id"),
-				Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
-			}}),
-		}),
-		Tags: braintrust.F([]string{"string"}),
+		FunctionData: braintrust.FunctionNewParamsFunctionDataUnion{
+			OfPrompt: &braintrust.FunctionNewParamsFunctionDataPrompt{
+				Type: "prompt",
+			},
+		},
+		Name:        "x",
+		ProjectID:   "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		Slug:        "x",
+		Description: braintrust.String("description"),
+		FunctionSchema: braintrust.FunctionNewParamsFunctionSchema{
+			Parameters: map[string]interface{}{},
+			Returns:    map[string]interface{}{},
+		},
+		FunctionType: braintrust.FunctionNewParamsFunctionTypeLlm,
+		Origin: braintrust.FunctionNewParamsOrigin{
+			ObjectID:   "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+			ObjectType: shared.ACLObjectTypeOrganization,
+			Internal:   braintrust.Bool(true),
+		},
+		PromptData: shared.PromptDataParam{
+			Options: shared.PromptOptionsParam{
+				Model: braintrust.String("model"),
+				Params: shared.PromptOptionsParamsUnionParam{
+					OfOpenAIModels: &shared.PromptOptionsParamsOpenAIModelParamsParam{
+						FrequencyPenalty: braintrust.Float(0),
+						FunctionCall: shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam{
+							OfPromptOptionssOpenAIModelParamsFunctionCallString: braintrust.Opt(shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto),
+						},
+						MaxCompletionTokens: braintrust.Float(0),
+						MaxTokens:           braintrust.Float(0),
+						N:                   braintrust.Float(0),
+						PresencePenalty:     braintrust.Float(0),
+						ReasoningEffort:     "low",
+						ResponseFormat: shared.PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam{
+							OfJsonObject: &shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam{
+								Type: "json_object",
+							},
+						},
+						Stop:        []string{"string"},
+						Temperature: braintrust.Float(0),
+						ToolChoice: shared.PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam{
+							OfPromptOptionssOpenAIModelParamsToolChoiceString: braintrust.Opt(shared.PromptOptionsParamsOpenAIModelParamsToolChoiceStringAuto),
+						},
+						TopP:     braintrust.Float(0),
+						UseCache: braintrust.Bool(true),
+					},
+				},
+				Position: braintrust.String("position"),
+			},
+			Origin: shared.PromptDataOriginParam{
+				ProjectID:     braintrust.String("project_id"),
+				PromptID:      braintrust.String("prompt_id"),
+				PromptVersion: braintrust.String("prompt_version"),
+			},
+			Parser: shared.PromptDataParserParam{
+				ChoiceScores: map[string]float64{
+					"foo": 0,
+				},
+				Type:   "llm_classifier",
+				UseCot: true,
+			},
+			Prompt: shared.PromptDataPromptUnionParam{
+				OfCompletion: &shared.PromptDataPromptCompletionParam{
+					Content: "content",
+					Type:    "completion",
+				},
+			},
+			ToolFunctions: []shared.PromptDataToolFunctionUnionParam{{
+				OfFunction: &shared.PromptDataToolFunctionFunctionParam{
+					ID:   "id",
+					Type: "function",
+				},
+			}},
+		},
+		Tags: []string{"string"},
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -136,55 +150,69 @@ func TestFunctionUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.FunctionUpdateParams{
-			Description: braintrust.F("description"),
-			FunctionData: braintrust.F[braintrust.FunctionUpdateParamsFunctionDataUnion](braintrust.FunctionUpdateParamsFunctionDataPrompt{
-				Type: braintrust.F(braintrust.FunctionUpdateParamsFunctionDataPromptTypePrompt),
-			}),
-			Name: braintrust.F("name"),
-			PromptData: braintrust.F(shared.PromptDataParam{
-				Options: braintrust.F(shared.PromptOptionsParam{
-					Model: braintrust.F("model"),
-					Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsOpenAIModelParamsParam{
-						FrequencyPenalty:    braintrust.F(0.000000),
-						FunctionCall:        braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam](shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString(shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto)),
-						MaxCompletionTokens: braintrust.F(0.000000),
-						MaxTokens:           braintrust.F(0.000000),
-						N:                   braintrust.F(0.000000),
-						PresencePenalty:     braintrust.F(0.000000),
-						ReasoningEffort:     braintrust.F(shared.PromptOptionsParamsOpenAIModelParamsReasoningEffortLow),
-						ResponseFormat: braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam](shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam{
-							Type: braintrust.F(shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject),
-						}),
-						Stop:        braintrust.F([]string{"string"}),
-						Temperature: braintrust.F(0.000000),
-						ToolChoice:  braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam](shared.PromptOptionsParamsOpenAIModelParamsToolChoiceString(shared.PromptOptionsParamsOpenAIModelParamsToolChoiceStringAuto)),
-						TopP:        braintrust.F(0.000000),
-						UseCache:    braintrust.F(true),
-					}),
-					Position: braintrust.F("position"),
-				}),
-				Origin: braintrust.F(shared.PromptDataOriginParam{
-					ProjectID:     braintrust.F("project_id"),
-					PromptID:      braintrust.F("prompt_id"),
-					PromptVersion: braintrust.F("prompt_version"),
-				}),
-				Parser: braintrust.F(shared.PromptDataParserParam{
-					ChoiceScores: braintrust.F(map[string]float64{
-						"foo": 0.000000,
-					}),
-					Type:   braintrust.F(shared.PromptDataParserTypeLlmClassifier),
-					UseCot: braintrust.F(true),
-				}),
-				Prompt: braintrust.F[shared.PromptDataPromptUnionParam](shared.PromptDataPromptCompletionParam{
-					Content: braintrust.F("content"),
-					Type:    braintrust.F(shared.PromptDataPromptCompletionTypeCompletion),
-				}),
-				ToolFunctions: braintrust.F([]shared.PromptDataToolFunctionsUnionParam{shared.PromptDataToolFunctionsFunctionParam{
-					ID:   braintrust.F("id"),
-					Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
-				}}),
-			}),
-			Tags: braintrust.F([]string{"string"}),
+			Description: braintrust.String("description"),
+			FunctionData: braintrust.FunctionUpdateParamsFunctionDataUnion{
+				OfPrompt: &braintrust.FunctionUpdateParamsFunctionDataPrompt{
+					Type: "prompt",
+				},
+			},
+			Name: braintrust.String("name"),
+			PromptData: shared.PromptDataParam{
+				Options: shared.PromptOptionsParam{
+					Model: braintrust.String("model"),
+					Params: shared.PromptOptionsParamsUnionParam{
+						OfOpenAIModels: &shared.PromptOptionsParamsOpenAIModelParamsParam{
+							FrequencyPenalty: braintrust.Float(0),
+							FunctionCall: shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam{
+								OfPromptOptionssOpenAIModelParamsFunctionCallString: braintrust.Opt(shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto),
+							},
+							MaxCompletionTokens: braintrust.Float(0),
+							MaxTokens:           braintrust.Float(0),
+							N:                   braintrust.Float(0),
+							PresencePenalty:     braintrust.Float(0),
+							ReasoningEffort:     "low",
+							ResponseFormat: shared.PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam{
+								OfJsonObject: &shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam{
+									Type: "json_object",
+								},
+							},
+							Stop:        []string{"string"},
+							Temperature: braintrust.Float(0),
+							ToolChoice: shared.PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam{
+								OfPromptOptionssOpenAIModelParamsToolChoiceString: braintrust.Opt(shared.PromptOptionsParamsOpenAIModelParamsToolChoiceStringAuto),
+							},
+							TopP:     braintrust.Float(0),
+							UseCache: braintrust.Bool(true),
+						},
+					},
+					Position: braintrust.String("position"),
+				},
+				Origin: shared.PromptDataOriginParam{
+					ProjectID:     braintrust.String("project_id"),
+					PromptID:      braintrust.String("prompt_id"),
+					PromptVersion: braintrust.String("prompt_version"),
+				},
+				Parser: shared.PromptDataParserParam{
+					ChoiceScores: map[string]float64{
+						"foo": 0,
+					},
+					Type:   "llm_classifier",
+					UseCot: true,
+				},
+				Prompt: shared.PromptDataPromptUnionParam{
+					OfCompletion: &shared.PromptDataPromptCompletionParam{
+						Content: "content",
+						Type:    "completion",
+					},
+				},
+				ToolFunctions: []shared.PromptDataToolFunctionUnionParam{{
+					OfFunction: &shared.PromptDataToolFunctionFunctionParam{
+						ID:   "id",
+						Type: "function",
+					},
+				}},
+			},
+			Tags: []string{"string"},
 		},
 	)
 	if err != nil {
@@ -209,16 +237,18 @@ func TestFunctionListWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Functions.List(context.TODO(), braintrust.FunctionListParams{
-		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		FunctionName:  braintrust.F("function_name"),
-		IDs:           braintrust.F[braintrust.FunctionListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
-		Limit:         braintrust.F(int64(0)),
-		OrgName:       braintrust.F("org_name"),
-		ProjectID:     braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		ProjectName:   braintrust.F("project_name"),
-		Slug:          braintrust.F("slug"),
-		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Version:       braintrust.F("version"),
+		EndingBefore: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		FunctionName: braintrust.String("function_name"),
+		IDs: braintrust.FunctionListParamsIDsUnion{
+			OfString: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		},
+		Limit:         braintrust.Int(0),
+		OrgName:       braintrust.String("org_name"),
+		ProjectID:     braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		ProjectName:   braintrust.String("project_name"),
+		Slug:          braintrust.String("slug"),
+		StartingAfter: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		Version:       braintrust.String("version"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -267,31 +297,35 @@ func TestFunctionInvokeWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.FunctionInvokeParams{
-			Expected: braintrust.F[any](map[string]interface{}{}),
-			Input:    braintrust.F[any](map[string]interface{}{}),
-			Messages: braintrust.F([]braintrust.FunctionInvokeParamsMessageUnion{braintrust.FunctionInvokeParamsMessagesSystem{
-				Role:    braintrust.F(braintrust.FunctionInvokeParamsMessagesSystemRoleSystem),
-				Content: braintrust.F("content"),
-				Name:    braintrust.F("name"),
-			}}),
-			Metadata: braintrust.F(map[string]interface{}{
+			Expected: map[string]interface{}{},
+			Input:    map[string]interface{}{},
+			Messages: []braintrust.FunctionInvokeParamsMessageUnion{{
+				OfSystem: &braintrust.FunctionInvokeParamsMessageSystem{
+					Role:    "system",
+					Content: braintrust.String("content"),
+					Name:    braintrust.String("name"),
+				},
+			}},
+			Metadata: map[string]any{
 				"foo": "bar",
-			}),
-			Mode: braintrust.F(braintrust.FunctionInvokeParamsModeAuto),
-			Parent: braintrust.F[braintrust.FunctionInvokeParamsParentUnion](braintrust.FunctionInvokeParamsParentSpanParentStruct{
-				ObjectID:   braintrust.F("object_id"),
-				ObjectType: braintrust.F(braintrust.FunctionInvokeParamsParentSpanParentStructObjectTypeProjectLogs),
-				PropagatedEvent: braintrust.F(map[string]interface{}{
-					"foo": "bar",
-				}),
-				RowIDs: braintrust.F(braintrust.FunctionInvokeParamsParentSpanParentStructRowIDs{
-					ID:         braintrust.F("id"),
-					RootSpanID: braintrust.F("root_span_id"),
-					SpanID:     braintrust.F("span_id"),
-				}),
-			}),
-			Stream:  braintrust.F(true),
-			Version: braintrust.F("version"),
+			},
+			Mode: braintrust.FunctionInvokeParamsModeAuto,
+			Parent: braintrust.FunctionInvokeParamsParentUnion{
+				OfSpanParentStruct: &braintrust.FunctionInvokeParamsParentSpanParentStruct{
+					ObjectID:   "object_id",
+					ObjectType: "project_logs",
+					PropagatedEvent: map[string]any{
+						"foo": "bar",
+					},
+					RowIDs: braintrust.FunctionInvokeParamsParentSpanParentStructRowIDs{
+						ID:         "id",
+						RootSpanID: "root_span_id",
+						SpanID:     "span_id",
+					},
+				},
+			},
+			Stream:  braintrust.Bool(true),
+			Version: braintrust.String("version"),
 		},
 	)
 	if err != nil {
@@ -316,67 +350,81 @@ func TestFunctionReplaceWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Functions.Replace(context.TODO(), braintrust.FunctionReplaceParams{
-		FunctionData: braintrust.F[braintrust.FunctionReplaceParamsFunctionDataUnion](braintrust.FunctionReplaceParamsFunctionDataPrompt{
-			Type: braintrust.F(braintrust.FunctionReplaceParamsFunctionDataPromptTypePrompt),
-		}),
-		Name:        braintrust.F("x"),
-		ProjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		Slug:        braintrust.F("x"),
-		Description: braintrust.F("description"),
-		FunctionSchema: braintrust.F(braintrust.FunctionReplaceParamsFunctionSchema{
-			Parameters: braintrust.F[any](map[string]interface{}{}),
-			Returns:    braintrust.F[any](map[string]interface{}{}),
-		}),
-		FunctionType: braintrust.F(braintrust.FunctionReplaceParamsFunctionTypeLlm),
-		Origin: braintrust.F(braintrust.FunctionReplaceParamsOrigin{
-			ObjectID:   braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			ObjectType: braintrust.F(shared.ACLObjectTypeOrganization),
-			Internal:   braintrust.F(true),
-		}),
-		PromptData: braintrust.F(shared.PromptDataParam{
-			Options: braintrust.F(shared.PromptOptionsParam{
-				Model: braintrust.F("model"),
-				Params: braintrust.F[shared.PromptOptionsParamsUnionParam](shared.PromptOptionsParamsOpenAIModelParamsParam{
-					FrequencyPenalty:    braintrust.F(0.000000),
-					FunctionCall:        braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam](shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString(shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto)),
-					MaxCompletionTokens: braintrust.F(0.000000),
-					MaxTokens:           braintrust.F(0.000000),
-					N:                   braintrust.F(0.000000),
-					PresencePenalty:     braintrust.F(0.000000),
-					ReasoningEffort:     braintrust.F(shared.PromptOptionsParamsOpenAIModelParamsReasoningEffortLow),
-					ResponseFormat: braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam](shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam{
-						Type: braintrust.F(shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject),
-					}),
-					Stop:        braintrust.F([]string{"string"}),
-					Temperature: braintrust.F(0.000000),
-					ToolChoice:  braintrust.F[shared.PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam](shared.PromptOptionsParamsOpenAIModelParamsToolChoiceString(shared.PromptOptionsParamsOpenAIModelParamsToolChoiceStringAuto)),
-					TopP:        braintrust.F(0.000000),
-					UseCache:    braintrust.F(true),
-				}),
-				Position: braintrust.F("position"),
-			}),
-			Origin: braintrust.F(shared.PromptDataOriginParam{
-				ProjectID:     braintrust.F("project_id"),
-				PromptID:      braintrust.F("prompt_id"),
-				PromptVersion: braintrust.F("prompt_version"),
-			}),
-			Parser: braintrust.F(shared.PromptDataParserParam{
-				ChoiceScores: braintrust.F(map[string]float64{
-					"foo": 0.000000,
-				}),
-				Type:   braintrust.F(shared.PromptDataParserTypeLlmClassifier),
-				UseCot: braintrust.F(true),
-			}),
-			Prompt: braintrust.F[shared.PromptDataPromptUnionParam](shared.PromptDataPromptCompletionParam{
-				Content: braintrust.F("content"),
-				Type:    braintrust.F(shared.PromptDataPromptCompletionTypeCompletion),
-			}),
-			ToolFunctions: braintrust.F([]shared.PromptDataToolFunctionsUnionParam{shared.PromptDataToolFunctionsFunctionParam{
-				ID:   braintrust.F("id"),
-				Type: braintrust.F(shared.PromptDataToolFunctionsFunctionTypeFunction),
-			}}),
-		}),
-		Tags: braintrust.F([]string{"string"}),
+		FunctionData: braintrust.FunctionReplaceParamsFunctionDataUnion{
+			OfPrompt: &braintrust.FunctionReplaceParamsFunctionDataPrompt{
+				Type: "prompt",
+			},
+		},
+		Name:        "x",
+		ProjectID:   "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		Slug:        "x",
+		Description: braintrust.String("description"),
+		FunctionSchema: braintrust.FunctionReplaceParamsFunctionSchema{
+			Parameters: map[string]interface{}{},
+			Returns:    map[string]interface{}{},
+		},
+		FunctionType: braintrust.FunctionReplaceParamsFunctionTypeLlm,
+		Origin: braintrust.FunctionReplaceParamsOrigin{
+			ObjectID:   "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+			ObjectType: shared.ACLObjectTypeOrganization,
+			Internal:   braintrust.Bool(true),
+		},
+		PromptData: shared.PromptDataParam{
+			Options: shared.PromptOptionsParam{
+				Model: braintrust.String("model"),
+				Params: shared.PromptOptionsParamsUnionParam{
+					OfOpenAIModels: &shared.PromptOptionsParamsOpenAIModelParamsParam{
+						FrequencyPenalty: braintrust.Float(0),
+						FunctionCall: shared.PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam{
+							OfPromptOptionssOpenAIModelParamsFunctionCallString: braintrust.Opt(shared.PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto),
+						},
+						MaxCompletionTokens: braintrust.Float(0),
+						MaxTokens:           braintrust.Float(0),
+						N:                   braintrust.Float(0),
+						PresencePenalty:     braintrust.Float(0),
+						ReasoningEffort:     "low",
+						ResponseFormat: shared.PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam{
+							OfJsonObject: &shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam{
+								Type: "json_object",
+							},
+						},
+						Stop:        []string{"string"},
+						Temperature: braintrust.Float(0),
+						ToolChoice: shared.PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam{
+							OfPromptOptionssOpenAIModelParamsToolChoiceString: braintrust.Opt(shared.PromptOptionsParamsOpenAIModelParamsToolChoiceStringAuto),
+						},
+						TopP:     braintrust.Float(0),
+						UseCache: braintrust.Bool(true),
+					},
+				},
+				Position: braintrust.String("position"),
+			},
+			Origin: shared.PromptDataOriginParam{
+				ProjectID:     braintrust.String("project_id"),
+				PromptID:      braintrust.String("prompt_id"),
+				PromptVersion: braintrust.String("prompt_version"),
+			},
+			Parser: shared.PromptDataParserParam{
+				ChoiceScores: map[string]float64{
+					"foo": 0,
+				},
+				Type:   "llm_classifier",
+				UseCot: true,
+			},
+			Prompt: shared.PromptDataPromptUnionParam{
+				OfCompletion: &shared.PromptDataPromptCompletionParam{
+					Content: "content",
+					Type:    "completion",
+				},
+			},
+			ToolFunctions: []shared.PromptDataToolFunctionUnionParam{{
+				OfFunction: &shared.PromptDataToolFunctionFunctionParam{
+					ID:   "id",
+					Type: "function",
+				},
+			}},
+		},
+		Tags: []string{"string"},
 	})
 	if err != nil {
 		var apierr *braintrust.Error

@@ -11,7 +11,6 @@ import (
 	"github.com/braintrustdata/braintrust-go"
 	"github.com/braintrustdata/braintrust-go/internal/testutil"
 	"github.com/braintrustdata/braintrust-go/option"
-	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 func TestAISecretNewWithOptionalParams(t *testing.T) {
@@ -27,13 +26,13 @@ func TestAISecretNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.AISecrets.New(context.TODO(), braintrust.AISecretNewParams{
-		Name: braintrust.F("name"),
-		Metadata: braintrust.F(map[string]interface{}{
+		Name: "name",
+		Metadata: map[string]any{
 			"foo": "bar",
-		}),
-		OrgName: braintrust.F("org_name"),
-		Secret:  braintrust.F("secret"),
-		Type:    braintrust.F("type"),
+		},
+		OrgName: braintrust.String("org_name"),
+		Secret:  braintrust.String("secret"),
+		Type:    braintrust.String("type"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -82,12 +81,12 @@ func TestAISecretUpdateWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.AISecretUpdateParams{
-			Metadata: braintrust.F(map[string]interface{}{
+			Metadata: map[string]any{
 				"foo": "bar",
-			}),
-			Name:   braintrust.F("name"),
-			Secret: braintrust.F("secret"),
-			Type:   braintrust.F("type"),
+			},
+			Name:   braintrust.String("name"),
+			Secret: braintrust.String("secret"),
+			Type:   braintrust.String("type"),
 		},
 	)
 	if err != nil {
@@ -112,13 +111,17 @@ func TestAISecretListWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.AISecrets.List(context.TODO(), braintrust.AISecretListParams{
-		AISecretName:  braintrust.F("ai_secret_name"),
-		AISecretType:  braintrust.F[braintrust.AISecretListParamsAISecretTypeUnion](shared.UnionString("string")),
-		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:           braintrust.F[braintrust.AISecretListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
-		Limit:         braintrust.F(int64(0)),
-		OrgName:       braintrust.F("org_name"),
-		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		AISecretName: braintrust.String("ai_secret_name"),
+		AISecretType: braintrust.AISecretListParamsAISecretTypeUnion{
+			OfString: braintrust.String("string"),
+		},
+		EndingBefore: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		IDs: braintrust.AISecretListParamsIDsUnion{
+			OfString: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		},
+		Limit:         braintrust.Int(0),
+		OrgName:       braintrust.String("org_name"),
+		StartingAfter: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -164,8 +167,8 @@ func TestAISecretFindAndDeleteWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.AISecrets.FindAndDelete(context.TODO(), braintrust.AISecretFindAndDeleteParams{
-		Name:    braintrust.F("name"),
-		OrgName: braintrust.F("org_name"),
+		Name:    "name",
+		OrgName: braintrust.String("org_name"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -189,13 +192,13 @@ func TestAISecretReplaceWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.AISecrets.Replace(context.TODO(), braintrust.AISecretReplaceParams{
-		Name: braintrust.F("name"),
-		Metadata: braintrust.F(map[string]interface{}{
+		Name: "name",
+		Metadata: map[string]any{
 			"foo": "bar",
-		}),
-		OrgName: braintrust.F("org_name"),
-		Secret:  braintrust.F("secret"),
-		Type:    braintrust.F("type"),
+		},
+		OrgName: braintrust.String("org_name"),
+		Secret:  braintrust.String("secret"),
+		Type:    braintrust.String("type"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
