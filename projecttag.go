@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -135,6 +136,9 @@ func (r ProjectTagNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectTagNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ProjectTagNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type ProjectTagUpdateParams struct {
 	// Color of the tag for the UI
@@ -149,6 +153,9 @@ type ProjectTagUpdateParams struct {
 func (r ProjectTagUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectTagUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ProjectTagUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ProjectTagListParams struct {
@@ -221,4 +228,7 @@ type ProjectTagReplaceParams struct {
 func (r ProjectTagReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectTagReplaceParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ProjectTagReplaceParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

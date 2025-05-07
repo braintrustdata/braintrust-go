@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -148,6 +149,9 @@ func (r ACLNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow ACLNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ACLNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type ACLListParams struct {
 	// The id of the object the ACL applies to
@@ -233,6 +237,9 @@ func (r ACLBatchUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow ACLBatchUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ACLBatchUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // An ACL grants a certain permission or role to a certain user or group on an
 // object.
@@ -281,6 +288,9 @@ type ACLBatchUpdateParamsAddACL struct {
 func (r ACLBatchUpdateParamsAddACL) MarshalJSON() (data []byte, err error) {
 	type shadow ACLBatchUpdateParamsAddACL
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ACLBatchUpdateParamsAddACL) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // An ACL grants a certain permission or role to a certain user or group on an
@@ -331,6 +341,9 @@ func (r ACLBatchUpdateParamsRemoveACL) MarshalJSON() (data []byte, err error) {
 	type shadow ACLBatchUpdateParamsRemoveACL
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ACLBatchUpdateParamsRemoveACL) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type ACLFindAndDeleteParams struct {
 	// The id of the object the ACL applies to
@@ -367,4 +380,7 @@ type ACLFindAndDeleteParams struct {
 func (r ACLFindAndDeleteParams) MarshalJSON() (data []byte, err error) {
 	type shadow ACLFindAndDeleteParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ACLFindAndDeleteParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

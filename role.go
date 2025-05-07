@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -141,6 +142,9 @@ func (r RoleNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow RoleNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *RoleNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // The property Permission is required.
 type RoleNewParamsMemberPermission struct {
@@ -164,6 +168,9 @@ func (r RoleNewParamsMemberPermission) MarshalJSON() (data []byte, err error) {
 	type shadow RoleNewParamsMemberPermission
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *RoleNewParamsMemberPermission) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type RoleUpdateParams struct {
 	// Textual description of the role
@@ -184,6 +191,9 @@ type RoleUpdateParams struct {
 func (r RoleUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow RoleUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *RoleUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // The property Permission is required.
@@ -208,6 +218,9 @@ func (r RoleUpdateParamsAddMemberPermission) MarshalJSON() (data []byte, err err
 	type shadow RoleUpdateParamsAddMemberPermission
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *RoleUpdateParamsAddMemberPermission) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // The property Permission is required.
 type RoleUpdateParamsRemoveMemberPermission struct {
@@ -230,6 +243,9 @@ type RoleUpdateParamsRemoveMemberPermission struct {
 func (r RoleUpdateParamsRemoveMemberPermission) MarshalJSON() (data []byte, err error) {
 	type shadow RoleUpdateParamsRemoveMemberPermission
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *RoleUpdateParamsRemoveMemberPermission) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type RoleListParams struct {
@@ -306,6 +322,9 @@ func (r RoleReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow RoleReplaceParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *RoleReplaceParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // The property Permission is required.
 type RoleReplaceParamsMemberPermission struct {
@@ -328,4 +347,7 @@ type RoleReplaceParamsMemberPermission struct {
 func (r RoleReplaceParamsMemberPermission) MarshalJSON() (data []byte, err error) {
 	type shadow RoleReplaceParamsMemberPermission
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *RoleReplaceParamsMemberPermission) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

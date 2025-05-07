@@ -96,6 +96,9 @@ func (r EvalNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow EvalNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EvalNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Only one field can be non-zero.
 //
@@ -109,6 +112,9 @@ type EvalNewParamsDataUnion struct {
 
 func (u EvalNewParamsDataUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[EvalNewParamsDataUnion](u.OfDatasetID, u.OfProjectDatasetName, u.OfDatasetRows)
+}
+func (u *EvalNewParamsDataUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *EvalNewParamsDataUnion) asAny() any {
@@ -177,6 +183,9 @@ func (r EvalNewParamsDataDatasetID) MarshalJSON() (data []byte, err error) {
 	type shadow EvalNewParamsDataDatasetID
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EvalNewParamsDataDatasetID) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Project and dataset name
 //
@@ -192,6 +201,9 @@ func (r EvalNewParamsDataProjectDatasetName) MarshalJSON() (data []byte, err err
 	type shadow EvalNewParamsDataProjectDatasetName
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EvalNewParamsDataProjectDatasetName) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Dataset rows
 //
@@ -204,6 +216,9 @@ type EvalNewParamsDataDatasetRows struct {
 func (r EvalNewParamsDataDatasetRows) MarshalJSON() (data []byte, err error) {
 	type shadow EvalNewParamsDataDatasetRows
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsDataDatasetRows) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Only one field can be non-zero.
@@ -226,6 +241,9 @@ func (u EvalNewParamsScoreUnion) MarshalJSON() ([]byte, error) {
 		u.OfPromptSessionID,
 		u.OfInlineCode,
 		u.OfInlinePrompt)
+}
+func (u *EvalNewParamsScoreUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *EvalNewParamsScoreUnion) asAny() any {
@@ -354,6 +372,9 @@ func (r EvalNewParamsScoreFunctionID) MarshalJSON() (data []byte, err error) {
 	type shadow EvalNewParamsScoreFunctionID
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EvalNewParamsScoreFunctionID) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Project name and slug
 //
@@ -372,6 +393,9 @@ func (r EvalNewParamsScoreProjectSlug) MarshalJSON() (data []byte, err error) {
 	type shadow EvalNewParamsScoreProjectSlug
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EvalNewParamsScoreProjectSlug) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Global function name
 //
@@ -386,6 +410,9 @@ type EvalNewParamsScoreGlobalFunction struct {
 func (r EvalNewParamsScoreGlobalFunction) MarshalJSON() (data []byte, err error) {
 	type shadow EvalNewParamsScoreGlobalFunction
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsScoreGlobalFunction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Prompt session id
@@ -405,6 +432,9 @@ func (r EvalNewParamsScorePromptSessionID) MarshalJSON() (data []byte, err error
 	type shadow EvalNewParamsScorePromptSessionID
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EvalNewParamsScorePromptSessionID) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Inline code function
 //
@@ -422,6 +452,9 @@ func (r EvalNewParamsScoreInlineCode) MarshalJSON() (data []byte, err error) {
 	type shadow EvalNewParamsScoreInlineCode
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EvalNewParamsScoreInlineCode) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // The properties Runtime, Version are required.
 type EvalNewParamsScoreInlineCodeInlineContext struct {
@@ -435,10 +468,13 @@ func (r EvalNewParamsScoreInlineCodeInlineContext) MarshalJSON() (data []byte, e
 	type shadow EvalNewParamsScoreInlineCodeInlineContext
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EvalNewParamsScoreInlineCodeInlineContext) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[EvalNewParamsScoreInlineCodeInlineContext](
-		"Runtime", false, "node", "python",
+		"runtime", "node", "python",
 	)
 }
 
@@ -456,6 +492,9 @@ type EvalNewParamsScoreInlinePrompt struct {
 func (r EvalNewParamsScoreInlinePrompt) MarshalJSON() (data []byte, err error) {
 	type shadow EvalNewParamsScoreInlinePrompt
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsScoreInlinePrompt) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Only one field can be non-zero.
@@ -478,6 +517,9 @@ func (u EvalNewParamsTaskUnion) MarshalJSON() ([]byte, error) {
 		u.OfPromptSessionID,
 		u.OfInlineCode,
 		u.OfInlinePrompt)
+}
+func (u *EvalNewParamsTaskUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *EvalNewParamsTaskUnion) asAny() any {
@@ -606,6 +648,9 @@ func (r EvalNewParamsTaskFunctionID) MarshalJSON() (data []byte, err error) {
 	type shadow EvalNewParamsTaskFunctionID
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EvalNewParamsTaskFunctionID) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Project name and slug
 //
@@ -624,6 +669,9 @@ func (r EvalNewParamsTaskProjectSlug) MarshalJSON() (data []byte, err error) {
 	type shadow EvalNewParamsTaskProjectSlug
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EvalNewParamsTaskProjectSlug) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Global function name
 //
@@ -638,6 +686,9 @@ type EvalNewParamsTaskGlobalFunction struct {
 func (r EvalNewParamsTaskGlobalFunction) MarshalJSON() (data []byte, err error) {
 	type shadow EvalNewParamsTaskGlobalFunction
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsTaskGlobalFunction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Prompt session id
@@ -657,6 +708,9 @@ func (r EvalNewParamsTaskPromptSessionID) MarshalJSON() (data []byte, err error)
 	type shadow EvalNewParamsTaskPromptSessionID
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EvalNewParamsTaskPromptSessionID) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Inline code function
 //
@@ -674,6 +728,9 @@ func (r EvalNewParamsTaskInlineCode) MarshalJSON() (data []byte, err error) {
 	type shadow EvalNewParamsTaskInlineCode
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EvalNewParamsTaskInlineCode) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // The properties Runtime, Version are required.
 type EvalNewParamsTaskInlineCodeInlineContext struct {
@@ -687,10 +744,13 @@ func (r EvalNewParamsTaskInlineCodeInlineContext) MarshalJSON() (data []byte, er
 	type shadow EvalNewParamsTaskInlineCodeInlineContext
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EvalNewParamsTaskInlineCodeInlineContext) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[EvalNewParamsTaskInlineCodeInlineContext](
-		"Runtime", false, "node", "python",
+		"runtime", "node", "python",
 	)
 }
 
@@ -708,6 +768,9 @@ type EvalNewParamsTaskInlinePrompt struct {
 func (r EvalNewParamsTaskInlinePrompt) MarshalJSON() (data []byte, err error) {
 	type shadow EvalNewParamsTaskInlinePrompt
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsTaskInlinePrompt) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Optional settings for collecting git metadata. By default, will collect all git
@@ -727,10 +790,13 @@ func (r EvalNewParamsGitMetadataSettings) MarshalJSON() (data []byte, err error)
 	type shadow EvalNewParamsGitMetadataSettings
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EvalNewParamsGitMetadataSettings) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[EvalNewParamsGitMetadataSettings](
-		"Collect", false, "all", "none", "some",
+		"collect", "all", "none", "some",
 	)
 }
 
@@ -745,6 +811,9 @@ type EvalNewParamsParentUnion struct {
 
 func (u EvalNewParamsParentUnion) MarshalJSON() ([]byte, error) {
 	return param.MarshalUnion[EvalNewParamsParentUnion](u.OfSpanParentStruct, u.OfString)
+}
+func (u *EvalNewParamsParentUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
 func (u *EvalNewParamsParentUnion) asAny() any {
@@ -775,10 +844,13 @@ func (r EvalNewParamsParentSpanParentStruct) MarshalJSON() (data []byte, err err
 	type shadow EvalNewParamsParentSpanParentStruct
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EvalNewParamsParentSpanParentStruct) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 func init() {
 	apijson.RegisterFieldValidator[EvalNewParamsParentSpanParentStruct](
-		"ObjectType", false, "project_logs", "experiment", "playground_logs",
+		"object_type", "project_logs", "experiment", "playground_logs",
 	)
 }
 
@@ -798,4 +870,7 @@ type EvalNewParamsParentSpanParentStructRowIDs struct {
 func (r EvalNewParamsParentSpanParentStructRowIDs) MarshalJSON() (data []byte, err error) {
 	type shadow EvalNewParamsParentSpanParentStructRowIDs
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsParentSpanParentStructRowIDs) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

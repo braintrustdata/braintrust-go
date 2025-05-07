@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -138,6 +139,9 @@ func (r SpanIframeNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow SpanIframeNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *SpanIframeNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type SpanIframeUpdateParams struct {
 	// Textual description of the span iframe
@@ -155,6 +159,9 @@ type SpanIframeUpdateParams struct {
 func (r SpanIframeUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow SpanIframeUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *SpanIframeUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type SpanIframeListParams struct {
@@ -226,4 +233,7 @@ type SpanIframeReplaceParams struct {
 func (r SpanIframeReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow SpanIframeReplaceParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *SpanIframeReplaceParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

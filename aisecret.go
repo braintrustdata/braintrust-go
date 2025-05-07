@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -145,6 +146,9 @@ func (r AISecretNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow AISecretNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *AISecretNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type AISecretUpdateParams struct {
 	// Name of the AI secret
@@ -158,6 +162,9 @@ type AISecretUpdateParams struct {
 func (r AISecretUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow AISecretUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *AISecretUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type AISecretListParams struct {
@@ -244,6 +251,9 @@ func (r AISecretFindAndDeleteParams) MarshalJSON() (data []byte, err error) {
 	type shadow AISecretFindAndDeleteParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *AISecretFindAndDeleteParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type AISecretReplaceParams struct {
 	// Name of the AI secret
@@ -263,4 +273,7 @@ type AISecretReplaceParams struct {
 func (r AISecretReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow AISecretReplaceParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *AISecretReplaceParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

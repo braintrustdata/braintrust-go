@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -149,6 +150,9 @@ func (r ViewNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow ViewNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ViewNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Type of table that the view corresponds to.
 type ViewNewParamsViewType string
@@ -213,6 +217,9 @@ type ViewUpdateParams struct {
 func (r ViewUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow ViewUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ViewUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Type of table that the view corresponds to.
@@ -308,6 +315,9 @@ func (r ViewDeleteParams) MarshalJSON() (data []byte, err error) {
 	type shadow ViewDeleteParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ViewDeleteParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type ViewReplaceParams struct {
 	// Type of table that the view corresponds to.
@@ -338,6 +348,9 @@ type ViewReplaceParams struct {
 func (r ViewReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow ViewReplaceParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ViewReplaceParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Type of table that the view corresponds to.

@@ -138,6 +138,9 @@ func (r EnvVarNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow EnvVarNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *EnvVarNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // The type of the object the environment variable is scoped for
 type EnvVarNewParamsObjectType string
@@ -159,6 +162,9 @@ type EnvVarUpdateParams struct {
 func (r EnvVarUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow EnvVarUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EnvVarUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type EnvVarListParams struct {
@@ -221,6 +227,9 @@ type EnvVarReplaceParams struct {
 func (r EnvVarReplaceParams) MarshalJSON() (data []byte, err error) {
 	type shadow EnvVarReplaceParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EnvVarReplaceParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // The type of the object the environment variable is scoped for

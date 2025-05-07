@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -207,6 +208,9 @@ func (r ExperimentNewParams) MarshalJSON() (data []byte, err error) {
 	type shadow ExperimentNewParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ExperimentNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type ExperimentUpdateParams struct {
 	// Id of default base experiment to compare against when viewing this experiment
@@ -234,6 +238,9 @@ type ExperimentUpdateParams struct {
 func (r ExperimentUpdateParams) MarshalJSON() (data []byte, err error) {
 	type shadow ExperimentUpdateParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ExperimentUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ExperimentListParams struct {
@@ -300,6 +307,9 @@ type ExperimentFeedbackParams struct {
 func (r ExperimentFeedbackParams) MarshalJSON() (data []byte, err error) {
 	type shadow ExperimentFeedbackParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ExperimentFeedbackParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ExperimentFetchParams struct {
@@ -414,6 +424,9 @@ func (r ExperimentFetchPostParams) MarshalJSON() (data []byte, err error) {
 	type shadow ExperimentFetchPostParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ExperimentFetchPostParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type ExperimentInsertParams struct {
 	// A list of experiment events to insert
@@ -424,6 +437,9 @@ type ExperimentInsertParams struct {
 func (r ExperimentInsertParams) MarshalJSON() (data []byte, err error) {
 	type shadow ExperimentInsertParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ExperimentInsertParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ExperimentSummarizeParams struct {

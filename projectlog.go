@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -96,6 +97,9 @@ type ProjectLogFeedbackParams struct {
 func (r ProjectLogFeedbackParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectLogFeedbackParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ProjectLogFeedbackParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ProjectLogFetchParams struct {
@@ -210,6 +214,9 @@ func (r ProjectLogFetchPostParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectLogFetchPostParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
+func (r *ProjectLogFetchPostParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type ProjectLogInsertParams struct {
 	// A list of project logs events to insert
@@ -220,4 +227,7 @@ type ProjectLogInsertParams struct {
 func (r ProjectLogInsertParams) MarshalJSON() (data []byte, err error) {
 	type shadow ProjectLogInsertParams
 	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ProjectLogInsertParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
