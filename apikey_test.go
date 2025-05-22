@@ -11,7 +11,6 @@ import (
 	"github.com/braintrustdata/braintrust-go"
 	"github.com/braintrustdata/braintrust-go/internal/testutil"
 	"github.com/braintrustdata/braintrust-go/option"
-	"github.com/braintrustdata/braintrust-go/shared"
 )
 
 func TestAPIKeyNewWithOptionalParams(t *testing.T) {
@@ -27,8 +26,8 @@ func TestAPIKeyNewWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.APIKeys.New(context.TODO(), braintrust.APIKeyNewParams{
-		Name:    braintrust.F("name"),
-		OrgName: braintrust.F("org_name"),
+		Name:    "name",
+		OrgName: braintrust.String("org_name"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
@@ -74,12 +73,14 @@ func TestAPIKeyListWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.APIKeys.List(context.TODO(), braintrust.APIKeyListParams{
-		APIKeyName:    braintrust.F("api_key_name"),
-		EndingBefore:  braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		IDs:           braintrust.F[braintrust.APIKeyListParamsIDsUnion](shared.UnionString("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")),
-		Limit:         braintrust.F(int64(0)),
-		OrgName:       braintrust.F("org_name"),
-		StartingAfter: braintrust.F("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		APIKeyName:   braintrust.String("api_key_name"),
+		EndingBefore: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		IDs: braintrust.APIKeyListParamsIDsUnion{
+			OfString: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		},
+		Limit:         braintrust.Int(0),
+		OrgName:       braintrust.String("org_name"),
+		StartingAfter: braintrust.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *braintrust.Error
