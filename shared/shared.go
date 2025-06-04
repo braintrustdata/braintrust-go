@@ -232,7 +232,7 @@ func (r *ChatCompletionContentPartImage) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // ChatCompletionContentPartImageParam.Overrides()
 func (r ChatCompletionContentPartImage) ToParam() ChatCompletionContentPartImageParam {
-	return param.Override[ChatCompletionContentPartImageParam](r.RawJSON())
+	return param.Override[ChatCompletionContentPartImageParam](json.RawMessage(r.RawJSON()))
 }
 
 type ChatCompletionContentPartImageImageURL struct {
@@ -326,7 +326,7 @@ func (r *ChatCompletionContentPartText) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // ChatCompletionContentPartTextParam.Overrides()
 func (r ChatCompletionContentPartText) ToParam() ChatCompletionContentPartTextParam {
-	return param.Override[ChatCompletionContentPartTextParam](r.RawJSON())
+	return param.Override[ChatCompletionContentPartTextParam](json.RawMessage(r.RawJSON()))
 }
 
 type ChatCompletionContentPartTextType string
@@ -379,7 +379,7 @@ func (r *ChatCompletionMessageToolCall) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // ChatCompletionMessageToolCallParam.Overrides()
 func (r ChatCompletionMessageToolCall) ToParam() ChatCompletionMessageToolCallParam {
-	return param.Override[ChatCompletionMessageToolCallParam](r.RawJSON())
+	return param.Override[ChatCompletionMessageToolCallParam](json.RawMessage(r.RawJSON()))
 }
 
 type ChatCompletionMessageToolCallFunction struct {
@@ -467,7 +467,7 @@ func (r *CodeBundle) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // CodeBundleParam.Overrides()
 func (r CodeBundle) ToParam() CodeBundleParam {
-	return param.Override[CodeBundleParam](r.RawJSON())
+	return param.Override[CodeBundleParam](json.RawMessage(r.RawJSON()))
 }
 
 // CodeBundleLocationUnion contains all possible properties and values from
@@ -2698,7 +2698,7 @@ func (r *ObjectReference) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // ObjectReferenceParam.Overrides()
 func (r ObjectReference) ToParam() ObjectReferenceParam {
-	return param.Override[ObjectReferenceParam](r.RawJSON())
+	return param.Override[ObjectReferenceParam](json.RawMessage(r.RawJSON()))
 }
 
 // Type of the object the event is originating from.
@@ -2773,7 +2773,7 @@ func (r *OnlineScoreConfig) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // OnlineScoreConfigParam.Overrides()
 func (r OnlineScoreConfig) ToParam() OnlineScoreConfigParam {
-	return param.Override[OnlineScoreConfigParam](r.RawJSON())
+	return param.Override[OnlineScoreConfigParam](json.RawMessage(r.RawJSON()))
 }
 
 // OnlineScoreConfigScorerUnion contains all possible properties and values from
@@ -3407,7 +3407,7 @@ func (r *ProjectScoreCategory) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // ProjectScoreCategoryParam.Overrides()
 func (r ProjectScoreCategory) ToParam() ProjectScoreCategoryParam {
-	return param.Override[ProjectScoreCategoryParam](r.RawJSON())
+	return param.Override[ProjectScoreCategoryParam](json.RawMessage(r.RawJSON()))
 }
 
 // For categorical-type project scores, defines a single category
@@ -3455,7 +3455,7 @@ func (r *ProjectScoreConfig) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // ProjectScoreConfigParam.Overrides()
 func (r ProjectScoreConfig) ToParam() ProjectScoreConfigParam {
-	return param.Override[ProjectScoreConfigParam](r.RawJSON())
+	return param.Override[ProjectScoreConfigParam](json.RawMessage(r.RawJSON()))
 }
 
 type ProjectScoreConfigParam struct {
@@ -3515,7 +3515,7 @@ func (r *ProjectSettings) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // ProjectSettingsParam.Overrides()
 func (r ProjectSettings) ToParam() ProjectSettingsParam {
-	return param.Override[ProjectSettingsParam](r.RawJSON())
+	return param.Override[ProjectSettingsParam](json.RawMessage(r.RawJSON()))
 }
 
 type ProjectSettingsSpanFieldOrder struct {
@@ -3725,7 +3725,7 @@ func (r *PromptData) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // PromptDataParam.Overrides()
 func (r PromptData) ToParam() PromptDataParam {
-	return param.Override[PromptDataParam](r.RawJSON())
+	return param.Override[PromptDataParam](json.RawMessage(r.RawJSON()))
 }
 
 type PromptDataOrigin struct {
@@ -4875,7 +4875,7 @@ func (r *PromptOptions) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // PromptOptionsParam.Overrides()
 func (r PromptOptions) ToParam() PromptOptionsParam {
-	return param.Override[PromptOptionsParam](r.RawJSON())
+	return param.Override[PromptOptionsParam](json.RawMessage(r.RawJSON()))
 }
 
 // PromptOptionsParamsUnion contains all possible properties and values from
@@ -5969,7 +5969,7 @@ func (r *RepoInfo) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // RepoInfoParam.Overrides()
 func (r RepoInfo) ToParam() RepoInfoParam {
-	return param.Override[RepoInfoParam](r.RawJSON())
+	return param.Override[RepoInfoParam](json.RawMessage(r.RawJSON()))
 }
 
 // Metadata about the state of the repo when the experiment was created
@@ -6146,7 +6146,7 @@ func (r *SpanAttributes) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // SpanAttributesParam.Overrides()
 func (r SpanAttributes) ToParam() SpanAttributesParam {
-	return param.Override[SpanAttributesParam](r.RawJSON())
+	return param.Override[SpanAttributesParam](json.RawMessage(r.RawJSON()))
 }
 
 // Human-identifying attributes of the span, such as name, type, etc.
@@ -6411,7 +6411,7 @@ func (r *ViewData) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // ViewDataParam.Overrides()
 func (r ViewData) ToParam() ViewDataParam {
-	return param.Override[ViewDataParam](r.RawJSON())
+	return param.Override[ViewDataParam](json.RawMessage(r.RawJSON()))
 }
 
 // The view definition
@@ -6456,7 +6456,7 @@ func (r *ViewDataSearch) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // ViewDataSearchParam.Overrides()
 func (r ViewDataSearch) ToParam() ViewDataSearchParam {
-	return param.Override[ViewDataSearchParam](r.RawJSON())
+	return param.Override[ViewDataSearchParam](json.RawMessage(r.RawJSON()))
 }
 
 type ViewDataSearchParam struct {
@@ -6508,7 +6508,7 @@ func (r *ViewOptions) UnmarshalJSON(data []byte) error {
 // be used at the last possible moment before sending a request. Test for this with
 // ViewOptionsParam.Overrides()
 func (r ViewOptions) ToParam() ViewOptionsParam {
-	return param.Override[ViewOptionsParam](r.RawJSON())
+	return param.Override[ViewOptionsParam](json.RawMessage(r.RawJSON()))
 }
 
 // Options for the view in the app
