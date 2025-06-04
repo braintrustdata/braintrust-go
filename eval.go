@@ -111,7 +111,7 @@ type EvalNewParamsDataUnion struct {
 }
 
 func (u EvalNewParamsDataUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[EvalNewParamsDataUnion](u.OfDatasetID, u.OfProjectDatasetName, u.OfDatasetRows)
+	return param.MarshalUnion(u, u.OfDatasetID, u.OfProjectDatasetName, u.OfDatasetRows)
 }
 func (u *EvalNewParamsDataUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -235,7 +235,7 @@ type EvalNewParamsScoreUnion struct {
 }
 
 func (u EvalNewParamsScoreUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[EvalNewParamsScoreUnion](u.OfFunctionID,
+	return param.MarshalUnion(u, u.OfFunctionID,
 		u.OfProjectSlug,
 		u.OfGlobalFunction,
 		u.OfPromptSessionID,
@@ -511,7 +511,7 @@ type EvalNewParamsTaskUnion struct {
 }
 
 func (u EvalNewParamsTaskUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[EvalNewParamsTaskUnion](u.OfFunctionID,
+	return param.MarshalUnion(u, u.OfFunctionID,
 		u.OfProjectSlug,
 		u.OfGlobalFunction,
 		u.OfPromptSessionID,
@@ -810,7 +810,7 @@ type EvalNewParamsParentUnion struct {
 }
 
 func (u EvalNewParamsParentUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[EvalNewParamsParentUnion](u.OfSpanParentStruct, u.OfString)
+	return param.MarshalUnion(u, u.OfSpanParentStruct, u.OfString)
 }
 func (u *EvalNewParamsParentUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)

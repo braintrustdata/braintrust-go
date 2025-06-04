@@ -664,7 +664,7 @@ type CodeBundleLocationUnionParam struct {
 }
 
 func (u CodeBundleLocationUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[CodeBundleLocationUnionParam](u.OfExperiment, u.OfFunction)
+	return param.MarshalUnion(u, u.OfExperiment, u.OfFunction)
 }
 func (u *CodeBundleLocationUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -746,7 +746,7 @@ type CodeBundleLocationExperimentPositionUnionParam struct {
 }
 
 func (u CodeBundleLocationExperimentPositionUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[CodeBundleLocationExperimentPositionUnionParam](u.OfCodeBundleLocationExperimentPositionType, u.OfScorer)
+	return param.MarshalUnion(u, u.OfCodeBundleLocationExperimentPositionType, u.OfScorer)
 }
 func (u *CodeBundleLocationExperimentPositionUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -2880,7 +2880,7 @@ type OnlineScoreConfigScorerUnionParam struct {
 }
 
 func (u OnlineScoreConfigScorerUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[OnlineScoreConfigScorerUnionParam](u.OfFunction, u.OfGlobal)
+	return param.MarshalUnion(u, u.OfFunction, u.OfGlobal)
 }
 func (u *OnlineScoreConfigScorerUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -4298,7 +4298,7 @@ type PromptDataPromptUnionParam struct {
 }
 
 func (u PromptDataPromptUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[PromptDataPromptUnionParam](u.OfCompletion, u.OfChat)
+	return param.MarshalUnion(u, u.OfCompletion, u.OfChat)
 }
 func (u *PromptDataPromptUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -4406,7 +4406,7 @@ type PromptDataPromptChatMessageUnionParam struct {
 }
 
 func (u PromptDataPromptChatMessageUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[PromptDataPromptChatMessageUnionParam](u.OfSystem,
+	return param.MarshalUnion(u, u.OfSystem,
 		u.OfUser,
 		u.OfAssistant,
 		u.OfTool,
@@ -4580,7 +4580,7 @@ type PromptDataPromptChatMessageUserContentUnionParam struct {
 }
 
 func (u PromptDataPromptChatMessageUserContentUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[PromptDataPromptChatMessageUserContentUnionParam](u.OfString, u.OfArray)
+	return param.MarshalUnion(u, u.OfString, u.OfArray)
 }
 func (u *PromptDataPromptChatMessageUserContentUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -4605,7 +4605,7 @@ type PromptDataPromptChatMessageUserContentArrayItemUnionParam struct {
 }
 
 func (u PromptDataPromptChatMessageUserContentArrayItemUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[PromptDataPromptChatMessageUserContentArrayItemUnionParam](u.OfText, u.OfImageURL)
+	return param.MarshalUnion(u, u.OfText, u.OfImageURL)
 }
 func (u *PromptDataPromptChatMessageUserContentArrayItemUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -4764,7 +4764,7 @@ type PromptDataToolFunctionUnionParam struct {
 }
 
 func (u PromptDataToolFunctionUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[PromptDataToolFunctionUnionParam](u.OfFunction, u.OfGlobal)
+	return param.MarshalUnion(u, u.OfFunction, u.OfGlobal)
 }
 func (u *PromptDataToolFunctionUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -5403,7 +5403,7 @@ type PromptOptionsParamsUnionParam struct {
 }
 
 func (u PromptOptionsParamsUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[PromptOptionsParamsUnionParam](u.OfOpenAIModels,
+	return param.MarshalUnion(u, u.OfOpenAIModels,
 		u.OfAnthropicModels,
 		u.OfGoogleModels,
 		u.OfWindowAIModels,
@@ -5633,7 +5633,7 @@ type PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam struct {
 }
 
 func (u PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam](u.OfPromptOptionssOpenAIModelParamsFunctionCallString, u.OfFunction)
+	return param.MarshalUnion(u, u.OfPromptOptionssOpenAIModelParamsFunctionCallString, u.OfFunction)
 }
 func (u *PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -5673,7 +5673,7 @@ type PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam struct {
 }
 
 func (u PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam](u.OfJsonObject, u.OfJsonSchema, u.OfText)
+	return param.MarshalUnion(u, u.OfJsonObject, u.OfJsonSchema, u.OfText)
 }
 func (u *PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -5803,7 +5803,7 @@ type PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam struct {
 }
 
 func (u PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam](u.OfPromptOptionssOpenAIModelParamsToolChoiceString, u.OfFunction)
+	return param.MarshalUnion(u, u.OfPromptOptionssOpenAIModelParamsToolChoiceString, u.OfFunction)
 }
 func (u *PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
