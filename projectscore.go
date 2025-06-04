@@ -156,7 +156,7 @@ type ProjectScoreNewParamsCategoriesUnion struct {
 }
 
 func (u ProjectScoreNewParamsCategoriesUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[ProjectScoreNewParamsCategoriesUnion](u.OfCategorical, u.OfMinimum)
+	return param.MarshalUnion(u, u.OfCategorical, u.OfMinimum)
 }
 func (u *ProjectScoreNewParamsCategoriesUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -205,7 +205,7 @@ type ProjectScoreUpdateParamsCategoriesUnion struct {
 }
 
 func (u ProjectScoreUpdateParamsCategoriesUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[ProjectScoreUpdateParamsCategoriesUnion](u.OfCategorical, u.OfMinimum)
+	return param.MarshalUnion(u, u.OfCategorical, u.OfMinimum)
 }
 func (u *ProjectScoreUpdateParamsCategoriesUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -333,7 +333,7 @@ type ProjectScoreReplaceParamsCategoriesUnion struct {
 }
 
 func (u ProjectScoreReplaceParamsCategoriesUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[ProjectScoreReplaceParamsCategoriesUnion](u.OfCategorical, u.OfMinimum)
+	return param.MarshalUnion(u, u.OfCategorical, u.OfMinimum)
 }
 func (u *ProjectScoreReplaceParamsCategoriesUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)

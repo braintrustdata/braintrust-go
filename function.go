@@ -175,7 +175,7 @@ type FunctionNewParamsFunctionDataUnion struct {
 }
 
 func (u FunctionNewParamsFunctionDataUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[FunctionNewParamsFunctionDataUnion](u.OfPrompt, u.OfCode, u.OfGlobal)
+	return param.MarshalUnion(u, u.OfPrompt, u.OfCode, u.OfGlobal)
 }
 func (u *FunctionNewParamsFunctionDataUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -273,7 +273,7 @@ type FunctionNewParamsFunctionDataCodeDataUnion struct {
 }
 
 func (u FunctionNewParamsFunctionDataCodeDataUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[FunctionNewParamsFunctionDataCodeDataUnion](u.OfBundle, u.OfInline)
+	return param.MarshalUnion(u, u.OfBundle, u.OfInline)
 }
 func (u *FunctionNewParamsFunctionDataCodeDataUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -534,7 +534,7 @@ type FunctionUpdateParamsFunctionDataUnion struct {
 }
 
 func (u FunctionUpdateParamsFunctionDataUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[FunctionUpdateParamsFunctionDataUnion](u.OfPrompt, u.OfCode, u.OfGlobal)
+	return param.MarshalUnion(u, u.OfPrompt, u.OfCode, u.OfGlobal)
 }
 func (u *FunctionUpdateParamsFunctionDataUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -632,7 +632,7 @@ type FunctionUpdateParamsFunctionDataCodeDataUnion struct {
 }
 
 func (u FunctionUpdateParamsFunctionDataCodeDataUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[FunctionUpdateParamsFunctionDataCodeDataUnion](u.OfBundle, u.OfInline)
+	return param.MarshalUnion(u, u.OfBundle, u.OfInline)
 }
 func (u *FunctionUpdateParamsFunctionDataCodeDataUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -921,7 +921,7 @@ type FunctionInvokeParamsMessageUnion struct {
 }
 
 func (u FunctionInvokeParamsMessageUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[FunctionInvokeParamsMessageUnion](u.OfSystem,
+	return param.MarshalUnion(u, u.OfSystem,
 		u.OfUser,
 		u.OfAssistant,
 		u.OfTool,
@@ -1095,7 +1095,7 @@ type FunctionInvokeParamsMessageUserContentUnion struct {
 }
 
 func (u FunctionInvokeParamsMessageUserContentUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[FunctionInvokeParamsMessageUserContentUnion](u.OfString, u.OfArray)
+	return param.MarshalUnion(u, u.OfString, u.OfArray)
 }
 func (u *FunctionInvokeParamsMessageUserContentUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -1120,7 +1120,7 @@ type FunctionInvokeParamsMessageUserContentArrayItemUnion struct {
 }
 
 func (u FunctionInvokeParamsMessageUserContentArrayItemUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[FunctionInvokeParamsMessageUserContentArrayItemUnion](u.OfText, u.OfImageURL)
+	return param.MarshalUnion(u, u.OfText, u.OfImageURL)
 }
 func (u *FunctionInvokeParamsMessageUserContentArrayItemUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -1287,7 +1287,7 @@ type FunctionInvokeParamsParentUnion struct {
 }
 
 func (u FunctionInvokeParamsParentUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[FunctionInvokeParamsParentUnion](u.OfSpanParentStruct, u.OfString)
+	return param.MarshalUnion(u, u.OfSpanParentStruct, u.OfString)
 }
 func (u *FunctionInvokeParamsParentUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -1393,7 +1393,7 @@ type FunctionReplaceParamsFunctionDataUnion struct {
 }
 
 func (u FunctionReplaceParamsFunctionDataUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[FunctionReplaceParamsFunctionDataUnion](u.OfPrompt, u.OfCode, u.OfGlobal)
+	return param.MarshalUnion(u, u.OfPrompt, u.OfCode, u.OfGlobal)
 }
 func (u *FunctionReplaceParamsFunctionDataUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -1491,7 +1491,7 @@ type FunctionReplaceParamsFunctionDataCodeDataUnion struct {
 }
 
 func (u FunctionReplaceParamsFunctionDataCodeDataUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion[FunctionReplaceParamsFunctionDataCodeDataUnion](u.OfBundle, u.OfInline)
+	return param.MarshalUnion(u, u.OfBundle, u.OfInline)
 }
 func (u *FunctionReplaceParamsFunctionDataCodeDataUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
