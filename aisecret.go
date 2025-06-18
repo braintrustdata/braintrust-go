@@ -11,10 +11,10 @@ import (
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/pagination"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -31,8 +31,8 @@ type AISecretService struct {
 // NewAISecretService generates a new service that applies the given options to
 // each request. These options are applied after the parent client's options (if
 // there is one), and before any request-specific options.
-func NewAISecretService(opts ...option.RequestOption) (r *AISecretService) {
-	r = &AISecretService{}
+func NewAISecretService(opts ...option.RequestOption) (r AISecretService) {
+	r = AISecretService{}
 	r.Options = opts
 	return
 }
@@ -129,115 +129,151 @@ func (r *AISecretService) Replace(ctx context.Context, body AISecretReplaceParam
 
 type AISecretNewParams struct {
 	// Name of the AI secret
-	Name     param.Field[string]                 `json:"name,required"`
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
+	Name string `json:"name,required"`
 	// For nearly all users, this parameter should be unnecessary. But in the rare case
 	// that your API key belongs to multiple organizations, you may specify the name of
 	// the organization the AI Secret belongs in.
-	OrgName param.Field[string] `json:"org_name"`
+	OrgName param.Opt[string] `json:"org_name,omitzero"`
 	// Secret value. If omitted in a PUT request, the existing secret value will be
 	// left intact, not replaced with null.
-	Secret param.Field[string] `json:"secret"`
-	Type   param.Field[string] `json:"type"`
+	Secret   param.Opt[string] `json:"secret,omitzero"`
+	Type     param.Opt[string] `json:"type,omitzero"`
+	Metadata map[string]any    `json:"metadata,omitzero"`
+	paramObj
 }
 
 func (r AISecretNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow AISecretNewParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *AISecretNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type AISecretUpdateParams struct {
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
 	// Name of the AI secret
-	Name   param.Field[string] `json:"name"`
-	Secret param.Field[string] `json:"secret"`
-	Type   param.Field[string] `json:"type"`
+	Name     param.Opt[string] `json:"name,omitzero"`
+	Secret   param.Opt[string] `json:"secret,omitzero"`
+	Type     param.Opt[string] `json:"type,omitzero"`
+	Metadata map[string]any    `json:"metadata,omitzero"`
+	paramObj
 }
 
 func (r AISecretUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow AISecretUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *AISecretUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type AISecretListParams struct {
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Name of the ai_secret to search for
-	AISecretName param.Field[string]                              `query:"ai_secret_name"`
-	AISecretType param.Field[AISecretListParamsAISecretTypeUnion] `query:"ai_secret_type"`
+	AISecretName param.Opt[string] `query:"ai_secret_name,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
-	// Filter search results to a particular set of object IDs. To specify a list of
-	// IDs, include the query param multiple times
-	IDs param.Field[AISecretListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	EndingBefore param.Opt[string] `query:"ending_before,omitzero" format:"uuid" json:"-"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Opt[string] `query:"org_name,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Opt[string]                   `query:"starting_after,omitzero" format:"uuid" json:"-"`
+	AISecretType  AISecretListParamsAISecretTypeUnion `query:"ai_secret_type,omitzero" json:"-"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs AISecretListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
+	paramObj
 }
 
 // URLQuery serializes [AISecretListParams]'s query parameters as `url.Values`.
-func (r AISecretListParams) URLQuery() (v url.Values) {
+func (r AISecretListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
 
-// Satisfied by [shared.UnionString], [AISecretListParamsAISecretTypeArray].
-type AISecretListParamsAISecretTypeUnion interface {
-	ImplementsAISecretListParamsAISecretTypeUnion()
-}
-
-type AISecretListParamsAISecretTypeArray []string
-
-func (r AISecretListParamsAISecretTypeArray) ImplementsAISecretListParamsAISecretTypeUnion() {}
-
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [AISecretListParamsIDsArray].
-type AISecretListParamsIDsUnion interface {
-	ImplementsAISecretListParamsIDsUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type AISecretListParamsAISecretTypeUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
 }
 
-type AISecretListParamsIDsArray []string
+func (u *AISecretListParamsAISecretTypeUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
+	}
+	return nil
+}
 
-func (r AISecretListParamsIDsArray) ImplementsAISecretListParamsIDsUnion() {}
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type AISecretListParamsIDsUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+func (u *AISecretListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
+	}
+	return nil
+}
 
 type AISecretFindAndDeleteParams struct {
 	// Name of the AI secret
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// For nearly all users, this parameter should be unnecessary. But in the rare case
 	// that your API key belongs to multiple organizations, you may specify the name of
 	// the organization the AI Secret belongs in.
-	OrgName param.Field[string] `json:"org_name"`
+	OrgName param.Opt[string] `json:"org_name,omitzero"`
+	paramObj
 }
 
 func (r AISecretFindAndDeleteParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow AISecretFindAndDeleteParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *AISecretFindAndDeleteParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type AISecretReplaceParams struct {
 	// Name of the AI secret
-	Name     param.Field[string]                 `json:"name,required"`
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
+	Name string `json:"name,required"`
 	// For nearly all users, this parameter should be unnecessary. But in the rare case
 	// that your API key belongs to multiple organizations, you may specify the name of
 	// the organization the AI Secret belongs in.
-	OrgName param.Field[string] `json:"org_name"`
+	OrgName param.Opt[string] `json:"org_name,omitzero"`
 	// Secret value. If omitted in a PUT request, the existing secret value will be
 	// left intact, not replaced with null.
-	Secret param.Field[string] `json:"secret"`
-	Type   param.Field[string] `json:"type"`
+	Secret   param.Opt[string] `json:"secret,omitzero"`
+	Type     param.Opt[string] `json:"type,omitzero"`
+	Metadata map[string]any    `json:"metadata,omitzero"`
+	paramObj
 }
 
 func (r AISecretReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow AISecretReplaceParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *AISecretReplaceParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

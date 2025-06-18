@@ -11,10 +11,10 @@ import (
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/pagination"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -31,8 +31,8 @@ type RoleService struct {
 // NewRoleService generates a new service that applies the given options to each
 // request. These options are applied after the parent client's options (if there
 // is one), and before any request-specific options.
-func NewRoleService(opts ...option.RequestOption) (r *RoleService) {
-	r = &RoleService{}
+func NewRoleService(opts ...option.RequestOption) (r RoleService) {
+	r = RoleService{}
 	r.Options = opts
 	return
 }
@@ -121,163 +121,233 @@ func (r *RoleService) Replace(ctx context.Context, body RoleReplaceParams, opts 
 
 type RoleNewParams struct {
 	// Name of the role
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Textual description of the role
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
+	// For nearly all users, this parameter should be unnecessary. But in the rare case
+	// that your API key belongs to multiple organizations, you may specify the name of
+	// the organization the role belongs in.
+	OrgName param.Opt[string] `json:"org_name,omitzero"`
 	// (permission, restrict_object_type) tuples which belong to this role
-	MemberPermissions param.Field[[]RoleNewParamsMemberPermission] `json:"member_permissions"`
+	MemberPermissions []RoleNewParamsMemberPermission `json:"member_permissions,omitzero"`
 	// Ids of the roles this role inherits from
 	//
 	// An inheriting role has all the permissions contained in its member roles, as
 	// well as all of their inherited permissions
-	MemberRoles param.Field[[]string] `json:"member_roles" format:"uuid"`
-	// For nearly all users, this parameter should be unnecessary. But in the rare case
-	// that your API key belongs to multiple organizations, you may specify the name of
-	// the organization the role belongs in.
-	OrgName param.Field[string] `json:"org_name"`
+	MemberRoles []string `json:"member_roles,omitzero" format:"uuid"`
+	paramObj
 }
 
 func (r RoleNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow RoleNewParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *RoleNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
+// The property Permission is required.
 type RoleNewParamsMemberPermission struct {
 	// Each permission permits a certain type of operation on an object in the system
 	//
 	// Permissions can be assigned to to objects on an individual basis, or grouped
 	// into roles
-	Permission param.Field[shared.Permission] `json:"permission,required"`
+	//
+	// Any of "create", "read", "update", "delete", "create_acls", "read_acls",
+	// "update_acls", "delete_acls".
+	Permission shared.Permission `json:"permission,omitzero,required"`
 	// The object type that the ACL applies to
-	RestrictObjectType param.Field[shared.ACLObjectType] `json:"restrict_object_type"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	RestrictObjectType shared.ACLObjectType `json:"restrict_object_type,omitzero"`
+	paramObj
 }
 
 func (r RoleNewParamsMemberPermission) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow RoleNewParamsMemberPermission
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *RoleNewParamsMemberPermission) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type RoleUpdateParams struct {
-	// A list of permissions to add to the role
-	AddMemberPermissions param.Field[[]RoleUpdateParamsAddMemberPermission] `json:"add_member_permissions"`
-	// A list of role IDs to add to the role's inheriting-from set
-	AddMemberRoles param.Field[[]string] `json:"add_member_roles" format:"uuid"`
 	// Textual description of the role
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
 	// Name of the role
-	Name param.Field[string] `json:"name"`
+	Name param.Opt[string] `json:"name,omitzero"`
+	// A list of permissions to add to the role
+	AddMemberPermissions []RoleUpdateParamsAddMemberPermission `json:"add_member_permissions,omitzero"`
+	// A list of role IDs to add to the role's inheriting-from set
+	AddMemberRoles []string `json:"add_member_roles,omitzero" format:"uuid"`
 	// A list of permissions to remove from the role
-	RemoveMemberPermissions param.Field[[]RoleUpdateParamsRemoveMemberPermission] `json:"remove_member_permissions"`
+	RemoveMemberPermissions []RoleUpdateParamsRemoveMemberPermission `json:"remove_member_permissions,omitzero"`
 	// A list of role IDs to remove from the role's inheriting-from set
-	RemoveMemberRoles param.Field[[]string] `json:"remove_member_roles" format:"uuid"`
+	RemoveMemberRoles []string `json:"remove_member_roles,omitzero" format:"uuid"`
+	paramObj
 }
 
 func (r RoleUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow RoleUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *RoleUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
+// The property Permission is required.
 type RoleUpdateParamsAddMemberPermission struct {
 	// Each permission permits a certain type of operation on an object in the system
 	//
 	// Permissions can be assigned to to objects on an individual basis, or grouped
 	// into roles
-	Permission param.Field[shared.Permission] `json:"permission,required"`
+	//
+	// Any of "create", "read", "update", "delete", "create_acls", "read_acls",
+	// "update_acls", "delete_acls".
+	Permission shared.Permission `json:"permission,omitzero,required"`
 	// The object type that the ACL applies to
-	RestrictObjectType param.Field[shared.ACLObjectType] `json:"restrict_object_type"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	RestrictObjectType shared.ACLObjectType `json:"restrict_object_type,omitzero"`
+	paramObj
 }
 
 func (r RoleUpdateParamsAddMemberPermission) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow RoleUpdateParamsAddMemberPermission
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *RoleUpdateParamsAddMemberPermission) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
+// The property Permission is required.
 type RoleUpdateParamsRemoveMemberPermission struct {
 	// Each permission permits a certain type of operation on an object in the system
 	//
 	// Permissions can be assigned to to objects on an individual basis, or grouped
 	// into roles
-	Permission param.Field[shared.Permission] `json:"permission,required"`
+	//
+	// Any of "create", "read", "update", "delete", "create_acls", "read_acls",
+	// "update_acls", "delete_acls".
+	Permission shared.Permission `json:"permission,omitzero,required"`
 	// The object type that the ACL applies to
-	RestrictObjectType param.Field[shared.ACLObjectType] `json:"restrict_object_type"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	RestrictObjectType shared.ACLObjectType `json:"restrict_object_type,omitzero"`
+	paramObj
 }
 
 func (r RoleUpdateParamsRemoveMemberPermission) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow RoleUpdateParamsRemoveMemberPermission
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *RoleUpdateParamsRemoveMemberPermission) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type RoleListParams struct {
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
-	// Filter search results to a particular set of object IDs. To specify a list of
-	// IDs, include the query param multiple times
-	IDs param.Field[RoleListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	EndingBefore param.Opt[string] `query:"ending_before,omitzero" format:"uuid" json:"-"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Opt[string] `query:"org_name,omitzero" json:"-"`
 	// Name of the role to search for
-	RoleName param.Field[string] `query:"role_name"`
+	RoleName param.Opt[string] `query:"role_name,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Opt[string] `query:"starting_after,omitzero" format:"uuid" json:"-"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs RoleListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
+	paramObj
 }
 
 // URLQuery serializes [RoleListParams]'s query parameters as `url.Values`.
-func (r RoleListParams) URLQuery() (v url.Values) {
+func (r RoleListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [RoleListParamsIDsArray].
-type RoleListParamsIDsUnion interface {
-	ImplementsRoleListParamsIDsUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type RoleListParamsIDsUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
 }
 
-type RoleListParamsIDsArray []string
-
-func (r RoleListParamsIDsArray) ImplementsRoleListParamsIDsUnion() {}
+func (u *RoleListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
+	}
+	return nil
+}
 
 type RoleReplaceParams struct {
 	// Name of the role
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Textual description of the role
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
+	// For nearly all users, this parameter should be unnecessary. But in the rare case
+	// that your API key belongs to multiple organizations, you may specify the name of
+	// the organization the role belongs in.
+	OrgName param.Opt[string] `json:"org_name,omitzero"`
 	// (permission, restrict_object_type) tuples which belong to this role
-	MemberPermissions param.Field[[]RoleReplaceParamsMemberPermission] `json:"member_permissions"`
+	MemberPermissions []RoleReplaceParamsMemberPermission `json:"member_permissions,omitzero"`
 	// Ids of the roles this role inherits from
 	//
 	// An inheriting role has all the permissions contained in its member roles, as
 	// well as all of their inherited permissions
-	MemberRoles param.Field[[]string] `json:"member_roles" format:"uuid"`
-	// For nearly all users, this parameter should be unnecessary. But in the rare case
-	// that your API key belongs to multiple organizations, you may specify the name of
-	// the organization the role belongs in.
-	OrgName param.Field[string] `json:"org_name"`
+	MemberRoles []string `json:"member_roles,omitzero" format:"uuid"`
+	paramObj
 }
 
 func (r RoleReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow RoleReplaceParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *RoleReplaceParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
+// The property Permission is required.
 type RoleReplaceParamsMemberPermission struct {
 	// Each permission permits a certain type of operation on an object in the system
 	//
 	// Permissions can be assigned to to objects on an individual basis, or grouped
 	// into roles
-	Permission param.Field[shared.Permission] `json:"permission,required"`
+	//
+	// Any of "create", "read", "update", "delete", "create_acls", "read_acls",
+	// "update_acls", "delete_acls".
+	Permission shared.Permission `json:"permission,omitzero,required"`
 	// The object type that the ACL applies to
-	RestrictObjectType param.Field[shared.ACLObjectType] `json:"restrict_object_type"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	RestrictObjectType shared.ACLObjectType `json:"restrict_object_type,omitzero"`
+	paramObj
 }
 
 func (r RoleReplaceParamsMemberPermission) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow RoleReplaceParamsMemberPermission
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *RoleReplaceParamsMemberPermission) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

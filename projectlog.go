@@ -11,9 +11,9 @@ import (
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -30,8 +30,8 @@ type ProjectLogService struct {
 // NewProjectLogService generates a new service that applies the given options to
 // each request. These options are applied after the parent client's options (if
 // there is one), and before any request-specific options.
-func NewProjectLogService(opts ...option.RequestOption) (r *ProjectLogService) {
-	r = &ProjectLogService{}
+func NewProjectLogService(opts ...option.RequestOption) (r ProjectLogService) {
+	r = ProjectLogService{}
 	r.Options = opts
 	return
 }
@@ -90,11 +90,16 @@ func (r *ProjectLogService) Insert(ctx context.Context, projectID string, body P
 
 type ProjectLogFeedbackParams struct {
 	// A list of project logs feedback items
-	Feedback param.Field[[]shared.FeedbackProjectLogsItemParam] `json:"feedback,required"`
+	Feedback []shared.FeedbackProjectLogsItemParam `json:"feedback,omitzero,required"`
+	paramObj
 }
 
 func (r ProjectLogFeedbackParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ProjectLogFeedbackParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ProjectLogFeedbackParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ProjectLogFetchParams struct {
@@ -112,7 +117,7 @@ type ProjectLogFetchParams struct {
 	// The `limit` parameter controls the number of full traces to return. So you may
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
-	Limit param.Field[int64] `query:"limit"`
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -123,7 +128,7 @@ type ProjectLogFetchParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxRootSpanID param.Field[string] `query:"max_root_span_id"`
+	MaxRootSpanID param.Opt[string] `query:"max_root_span_id,omitzero" json:"-"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -134,17 +139,18 @@ type ProjectLogFetchParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxXactID param.Field[string] `query:"max_xact_id"`
+	MaxXactID param.Opt[string] `query:"max_xact_id,omitzero" json:"-"`
 	// Retrieve a snapshot of events from a past time
 	//
 	// The version id is essentially a filter on the latest event transaction id. You
 	// can use the `max_xact_id` returned by a past fetch as the version to reproduce
 	// that exact fetch.
-	Version param.Field[string] `query:"version"`
+	Version param.Opt[string] `query:"version,omitzero" json:"-"`
+	paramObj
 }
 
 // URLQuery serializes [ProjectLogFetchParams]'s query parameters as `url.Values`.
-func (r ProjectLogFetchParams) URLQuery() (v url.Values) {
+func (r ProjectLogFetchParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -157,7 +163,7 @@ type ProjectLogFetchPostParams struct {
 	//
 	// The string can be obtained directly from the `cursor` property of the previous
 	// fetch query
-	Cursor param.Field[string] `json:"cursor"`
+	Cursor param.Opt[string] `json:"cursor,omitzero"`
 	// limit the number of traces fetched
 	//
 	// Fetch queries may be paginated if the total result size is expected to be large
@@ -172,7 +178,7 @@ type ProjectLogFetchPostParams struct {
 	// The `limit` parameter controls the number of full traces to return. So you may
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
-	Limit param.Field[int64] `json:"limit"`
+	Limit param.Opt[int64] `json:"limit,omitzero"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -183,7 +189,7 @@ type ProjectLogFetchPostParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxRootSpanID param.Field[string] `json:"max_root_span_id"`
+	MaxRootSpanID param.Opt[string] `json:"max_root_span_id,omitzero"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -194,24 +200,34 @@ type ProjectLogFetchPostParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxXactID param.Field[string] `json:"max_xact_id"`
+	MaxXactID param.Opt[string] `json:"max_xact_id,omitzero"`
 	// Retrieve a snapshot of events from a past time
 	//
 	// The version id is essentially a filter on the latest event transaction id. You
 	// can use the `max_xact_id` returned by a past fetch as the version to reproduce
 	// that exact fetch.
-	Version param.Field[string] `json:"version"`
+	Version param.Opt[string] `json:"version,omitzero"`
+	paramObj
 }
 
 func (r ProjectLogFetchPostParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ProjectLogFetchPostParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ProjectLogFetchPostParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ProjectLogInsertParams struct {
 	// A list of project logs events to insert
-	Events param.Field[[]shared.InsertProjectLogsEventParam] `json:"events,required"`
+	Events []shared.InsertProjectLogsEventParam `json:"events,omitzero,required"`
+	paramObj
 }
 
 func (r ProjectLogInsertParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ProjectLogInsertParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ProjectLogInsertParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

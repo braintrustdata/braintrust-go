@@ -7,9 +7,9 @@ import (
 	"net/http"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -26,8 +26,8 @@ type OrganizationMemberService struct {
 // NewOrganizationMemberService generates a new service that applies the given
 // options to each request. These options are applied after the parent client's
 // options (if there is one), and before any request-specific options.
-func NewOrganizationMemberService(opts ...option.RequestOption) (r *OrganizationMemberService) {
-	r = &OrganizationMemberService{}
+func NewOrganizationMemberService(opts ...option.RequestOption) (r OrganizationMemberService) {
+	r = OrganizationMemberService{}
 	r.Options = opts
 	return
 }
@@ -41,56 +41,71 @@ func (r *OrganizationMemberService) Update(ctx context.Context, body Organizatio
 }
 
 type OrganizationMemberUpdateParams struct {
-	// Users to invite to the organization
-	InviteUsers param.Field[OrganizationMemberUpdateParamsInviteUsers] `json:"invite_users"`
 	// For nearly all users, this parameter should be unnecessary. But in the rare case
 	// that your API key belongs to multiple organizations, or in case you want to
 	// explicitly assert the organization you are modifying, you may specify the id of
 	// the organization.
-	OrgID param.Field[string] `json:"org_id"`
+	OrgID param.Opt[string] `json:"org_id,omitzero"`
 	// For nearly all users, this parameter should be unnecessary. But in the rare case
 	// that your API key belongs to multiple organizations, or in case you want to
 	// explicitly assert the organization you are modifying, you may specify the name
 	// of the organization.
-	OrgName param.Field[string] `json:"org_name"`
+	OrgName param.Opt[string] `json:"org_name,omitzero"`
+	// Users to invite to the organization
+	InviteUsers OrganizationMemberUpdateParamsInviteUsers `json:"invite_users,omitzero"`
 	// Users to remove from the organization
-	RemoveUsers param.Field[OrganizationMemberUpdateParamsRemoveUsers] `json:"remove_users"`
+	RemoveUsers OrganizationMemberUpdateParamsRemoveUsers `json:"remove_users,omitzero"`
+	paramObj
 }
 
 func (r OrganizationMemberUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow OrganizationMemberUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OrganizationMemberUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Users to invite to the organization
 type OrganizationMemberUpdateParamsInviteUsers struct {
-	// Emails of users to invite
-	Emails param.Field[[]string] `json:"emails"`
 	// Singular form of group_ids
-	GroupID param.Field[string] `json:"group_id" format:"uuid"`
-	// Optional list of group ids to add newly-invited users to.
-	GroupIDs param.Field[[]string] `json:"group_ids" format:"uuid"`
+	GroupID param.Opt[string] `json:"group_id,omitzero" format:"uuid"`
 	// Singular form of group_names
-	GroupName param.Field[string] `json:"group_name"`
-	// Optional list of group names to add newly-invited users to.
-	GroupNames param.Field[[]string] `json:"group_names"`
-	// Ids of existing users to invite
-	IDs param.Field[[]string] `json:"ids" format:"uuid"`
+	GroupName param.Opt[string] `json:"group_name,omitzero"`
 	// If true, send invite emails to the users who wore actually added
-	SendInviteEmails param.Field[bool] `json:"send_invite_emails"`
+	SendInviteEmails param.Opt[bool] `json:"send_invite_emails,omitzero"`
+	// Emails of users to invite
+	Emails []string `json:"emails,omitzero"`
+	// Optional list of group ids to add newly-invited users to.
+	GroupIDs []string `json:"group_ids,omitzero" format:"uuid"`
+	// Optional list of group names to add newly-invited users to.
+	GroupNames []string `json:"group_names,omitzero"`
+	// Ids of existing users to invite
+	IDs []string `json:"ids,omitzero" format:"uuid"`
+	paramObj
 }
 
 func (r OrganizationMemberUpdateParamsInviteUsers) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow OrganizationMemberUpdateParamsInviteUsers
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OrganizationMemberUpdateParamsInviteUsers) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Users to remove from the organization
 type OrganizationMemberUpdateParamsRemoveUsers struct {
 	// Emails of users to remove
-	Emails param.Field[[]string] `json:"emails"`
+	Emails []string `json:"emails,omitzero"`
 	// Ids of users to remove
-	IDs param.Field[[]string] `json:"ids" format:"uuid"`
+	IDs []string `json:"ids,omitzero" format:"uuid"`
+	paramObj
 }
 
 func (r OrganizationMemberUpdateParamsRemoveUsers) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow OrganizationMemberUpdateParamsRemoveUsers
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OrganizationMemberUpdateParamsRemoveUsers) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

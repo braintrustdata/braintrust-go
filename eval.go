@@ -7,9 +7,9 @@ import (
 	"net/http"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -26,8 +26,8 @@ type EvalService struct {
 // NewEvalService generates a new service that applies the given options to each
 // request. These options are applied after the parent client's options (if there
 // is one), and before any request-specific options.
-func NewEvalService(opts ...option.RequestOption) (r *EvalService) {
-	r = &EvalService{}
+func NewEvalService(opts ...option.RequestOption) (r EvalService) {
+	r = EvalService{}
 	r.Options = opts
 	return
 }
@@ -47,521 +47,830 @@ func (r *EvalService) New(ctx context.Context, body EvalNewParams, opts ...optio
 
 type EvalNewParams struct {
 	// The dataset to use
-	Data param.Field[EvalNewParamsDataUnion] `json:"data,required"`
+	Data EvalNewParamsDataUnion `json:"data,omitzero,required"`
 	// Unique identifier for the project to run the eval in
-	ProjectID param.Field[string] `json:"project_id,required"`
+	ProjectID string `json:"project_id,required"`
 	// The functions to score the eval on
-	Scores param.Field[[]EvalNewParamsScoreUnion] `json:"scores,required"`
+	Scores []EvalNewParamsScoreUnion `json:"scores,omitzero,required"`
 	// The function to evaluate
-	Task param.Field[EvalNewParamsTaskUnion] `json:"task,required"`
+	Task EvalNewParamsTaskUnion `json:"task,omitzero,required"`
 	// An optional experiment id to use as a base. If specified, the new experiment
 	// will be summarized and compared to this experiment.
-	BaseExperimentID param.Field[string] `json:"base_experiment_id"`
+	BaseExperimentID param.Opt[string] `json:"base_experiment_id,omitzero"`
 	// An optional experiment name to use as a base. If specified, the new experiment
 	// will be summarized and compared to this experiment.
-	BaseExperimentName param.Field[string] `json:"base_experiment_name"`
-	// An optional name for the experiment created by this eval. If it conflicts with
-	// an existing experiment, it will be suffixed with a unique identifier.
-	ExperimentName param.Field[string] `json:"experiment_name"`
-	// Optional settings for collecting git metadata. By default, will collect all git
-	// metadata fields allowed in org-level settings.
-	GitMetadataSettings param.Field[EvalNewParamsGitMetadataSettings] `json:"git_metadata_settings"`
+	BaseExperimentName param.Opt[string] `json:"base_experiment_name,omitzero"`
 	// Whether the experiment should be public. Defaults to false.
-	IsPublic param.Field[bool] `json:"is_public"`
+	IsPublic param.Opt[bool] `json:"is_public,omitzero"`
 	// The maximum number of tasks/scorers that will be run concurrently. Defaults to
 	// undefined, in which case there is no max concurrency.
-	MaxConcurrency param.Field[float64] `json:"max_concurrency"`
-	// Optional experiment-level metadata to store about the evaluation. You can later
-	// use this to slice & dice across experiments.
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
-	// Options for tracing the evaluation
-	Parent param.Field[EvalNewParamsParentUnion] `json:"parent"`
-	// Metadata about the state of the repo when the experiment was created
-	RepoInfo param.Field[shared.RepoInfoParam] `json:"repo_info"`
-	// Whether to stream the results of the eval. If true, the request will return two
-	// events: one to indicate the experiment has started, and another upon completion.
-	// If false, the request will return the evaluation's summary upon completion.
-	Stream param.Field[bool] `json:"stream"`
+	MaxConcurrency param.Opt[float64] `json:"max_concurrency,omitzero"`
 	// The maximum duration, in milliseconds, to run the evaluation. Defaults to
 	// undefined, in which case there is no timeout.
-	Timeout param.Field[float64] `json:"timeout"`
+	Timeout param.Opt[float64] `json:"timeout,omitzero"`
 	// The number of times to run the evaluator per input. This is useful for
 	// evaluating applications that have non-deterministic behavior and gives you both
 	// a stronger aggregate measure and a sense of the variance in the results.
-	TrialCount param.Field[float64] `json:"trial_count"`
+	TrialCount param.Opt[float64] `json:"trial_count,omitzero"`
+	// An optional name for the experiment created by this eval. If it conflicts with
+	// an existing experiment, it will be suffixed with a unique identifier.
+	ExperimentName param.Opt[string] `json:"experiment_name,omitzero"`
+	// Whether to stream the results of the eval. If true, the request will return two
+	// events: one to indicate the experiment has started, and another upon completion.
+	// If false, the request will return the evaluation's summary upon completion.
+	Stream param.Opt[bool] `json:"stream,omitzero"`
+	// Optional settings for collecting git metadata. By default, will collect all git
+	// metadata fields allowed in org-level settings.
+	GitMetadataSettings EvalNewParamsGitMetadataSettings `json:"git_metadata_settings,omitzero"`
+	// Metadata about the state of the repo when the experiment was created
+	RepoInfo shared.RepoInfoParam `json:"repo_info,omitzero"`
+	// Optional experiment-level metadata to store about the evaluation. You can later
+	// use this to slice & dice across experiments.
+	Metadata map[string]any `json:"metadata,omitzero"`
+	// Options for tracing the evaluation
+	Parent EvalNewParamsParentUnion `json:"parent,omitzero"`
+	paramObj
 }
 
 func (r EvalNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EvalNewParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-// The dataset to use
-type EvalNewParamsData struct {
-	InternalBtql param.Field[interface{}] `json:"_internal_btql"`
-	Data         param.Field[interface{}] `json:"data"`
-	DatasetID    param.Field[string]      `json:"dataset_id"`
-	DatasetName  param.Field[string]      `json:"dataset_name"`
-	ProjectName  param.Field[string]      `json:"project_name"`
-}
-
-func (r EvalNewParamsData) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r EvalNewParamsData) implementsEvalNewParamsDataUnion() {}
-
-// The dataset to use
+// Only one field can be non-zero.
 //
-// Satisfied by [EvalNewParamsDataDatasetID],
-// [EvalNewParamsDataProjectDatasetName], [EvalNewParamsDataDatasetRows],
-// [EvalNewParamsData].
-type EvalNewParamsDataUnion interface {
-	implementsEvalNewParamsDataUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type EvalNewParamsDataUnion struct {
+	OfDatasetID          *EvalNewParamsDataDatasetID          `json:",omitzero,inline"`
+	OfProjectDatasetName *EvalNewParamsDataProjectDatasetName `json:",omitzero,inline"`
+	OfDatasetRows        *EvalNewParamsDataDatasetRows        `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u EvalNewParamsDataUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfDatasetID, u.OfProjectDatasetName, u.OfDatasetRows)
+}
+func (u *EvalNewParamsDataUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *EvalNewParamsDataUnion) asAny() any {
+	if !param.IsOmitted(u.OfDatasetID) {
+		return u.OfDatasetID
+	} else if !param.IsOmitted(u.OfProjectDatasetName) {
+		return u.OfProjectDatasetName
+	} else if !param.IsOmitted(u.OfDatasetRows) {
+		return u.OfDatasetRows
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsDataUnion) GetDatasetID() *string {
+	if vt := u.OfDatasetID; vt != nil {
+		return &vt.DatasetID
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsDataUnion) GetDatasetName() *string {
+	if vt := u.OfProjectDatasetName; vt != nil {
+		return &vt.DatasetName
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsDataUnion) GetProjectName() *string {
+	if vt := u.OfProjectDatasetName; vt != nil {
+		return &vt.ProjectName
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsDataUnion) GetData() []any {
+	if vt := u.OfDatasetRows; vt != nil {
+		return vt.Data
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's InternalBtql property, if present.
+func (u EvalNewParamsDataUnion) GetInternalBtql() map[string]any {
+	if vt := u.OfDatasetID; vt != nil {
+		return vt.InternalBtql
+	} else if vt := u.OfProjectDatasetName; vt != nil {
+		return vt.InternalBtql
+	}
+	return nil
 }
 
 // Dataset id
+//
+// The property DatasetID is required.
 type EvalNewParamsDataDatasetID struct {
-	DatasetID    param.Field[string]                 `json:"dataset_id,required"`
-	InternalBtql param.Field[map[string]interface{}] `json:"_internal_btql"`
+	DatasetID    string         `json:"dataset_id,required"`
+	InternalBtql map[string]any `json:"_internal_btql,omitzero"`
+	paramObj
 }
 
 func (r EvalNewParamsDataDatasetID) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EvalNewParamsDataDatasetID
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsDataDatasetID) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r EvalNewParamsDataDatasetID) implementsEvalNewParamsDataUnion() {}
-
 // Project and dataset name
+//
+// The properties DatasetName, ProjectName are required.
 type EvalNewParamsDataProjectDatasetName struct {
-	DatasetName  param.Field[string]                 `json:"dataset_name,required"`
-	ProjectName  param.Field[string]                 `json:"project_name,required"`
-	InternalBtql param.Field[map[string]interface{}] `json:"_internal_btql"`
+	DatasetName  string         `json:"dataset_name,required"`
+	ProjectName  string         `json:"project_name,required"`
+	InternalBtql map[string]any `json:"_internal_btql,omitzero"`
+	paramObj
 }
 
 func (r EvalNewParamsDataProjectDatasetName) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EvalNewParamsDataProjectDatasetName
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsDataProjectDatasetName) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r EvalNewParamsDataProjectDatasetName) implementsEvalNewParamsDataUnion() {}
-
 // Dataset rows
+//
+// The property Data is required.
 type EvalNewParamsDataDatasetRows struct {
-	Data param.Field[[]interface{}] `json:"data,required"`
+	Data []any `json:"data,omitzero,required"`
+	paramObj
 }
 
 func (r EvalNewParamsDataDatasetRows) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EvalNewParamsDataDatasetRows
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsDataDatasetRows) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r EvalNewParamsDataDatasetRows) implementsEvalNewParamsDataUnion() {}
-
-// The function to evaluate
-type EvalNewParamsScore struct {
-	// The inline code to execute
-	Code param.Field[string] `json:"code"`
-	// The ID of the function
-	FunctionID param.Field[string] `json:"function_id"`
-	// The name of the global function. Currently, the global namespace includes the
-	// functions in autoevals
-	GlobalFunction param.Field[string]      `json:"global_function"`
-	InlineContext  param.Field[interface{}] `json:"inline_context"`
-	// The prompt, model, and its parameters
-	InlinePrompt param.Field[shared.PromptDataParam] `json:"inline_prompt"`
-	// The name of the inline code function
-	Name param.Field[string] `json:"name"`
-	// The name of the project containing the function
-	ProjectName param.Field[string] `json:"project_name"`
-	// The ID of the function in the prompt session
-	PromptSessionFunctionID param.Field[string] `json:"prompt_session_function_id"`
-	// The ID of the prompt session
-	PromptSessionID param.Field[string] `json:"prompt_session_id"`
-	// The slug of the function
-	Slug param.Field[string] `json:"slug"`
-	// The version of the function
-	Version param.Field[string] `json:"version"`
-}
-
-func (r EvalNewParamsScore) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r EvalNewParamsScore) implementsEvalNewParamsScoreUnion() {}
-
-// The function to evaluate
+// Only one field can be non-zero.
 //
-// Satisfied by [EvalNewParamsScoresFunctionID], [EvalNewParamsScoresProjectSlug],
-// [EvalNewParamsScoresGlobalFunction], [EvalNewParamsScoresPromptSessionID],
-// [EvalNewParamsScoresInlineCode], [EvalNewParamsScoresInlinePrompt],
-// [EvalNewParamsScore].
-type EvalNewParamsScoreUnion interface {
-	implementsEvalNewParamsScoreUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type EvalNewParamsScoreUnion struct {
+	OfFunctionID      *EvalNewParamsScoreFunctionID      `json:",omitzero,inline"`
+	OfProjectSlug     *EvalNewParamsScoreProjectSlug     `json:",omitzero,inline"`
+	OfGlobalFunction  *EvalNewParamsScoreGlobalFunction  `json:",omitzero,inline"`
+	OfPromptSessionID *EvalNewParamsScorePromptSessionID `json:",omitzero,inline"`
+	OfInlineCode      *EvalNewParamsScoreInlineCode      `json:",omitzero,inline"`
+	OfInlinePrompt    *EvalNewParamsScoreInlinePrompt    `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u EvalNewParamsScoreUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfFunctionID,
+		u.OfProjectSlug,
+		u.OfGlobalFunction,
+		u.OfPromptSessionID,
+		u.OfInlineCode,
+		u.OfInlinePrompt)
+}
+func (u *EvalNewParamsScoreUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *EvalNewParamsScoreUnion) asAny() any {
+	if !param.IsOmitted(u.OfFunctionID) {
+		return u.OfFunctionID
+	} else if !param.IsOmitted(u.OfProjectSlug) {
+		return u.OfProjectSlug
+	} else if !param.IsOmitted(u.OfGlobalFunction) {
+		return u.OfGlobalFunction
+	} else if !param.IsOmitted(u.OfPromptSessionID) {
+		return u.OfPromptSessionID
+	} else if !param.IsOmitted(u.OfInlineCode) {
+		return u.OfInlineCode
+	} else if !param.IsOmitted(u.OfInlinePrompt) {
+		return u.OfInlinePrompt
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsScoreUnion) GetFunctionID() *string {
+	if vt := u.OfFunctionID; vt != nil {
+		return &vt.FunctionID
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsScoreUnion) GetProjectName() *string {
+	if vt := u.OfProjectSlug; vt != nil {
+		return &vt.ProjectName
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsScoreUnion) GetSlug() *string {
+	if vt := u.OfProjectSlug; vt != nil {
+		return &vt.Slug
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsScoreUnion) GetGlobalFunction() *string {
+	if vt := u.OfGlobalFunction; vt != nil {
+		return &vt.GlobalFunction
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsScoreUnion) GetPromptSessionFunctionID() *string {
+	if vt := u.OfPromptSessionID; vt != nil {
+		return &vt.PromptSessionFunctionID
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsScoreUnion) GetPromptSessionID() *string {
+	if vt := u.OfPromptSessionID; vt != nil {
+		return &vt.PromptSessionID
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsScoreUnion) GetCode() *string {
+	if vt := u.OfInlineCode; vt != nil {
+		return &vt.Code
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsScoreUnion) GetInlineContext() *EvalNewParamsScoreInlineCodeInlineContext {
+	if vt := u.OfInlineCode; vt != nil {
+		return &vt.InlineContext
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsScoreUnion) GetInlinePrompt() *shared.PromptDataParam {
+	if vt := u.OfInlinePrompt; vt != nil {
+		return &vt.InlinePrompt
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsScoreUnion) GetVersion() *string {
+	if vt := u.OfFunctionID; vt != nil && vt.Version.Valid() {
+		return &vt.Version.Value
+	} else if vt := u.OfProjectSlug; vt != nil && vt.Version.Valid() {
+		return &vt.Version.Value
+	} else if vt := u.OfPromptSessionID; vt != nil && vt.Version.Valid() {
+		return &vt.Version.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsScoreUnion) GetName() *string {
+	if vt := u.OfInlineCode; vt != nil && vt.Name.Valid() {
+		return &vt.Name.Value
+	} else if vt := u.OfInlinePrompt; vt != nil && vt.Name.Valid() {
+		return &vt.Name.Value
+	}
+	return nil
 }
 
 // Function id
-type EvalNewParamsScoresFunctionID struct {
+//
+// The property FunctionID is required.
+type EvalNewParamsScoreFunctionID struct {
 	// The ID of the function
-	FunctionID param.Field[string] `json:"function_id,required"`
+	FunctionID string `json:"function_id,required"`
 	// The version of the function
-	Version param.Field[string] `json:"version"`
+	Version param.Opt[string] `json:"version,omitzero"`
+	paramObj
 }
 
-func (r EvalNewParamsScoresFunctionID) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+func (r EvalNewParamsScoreFunctionID) MarshalJSON() (data []byte, err error) {
+	type shadow EvalNewParamsScoreFunctionID
+	return param.MarshalObject(r, (*shadow)(&r))
 }
-
-func (r EvalNewParamsScoresFunctionID) implementsEvalNewParamsScoreUnion() {}
+func (r *EvalNewParamsScoreFunctionID) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Project name and slug
-type EvalNewParamsScoresProjectSlug struct {
+//
+// The properties ProjectName, Slug are required.
+type EvalNewParamsScoreProjectSlug struct {
 	// The name of the project containing the function
-	ProjectName param.Field[string] `json:"project_name,required"`
+	ProjectName string `json:"project_name,required"`
 	// The slug of the function
-	Slug param.Field[string] `json:"slug,required"`
+	Slug string `json:"slug,required"`
 	// The version of the function
-	Version param.Field[string] `json:"version"`
+	Version param.Opt[string] `json:"version,omitzero"`
+	paramObj
 }
 
-func (r EvalNewParamsScoresProjectSlug) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+func (r EvalNewParamsScoreProjectSlug) MarshalJSON() (data []byte, err error) {
+	type shadow EvalNewParamsScoreProjectSlug
+	return param.MarshalObject(r, (*shadow)(&r))
 }
-
-func (r EvalNewParamsScoresProjectSlug) implementsEvalNewParamsScoreUnion() {}
+func (r *EvalNewParamsScoreProjectSlug) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Global function name
-type EvalNewParamsScoresGlobalFunction struct {
+//
+// The property GlobalFunction is required.
+type EvalNewParamsScoreGlobalFunction struct {
 	// The name of the global function. Currently, the global namespace includes the
 	// functions in autoevals
-	GlobalFunction param.Field[string] `json:"global_function,required"`
+	GlobalFunction string `json:"global_function,required"`
+	paramObj
 }
 
-func (r EvalNewParamsScoresGlobalFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+func (r EvalNewParamsScoreGlobalFunction) MarshalJSON() (data []byte, err error) {
+	type shadow EvalNewParamsScoreGlobalFunction
+	return param.MarshalObject(r, (*shadow)(&r))
 }
-
-func (r EvalNewParamsScoresGlobalFunction) implementsEvalNewParamsScoreUnion() {}
+func (r *EvalNewParamsScoreGlobalFunction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Prompt session id
-type EvalNewParamsScoresPromptSessionID struct {
+//
+// The properties PromptSessionFunctionID, PromptSessionID are required.
+type EvalNewParamsScorePromptSessionID struct {
 	// The ID of the function in the prompt session
-	PromptSessionFunctionID param.Field[string] `json:"prompt_session_function_id,required"`
+	PromptSessionFunctionID string `json:"prompt_session_function_id,required"`
 	// The ID of the prompt session
-	PromptSessionID param.Field[string] `json:"prompt_session_id,required"`
+	PromptSessionID string `json:"prompt_session_id,required"`
 	// The version of the function
-	Version param.Field[string] `json:"version"`
+	Version param.Opt[string] `json:"version,omitzero"`
+	paramObj
 }
 
-func (r EvalNewParamsScoresPromptSessionID) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+func (r EvalNewParamsScorePromptSessionID) MarshalJSON() (data []byte, err error) {
+	type shadow EvalNewParamsScorePromptSessionID
+	return param.MarshalObject(r, (*shadow)(&r))
 }
-
-func (r EvalNewParamsScoresPromptSessionID) implementsEvalNewParamsScoreUnion() {}
+func (r *EvalNewParamsScorePromptSessionID) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Inline code function
-type EvalNewParamsScoresInlineCode struct {
+//
+// The properties Code, InlineContext are required.
+type EvalNewParamsScoreInlineCode struct {
 	// The inline code to execute
-	Code          param.Field[string]                                     `json:"code,required"`
-	InlineContext param.Field[EvalNewParamsScoresInlineCodeInlineContext] `json:"inline_context,required"`
+	Code          string                                    `json:"code,required"`
+	InlineContext EvalNewParamsScoreInlineCodeInlineContext `json:"inline_context,omitzero,required"`
 	// The name of the inline code function
-	Name param.Field[string] `json:"name"`
+	Name param.Opt[string] `json:"name,omitzero"`
+	paramObj
 }
 
-func (r EvalNewParamsScoresInlineCode) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+func (r EvalNewParamsScoreInlineCode) MarshalJSON() (data []byte, err error) {
+	type shadow EvalNewParamsScoreInlineCode
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsScoreInlineCode) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r EvalNewParamsScoresInlineCode) implementsEvalNewParamsScoreUnion() {}
-
-type EvalNewParamsScoresInlineCodeInlineContext struct {
-	Runtime param.Field[EvalNewParamsScoresInlineCodeInlineContextRuntime] `json:"runtime,required"`
-	Version param.Field[string]                                            `json:"version,required"`
+// The properties Runtime, Version are required.
+type EvalNewParamsScoreInlineCodeInlineContext struct {
+	// Any of "node", "python".
+	Runtime string `json:"runtime,omitzero,required"`
+	Version string `json:"version,required"`
+	paramObj
 }
 
-func (r EvalNewParamsScoresInlineCodeInlineContext) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+func (r EvalNewParamsScoreInlineCodeInlineContext) MarshalJSON() (data []byte, err error) {
+	type shadow EvalNewParamsScoreInlineCodeInlineContext
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsScoreInlineCodeInlineContext) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-type EvalNewParamsScoresInlineCodeInlineContextRuntime string
-
-const (
-	EvalNewParamsScoresInlineCodeInlineContextRuntimeNode   EvalNewParamsScoresInlineCodeInlineContextRuntime = "node"
-	EvalNewParamsScoresInlineCodeInlineContextRuntimePython EvalNewParamsScoresInlineCodeInlineContextRuntime = "python"
-)
-
-func (r EvalNewParamsScoresInlineCodeInlineContextRuntime) IsKnown() bool {
-	switch r {
-	case EvalNewParamsScoresInlineCodeInlineContextRuntimeNode, EvalNewParamsScoresInlineCodeInlineContextRuntimePython:
-		return true
-	}
-	return false
+func init() {
+	apijson.RegisterFieldValidator[EvalNewParamsScoreInlineCodeInlineContext](
+		"runtime", "node", "python",
+	)
 }
 
 // Inline prompt definition
-type EvalNewParamsScoresInlinePrompt struct {
-	// The prompt, model, and its parameters
-	InlinePrompt param.Field[shared.PromptDataParam] `json:"inline_prompt,required"`
-	// The name of the inline prompt
-	Name param.Field[string] `json:"name"`
-}
-
-func (r EvalNewParamsScoresInlinePrompt) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r EvalNewParamsScoresInlinePrompt) implementsEvalNewParamsScoreUnion() {}
-
-// The function to evaluate
-type EvalNewParamsTask struct {
-	// The inline code to execute
-	Code param.Field[string] `json:"code"`
-	// The ID of the function
-	FunctionID param.Field[string] `json:"function_id"`
-	// The name of the global function. Currently, the global namespace includes the
-	// functions in autoevals
-	GlobalFunction param.Field[string]      `json:"global_function"`
-	InlineContext  param.Field[interface{}] `json:"inline_context"`
-	// The prompt, model, and its parameters
-	InlinePrompt param.Field[shared.PromptDataParam] `json:"inline_prompt"`
-	// The name of the inline code function
-	Name param.Field[string] `json:"name"`
-	// The name of the project containing the function
-	ProjectName param.Field[string] `json:"project_name"`
-	// The ID of the function in the prompt session
-	PromptSessionFunctionID param.Field[string] `json:"prompt_session_function_id"`
-	// The ID of the prompt session
-	PromptSessionID param.Field[string] `json:"prompt_session_id"`
-	// The slug of the function
-	Slug param.Field[string] `json:"slug"`
-	// The version of the function
-	Version param.Field[string] `json:"version"`
-}
-
-func (r EvalNewParamsTask) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r EvalNewParamsTask) implementsEvalNewParamsTaskUnion() {}
-
-// The function to evaluate
 //
-// Satisfied by [EvalNewParamsTaskFunctionID], [EvalNewParamsTaskProjectSlug],
-// [EvalNewParamsTaskGlobalFunction], [EvalNewParamsTaskPromptSessionID],
-// [EvalNewParamsTaskInlineCode], [EvalNewParamsTaskInlinePrompt],
-// [EvalNewParamsTask].
-type EvalNewParamsTaskUnion interface {
-	implementsEvalNewParamsTaskUnion()
+// The property InlinePrompt is required.
+type EvalNewParamsScoreInlinePrompt struct {
+	// The prompt, model, and its parameters
+	InlinePrompt shared.PromptDataParam `json:"inline_prompt,omitzero,required"`
+	// The name of the inline prompt
+	Name param.Opt[string] `json:"name,omitzero"`
+	paramObj
+}
+
+func (r EvalNewParamsScoreInlinePrompt) MarshalJSON() (data []byte, err error) {
+	type shadow EvalNewParamsScoreInlinePrompt
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsScoreInlinePrompt) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type EvalNewParamsTaskUnion struct {
+	OfFunctionID      *EvalNewParamsTaskFunctionID      `json:",omitzero,inline"`
+	OfProjectSlug     *EvalNewParamsTaskProjectSlug     `json:",omitzero,inline"`
+	OfGlobalFunction  *EvalNewParamsTaskGlobalFunction  `json:",omitzero,inline"`
+	OfPromptSessionID *EvalNewParamsTaskPromptSessionID `json:",omitzero,inline"`
+	OfInlineCode      *EvalNewParamsTaskInlineCode      `json:",omitzero,inline"`
+	OfInlinePrompt    *EvalNewParamsTaskInlinePrompt    `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u EvalNewParamsTaskUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfFunctionID,
+		u.OfProjectSlug,
+		u.OfGlobalFunction,
+		u.OfPromptSessionID,
+		u.OfInlineCode,
+		u.OfInlinePrompt)
+}
+func (u *EvalNewParamsTaskUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *EvalNewParamsTaskUnion) asAny() any {
+	if !param.IsOmitted(u.OfFunctionID) {
+		return u.OfFunctionID
+	} else if !param.IsOmitted(u.OfProjectSlug) {
+		return u.OfProjectSlug
+	} else if !param.IsOmitted(u.OfGlobalFunction) {
+		return u.OfGlobalFunction
+	} else if !param.IsOmitted(u.OfPromptSessionID) {
+		return u.OfPromptSessionID
+	} else if !param.IsOmitted(u.OfInlineCode) {
+		return u.OfInlineCode
+	} else if !param.IsOmitted(u.OfInlinePrompt) {
+		return u.OfInlinePrompt
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsTaskUnion) GetFunctionID() *string {
+	if vt := u.OfFunctionID; vt != nil {
+		return &vt.FunctionID
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsTaskUnion) GetProjectName() *string {
+	if vt := u.OfProjectSlug; vt != nil {
+		return &vt.ProjectName
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsTaskUnion) GetSlug() *string {
+	if vt := u.OfProjectSlug; vt != nil {
+		return &vt.Slug
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsTaskUnion) GetGlobalFunction() *string {
+	if vt := u.OfGlobalFunction; vt != nil {
+		return &vt.GlobalFunction
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsTaskUnion) GetPromptSessionFunctionID() *string {
+	if vt := u.OfPromptSessionID; vt != nil {
+		return &vt.PromptSessionFunctionID
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsTaskUnion) GetPromptSessionID() *string {
+	if vt := u.OfPromptSessionID; vt != nil {
+		return &vt.PromptSessionID
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsTaskUnion) GetCode() *string {
+	if vt := u.OfInlineCode; vt != nil {
+		return &vt.Code
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsTaskUnion) GetInlineContext() *EvalNewParamsTaskInlineCodeInlineContext {
+	if vt := u.OfInlineCode; vt != nil {
+		return &vt.InlineContext
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsTaskUnion) GetInlinePrompt() *shared.PromptDataParam {
+	if vt := u.OfInlinePrompt; vt != nil {
+		return &vt.InlinePrompt
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsTaskUnion) GetVersion() *string {
+	if vt := u.OfFunctionID; vt != nil && vt.Version.Valid() {
+		return &vt.Version.Value
+	} else if vt := u.OfProjectSlug; vt != nil && vt.Version.Valid() {
+		return &vt.Version.Value
+	} else if vt := u.OfPromptSessionID; vt != nil && vt.Version.Valid() {
+		return &vt.Version.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u EvalNewParamsTaskUnion) GetName() *string {
+	if vt := u.OfInlineCode; vt != nil && vt.Name.Valid() {
+		return &vt.Name.Value
+	} else if vt := u.OfInlinePrompt; vt != nil && vt.Name.Valid() {
+		return &vt.Name.Value
+	}
+	return nil
 }
 
 // Function id
+//
+// The property FunctionID is required.
 type EvalNewParamsTaskFunctionID struct {
 	// The ID of the function
-	FunctionID param.Field[string] `json:"function_id,required"`
+	FunctionID string `json:"function_id,required"`
 	// The version of the function
-	Version param.Field[string] `json:"version"`
+	Version param.Opt[string] `json:"version,omitzero"`
+	paramObj
 }
 
 func (r EvalNewParamsTaskFunctionID) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EvalNewParamsTaskFunctionID
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsTaskFunctionID) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r EvalNewParamsTaskFunctionID) implementsEvalNewParamsTaskUnion() {}
-
 // Project name and slug
+//
+// The properties ProjectName, Slug are required.
 type EvalNewParamsTaskProjectSlug struct {
 	// The name of the project containing the function
-	ProjectName param.Field[string] `json:"project_name,required"`
+	ProjectName string `json:"project_name,required"`
 	// The slug of the function
-	Slug param.Field[string] `json:"slug,required"`
+	Slug string `json:"slug,required"`
 	// The version of the function
-	Version param.Field[string] `json:"version"`
+	Version param.Opt[string] `json:"version,omitzero"`
+	paramObj
 }
 
 func (r EvalNewParamsTaskProjectSlug) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EvalNewParamsTaskProjectSlug
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsTaskProjectSlug) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r EvalNewParamsTaskProjectSlug) implementsEvalNewParamsTaskUnion() {}
-
 // Global function name
+//
+// The property GlobalFunction is required.
 type EvalNewParamsTaskGlobalFunction struct {
 	// The name of the global function. Currently, the global namespace includes the
 	// functions in autoevals
-	GlobalFunction param.Field[string] `json:"global_function,required"`
+	GlobalFunction string `json:"global_function,required"`
+	paramObj
 }
 
 func (r EvalNewParamsTaskGlobalFunction) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EvalNewParamsTaskGlobalFunction
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsTaskGlobalFunction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r EvalNewParamsTaskGlobalFunction) implementsEvalNewParamsTaskUnion() {}
-
 // Prompt session id
+//
+// The properties PromptSessionFunctionID, PromptSessionID are required.
 type EvalNewParamsTaskPromptSessionID struct {
 	// The ID of the function in the prompt session
-	PromptSessionFunctionID param.Field[string] `json:"prompt_session_function_id,required"`
+	PromptSessionFunctionID string `json:"prompt_session_function_id,required"`
 	// The ID of the prompt session
-	PromptSessionID param.Field[string] `json:"prompt_session_id,required"`
+	PromptSessionID string `json:"prompt_session_id,required"`
 	// The version of the function
-	Version param.Field[string] `json:"version"`
+	Version param.Opt[string] `json:"version,omitzero"`
+	paramObj
 }
 
 func (r EvalNewParamsTaskPromptSessionID) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EvalNewParamsTaskPromptSessionID
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsTaskPromptSessionID) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r EvalNewParamsTaskPromptSessionID) implementsEvalNewParamsTaskUnion() {}
-
 // Inline code function
+//
+// The properties Code, InlineContext are required.
 type EvalNewParamsTaskInlineCode struct {
 	// The inline code to execute
-	Code          param.Field[string]                                   `json:"code,required"`
-	InlineContext param.Field[EvalNewParamsTaskInlineCodeInlineContext] `json:"inline_context,required"`
+	Code          string                                   `json:"code,required"`
+	InlineContext EvalNewParamsTaskInlineCodeInlineContext `json:"inline_context,omitzero,required"`
 	// The name of the inline code function
-	Name param.Field[string] `json:"name"`
+	Name param.Opt[string] `json:"name,omitzero"`
+	paramObj
 }
 
 func (r EvalNewParamsTaskInlineCode) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EvalNewParamsTaskInlineCode
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsTaskInlineCode) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r EvalNewParamsTaskInlineCode) implementsEvalNewParamsTaskUnion() {}
-
+// The properties Runtime, Version are required.
 type EvalNewParamsTaskInlineCodeInlineContext struct {
-	Runtime param.Field[EvalNewParamsTaskInlineCodeInlineContextRuntime] `json:"runtime,required"`
-	Version param.Field[string]                                          `json:"version,required"`
+	// Any of "node", "python".
+	Runtime string `json:"runtime,omitzero,required"`
+	Version string `json:"version,required"`
+	paramObj
 }
 
 func (r EvalNewParamsTaskInlineCodeInlineContext) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EvalNewParamsTaskInlineCodeInlineContext
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsTaskInlineCodeInlineContext) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-type EvalNewParamsTaskInlineCodeInlineContextRuntime string
-
-const (
-	EvalNewParamsTaskInlineCodeInlineContextRuntimeNode   EvalNewParamsTaskInlineCodeInlineContextRuntime = "node"
-	EvalNewParamsTaskInlineCodeInlineContextRuntimePython EvalNewParamsTaskInlineCodeInlineContextRuntime = "python"
-)
-
-func (r EvalNewParamsTaskInlineCodeInlineContextRuntime) IsKnown() bool {
-	switch r {
-	case EvalNewParamsTaskInlineCodeInlineContextRuntimeNode, EvalNewParamsTaskInlineCodeInlineContextRuntimePython:
-		return true
-	}
-	return false
+func init() {
+	apijson.RegisterFieldValidator[EvalNewParamsTaskInlineCodeInlineContext](
+		"runtime", "node", "python",
+	)
 }
 
 // Inline prompt definition
+//
+// The property InlinePrompt is required.
 type EvalNewParamsTaskInlinePrompt struct {
 	// The prompt, model, and its parameters
-	InlinePrompt param.Field[shared.PromptDataParam] `json:"inline_prompt,required"`
+	InlinePrompt shared.PromptDataParam `json:"inline_prompt,omitzero,required"`
 	// The name of the inline prompt
-	Name param.Field[string] `json:"name"`
+	Name param.Opt[string] `json:"name,omitzero"`
+	paramObj
 }
 
 func (r EvalNewParamsTaskInlinePrompt) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EvalNewParamsTaskInlinePrompt
+	return param.MarshalObject(r, (*shadow)(&r))
 }
-
-func (r EvalNewParamsTaskInlinePrompt) implementsEvalNewParamsTaskUnion() {}
+func (r *EvalNewParamsTaskInlinePrompt) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Optional settings for collecting git metadata. By default, will collect all git
 // metadata fields allowed in org-level settings.
+//
+// The property Collect is required.
 type EvalNewParamsGitMetadataSettings struct {
-	Collect param.Field[EvalNewParamsGitMetadataSettingsCollect] `json:"collect,required"`
-	Fields  param.Field[[]EvalNewParamsGitMetadataSettingsField] `json:"fields"`
+	// Any of "all", "none", "some".
+	Collect string `json:"collect,omitzero,required"`
+	// Any of "commit", "branch", "tag", "dirty", "author_name", "author_email",
+	// "commit_message", "commit_time", "git_diff".
+	Fields []string `json:"fields,omitzero"`
+	paramObj
 }
 
 func (r EvalNewParamsGitMetadataSettings) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EvalNewParamsGitMetadataSettings
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsGitMetadataSettings) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-type EvalNewParamsGitMetadataSettingsCollect string
-
-const (
-	EvalNewParamsGitMetadataSettingsCollectAll  EvalNewParamsGitMetadataSettingsCollect = "all"
-	EvalNewParamsGitMetadataSettingsCollectNone EvalNewParamsGitMetadataSettingsCollect = "none"
-	EvalNewParamsGitMetadataSettingsCollectSome EvalNewParamsGitMetadataSettingsCollect = "some"
-)
-
-func (r EvalNewParamsGitMetadataSettingsCollect) IsKnown() bool {
-	switch r {
-	case EvalNewParamsGitMetadataSettingsCollectAll, EvalNewParamsGitMetadataSettingsCollectNone, EvalNewParamsGitMetadataSettingsCollectSome:
-		return true
-	}
-	return false
+func init() {
+	apijson.RegisterFieldValidator[EvalNewParamsGitMetadataSettings](
+		"collect", "all", "none", "some",
+	)
 }
 
-type EvalNewParamsGitMetadataSettingsField string
-
-const (
-	EvalNewParamsGitMetadataSettingsFieldCommit        EvalNewParamsGitMetadataSettingsField = "commit"
-	EvalNewParamsGitMetadataSettingsFieldBranch        EvalNewParamsGitMetadataSettingsField = "branch"
-	EvalNewParamsGitMetadataSettingsFieldTag           EvalNewParamsGitMetadataSettingsField = "tag"
-	EvalNewParamsGitMetadataSettingsFieldDirty         EvalNewParamsGitMetadataSettingsField = "dirty"
-	EvalNewParamsGitMetadataSettingsFieldAuthorName    EvalNewParamsGitMetadataSettingsField = "author_name"
-	EvalNewParamsGitMetadataSettingsFieldAuthorEmail   EvalNewParamsGitMetadataSettingsField = "author_email"
-	EvalNewParamsGitMetadataSettingsFieldCommitMessage EvalNewParamsGitMetadataSettingsField = "commit_message"
-	EvalNewParamsGitMetadataSettingsFieldCommitTime    EvalNewParamsGitMetadataSettingsField = "commit_time"
-	EvalNewParamsGitMetadataSettingsFieldGitDiff       EvalNewParamsGitMetadataSettingsField = "git_diff"
-)
-
-func (r EvalNewParamsGitMetadataSettingsField) IsKnown() bool {
-	switch r {
-	case EvalNewParamsGitMetadataSettingsFieldCommit, EvalNewParamsGitMetadataSettingsFieldBranch, EvalNewParamsGitMetadataSettingsFieldTag, EvalNewParamsGitMetadataSettingsFieldDirty, EvalNewParamsGitMetadataSettingsFieldAuthorName, EvalNewParamsGitMetadataSettingsFieldAuthorEmail, EvalNewParamsGitMetadataSettingsFieldCommitMessage, EvalNewParamsGitMetadataSettingsFieldCommitTime, EvalNewParamsGitMetadataSettingsFieldGitDiff:
-		return true
-	}
-	return false
-}
-
-// Options for tracing the evaluation
+// Only one field can be non-zero.
 //
-// Satisfied by [EvalNewParamsParentSpanParentStruct], [shared.UnionString].
-type EvalNewParamsParentUnion interface {
-	ImplementsEvalNewParamsParentUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type EvalNewParamsParentUnion struct {
+	OfSpanParentStruct *EvalNewParamsParentSpanParentStruct `json:",omitzero,inline"`
+	OfString           param.Opt[string]                    `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u EvalNewParamsParentUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfSpanParentStruct, u.OfString)
+}
+func (u *EvalNewParamsParentUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *EvalNewParamsParentUnion) asAny() any {
+	if !param.IsOmitted(u.OfSpanParentStruct) {
+		return u.OfSpanParentStruct
+	} else if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	}
+	return nil
 }
 
 // Span parent properties
+//
+// The properties ObjectID, ObjectType are required.
 type EvalNewParamsParentSpanParentStruct struct {
 	// The id of the container object you are logging to
-	ObjectID   param.Field[string]                                        `json:"object_id,required"`
-	ObjectType param.Field[EvalNewParamsParentSpanParentStructObjectType] `json:"object_type,required"`
+	ObjectID string `json:"object_id,required"`
+	// Any of "project_logs", "experiment", "playground_logs".
+	ObjectType string `json:"object_type,omitzero,required"`
 	// Include these properties in every span created under this parent
-	PropagatedEvent param.Field[map[string]interface{}] `json:"propagated_event"`
+	PropagatedEvent map[string]any `json:"propagated_event,omitzero"`
 	// Identifiers for the row to to log a subspan under
-	RowIDs param.Field[EvalNewParamsParentSpanParentStructRowIDs] `json:"row_ids"`
+	RowIDs EvalNewParamsParentSpanParentStructRowIDs `json:"row_ids,omitzero"`
+	paramObj
 }
 
 func (r EvalNewParamsParentSpanParentStruct) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EvalNewParamsParentSpanParentStruct
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsParentSpanParentStruct) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r EvalNewParamsParentSpanParentStruct) ImplementsEvalNewParamsParentUnion() {}
-
-type EvalNewParamsParentSpanParentStructObjectType string
-
-const (
-	EvalNewParamsParentSpanParentStructObjectTypeProjectLogs    EvalNewParamsParentSpanParentStructObjectType = "project_logs"
-	EvalNewParamsParentSpanParentStructObjectTypeExperiment     EvalNewParamsParentSpanParentStructObjectType = "experiment"
-	EvalNewParamsParentSpanParentStructObjectTypePlaygroundLogs EvalNewParamsParentSpanParentStructObjectType = "playground_logs"
-)
-
-func (r EvalNewParamsParentSpanParentStructObjectType) IsKnown() bool {
-	switch r {
-	case EvalNewParamsParentSpanParentStructObjectTypeProjectLogs, EvalNewParamsParentSpanParentStructObjectTypeExperiment, EvalNewParamsParentSpanParentStructObjectTypePlaygroundLogs:
-		return true
-	}
-	return false
+func init() {
+	apijson.RegisterFieldValidator[EvalNewParamsParentSpanParentStruct](
+		"object_type", "project_logs", "experiment", "playground_logs",
+	)
 }
 
 // Identifiers for the row to to log a subspan under
+//
+// The properties ID, RootSpanID, SpanID are required.
 type EvalNewParamsParentSpanParentStructRowIDs struct {
 	// The id of the row
-	ID param.Field[string] `json:"id,required"`
+	ID string `json:"id,required"`
 	// The root_span_id of the row
-	RootSpanID param.Field[string] `json:"root_span_id,required"`
+	RootSpanID string `json:"root_span_id,required"`
 	// The span_id of the row
-	SpanID param.Field[string] `json:"span_id,required"`
+	SpanID string `json:"span_id,required"`
+	paramObj
 }
 
 func (r EvalNewParamsParentSpanParentStructRowIDs) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EvalNewParamsParentSpanParentStructRowIDs
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EvalNewParamsParentSpanParentStructRowIDs) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

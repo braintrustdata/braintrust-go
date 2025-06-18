@@ -1,5 +1,80 @@
 # Changelog
 
+## 0.8.0 (2025-06-17)
+
+Full Changelog: [v0.7.0...v0.8.0](https://github.com/braintrustdata/braintrust-go/compare/v0.7.0...v0.8.0)
+
+### ⚠ BREAKING CHANGES
+
+* **client:** rename resp package
+* **client:** improve core function names
+* **client:** improve union variant names
+* **client:** improve param subunions & deduplicate types
+
+### Features
+
+* **api:** manual updates ([#143](https://github.com/braintrustdata/braintrust-go/issues/143)) ([0ad70ec](https://github.com/braintrustdata/braintrust-go/commit/0ad70ec11f4b7d4c54d5273ae259c377cffc7819))
+* **client:** add debug log helper ([3591364](https://github.com/braintrustdata/braintrust-go/commit/35913643a22c49b2f1adb855d1a920f72a92af7b))
+* **client:** add escape hatch to omit required param fields ([#150](https://github.com/braintrustdata/braintrust-go/issues/150)) ([5058854](https://github.com/braintrustdata/braintrust-go/commit/5058854b03274d44549c17989dd6e951e43c911a))
+* **client:** add support for endpoint-specific base URLs in python ([538ea47](https://github.com/braintrustdata/braintrust-go/commit/538ea47512fb9876a49df809d2a48c98c0577882))
+* **client:** add support for reading base URL from environment variable ([febb457](https://github.com/braintrustdata/braintrust-go/commit/febb4578d89095ae52ff06104922b4c165a4a4d6))
+* **client:** allow overriding unions ([e8e4fe3](https://github.com/braintrustdata/braintrust-go/commit/e8e4fe3be01361d1c18710661cc2d23b672fc47e))
+* **client:** experimental support for unmarshalling into param structs ([af4406e](https://github.com/braintrustdata/braintrust-go/commit/af4406e238d0c280e95888e6c52b4b42245a8374))
+* **client:** improve param subunions & deduplicate types ([3c0e907](https://github.com/braintrustdata/braintrust-go/commit/3c0e907a3ecf6b3bdc00ff33e603a6ed1f362edc))
+* **client:** rename resp package ([7895a14](https://github.com/braintrustdata/braintrust-go/commit/7895a140f3131cb039601b411f11b2faa6140fe9))
+* **client:** support custom http clients ([#152](https://github.com/braintrustdata/braintrust-go/issues/152)) ([bab0058](https://github.com/braintrustdata/braintrust-go/commit/bab00589900543a46510c691f32c064e18d8d785))
+* **client:** support more time formats ([f7c7d39](https://github.com/braintrustdata/braintrust-go/commit/f7c7d39d1222649adaed7f6b8902cb394dd7f5f3))
+* **client:** support param struct overrides ([#145](https://github.com/braintrustdata/braintrust-go/issues/145)) ([0baf2f6](https://github.com/braintrustdata/braintrust-go/commit/0baf2f64f4e8a809d26dcc7db7830f69eaf9ecc0))
+* **client:** support unions in query and forms ([#148](https://github.com/braintrustdata/braintrust-go/issues/148)) ([c49965f](https://github.com/braintrustdata/braintrust-go/commit/c49965f1fdd38099fe927ab12f2eb5230af4b6f6))
+
+
+### Bug Fixes
+
+* **client:** cast to raw message when converting to params ([88b5d2f](https://github.com/braintrustdata/braintrust-go/commit/88b5d2fd0333090af6299046a038ee052321ac06))
+* **client:** clean up reader resources ([ac1b426](https://github.com/braintrustdata/braintrust-go/commit/ac1b4267d58425c8460b2db0673ad388eacf9c6f))
+* **client:** correctly set stream key for multipart ([9aeecf5](https://github.com/braintrustdata/braintrust-go/commit/9aeecf514d59861d97dfe82b4023b889e1d1b86e))
+* **client:** correctly update body in WithJSONSet ([11a6d11](https://github.com/braintrustdata/braintrust-go/commit/11a6d11af861687140b494e354a4bb3319a3441b))
+* **client:** don't panic on marshal with extra null field ([5546f82](https://github.com/braintrustdata/braintrust-go/commit/5546f827da3dfaf4abe55898b4b7ffa20b350aa9))
+* **client:** improve core function names ([014a26a](https://github.com/braintrustdata/braintrust-go/commit/014a26a347b34df97e98e24d1aee9aa3b4633362))
+* **client:** improve union variant names ([7fa4de7](https://github.com/braintrustdata/braintrust-go/commit/7fa4de7749644bae2127fceec8902ac9f378be8e))
+* **client:** resolve issue with optional multipart files ([51a5e0b](https://github.com/braintrustdata/braintrust-go/commit/51a5e0b76a6225af03c58011e1593488e1125af9))
+* **client:** return error on bad custom url instead of panic ([#146](https://github.com/braintrustdata/braintrust-go/issues/146)) ([b0d0fac](https://github.com/braintrustdata/braintrust-go/commit/b0d0fac421e4db8dc283fbb0465973581e398c49))
+* **client:** support multipart encoding array formats ([#147](https://github.com/braintrustdata/braintrust-go/issues/147)) ([8eee61a](https://github.com/braintrustdata/braintrust-go/commit/8eee61a01d517a8ad10b1886d8f32a292b43e461))
+* **client:** time format encoding fix ([a560d93](https://github.com/braintrustdata/braintrust-go/commit/a560d93727c2999ffa241139b6207353dd61c348))
+* **client:** unmarshal responses properly ([9e2c24b](https://github.com/braintrustdata/braintrust-go/commit/9e2c24b0e8f1f4c7f926ee938b6509f8ce0a2d07))
+* fix error ([f1257f0](https://github.com/braintrustdata/braintrust-go/commit/f1257f0e155aba6961fc60ab1e6589780721080f))
+* handle empty bodies in WithJSONSet ([5003fac](https://github.com/braintrustdata/braintrust-go/commit/5003fac9849f41780ec7c3d53bb5541492989b5b))
+* **pagination:** handle errors when applying options ([e4e55ff](https://github.com/braintrustdata/braintrust-go/commit/e4e55ffc43bf59fdda865d76b09830760ec926b5))
+* **test:** return early after test failure ([#141](https://github.com/braintrustdata/braintrust-go/issues/141)) ([37c95eb](https://github.com/braintrustdata/braintrust-go/commit/37c95ebb24d4a6a415d882ae0e9ac741ba0085a4))
+
+
+### Chores
+
+* add request options to client tests ([#140](https://github.com/braintrustdata/braintrust-go/issues/140)) ([13d2104](https://github.com/braintrustdata/braintrust-go/commit/13d210467e84ee86d33e142a0cd844abe0885841))
+* **ci:** add timeout thresholds for CI jobs ([b3345b6](https://github.com/braintrustdata/braintrust-go/commit/b3345b69e28c7ccc3e704fc71c48e4785ecfc0bf))
+* **ci:** enable for pull requests ([e25c30c](https://github.com/braintrustdata/braintrust-go/commit/e25c30c7caee28aec6663154259870dd10206d5e))
+* **ci:** only use depot for staging repos ([43b7288](https://github.com/braintrustdata/braintrust-go/commit/43b728868ca235f5f4acaa4b543df5aefdf652c5))
+* **docs:** doc improvements ([#149](https://github.com/braintrustdata/braintrust-go/issues/149)) ([6bd9e2a](https://github.com/braintrustdata/braintrust-go/commit/6bd9e2aedca74e2c22ae7ddbb7955da1269bfce1))
+* **docs:** document pre-request options ([2e2b1ba](https://github.com/braintrustdata/braintrust-go/commit/2e2b1ba5033c4aa2780ff07deed272734e5e3a0d))
+* **docs:** grammar improvements ([16390fa](https://github.com/braintrustdata/braintrust-go/commit/16390faa8872b32927b1dff83f16fa3f8f60e80d))
+* **docs:** improve security documentation ([#138](https://github.com/braintrustdata/braintrust-go/issues/138)) ([b8d2249](https://github.com/braintrustdata/braintrust-go/commit/b8d2249f32bd44f1463a03830906f6e53529ae92))
+* **docs:** readme improvements ([#151](https://github.com/braintrustdata/braintrust-go/issues/151)) ([c7916fd](https://github.com/braintrustdata/braintrust-go/commit/c7916fda2d2a664db3381b7eb8a75ce230b65f76))
+* **docs:** update file uploads in README ([#144](https://github.com/braintrustdata/braintrust-go/issues/144)) ([0970fb3](https://github.com/braintrustdata/braintrust-go/commit/0970fb3666bec584abe528f1833402157ac36f8a))
+* **docs:** update respjson package name ([495df23](https://github.com/braintrustdata/braintrust-go/commit/495df236003b829ad8824a28d379ba30b95ac635))
+* fix typos ([#142](https://github.com/braintrustdata/braintrust-go/issues/142)) ([6019d95](https://github.com/braintrustdata/braintrust-go/commit/6019d95f5d92016e03b4cbd20bb5d69602511fbf))
+* improve devcontainer setup ([bc84a08](https://github.com/braintrustdata/braintrust-go/commit/bc84a085103697c13c910d0fda4901c42253e470))
+* **internal:** codegen related update ([6d633ca](https://github.com/braintrustdata/braintrust-go/commit/6d633ca1720bee0651ad6f040ff25d38049d0492))
+* **internal:** expand CI branch coverage ([068b8e7](https://github.com/braintrustdata/braintrust-go/commit/068b8e7f70aea5840664625fcaa5517eb760bb92))
+* **internal:** reduce CI branch coverage ([4564b6a](https://github.com/braintrustdata/braintrust-go/commit/4564b6add83e1a7a73c4efdbe979b67dd245c449))
+* make go mod tidy continue on error ([206aac6](https://github.com/braintrustdata/braintrust-go/commit/206aac6443db26806956de1bba6d38fc6d5e0e9b))
+* **readme:** improve formatting ([3ecd3b8](https://github.com/braintrustdata/braintrust-go/commit/3ecd3b85fb3ff79fcc4b66074a1bd3d5fb61fc18))
+* **utils:** add internal resp to param utility ([a681757](https://github.com/braintrustdata/braintrust-go/commit/a681757186db33e1e52c365e41bcffaf36531b86))
+
+
+### Documentation
+
+* update documentation links to be more uniform ([eefe3d3](https://github.com/braintrustdata/braintrust-go/commit/eefe3d37dfa4a2a5d55682c881ff052fc04c1b22))
+
 ## 0.7.0 (2025-03-14)
 
 Full Changelog: [v0.6.0...v0.7.0](https://github.com/braintrustdata/braintrust-go/compare/v0.6.0...v0.7.0)

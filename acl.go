@@ -11,10 +11,10 @@ import (
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/pagination"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -31,8 +31,8 @@ type ACLService struct {
 // NewACLService generates a new service that applies the given options to each
 // request. These options are applied after the parent client's options (if there
 // is one), and before any request-specific options.
-func NewACLService(opts ...option.RequestOption) (r *ACLService) {
-	r = &ACLService{}
+func NewACLService(opts ...option.RequestOption) (r ACLService) {
+	r = ACLService{}
 	r.Options = opts
 	return
 }
@@ -115,73 +115,97 @@ func (r *ACLService) FindAndDelete(ctx context.Context, body ACLFindAndDeletePar
 
 type ACLNewParams struct {
 	// The id of the object the ACL applies to
-	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	ObjectType shared.ACLObjectType `json:"object_type,omitzero,required"`
 	// Id of the group the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
-	GroupID param.Field[string] `json:"group_id" format:"uuid"`
-	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
-	// provided
-	Permission param.Field[shared.Permission] `json:"permission"`
-	// When setting a permission directly, optionally restricts the permission grant to
-	// just the specified object type. Cannot be set alongside a `role_id`.
-	RestrictObjectType param.Field[shared.ACLObjectType] `json:"restrict_object_type"`
+	GroupID param.Opt[string] `json:"group_id,omitzero" format:"uuid"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
-	RoleID param.Field[string] `json:"role_id" format:"uuid"`
+	RoleID param.Opt[string] `json:"role_id,omitzero" format:"uuid"`
 	// Id of the user the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
-	UserID param.Field[string] `json:"user_id" format:"uuid"`
+	UserID param.Opt[string] `json:"user_id,omitzero" format:"uuid"`
+	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
+	// provided
+	//
+	// Any of "create", "read", "update", "delete", "create_acls", "read_acls",
+	// "update_acls", "delete_acls".
+	Permission shared.Permission `json:"permission,omitzero"`
+	// When setting a permission directly, optionally restricts the permission grant to
+	// just the specified object type. Cannot be set alongside a `role_id`.
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	RestrictObjectType shared.ACLObjectType `json:"restrict_object_type,omitzero"`
+	paramObj
 }
 
 func (r ACLNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ACLNewParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ACLNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ACLListParams struct {
 	// The id of the object the ACL applies to
-	ObjectID param.Field[string] `query:"object_id,required" format:"uuid"`
+	ObjectID string `query:"object_id,required" format:"uuid" json:"-"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `query:"object_type,required"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	ObjectType shared.ACLObjectType `query:"object_type,omitzero,required" json:"-"`
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
-	// Filter search results to a particular set of object IDs. To specify a list of
-	// IDs, include the query param multiple times
-	IDs param.Field[ACLListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	EndingBefore param.Opt[string] `query:"ending_before,omitzero" format:"uuid" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Opt[string] `query:"starting_after,omitzero" format:"uuid" json:"-"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs ACLListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
+	paramObj
 }
 
 // URLQuery serializes [ACLListParams]'s query parameters as `url.Values`.
-func (r ACLListParams) URLQuery() (v url.Values) {
+func (r ACLListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [ACLListParamsIDsArray].
-type ACLListParamsIDsUnion interface {
-	ImplementsACLListParamsIDsUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type ACLListParamsIDsUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
 }
 
-type ACLListParamsIDsArray []string
-
-func (r ACLListParamsIDsArray) ImplementsACLListParamsIDsUnion() {}
+func (u *ACLListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
+	}
+	return nil
+}
 
 type ACLBatchUpdateParams struct {
 	// An ACL grants a certain permission or role to a certain user or group on an
@@ -194,7 +218,7 @@ type ACLBatchUpdateParams struct {
 	// To restrict a grant to a particular sub-object, you may specify
 	// `restrict_object_type` in the ACL, as part of a direct permission grant or as
 	// part of a role.
-	AddACLs param.Field[[]ACLBatchUpdateParamsAddACL] `json:"add_acls"`
+	AddACLs []ACLBatchUpdateParamsAddACL `json:"add_acls,omitzero"`
 	// An ACL grants a certain permission or role to a certain user or group on an
 	// object.
 	//
@@ -205,11 +229,16 @@ type ACLBatchUpdateParams struct {
 	// To restrict a grant to a particular sub-object, you may specify
 	// `restrict_object_type` in the ACL, as part of a direct permission grant or as
 	// part of a role.
-	RemoveACLs param.Field[[]ACLBatchUpdateParamsRemoveACL] `json:"remove_acls"`
+	RemoveACLs []ACLBatchUpdateParamsRemoveACL `json:"remove_acls,omitzero"`
+	paramObj
 }
 
 func (r ACLBatchUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ACLBatchUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ACLBatchUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // An ACL grants a certain permission or role to a certain user or group on an
@@ -222,30 +251,46 @@ func (r ACLBatchUpdateParams) MarshalJSON() (data []byte, err error) {
 // To restrict a grant to a particular sub-object, you may specify
 // `restrict_object_type` in the ACL, as part of a direct permission grant or as
 // part of a role.
+//
+// The properties ObjectID, ObjectType are required.
 type ACLBatchUpdateParamsAddACL struct {
 	// The id of the object the ACL applies to
-	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	ObjectType shared.ACLObjectType `json:"object_type,omitzero,required"`
 	// Id of the group the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
-	GroupID param.Field[string] `json:"group_id" format:"uuid"`
-	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
-	// provided
-	Permission param.Field[shared.Permission] `json:"permission"`
-	// When setting a permission directly, optionally restricts the permission grant to
-	// just the specified object type. Cannot be set alongside a `role_id`.
-	RestrictObjectType param.Field[shared.ACLObjectType] `json:"restrict_object_type"`
+	GroupID param.Opt[string] `json:"group_id,omitzero" format:"uuid"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
-	RoleID param.Field[string] `json:"role_id" format:"uuid"`
+	RoleID param.Opt[string] `json:"role_id,omitzero" format:"uuid"`
 	// Id of the user the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
-	UserID param.Field[string] `json:"user_id" format:"uuid"`
+	UserID param.Opt[string] `json:"user_id,omitzero" format:"uuid"`
+	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
+	// provided
+	//
+	// Any of "create", "read", "update", "delete", "create_acls", "read_acls",
+	// "update_acls", "delete_acls".
+	Permission shared.Permission `json:"permission,omitzero"`
+	// When setting a permission directly, optionally restricts the permission grant to
+	// just the specified object type. Cannot be set alongside a `role_id`.
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	RestrictObjectType shared.ACLObjectType `json:"restrict_object_type,omitzero"`
+	paramObj
 }
 
 func (r ACLBatchUpdateParamsAddACL) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ACLBatchUpdateParamsAddACL
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ACLBatchUpdateParamsAddACL) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // An ACL grants a certain permission or role to a certain user or group on an
@@ -258,54 +303,84 @@ func (r ACLBatchUpdateParamsAddACL) MarshalJSON() (data []byte, err error) {
 // To restrict a grant to a particular sub-object, you may specify
 // `restrict_object_type` in the ACL, as part of a direct permission grant or as
 // part of a role.
+//
+// The properties ObjectID, ObjectType are required.
 type ACLBatchUpdateParamsRemoveACL struct {
 	// The id of the object the ACL applies to
-	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	ObjectType shared.ACLObjectType `json:"object_type,omitzero,required"`
 	// Id of the group the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
-	GroupID param.Field[string] `json:"group_id" format:"uuid"`
-	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
-	// provided
-	Permission param.Field[shared.Permission] `json:"permission"`
-	// When setting a permission directly, optionally restricts the permission grant to
-	// just the specified object type. Cannot be set alongside a `role_id`.
-	RestrictObjectType param.Field[shared.ACLObjectType] `json:"restrict_object_type"`
+	GroupID param.Opt[string] `json:"group_id,omitzero" format:"uuid"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
-	RoleID param.Field[string] `json:"role_id" format:"uuid"`
+	RoleID param.Opt[string] `json:"role_id,omitzero" format:"uuid"`
 	// Id of the user the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
-	UserID param.Field[string] `json:"user_id" format:"uuid"`
+	UserID param.Opt[string] `json:"user_id,omitzero" format:"uuid"`
+	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
+	// provided
+	//
+	// Any of "create", "read", "update", "delete", "create_acls", "read_acls",
+	// "update_acls", "delete_acls".
+	Permission shared.Permission `json:"permission,omitzero"`
+	// When setting a permission directly, optionally restricts the permission grant to
+	// just the specified object type. Cannot be set alongside a `role_id`.
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	RestrictObjectType shared.ACLObjectType `json:"restrict_object_type,omitzero"`
+	paramObj
 }
 
 func (r ACLBatchUpdateParamsRemoveACL) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ACLBatchUpdateParamsRemoveACL
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ACLBatchUpdateParamsRemoveACL) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ACLFindAndDeleteParams struct {
 	// The id of the object the ACL applies to
-	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
-	ObjectType param.Field[shared.ACLObjectType] `json:"object_type,required"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	ObjectType shared.ACLObjectType `json:"object_type,omitzero,required"`
 	// Id of the group the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
-	GroupID param.Field[string] `json:"group_id" format:"uuid"`
-	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
-	// provided
-	Permission param.Field[shared.Permission] `json:"permission"`
-	// When setting a permission directly, optionally restricts the permission grant to
-	// just the specified object type. Cannot be set alongside a `role_id`.
-	RestrictObjectType param.Field[shared.ACLObjectType] `json:"restrict_object_type"`
+	GroupID param.Opt[string] `json:"group_id,omitzero" format:"uuid"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
-	RoleID param.Field[string] `json:"role_id" format:"uuid"`
+	RoleID param.Opt[string] `json:"role_id,omitzero" format:"uuid"`
 	// Id of the user the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
-	UserID param.Field[string] `json:"user_id" format:"uuid"`
+	UserID param.Opt[string] `json:"user_id,omitzero" format:"uuid"`
+	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
+	// provided
+	//
+	// Any of "create", "read", "update", "delete", "create_acls", "read_acls",
+	// "update_acls", "delete_acls".
+	Permission shared.Permission `json:"permission,omitzero"`
+	// When setting a permission directly, optionally restricts the permission grant to
+	// just the specified object type. Cannot be set alongside a `role_id`.
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	RestrictObjectType shared.ACLObjectType `json:"restrict_object_type,omitzero"`
+	paramObj
 }
 
 func (r ACLFindAndDeleteParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ACLFindAndDeleteParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ACLFindAndDeleteParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

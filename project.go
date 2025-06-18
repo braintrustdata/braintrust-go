@@ -11,10 +11,10 @@ import (
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/pagination"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -26,14 +26,14 @@ import (
 // the [NewProjectService] method instead.
 type ProjectService struct {
 	Options []option.RequestOption
-	Logs    *ProjectLogService
+	Logs    ProjectLogService
 }
 
 // NewProjectService generates a new service that applies the given options to each
 // request. These options are applied after the parent client's options (if there
 // is one), and before any request-specific options.
-func NewProjectService(opts ...option.RequestOption) (r *ProjectService) {
-	r = &ProjectService{}
+func NewProjectService(opts ...option.RequestOption) (r ProjectService) {
+	r = ProjectService{}
 	r.Options = opts
 	r.Logs = NewProjectLogService(opts...)
 	return
@@ -113,69 +113,86 @@ func (r *ProjectService) Delete(ctx context.Context, projectID string, opts ...o
 
 type ProjectNewParams struct {
 	// Name of the project
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// For nearly all users, this parameter should be unnecessary. But in the rare case
 	// that your API key belongs to multiple organizations, you may specify the name of
 	// the organization the project belongs in.
-	OrgName param.Field[string] `json:"org_name"`
+	OrgName param.Opt[string] `json:"org_name,omitzero"`
+	paramObj
 }
 
 func (r ProjectNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ProjectNewParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ProjectNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ProjectUpdateParams struct {
 	// Name of the project
-	Name param.Field[string] `json:"name"`
+	Name param.Opt[string] `json:"name,omitzero"`
 	// Project settings. Patch operations replace all settings, so make sure you
 	// include all settings you want to keep.
-	Settings param.Field[shared.ProjectSettingsParam] `json:"settings"`
+	Settings shared.ProjectSettingsParam `json:"settings,omitzero"`
+	paramObj
 }
 
 func (r ProjectUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ProjectUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ProjectUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ProjectListParams struct {
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
-	// Filter search results to a particular set of object IDs. To specify a list of
-	// IDs, include the query param multiple times
-	IDs param.Field[ProjectListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	EndingBefore param.Opt[string] `query:"ending_before,omitzero" format:"uuid" json:"-"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Opt[string] `query:"org_name,omitzero" json:"-"`
 	// Name of the project to search for
-	ProjectName param.Field[string] `query:"project_name"`
+	ProjectName param.Opt[string] `query:"project_name,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Opt[string] `query:"starting_after,omitzero" format:"uuid" json:"-"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs ProjectListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
+	paramObj
 }
 
 // URLQuery serializes [ProjectListParams]'s query parameters as `url.Values`.
-func (r ProjectListParams) URLQuery() (v url.Values) {
+func (r ProjectListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [ProjectListParamsIDsArray].
-type ProjectListParamsIDsUnion interface {
-	ImplementsProjectListParamsIDsUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type ProjectListParamsIDsUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
 }
 
-type ProjectListParamsIDsArray []string
-
-func (r ProjectListParamsIDsArray) ImplementsProjectListParamsIDsUnion() {}
+func (u *ProjectListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
+	}
+	return nil
+}

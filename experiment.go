@@ -11,10 +11,10 @@ import (
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/pagination"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -31,8 +31,8 @@ type ExperimentService struct {
 // NewExperimentService generates a new service that applies the given options to
 // each request. These options are applied after the parent client's options (if
 // there is one), and before any request-specific options.
-func NewExperimentService(opts ...option.RequestOption) (r *ExperimentService) {
-	r = &ExperimentService{}
+func NewExperimentService(opts ...option.RequestOption) (r ExperimentService) {
+	r = ExperimentService{}
 	r.Options = opts
 	return
 }
@@ -176,118 +176,140 @@ func (r *ExperimentService) Summarize(ctx context.Context, experimentID string, 
 
 type ExperimentNewParams struct {
 	// Unique identifier for the project that the experiment belongs under
-	ProjectID param.Field[string] `json:"project_id,required" format:"uuid"`
+	ProjectID string `json:"project_id,required" format:"uuid"`
 	// Id of default base experiment to compare against when viewing this experiment
-	BaseExpID param.Field[string] `json:"base_exp_id" format:"uuid"`
+	BaseExpID param.Opt[string] `json:"base_exp_id,omitzero" format:"uuid"`
 	// Identifier of the linked dataset, or null if the experiment is not linked to a
 	// dataset
-	DatasetID param.Field[string] `json:"dataset_id" format:"uuid"`
+	DatasetID param.Opt[string] `json:"dataset_id,omitzero" format:"uuid"`
 	// Version number of the linked dataset the experiment was run against. This can be
 	// used to reproduce the experiment after the dataset has been modified.
-	DatasetVersion param.Field[string] `json:"dataset_version"`
+	DatasetVersion param.Opt[string] `json:"dataset_version,omitzero"`
 	// Textual description of the experiment
-	Description param.Field[string] `json:"description"`
+	Description param.Opt[string] `json:"description,omitzero"`
 	// Normally, creating an experiment with the same name as an existing experiment
 	// will return the existing one un-modified. But if `ensure_new` is true,
 	// registration will generate a new experiment with a unique name in case of a
 	// conflict.
-	EnsureNew param.Field[bool] `json:"ensure_new"`
-	// User-controlled metadata about the experiment
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
+	EnsureNew param.Opt[bool] `json:"ensure_new,omitzero"`
 	// Name of the experiment. Within a project, experiment names are unique
-	Name param.Field[string] `json:"name"`
+	Name param.Opt[string] `json:"name,omitzero"`
 	// Whether or not the experiment is public. Public experiments can be viewed by
 	// anybody inside or outside the organization
-	Public param.Field[bool] `json:"public"`
+	Public param.Opt[bool] `json:"public,omitzero"`
+	// User-controlled metadata about the experiment
+	Metadata map[string]any `json:"metadata,omitzero"`
 	// Metadata about the state of the repo when the experiment was created
-	RepoInfo param.Field[shared.RepoInfoParam] `json:"repo_info"`
+	RepoInfo shared.RepoInfoParam `json:"repo_info,omitzero"`
+	paramObj
 }
 
 func (r ExperimentNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ExperimentNewParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ExperimentNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ExperimentUpdateParams struct {
 	// Id of default base experiment to compare against when viewing this experiment
-	BaseExpID param.Field[string] `json:"base_exp_id" format:"uuid"`
+	BaseExpID param.Opt[string] `json:"base_exp_id,omitzero" format:"uuid"`
 	// Identifier of the linked dataset, or null if the experiment is not linked to a
 	// dataset
-	DatasetID param.Field[string] `json:"dataset_id" format:"uuid"`
+	DatasetID param.Opt[string] `json:"dataset_id,omitzero" format:"uuid"`
 	// Version number of the linked dataset the experiment was run against. This can be
 	// used to reproduce the experiment after the dataset has been modified.
-	DatasetVersion param.Field[string] `json:"dataset_version"`
+	DatasetVersion param.Opt[string] `json:"dataset_version,omitzero"`
 	// Textual description of the experiment
-	Description param.Field[string] `json:"description"`
-	// User-controlled metadata about the experiment
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
+	Description param.Opt[string] `json:"description,omitzero"`
 	// Name of the experiment. Within a project, experiment names are unique
-	Name param.Field[string] `json:"name"`
+	Name param.Opt[string] `json:"name,omitzero"`
 	// Whether or not the experiment is public. Public experiments can be viewed by
 	// anybody inside or outside the organization
-	Public param.Field[bool] `json:"public"`
+	Public param.Opt[bool] `json:"public,omitzero"`
+	// User-controlled metadata about the experiment
+	Metadata map[string]any `json:"metadata,omitzero"`
 	// Metadata about the state of the repo when the experiment was created
-	RepoInfo param.Field[shared.RepoInfoParam] `json:"repo_info"`
+	RepoInfo shared.RepoInfoParam `json:"repo_info,omitzero"`
+	paramObj
 }
 
 func (r ExperimentUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ExperimentUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ExperimentUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ExperimentListParams struct {
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
+	EndingBefore param.Opt[string] `query:"ending_before,omitzero" format:"uuid" json:"-"`
 	// Name of the experiment to search for
-	ExperimentName param.Field[string] `query:"experiment_name"`
-	// Filter search results to a particular set of object IDs. To specify a list of
-	// IDs, include the query param multiple times
-	IDs param.Field[ExperimentListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	ExperimentName param.Opt[string] `query:"experiment_name,omitzero" json:"-"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Opt[string] `query:"org_name,omitzero" json:"-"`
 	// Project id
-	ProjectID param.Field[string] `query:"project_id" format:"uuid"`
+	ProjectID param.Opt[string] `query:"project_id,omitzero" format:"uuid" json:"-"`
 	// Name of the project to search for
-	ProjectName param.Field[string] `query:"project_name"`
+	ProjectName param.Opt[string] `query:"project_name,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Opt[string] `query:"starting_after,omitzero" format:"uuid" json:"-"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs ExperimentListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
+	paramObj
 }
 
 // URLQuery serializes [ExperimentListParams]'s query parameters as `url.Values`.
-func (r ExperimentListParams) URLQuery() (v url.Values) {
+func (r ExperimentListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [ExperimentListParamsIDsArray].
-type ExperimentListParamsIDsUnion interface {
-	ImplementsExperimentListParamsIDsUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type ExperimentListParamsIDsUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
 }
 
-type ExperimentListParamsIDsArray []string
-
-func (r ExperimentListParamsIDsArray) ImplementsExperimentListParamsIDsUnion() {}
+func (u *ExperimentListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
+	}
+	return nil
+}
 
 type ExperimentFeedbackParams struct {
 	// A list of experiment feedback items
-	Feedback param.Field[[]shared.FeedbackExperimentItemParam] `json:"feedback,required"`
+	Feedback []shared.FeedbackExperimentItemParam `json:"feedback,omitzero,required"`
+	paramObj
 }
 
 func (r ExperimentFeedbackParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ExperimentFeedbackParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ExperimentFeedbackParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ExperimentFetchParams struct {
@@ -305,7 +327,7 @@ type ExperimentFetchParams struct {
 	// The `limit` parameter controls the number of full traces to return. So you may
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
-	Limit param.Field[int64] `query:"limit"`
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -316,7 +338,7 @@ type ExperimentFetchParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxRootSpanID param.Field[string] `query:"max_root_span_id"`
+	MaxRootSpanID param.Opt[string] `query:"max_root_span_id,omitzero" json:"-"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -327,17 +349,18 @@ type ExperimentFetchParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxXactID param.Field[string] `query:"max_xact_id"`
+	MaxXactID param.Opt[string] `query:"max_xact_id,omitzero" json:"-"`
 	// Retrieve a snapshot of events from a past time
 	//
 	// The version id is essentially a filter on the latest event transaction id. You
 	// can use the `max_xact_id` returned by a past fetch as the version to reproduce
 	// that exact fetch.
-	Version param.Field[string] `query:"version"`
+	Version param.Opt[string] `query:"version,omitzero" json:"-"`
+	paramObj
 }
 
 // URLQuery serializes [ExperimentFetchParams]'s query parameters as `url.Values`.
-func (r ExperimentFetchParams) URLQuery() (v url.Values) {
+func (r ExperimentFetchParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -350,7 +373,7 @@ type ExperimentFetchPostParams struct {
 	//
 	// The string can be obtained directly from the `cursor` property of the previous
 	// fetch query
-	Cursor param.Field[string] `json:"cursor"`
+	Cursor param.Opt[string] `json:"cursor,omitzero"`
 	// limit the number of traces fetched
 	//
 	// Fetch queries may be paginated if the total result size is expected to be large
@@ -365,7 +388,7 @@ type ExperimentFetchPostParams struct {
 	// The `limit` parameter controls the number of full traces to return. So you may
 	// end up with more individual rows than the specified limit if you are fetching
 	// events containing traces.
-	Limit param.Field[int64] `json:"limit"`
+	Limit param.Opt[int64] `json:"limit,omitzero"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -376,7 +399,7 @@ type ExperimentFetchPostParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxRootSpanID param.Field[string] `json:"max_root_span_id"`
+	MaxRootSpanID param.Opt[string] `json:"max_root_span_id,omitzero"`
 	// DEPRECATION NOTICE: The manually-constructed pagination cursor is deprecated in
 	// favor of the explicit 'cursor' returned by object fetch requests. Please prefer
 	// the 'cursor' argument going forwards.
@@ -387,42 +410,53 @@ type ExperimentFetchPostParams struct {
 	// the cursor for the next page can be found as the row with the minimum (earliest)
 	// value of the tuple `(_xact_id, root_span_id)`. See the documentation of `limit`
 	// for an overview of paginating fetch queries.
-	MaxXactID param.Field[string] `json:"max_xact_id"`
+	MaxXactID param.Opt[string] `json:"max_xact_id,omitzero"`
 	// Retrieve a snapshot of events from a past time
 	//
 	// The version id is essentially a filter on the latest event transaction id. You
 	// can use the `max_xact_id` returned by a past fetch as the version to reproduce
 	// that exact fetch.
-	Version param.Field[string] `json:"version"`
+	Version param.Opt[string] `json:"version,omitzero"`
+	paramObj
 }
 
 func (r ExperimentFetchPostParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ExperimentFetchPostParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ExperimentFetchPostParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ExperimentInsertParams struct {
 	// A list of experiment events to insert
-	Events param.Field[[]shared.InsertExperimentEventParam] `json:"events,required"`
+	Events []shared.InsertExperimentEventParam `json:"events,omitzero,required"`
+	paramObj
 }
 
 func (r ExperimentInsertParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ExperimentInsertParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ExperimentInsertParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ExperimentSummarizeParams struct {
+	// Whether to summarize the scores and metrics. If false (or omitted), only the
+	// metadata will be returned.
+	SummarizeScores param.Opt[bool] `query:"summarize_scores,omitzero" json:"-"`
 	// The experiment to compare against, if summarizing scores and metrics. If
 	// omitted, will fall back to the `base_exp_id` stored in the experiment metadata,
 	// and then to the most recent experiment run in the same project. Must pass
 	// `summarize_scores=true` for this id to be used
-	ComparisonExperimentID param.Field[string] `query:"comparison_experiment_id" format:"uuid"`
-	// Whether to summarize the scores and metrics. If false (or omitted), only the
-	// metadata will be returned.
-	SummarizeScores param.Field[bool] `query:"summarize_scores"`
+	ComparisonExperimentID param.Opt[string] `query:"comparison_experiment_id,omitzero" format:"uuid" json:"-"`
+	paramObj
 }
 
 // URLQuery serializes [ExperimentSummarizeParams]'s query parameters as
 // `url.Values`.
-func (r ExperimentSummarizeParams) URLQuery() (v url.Values) {
+func (r ExperimentSummarizeParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,

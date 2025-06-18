@@ -11,9 +11,10 @@ import (
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
+	"github.com/braintrustdata/braintrust-go/packages/param"
+	"github.com/braintrustdata/braintrust-go/packages/respjson"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -30,8 +31,8 @@ type EnvVarService struct {
 // NewEnvVarService generates a new service that applies the given options to each
 // request. These options are applied after the parent client's options (if there
 // is one), and before any request-specific options.
-func NewEnvVarService(opts ...option.RequestOption) (r *EnvVarService) {
-	r = &EnvVarService{}
+func NewEnvVarService(opts ...option.RequestOption) (r EnvVarService) {
+	r = EnvVarService{}
 	r.Options = opts
 	return
 }
@@ -104,39 +105,41 @@ func (r *EnvVarService) Replace(ctx context.Context, body EnvVarReplaceParams, o
 
 type EnvVarListResponse struct {
 	// A list of env_var objects
-	Objects []shared.EnvVar        `json:"objects,required"`
-	JSON    envVarListResponseJSON `json:"-"`
+	Objects []shared.EnvVar `json:"objects,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Objects     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// envVarListResponseJSON contains the JSON metadata for the struct
-// [EnvVarListResponse]
-type envVarListResponseJSON struct {
-	Objects     apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *EnvVarListResponse) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r EnvVarListResponse) RawJSON() string { return r.JSON.raw }
+func (r *EnvVarListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r envVarListResponseJSON) RawJSON() string {
-	return r.raw
 }
 
 type EnvVarNewParams struct {
 	// The name of the environment variable
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// The id of the object the environment variable is scoped for
-	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The type of the object the environment variable is scoped for
-	ObjectType param.Field[EnvVarNewParamsObjectType] `json:"object_type,required"`
+	//
+	// Any of "organization", "project", "function".
+	ObjectType EnvVarNewParamsObjectType `json:"object_type,omitzero,required"`
 	// The value of the environment variable. Will be encrypted at rest.
-	Value param.Field[string] `json:"value"`
+	Value param.Opt[string] `json:"value,omitzero"`
+	paramObj
 }
 
 func (r EnvVarNewParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EnvVarNewParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EnvVarNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // The type of the object the environment variable is scoped for
@@ -148,72 +151,85 @@ const (
 	EnvVarNewParamsObjectTypeFunction     EnvVarNewParamsObjectType = "function"
 )
 
-func (r EnvVarNewParamsObjectType) IsKnown() bool {
-	switch r {
-	case EnvVarNewParamsObjectTypeOrganization, EnvVarNewParamsObjectTypeProject, EnvVarNewParamsObjectTypeFunction:
-		return true
-	}
-	return false
-}
-
 type EnvVarUpdateParams struct {
 	// The name of the environment variable
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// The value of the environment variable. Will be encrypted at rest.
-	Value param.Field[string] `json:"value"`
+	Value param.Opt[string] `json:"value,omitzero"`
+	paramObj
 }
 
 func (r EnvVarUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EnvVarUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EnvVarUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type EnvVarListParams struct {
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Name of the env_var to search for
-	EnvVarName param.Field[string] `query:"env_var_name"`
+	EnvVarName param.Opt[string] `query:"env_var_name,omitzero" json:"-"`
+	// The id of the object the environment variable is scoped for
+	ObjectID param.Opt[string] `query:"object_id,omitzero" format:"uuid" json:"-"`
 	// Filter search results to a particular set of object IDs. To specify a list of
 	// IDs, include the query param multiple times
-	IDs param.Field[EnvVarListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
-	// The id of the object the environment variable is scoped for
-	ObjectID param.Field[string] `query:"object_id" format:"uuid"`
+	IDs EnvVarListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
 	// The type of the object the environment variable is scoped for
-	ObjectType param.Field[shared.EnvVarObjectType] `query:"object_type"`
+	//
+	// Any of "organization", "project", "function".
+	ObjectType shared.EnvVarObjectType `query:"object_type,omitzero" json:"-"`
+	paramObj
 }
 
 // URLQuery serializes [EnvVarListParams]'s query parameters as `url.Values`.
-func (r EnvVarListParams) URLQuery() (v url.Values) {
+func (r EnvVarListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [EnvVarListParamsIDsArray].
-type EnvVarListParamsIDsUnion interface {
-	ImplementsEnvVarListParamsIDsUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type EnvVarListParamsIDsUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
 }
 
-type EnvVarListParamsIDsArray []string
-
-func (r EnvVarListParamsIDsArray) ImplementsEnvVarListParamsIDsUnion() {}
+func (u *EnvVarListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
+	}
+	return nil
+}
 
 type EnvVarReplaceParams struct {
 	// The name of the environment variable
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// The id of the object the environment variable is scoped for
-	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The type of the object the environment variable is scoped for
-	ObjectType param.Field[EnvVarReplaceParamsObjectType] `json:"object_type,required"`
+	//
+	// Any of "organization", "project", "function".
+	ObjectType EnvVarReplaceParamsObjectType `json:"object_type,omitzero,required"`
 	// The value of the environment variable. Will be encrypted at rest.
-	Value param.Field[string] `json:"value"`
+	Value param.Opt[string] `json:"value,omitzero"`
+	paramObj
 }
 
 func (r EnvVarReplaceParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow EnvVarReplaceParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *EnvVarReplaceParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // The type of the object the environment variable is scoped for
@@ -224,11 +240,3 @@ const (
 	EnvVarReplaceParamsObjectTypeProject      EnvVarReplaceParamsObjectType = "project"
 	EnvVarReplaceParamsObjectTypeFunction     EnvVarReplaceParamsObjectType = "function"
 )
-
-func (r EnvVarReplaceParamsObjectType) IsKnown() bool {
-	switch r {
-	case EnvVarReplaceParamsObjectTypeOrganization, EnvVarReplaceParamsObjectTypeProject, EnvVarReplaceParamsObjectTypeFunction:
-		return true
-	}
-	return false
-}

@@ -11,10 +11,10 @@ import (
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/pagination"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -26,14 +26,14 @@ import (
 // the [NewOrganizationService] method instead.
 type OrganizationService struct {
 	Options []option.RequestOption
-	Members *OrganizationMemberService
+	Members OrganizationMemberService
 }
 
 // NewOrganizationService generates a new service that applies the given options to
 // each request. These options are applied after the parent client's options (if
 // there is one), and before any request-specific options.
-func NewOrganizationService(opts ...option.RequestOption) (r *OrganizationService) {
-	r = &OrganizationService{}
+func NewOrganizationService(opts ...option.RequestOption) (r OrganizationService) {
+	r = OrganizationService{}
 	r.Options = opts
 	r.Members = NewOrganizationMemberService(opts...)
 	return
@@ -103,56 +103,68 @@ func (r *OrganizationService) Delete(ctx context.Context, organizationID string,
 }
 
 type OrganizationUpdateParams struct {
-	APIURL         param.Field[string] `json:"api_url"`
-	IsUniversalAPI param.Field[bool]   `json:"is_universal_api"`
+	APIURL         param.Opt[string] `json:"api_url,omitzero"`
+	IsUniversalAPI param.Opt[bool]   `json:"is_universal_api,omitzero"`
 	// Name of the organization
-	Name        param.Field[string] `json:"name"`
-	ProxyURL    param.Field[string] `json:"proxy_url"`
-	RealtimeURL param.Field[string] `json:"realtime_url"`
+	Name        param.Opt[string] `json:"name,omitzero"`
+	ProxyURL    param.Opt[string] `json:"proxy_url,omitzero"`
+	RealtimeURL param.Opt[string] `json:"realtime_url,omitzero"`
+	paramObj
 }
 
 func (r OrganizationUpdateParams) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow OrganizationUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OrganizationUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type OrganizationListParams struct {
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
-	// Filter search results to a particular set of object IDs. To specify a list of
-	// IDs, include the query param multiple times
-	IDs param.Field[OrganizationListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	EndingBefore param.Opt[string] `query:"ending_before,omitzero" format:"uuid" json:"-"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Opt[string] `query:"org_name,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Opt[string] `query:"starting_after,omitzero" format:"uuid" json:"-"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs OrganizationListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
+	paramObj
 }
 
 // URLQuery serializes [OrganizationListParams]'s query parameters as `url.Values`.
-func (r OrganizationListParams) URLQuery() (v url.Values) {
+func (r OrganizationListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
 
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [OrganizationListParamsIDsArray].
-type OrganizationListParamsIDsUnion interface {
-	ImplementsOrganizationListParamsIDsUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type OrganizationListParamsIDsUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
 }
 
-type OrganizationListParamsIDsArray []string
-
-func (r OrganizationListParamsIDsArray) ImplementsOrganizationListParamsIDsUnion() {}
+func (u *OrganizationListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
+	}
+	return nil
+}

@@ -9,28 +9,32 @@ import (
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
+	"github.com/braintrustdata/braintrust-go/packages/param"
+	"github.com/braintrustdata/braintrust-go/packages/respjson"
 )
 
+// aliased to make [param.APIUnion] private when embedding
+type paramUnion = param.APIUnion
+
+// aliased to make [param.APIObject] private when embedding
+type paramObj = param.APIObject
+
 type ListObjects[T any] struct {
-	Objects []T             `json:"objects"`
-	JSON    listObjectsJSON `json:"-"`
-	cfg     *requestconfig.RequestConfig
-	res     *http.Response
+	Objects []T `json:"objects"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Objects     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	cfg *requestconfig.RequestConfig
+	res *http.Response
 }
 
-// listObjectsJSON contains the JSON metadata for the struct [ListObjects[T]]
-type listObjectsJSON struct {
-	Objects     apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ListObjects[T]) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ListObjects[T]) RawJSON() string { return r.JSON.raw }
+func (r *ListObjects[T]) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r listObjectsJSON) RawJSON() string {
-	return r.raw
 }
 
 // GetNextPage returns the next page as defined by this pagination style. When
@@ -44,7 +48,10 @@ func (r *ListObjects[T]) GetNextPage() (res *ListObjects[T], err error) {
 	cfg := r.cfg.Clone(r.cfg.Context)
 	value := reflect.ValueOf(items[len(items)-1])
 	field := value.FieldByName("ID")
-	cfg.Apply(option.WithQuery("starting_after", field.Interface().(string)))
+	err = cfg.Apply(option.WithQuery("starting_after", field.Interface().(string)))
+	if err != nil {
+		return nil, err
+	}
 	var raw *http.Response
 	cfg.ResponseInto = &raw
 	cfg.ResponseBodyInto = &res
@@ -70,6 +77,7 @@ type ListObjectsAutoPager[T any] struct {
 	idx  int
 	run  int
 	err  error
+	paramObj
 }
 
 func NewListObjectsAutoPager[T any](page *ListObjects[T], err error) *ListObjectsAutoPager[T] {

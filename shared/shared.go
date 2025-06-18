@@ -3,13 +3,19 @@
 package shared
 
 import (
-	"reflect"
+	"encoding/json"
 	"time"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
-	"github.com/braintrustdata/braintrust-go/internal/param"
-	"github.com/tidwall/gjson"
+	"github.com/braintrustdata/braintrust-go/packages/param"
+	"github.com/braintrustdata/braintrust-go/packages/respjson"
 )
+
+// aliased to make [param.APIUnion] private when embedding
+type paramUnion = param.APIUnion
+
+// aliased to make [param.APIObject] private when embedding
+type paramObj = param.APIObject
 
 type AISecret struct {
 	// Unique identifier for the AI secret
@@ -19,35 +25,31 @@ type AISecret struct {
 	// Unique identifier for the organization
 	OrgID string `json:"org_id,required" format:"uuid"`
 	// Date of AI secret creation
-	Created       time.Time              `json:"created,nullable" format:"date-time"`
-	Metadata      map[string]interface{} `json:"metadata,nullable"`
-	PreviewSecret string                 `json:"preview_secret,nullable"`
-	Type          string                 `json:"type,nullable"`
+	Created       time.Time      `json:"created,nullable" format:"date-time"`
+	Metadata      map[string]any `json:"metadata,nullable"`
+	PreviewSecret string         `json:"preview_secret,nullable"`
+	Type          string         `json:"type,nullable"`
 	// Date of last AI secret update
-	UpdatedAt time.Time    `json:"updated_at,nullable" format:"date-time"`
-	JSON      aiSecretJSON `json:"-"`
+	UpdatedAt time.Time `json:"updated_at,nullable" format:"date-time"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID            respjson.Field
+		Name          respjson.Field
+		OrgID         respjson.Field
+		Created       respjson.Field
+		Metadata      respjson.Field
+		PreviewSecret respjson.Field
+		Type          respjson.Field
+		UpdatedAt     respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
+	} `json:"-"`
 }
 
-// aiSecretJSON contains the JSON metadata for the struct [AISecret]
-type aiSecretJSON struct {
-	ID            apijson.Field
-	Name          apijson.Field
-	OrgID         apijson.Field
-	Created       apijson.Field
-	Metadata      apijson.Field
-	PreviewSecret apijson.Field
-	Type          apijson.Field
-	UpdatedAt     apijson.Field
-	raw           string
-	ExtraFields   map[string]apijson.Field
-}
-
-func (r *AISecret) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r AISecret) RawJSON() string { return r.JSON.raw }
+func (r *AISecret) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r aiSecretJSON) RawJSON() string {
-	return r.raw
 }
 
 // An ACL grants a certain permission or role to a certain user or group on an
@@ -68,6 +70,9 @@ type ACL struct {
 	// The id of the object the ACL applies to
 	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
 	ObjectType ACLObjectType `json:"object_type,required"`
 	// Date of acl creation
 	Created time.Time `json:"created,nullable" format:"date-time"`
@@ -76,41 +81,43 @@ type ACL struct {
 	GroupID string `json:"group_id,nullable" format:"uuid"`
 	// Permission the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
+	//
+	// Any of "create", "read", "update", "delete", "create_acls", "read_acls",
+	// "update_acls", "delete_acls".
 	Permission Permission `json:"permission,nullable"`
 	// When setting a permission directly, optionally restricts the permission grant to
 	// just the specified object type. Cannot be set alongside a `role_id`.
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
 	RestrictObjectType ACLObjectType `json:"restrict_object_type,nullable"`
 	// Id of the role the ACL grants. Exactly one of `permission` and `role_id` will be
 	// provided
 	RoleID string `json:"role_id,nullable" format:"uuid"`
 	// Id of the user the ACL applies to. Exactly one of `user_id` and `group_id` will
 	// be provided
-	UserID string  `json:"user_id,nullable" format:"uuid"`
-	JSON   aclJSON `json:"-"`
+	UserID string `json:"user_id,nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID                 respjson.Field
+		ObjectOrgID        respjson.Field
+		ObjectID           respjson.Field
+		ObjectType         respjson.Field
+		Created            respjson.Field
+		GroupID            respjson.Field
+		Permission         respjson.Field
+		RestrictObjectType respjson.Field
+		RoleID             respjson.Field
+		UserID             respjson.Field
+		ExtraFields        map[string]respjson.Field
+		raw                string
+	} `json:"-"`
 }
 
-// aclJSON contains the JSON metadata for the struct [ACL]
-type aclJSON struct {
-	ID                 apijson.Field
-	ObjectOrgID        apijson.Field
-	ObjectID           apijson.Field
-	ObjectType         apijson.Field
-	Created            apijson.Field
-	GroupID            apijson.Field
-	Permission         apijson.Field
-	RestrictObjectType apijson.Field
-	RoleID             apijson.Field
-	UserID             apijson.Field
-	raw                string
-	ExtraFields        map[string]apijson.Field
-}
-
-func (r *ACL) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ACL) RawJSON() string { return r.JSON.raw }
+func (r *ACL) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r aclJSON) RawJSON() string {
-	return r.raw
 }
 
 type ACLBatchUpdateResponse struct {
@@ -135,25 +142,20 @@ type ACLBatchUpdateResponse struct {
 	// To restrict a grant to a particular sub-object, you may specify
 	// `restrict_object_type` in the ACL, as part of a direct permission grant or as
 	// part of a role.
-	RemovedACLs []ACL                      `json:"removed_acls,required"`
-	JSON        aclBatchUpdateResponseJSON `json:"-"`
+	RemovedACLs []ACL `json:"removed_acls,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AddedACLs   respjson.Field
+		RemovedACLs respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// aclBatchUpdateResponseJSON contains the JSON metadata for the struct
-// [ACLBatchUpdateResponse]
-type aclBatchUpdateResponseJSON struct {
-	AddedACLs   apijson.Field
-	RemovedACLs apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ACLBatchUpdateResponse) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ACLBatchUpdateResponse) RawJSON() string { return r.JSON.raw }
+func (r *ACLBatchUpdateResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r aclBatchUpdateResponseJSON) RawJSON() string {
-	return r.raw
 }
 
 // The object type that the ACL applies to
@@ -173,14 +175,6 @@ const (
 	ACLObjectTypeOrgProject    ACLObjectType = "org_project"
 )
 
-func (r ACLObjectType) IsKnown() bool {
-	switch r {
-	case ACLObjectTypeOrganization, ACLObjectTypeProject, ACLObjectTypeExperiment, ACLObjectTypeDataset, ACLObjectTypePrompt, ACLObjectTypePromptSession, ACLObjectTypeGroup, ACLObjectTypeRole, ACLObjectTypeOrgMember, ACLObjectTypeProjectLog, ACLObjectTypeOrgProject:
-		return true
-	}
-	return false
-}
-
 type APIKey struct {
 	// Unique identifier for the api key
 	ID string `json:"id,required" format:"uuid"`
@@ -192,77 +186,72 @@ type APIKey struct {
 	// Unique identifier for the organization
 	OrgID string `json:"org_id,nullable" format:"uuid"`
 	// Unique identifier for the user
-	UserID string     `json:"user_id,nullable" format:"uuid"`
-	JSON   apiKeyJSON `json:"-"`
+	UserID string `json:"user_id,nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Name        respjson.Field
+		PreviewName respjson.Field
+		Created     respjson.Field
+		OrgID       respjson.Field
+		UserID      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// apiKeyJSON contains the JSON metadata for the struct [APIKey]
-type apiKeyJSON struct {
-	ID          apijson.Field
-	Name        apijson.Field
-	PreviewName apijson.Field
-	Created     apijson.Field
-	OrgID       apijson.Field
-	UserID      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *APIKey) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r APIKey) RawJSON() string { return r.JSON.raw }
+func (r *APIKey) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r apiKeyJSON) RawJSON() string {
-	return r.raw
 }
 
 type ChatCompletionContentPartImage struct {
 	ImageURL ChatCompletionContentPartImageImageURL `json:"image_url,required"`
-	Type     ChatCompletionContentPartImageType     `json:"type,required"`
-	JSON     chatCompletionContentPartImageJSON     `json:"-"`
+	// Any of "image_url".
+	Type ChatCompletionContentPartImageType `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ImageURL    respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// chatCompletionContentPartImageJSON contains the JSON metadata for the struct
-// [ChatCompletionContentPartImage]
-type chatCompletionContentPartImageJSON struct {
-	ImageURL    apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ChatCompletionContentPartImage) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ChatCompletionContentPartImage) RawJSON() string { return r.JSON.raw }
+func (r *ChatCompletionContentPartImage) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r chatCompletionContentPartImageJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r ChatCompletionContentPartImage) ImplementsPromptDataPromptChatMessagesUserContentArrayUnionItem() {
+// ToParam converts this ChatCompletionContentPartImage to a
+// ChatCompletionContentPartImageParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// ChatCompletionContentPartImageParam.Overrides()
+func (r ChatCompletionContentPartImage) ToParam() ChatCompletionContentPartImageParam {
+	return param.Override[ChatCompletionContentPartImageParam](json.RawMessage(r.RawJSON()))
 }
 
 type ChatCompletionContentPartImageImageURL struct {
-	URL    string                                       `json:"url,required"`
+	URL string `json:"url,required"`
+	// Any of "auto", "low", "high".
 	Detail ChatCompletionContentPartImageImageURLDetail `json:"detail"`
-	JSON   chatCompletionContentPartImageImageURLJSON   `json:"-"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		URL         respjson.Field
+		Detail      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// chatCompletionContentPartImageImageURLJSON contains the JSON metadata for the
-// struct [ChatCompletionContentPartImageImageURL]
-type chatCompletionContentPartImageImageURLJSON struct {
-	URL         apijson.Field
-	Detail      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ChatCompletionContentPartImageImageURL) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ChatCompletionContentPartImageImageURL) RawJSON() string { return r.JSON.raw }
+func (r *ChatCompletionContentPartImageImageURL) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r chatCompletionContentPartImageImageURLJSON) RawJSON() string {
-	return r.raw
 }
 
 type ChatCompletionContentPartImageImageURLDetail string
@@ -273,76 +262,71 @@ const (
 	ChatCompletionContentPartImageImageURLDetailHigh ChatCompletionContentPartImageImageURLDetail = "high"
 )
 
-func (r ChatCompletionContentPartImageImageURLDetail) IsKnown() bool {
-	switch r {
-	case ChatCompletionContentPartImageImageURLDetailAuto, ChatCompletionContentPartImageImageURLDetailLow, ChatCompletionContentPartImageImageURLDetailHigh:
-		return true
-	}
-	return false
-}
-
 type ChatCompletionContentPartImageType string
 
 const (
 	ChatCompletionContentPartImageTypeImageURL ChatCompletionContentPartImageType = "image_url"
 )
 
-func (r ChatCompletionContentPartImageType) IsKnown() bool {
-	switch r {
-	case ChatCompletionContentPartImageTypeImageURL:
-		return true
-	}
-	return false
-}
-
+// The properties ImageURL, Type are required.
 type ChatCompletionContentPartImageParam struct {
-	ImageURL param.Field[ChatCompletionContentPartImageImageURLParam] `json:"image_url,required"`
-	Type     param.Field[ChatCompletionContentPartImageType]          `json:"type,required"`
+	ImageURL ChatCompletionContentPartImageImageURLParam `json:"image_url,omitzero,required"`
+	// Any of "image_url".
+	Type ChatCompletionContentPartImageType `json:"type,omitzero,required"`
+	paramObj
 }
 
 func (r ChatCompletionContentPartImageParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ChatCompletionContentPartImageParam
+	return param.MarshalObject(r, (*shadow)(&r))
 }
-
-func (r ChatCompletionContentPartImageParam) ImplementsPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
-}
-
-func (r ChatCompletionContentPartImageParam) ImplementsFunctionInvokeParamsMessagesUserContentArrayItemUnion() {
-}
-
-type ChatCompletionContentPartImageImageURLParam struct {
-	URL    param.Field[string]                                       `json:"url,required"`
-	Detail param.Field[ChatCompletionContentPartImageImageURLDetail] `json:"detail"`
-}
-
-func (r ChatCompletionContentPartImageImageURLParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-type ChatCompletionContentPartText struct {
-	Type ChatCompletionContentPartTextType `json:"type,required"`
-	Text string                            `json:"text"`
-	JSON chatCompletionContentPartTextJSON `json:"-"`
-}
-
-// chatCompletionContentPartTextJSON contains the JSON metadata for the struct
-// [ChatCompletionContentPartText]
-type chatCompletionContentPartTextJSON struct {
-	Type        apijson.Field
-	Text        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ChatCompletionContentPartText) UnmarshalJSON(data []byte) (err error) {
+func (r *ChatCompletionContentPartImageParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r chatCompletionContentPartTextJSON) RawJSON() string {
-	return r.raw
+// The property URL is required.
+type ChatCompletionContentPartImageImageURLParam struct {
+	URL string `json:"url,required"`
+	// Any of "auto", "low", "high".
+	Detail ChatCompletionContentPartImageImageURLDetail `json:"detail,omitzero"`
+	paramObj
 }
 
-func (r ChatCompletionContentPartText) ImplementsPromptDataPromptChatMessagesUserContentArrayUnionItem() {
+func (r ChatCompletionContentPartImageImageURLParam) MarshalJSON() (data []byte, err error) {
+	type shadow ChatCompletionContentPartImageImageURLParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ChatCompletionContentPartImageImageURLParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ChatCompletionContentPartText struct {
+	// Any of "text".
+	Type ChatCompletionContentPartTextType `json:"type,required"`
+	Text string                            `json:"text"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		Text        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ChatCompletionContentPartText) RawJSON() string { return r.JSON.raw }
+func (r *ChatCompletionContentPartText) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ToParam converts this ChatCompletionContentPartText to a
+// ChatCompletionContentPartTextParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// ChatCompletionContentPartTextParam.Overrides()
+func (r ChatCompletionContentPartText) ToParam() ChatCompletionContentPartTextParam {
+	return param.Override[ChatCompletionContentPartTextParam](json.RawMessage(r.RawJSON()))
 }
 
 type ChatCompletionContentPartTextType string
@@ -351,75 +335,69 @@ const (
 	ChatCompletionContentPartTextTypeText ChatCompletionContentPartTextType = "text"
 )
 
-func (r ChatCompletionContentPartTextType) IsKnown() bool {
-	switch r {
-	case ChatCompletionContentPartTextTypeText:
-		return true
-	}
-	return false
-}
-
+// The property Type is required.
 type ChatCompletionContentPartTextParam struct {
-	Type param.Field[ChatCompletionContentPartTextType] `json:"type,required"`
-	Text param.Field[string]                            `json:"text"`
+	// Any of "text".
+	Type ChatCompletionContentPartTextType `json:"type,omitzero,required"`
+	Text param.Opt[string]                 `json:"text,omitzero"`
+	paramObj
 }
 
 func (r ChatCompletionContentPartTextParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ChatCompletionContentPartTextParam
+	return param.MarshalObject(r, (*shadow)(&r))
 }
-
-func (r ChatCompletionContentPartTextParam) ImplementsPromptDataPromptChatMessagesUserContentArrayUnionItemParam() {
-}
-
-func (r ChatCompletionContentPartTextParam) ImplementsFunctionInvokeParamsMessagesUserContentArrayItemUnion() {
+func (r *ChatCompletionContentPartTextParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ChatCompletionMessageToolCall struct {
 	ID       string                                `json:"id,required"`
 	Function ChatCompletionMessageToolCallFunction `json:"function,required"`
-	Type     ChatCompletionMessageToolCallType     `json:"type,required"`
-	JSON     chatCompletionMessageToolCallJSON     `json:"-"`
+	// Any of "function".
+	Type ChatCompletionMessageToolCallType `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Function    respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// chatCompletionMessageToolCallJSON contains the JSON metadata for the struct
-// [ChatCompletionMessageToolCall]
-type chatCompletionMessageToolCallJSON struct {
-	ID          apijson.Field
-	Function    apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ChatCompletionMessageToolCall) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ChatCompletionMessageToolCall) RawJSON() string { return r.JSON.raw }
+func (r *ChatCompletionMessageToolCall) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r chatCompletionMessageToolCallJSON) RawJSON() string {
-	return r.raw
+// ToParam converts this ChatCompletionMessageToolCall to a
+// ChatCompletionMessageToolCallParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// ChatCompletionMessageToolCallParam.Overrides()
+func (r ChatCompletionMessageToolCall) ToParam() ChatCompletionMessageToolCallParam {
+	return param.Override[ChatCompletionMessageToolCallParam](json.RawMessage(r.RawJSON()))
 }
 
 type ChatCompletionMessageToolCallFunction struct {
-	Arguments string                                    `json:"arguments,required"`
-	Name      string                                    `json:"name,required"`
-	JSON      chatCompletionMessageToolCallFunctionJSON `json:"-"`
+	Arguments string `json:"arguments,required"`
+	Name      string `json:"name,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Arguments   respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// chatCompletionMessageToolCallFunctionJSON contains the JSON metadata for the
-// struct [ChatCompletionMessageToolCallFunction]
-type chatCompletionMessageToolCallFunctionJSON struct {
-	Arguments   apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ChatCompletionMessageToolCallFunction) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ChatCompletionMessageToolCallFunction) RawJSON() string { return r.JSON.raw }
+func (r *ChatCompletionMessageToolCallFunction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r chatCompletionMessageToolCallFunctionJSON) RawJSON() string {
-	return r.raw
 }
 
 type ChatCompletionMessageToolCallType string
@@ -428,497 +406,464 @@ const (
 	ChatCompletionMessageToolCallTypeFunction ChatCompletionMessageToolCallType = "function"
 )
 
-func (r ChatCompletionMessageToolCallType) IsKnown() bool {
-	switch r {
-	case ChatCompletionMessageToolCallTypeFunction:
-		return true
-	}
-	return false
-}
-
+// The properties ID, Function, Type are required.
 type ChatCompletionMessageToolCallParam struct {
-	ID       param.Field[string]                                     `json:"id,required"`
-	Function param.Field[ChatCompletionMessageToolCallFunctionParam] `json:"function,required"`
-	Type     param.Field[ChatCompletionMessageToolCallType]          `json:"type,required"`
+	ID       string                                     `json:"id,required"`
+	Function ChatCompletionMessageToolCallFunctionParam `json:"function,omitzero,required"`
+	// Any of "function".
+	Type ChatCompletionMessageToolCallType `json:"type,omitzero,required"`
+	paramObj
 }
 
 func (r ChatCompletionMessageToolCallParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ChatCompletionMessageToolCallParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ChatCompletionMessageToolCallParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
+// The properties Arguments, Name are required.
 type ChatCompletionMessageToolCallFunctionParam struct {
-	Arguments param.Field[string] `json:"arguments,required"`
-	Name      param.Field[string] `json:"name,required"`
+	Arguments string `json:"arguments,required"`
+	Name      string `json:"name,required"`
+	paramObj
 }
 
 func (r ChatCompletionMessageToolCallFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ChatCompletionMessageToolCallFunctionParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ChatCompletionMessageToolCallFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type CodeBundle struct {
 	BundleID       string                   `json:"bundle_id,required"`
-	Location       CodeBundleLocation       `json:"location,required"`
+	Location       CodeBundleLocationUnion  `json:"location,required"`
 	RuntimeContext CodeBundleRuntimeContext `json:"runtime_context,required"`
 	// A preview of the code
-	Preview string         `json:"preview,nullable"`
-	JSON    codeBundleJSON `json:"-"`
+	Preview string `json:"preview,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		BundleID       respjson.Field
+		Location       respjson.Field
+		RuntimeContext respjson.Field
+		Preview        respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
+	} `json:"-"`
 }
 
-// codeBundleJSON contains the JSON metadata for the struct [CodeBundle]
-type codeBundleJSON struct {
-	BundleID       apijson.Field
-	Location       apijson.Field
-	RuntimeContext apijson.Field
-	Preview        apijson.Field
-	raw            string
-	ExtraFields    map[string]apijson.Field
-}
-
-func (r *CodeBundle) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r CodeBundle) RawJSON() string { return r.JSON.raw }
+func (r *CodeBundle) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r codeBundleJSON) RawJSON() string {
-	return r.raw
-}
-
-type CodeBundleLocation struct {
-	Type     CodeBundleLocationType `json:"type,required"`
-	EvalName string                 `json:"eval_name"`
-	Index    int64                  `json:"index"`
-	// This field can have the runtime type of [CodeBundleLocationExperimentPosition].
-	Position interface{}            `json:"position"`
-	JSON     codeBundleLocationJSON `json:"-"`
-	union    CodeBundleLocationUnion
-}
-
-// codeBundleLocationJSON contains the JSON metadata for the struct
-// [CodeBundleLocation]
-type codeBundleLocationJSON struct {
-	Type        apijson.Field
-	EvalName    apijson.Field
-	Index       apijson.Field
-	Position    apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r codeBundleLocationJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *CodeBundleLocation) UnmarshalJSON(data []byte) (err error) {
-	*r = CodeBundleLocation{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [CodeBundleLocationUnion] interface which you can cast to the
-// specific types for more type safety.
+// ToParam converts this CodeBundle to a CodeBundleParam.
 //
-// Possible runtime types of the union are [shared.CodeBundleLocationExperiment],
-// [shared.CodeBundleLocationFunction].
-func (r CodeBundleLocation) AsUnion() CodeBundleLocationUnion {
-	return r.union
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// CodeBundleParam.Overrides()
+func (r CodeBundle) ToParam() CodeBundleParam {
+	return param.Override[CodeBundleParam](json.RawMessage(r.RawJSON()))
 }
 
-// Union satisfied by [shared.CodeBundleLocationExperiment] or
-// [shared.CodeBundleLocationFunction].
-type CodeBundleLocationUnion interface {
-	implementsCodeBundleLocation()
+// CodeBundleLocationUnion contains all possible properties and values from
+// [CodeBundleLocationExperiment], [CodeBundleLocationFunction].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type CodeBundleLocationUnion struct {
+	// This field is from variant [CodeBundleLocationExperiment].
+	EvalName string `json:"eval_name"`
+	// This field is from variant [CodeBundleLocationExperiment].
+	Position CodeBundleLocationExperimentPositionUnion `json:"position"`
+	Type     string                                    `json:"type"`
+	// This field is from variant [CodeBundleLocationFunction].
+	Index int64 `json:"index"`
+	JSON  struct {
+		EvalName respjson.Field
+		Position respjson.Field
+		Type     respjson.Field
+		Index    respjson.Field
+		raw      string
+	} `json:"-"`
 }
 
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*CodeBundleLocationUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(CodeBundleLocationExperiment{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(CodeBundleLocationFunction{}),
-		},
-	)
+func (u CodeBundleLocationUnion) AsExperiment() (v CodeBundleLocationExperiment) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u CodeBundleLocationUnion) AsFunction() (v CodeBundleLocationFunction) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u CodeBundleLocationUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *CodeBundleLocationUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type CodeBundleLocationExperiment struct {
-	EvalName string                               `json:"eval_name,required"`
-	Position CodeBundleLocationExperimentPosition `json:"position,required"`
-	Type     CodeBundleLocationExperimentType     `json:"type,required"`
-	JSON     codeBundleLocationExperimentJSON     `json:"-"`
+	EvalName string                                    `json:"eval_name,required"`
+	Position CodeBundleLocationExperimentPositionUnion `json:"position,required"`
+	// Any of "experiment".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		EvalName    respjson.Field
+		Position    respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// codeBundleLocationExperimentJSON contains the JSON metadata for the struct
-// [CodeBundleLocationExperiment]
-type codeBundleLocationExperimentJSON struct {
-	EvalName    apijson.Field
-	Position    apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *CodeBundleLocationExperiment) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r CodeBundleLocationExperiment) RawJSON() string { return r.JSON.raw }
+func (r *CodeBundleLocationExperiment) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r codeBundleLocationExperimentJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r CodeBundleLocationExperiment) implementsCodeBundleLocation() {}
-
-type CodeBundleLocationExperimentPosition struct {
-	Type  CodeBundleLocationExperimentPositionType `json:"type,required"`
-	Index int64                                    `json:"index"`
-	JSON  codeBundleLocationExperimentPositionJSON `json:"-"`
-	union CodeBundleLocationExperimentPositionUnion
-}
-
-// codeBundleLocationExperimentPositionJSON contains the JSON metadata for the
-// struct [CodeBundleLocationExperimentPosition]
-type codeBundleLocationExperimentPositionJSON struct {
-	Type        apijson.Field
-	Index       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r codeBundleLocationExperimentPositionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *CodeBundleLocationExperimentPosition) UnmarshalJSON(data []byte) (err error) {
-	*r = CodeBundleLocationExperimentPosition{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [CodeBundleLocationExperimentPositionUnion] interface which
-// you can cast to the specific types for more type safety.
+// CodeBundleLocationExperimentPositionUnion contains all possible properties and
+// values from [CodeBundleLocationExperimentPositionType],
+// [CodeBundleLocationExperimentPositionScorer].
 //
-// Possible runtime types of the union are
-// [shared.CodeBundleLocationExperimentPositionType],
-// [shared.CodeBundleLocationExperimentPositionScorer].
-func (r CodeBundleLocationExperimentPosition) AsUnion() CodeBundleLocationExperimentPositionUnion {
-	return r.union
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type CodeBundleLocationExperimentPositionUnion struct {
+	Type string `json:"type"`
+	// This field is from variant [CodeBundleLocationExperimentPositionScorer].
+	Index int64 `json:"index"`
+	JSON  struct {
+		Type  respjson.Field
+		Index respjson.Field
+		raw   string
+	} `json:"-"`
 }
 
-// Union satisfied by [shared.CodeBundleLocationExperimentPositionType] or
-// [shared.CodeBundleLocationExperimentPositionScorer].
-type CodeBundleLocationExperimentPositionUnion interface {
-	implementsCodeBundleLocationExperimentPosition()
+func (u CodeBundleLocationExperimentPositionUnion) AsCodeBundleLocationExperimentPositionType() (v CodeBundleLocationExperimentPositionType) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
 }
 
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*CodeBundleLocationExperimentPositionUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(CodeBundleLocationExperimentPositionType{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(CodeBundleLocationExperimentPositionScorer{}),
-		},
-	)
+func (u CodeBundleLocationExperimentPositionUnion) AsScorer() (v CodeBundleLocationExperimentPositionScorer) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u CodeBundleLocationExperimentPositionUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *CodeBundleLocationExperimentPositionUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type CodeBundleLocationExperimentPositionType struct {
-	Type CodeBundleLocationExperimentPositionTypeType `json:"type,required"`
-	JSON codeBundleLocationExperimentPositionTypeJSON `json:"-"`
+	// Any of "task".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// codeBundleLocationExperimentPositionTypeJSON contains the JSON metadata for the
-// struct [CodeBundleLocationExperimentPositionType]
-type codeBundleLocationExperimentPositionTypeJSON struct {
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *CodeBundleLocationExperimentPositionType) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r CodeBundleLocationExperimentPositionType) RawJSON() string { return r.JSON.raw }
+func (r *CodeBundleLocationExperimentPositionType) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r codeBundleLocationExperimentPositionTypeJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r CodeBundleLocationExperimentPositionType) implementsCodeBundleLocationExperimentPosition() {}
-
-type CodeBundleLocationExperimentPositionTypeType string
-
-const (
-	CodeBundleLocationExperimentPositionTypeTypeTask CodeBundleLocationExperimentPositionTypeType = "task"
-)
-
-func (r CodeBundleLocationExperimentPositionTypeType) IsKnown() bool {
-	switch r {
-	case CodeBundleLocationExperimentPositionTypeTypeTask:
-		return true
-	}
-	return false
 }
 
 type CodeBundleLocationExperimentPositionScorer struct {
-	Index int64                                          `json:"index,required"`
-	Type  CodeBundleLocationExperimentPositionScorerType `json:"type,required"`
-	JSON  codeBundleLocationExperimentPositionScorerJSON `json:"-"`
+	Index int64 `json:"index,required"`
+	// Any of "scorer".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Index       respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// codeBundleLocationExperimentPositionScorerJSON contains the JSON metadata for
-// the struct [CodeBundleLocationExperimentPositionScorer]
-type codeBundleLocationExperimentPositionScorerJSON struct {
-	Index       apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *CodeBundleLocationExperimentPositionScorer) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r CodeBundleLocationExperimentPositionScorer) RawJSON() string { return r.JSON.raw }
+func (r *CodeBundleLocationExperimentPositionScorer) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r codeBundleLocationExperimentPositionScorerJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r CodeBundleLocationExperimentPositionScorer) implementsCodeBundleLocationExperimentPosition() {
-}
-
-type CodeBundleLocationExperimentPositionScorerType string
-
-const (
-	CodeBundleLocationExperimentPositionScorerTypeScorer CodeBundleLocationExperimentPositionScorerType = "scorer"
-)
-
-func (r CodeBundleLocationExperimentPositionScorerType) IsKnown() bool {
-	switch r {
-	case CodeBundleLocationExperimentPositionScorerTypeScorer:
-		return true
-	}
-	return false
-}
-
-type CodeBundleLocationExperimentType string
-
-const (
-	CodeBundleLocationExperimentTypeExperiment CodeBundleLocationExperimentType = "experiment"
-)
-
-func (r CodeBundleLocationExperimentType) IsKnown() bool {
-	switch r {
-	case CodeBundleLocationExperimentTypeExperiment:
-		return true
-	}
-	return false
 }
 
 type CodeBundleLocationFunction struct {
-	Index int64                          `json:"index,required"`
-	Type  CodeBundleLocationFunctionType `json:"type,required"`
-	JSON  codeBundleLocationFunctionJSON `json:"-"`
+	Index int64 `json:"index,required"`
+	// Any of "function".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Index       respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// codeBundleLocationFunctionJSON contains the JSON metadata for the struct
-// [CodeBundleLocationFunction]
-type codeBundleLocationFunctionJSON struct {
-	Index       apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *CodeBundleLocationFunction) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r CodeBundleLocationFunction) RawJSON() string { return r.JSON.raw }
+func (r *CodeBundleLocationFunction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r codeBundleLocationFunctionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r CodeBundleLocationFunction) implementsCodeBundleLocation() {}
-
-type CodeBundleLocationFunctionType string
-
-const (
-	CodeBundleLocationFunctionTypeFunction CodeBundleLocationFunctionType = "function"
-)
-
-func (r CodeBundleLocationFunctionType) IsKnown() bool {
-	switch r {
-	case CodeBundleLocationFunctionTypeFunction:
-		return true
-	}
-	return false
-}
-
-type CodeBundleLocationType string
-
-const (
-	CodeBundleLocationTypeExperiment CodeBundleLocationType = "experiment"
-	CodeBundleLocationTypeFunction   CodeBundleLocationType = "function"
-)
-
-func (r CodeBundleLocationType) IsKnown() bool {
-	switch r {
-	case CodeBundleLocationTypeExperiment, CodeBundleLocationTypeFunction:
-		return true
-	}
-	return false
 }
 
 type CodeBundleRuntimeContext struct {
-	Runtime CodeBundleRuntimeContextRuntime `json:"runtime,required"`
-	Version string                          `json:"version,required"`
-	JSON    codeBundleRuntimeContextJSON    `json:"-"`
+	// Any of "node", "python".
+	Runtime string `json:"runtime,required"`
+	Version string `json:"version,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Runtime     respjson.Field
+		Version     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// codeBundleRuntimeContextJSON contains the JSON metadata for the struct
-// [CodeBundleRuntimeContext]
-type codeBundleRuntimeContextJSON struct {
-	Runtime     apijson.Field
-	Version     apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *CodeBundleRuntimeContext) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r CodeBundleRuntimeContext) RawJSON() string { return r.JSON.raw }
+func (r *CodeBundleRuntimeContext) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r codeBundleRuntimeContextJSON) RawJSON() string {
-	return r.raw
-}
-
-type CodeBundleRuntimeContextRuntime string
-
-const (
-	CodeBundleRuntimeContextRuntimeNode   CodeBundleRuntimeContextRuntime = "node"
-	CodeBundleRuntimeContextRuntimePython CodeBundleRuntimeContextRuntime = "python"
-)
-
-func (r CodeBundleRuntimeContextRuntime) IsKnown() bool {
-	switch r {
-	case CodeBundleRuntimeContextRuntimeNode, CodeBundleRuntimeContextRuntimePython:
-		return true
-	}
-	return false
-}
-
+// The properties BundleID, Location, RuntimeContext are required.
 type CodeBundleParam struct {
-	BundleID       param.Field[string]                        `json:"bundle_id,required"`
-	Location       param.Field[CodeBundleLocationUnionParam]  `json:"location,required"`
-	RuntimeContext param.Field[CodeBundleRuntimeContextParam] `json:"runtime_context,required"`
+	BundleID       string                        `json:"bundle_id,required"`
+	Location       CodeBundleLocationUnionParam  `json:"location,omitzero,required"`
+	RuntimeContext CodeBundleRuntimeContextParam `json:"runtime_context,omitzero,required"`
 	// A preview of the code
-	Preview param.Field[string] `json:"preview"`
+	Preview param.Opt[string] `json:"preview,omitzero"`
+	paramObj
 }
 
 func (r CodeBundleParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow CodeBundleParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *CodeBundleParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-type CodeBundleLocationParam struct {
-	Type     param.Field[CodeBundleLocationType] `json:"type,required"`
-	EvalName param.Field[string]                 `json:"eval_name"`
-	Index    param.Field[int64]                  `json:"index"`
-	Position param.Field[interface{}]            `json:"position"`
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type CodeBundleLocationUnionParam struct {
+	OfExperiment *CodeBundleLocationExperimentParam `json:",omitzero,inline"`
+	OfFunction   *CodeBundleLocationFunctionParam   `json:",omitzero,inline"`
+	paramUnion
 }
 
-func (r CodeBundleLocationParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+func (u CodeBundleLocationUnionParam) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfExperiment, u.OfFunction)
+}
+func (u *CodeBundleLocationUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
-func (r CodeBundleLocationParam) implementsCodeBundleLocationUnionParam() {}
-
-// Satisfied by [shared.CodeBundleLocationExperimentParam],
-// [shared.CodeBundleLocationFunctionParam], [CodeBundleLocationParam].
-type CodeBundleLocationUnionParam interface {
-	implementsCodeBundleLocationUnionParam()
+func (u *CodeBundleLocationUnionParam) asAny() any {
+	if !param.IsOmitted(u.OfExperiment) {
+		return u.OfExperiment
+	} else if !param.IsOmitted(u.OfFunction) {
+		return u.OfFunction
+	}
+	return nil
 }
 
+// Returns a pointer to the underlying variant's property, if present.
+func (u CodeBundleLocationUnionParam) GetEvalName() *string {
+	if vt := u.OfExperiment; vt != nil {
+		return &vt.EvalName
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u CodeBundleLocationUnionParam) GetPosition() *CodeBundleLocationExperimentPositionUnionParam {
+	if vt := u.OfExperiment; vt != nil {
+		return &vt.Position
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u CodeBundleLocationUnionParam) GetIndex() *int64 {
+	if vt := u.OfFunction; vt != nil {
+		return &vt.Index
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u CodeBundleLocationUnionParam) GetType() *string {
+	if vt := u.OfExperiment; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfFunction; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
+}
+
+// The properties EvalName, Position, Type are required.
 type CodeBundleLocationExperimentParam struct {
-	EvalName param.Field[string]                                         `json:"eval_name,required"`
-	Position param.Field[CodeBundleLocationExperimentPositionUnionParam] `json:"position,required"`
-	Type     param.Field[CodeBundleLocationExperimentType]               `json:"type,required"`
+	EvalName string                                         `json:"eval_name,required"`
+	Position CodeBundleLocationExperimentPositionUnionParam `json:"position,omitzero,required"`
+	// Any of "experiment".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
 func (r CodeBundleLocationExperimentParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow CodeBundleLocationExperimentParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *CodeBundleLocationExperimentParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r CodeBundleLocationExperimentParam) implementsCodeBundleLocationUnionParam() {}
-
-type CodeBundleLocationExperimentPositionParam struct {
-	Type  param.Field[CodeBundleLocationExperimentPositionType] `json:"type,required"`
-	Index param.Field[int64]                                    `json:"index"`
+func init() {
+	apijson.RegisterFieldValidator[CodeBundleLocationExperimentParam](
+		"type", "experiment",
+	)
 }
 
-func (r CodeBundleLocationExperimentPositionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type CodeBundleLocationExperimentPositionUnionParam struct {
+	OfCodeBundleLocationExperimentPositionType *CodeBundleLocationExperimentPositionTypeParam   `json:",omitzero,inline"`
+	OfScorer                                   *CodeBundleLocationExperimentPositionScorerParam `json:",omitzero,inline"`
+	paramUnion
 }
 
-func (r CodeBundleLocationExperimentPositionParam) implementsCodeBundleLocationExperimentPositionUnionParam() {
+func (u CodeBundleLocationExperimentPositionUnionParam) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfCodeBundleLocationExperimentPositionType, u.OfScorer)
+}
+func (u *CodeBundleLocationExperimentPositionUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
-// Satisfied by [shared.CodeBundleLocationExperimentPositionTypeParam],
-// [shared.CodeBundleLocationExperimentPositionScorerParam],
-// [CodeBundleLocationExperimentPositionParam].
-type CodeBundleLocationExperimentPositionUnionParam interface {
-	implementsCodeBundleLocationExperimentPositionUnionParam()
+func (u *CodeBundleLocationExperimentPositionUnionParam) asAny() any {
+	if !param.IsOmitted(u.OfCodeBundleLocationExperimentPositionType) {
+		return u.OfCodeBundleLocationExperimentPositionType
+	} else if !param.IsOmitted(u.OfScorer) {
+		return u.OfScorer
+	}
+	return nil
 }
 
+// Returns a pointer to the underlying variant's property, if present.
+func (u CodeBundleLocationExperimentPositionUnionParam) GetIndex() *int64 {
+	if vt := u.OfScorer; vt != nil {
+		return &vt.Index
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u CodeBundleLocationExperimentPositionUnionParam) GetType() *string {
+	if vt := u.OfCodeBundleLocationExperimentPositionType; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfScorer; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
+}
+
+// The property Type is required.
 type CodeBundleLocationExperimentPositionTypeParam struct {
-	Type param.Field[CodeBundleLocationExperimentPositionTypeType] `json:"type,required"`
+	// Any of "task".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
 func (r CodeBundleLocationExperimentPositionTypeParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow CodeBundleLocationExperimentPositionTypeParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *CodeBundleLocationExperimentPositionTypeParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r CodeBundleLocationExperimentPositionTypeParam) implementsCodeBundleLocationExperimentPositionUnionParam() {
+func init() {
+	apijson.RegisterFieldValidator[CodeBundleLocationExperimentPositionTypeParam](
+		"type", "task",
+	)
 }
 
+// The properties Index, Type are required.
 type CodeBundleLocationExperimentPositionScorerParam struct {
-	Index param.Field[int64]                                          `json:"index,required"`
-	Type  param.Field[CodeBundleLocationExperimentPositionScorerType] `json:"type,required"`
+	Index int64 `json:"index,required"`
+	// Any of "scorer".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
 func (r CodeBundleLocationExperimentPositionScorerParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow CodeBundleLocationExperimentPositionScorerParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *CodeBundleLocationExperimentPositionScorerParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r CodeBundleLocationExperimentPositionScorerParam) implementsCodeBundleLocationExperimentPositionUnionParam() {
+func init() {
+	apijson.RegisterFieldValidator[CodeBundleLocationExperimentPositionScorerParam](
+		"type", "scorer",
+	)
 }
 
+// The properties Index, Type are required.
 type CodeBundleLocationFunctionParam struct {
-	Index param.Field[int64]                          `json:"index,required"`
-	Type  param.Field[CodeBundleLocationFunctionType] `json:"type,required"`
+	Index int64 `json:"index,required"`
+	// Any of "function".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
 func (r CodeBundleLocationFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow CodeBundleLocationFunctionParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *CodeBundleLocationFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r CodeBundleLocationFunctionParam) implementsCodeBundleLocationUnionParam() {}
+func init() {
+	apijson.RegisterFieldValidator[CodeBundleLocationFunctionParam](
+		"type", "function",
+	)
+}
 
+// The properties Runtime, Version are required.
 type CodeBundleRuntimeContextParam struct {
-	Runtime param.Field[CodeBundleRuntimeContextRuntime] `json:"runtime,required"`
-	Version param.Field[string]                          `json:"version,required"`
+	// Any of "node", "python".
+	Runtime string `json:"runtime,omitzero,required"`
+	Version string `json:"version,required"`
+	paramObj
 }
 
 func (r CodeBundleRuntimeContextParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow CodeBundleRuntimeContextParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *CodeBundleRuntimeContextParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[CodeBundleRuntimeContextParam](
+		"runtime", "node", "python",
+	)
 }
 
 type CreateAPIKeyOutput struct {
@@ -934,52 +879,43 @@ type CreateAPIKeyOutput struct {
 	// Unique identifier for the organization
 	OrgID string `json:"org_id,nullable" format:"uuid"`
 	// Unique identifier for the user
-	UserID string                 `json:"user_id,nullable" format:"uuid"`
-	JSON   createAPIKeyOutputJSON `json:"-"`
+	UserID string `json:"user_id,nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Key         respjson.Field
+		Name        respjson.Field
+		PreviewName respjson.Field
+		Created     respjson.Field
+		OrgID       respjson.Field
+		UserID      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// createAPIKeyOutputJSON contains the JSON metadata for the struct
-// [CreateAPIKeyOutput]
-type createAPIKeyOutputJSON struct {
-	ID          apijson.Field
-	Key         apijson.Field
-	Name        apijson.Field
-	PreviewName apijson.Field
-	Created     apijson.Field
-	OrgID       apijson.Field
-	UserID      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *CreateAPIKeyOutput) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r CreateAPIKeyOutput) RawJSON() string { return r.JSON.raw }
+func (r *CreateAPIKeyOutput) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r createAPIKeyOutputJSON) RawJSON() string {
-	return r.raw
 }
 
 // Summary of a dataset's data
 type DataSummary struct {
 	// Total number of records in the dataset
-	TotalRecords int64           `json:"total_records,required"`
-	JSON         dataSummaryJSON `json:"-"`
+	TotalRecords int64 `json:"total_records,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		TotalRecords respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
 }
 
-// dataSummaryJSON contains the JSON metadata for the struct [DataSummary]
-type dataSummaryJSON struct {
-	TotalRecords apijson.Field
-	raw          string
-	ExtraFields  map[string]apijson.Field
-}
-
-func (r *DataSummary) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r DataSummary) RawJSON() string { return r.JSON.raw }
+func (r *DataSummary) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r dataSummaryJSON) RawJSON() string {
-	return r.raw
 }
 
 type Dataset struct {
@@ -996,32 +932,28 @@ type Dataset struct {
 	// Textual description of the dataset
 	Description string `json:"description,nullable"`
 	// User-controlled metadata about the dataset
-	Metadata map[string]interface{} `json:"metadata,nullable"`
+	Metadata map[string]any `json:"metadata,nullable"`
 	// Identifies the user who created the dataset
-	UserID string      `json:"user_id,nullable" format:"uuid"`
-	JSON   datasetJSON `json:"-"`
+	UserID string `json:"user_id,nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Name        respjson.Field
+		ProjectID   respjson.Field
+		Created     respjson.Field
+		DeletedAt   respjson.Field
+		Description respjson.Field
+		Metadata    respjson.Field
+		UserID      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// datasetJSON contains the JSON metadata for the struct [Dataset]
-type datasetJSON struct {
-	ID          apijson.Field
-	Name        apijson.Field
-	ProjectID   apijson.Field
-	Created     apijson.Field
-	DeletedAt   apijson.Field
-	Description apijson.Field
-	Metadata    apijson.Field
-	UserID      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *Dataset) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r Dataset) RawJSON() string { return r.JSON.raw }
+func (r *Dataset) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r datasetJSON) RawJSON() string {
-	return r.raw
 }
 
 type DatasetEvent struct {
@@ -1048,10 +980,10 @@ type DatasetEvent struct {
 	SpanID string `json:"span_id,required"`
 	// The output of your application, including post-processing (an arbitrary, JSON
 	// serializable object)
-	Expected interface{} `json:"expected"`
+	Expected any `json:"expected"`
 	// The argument that uniquely define an input case (an arbitrary, JSON serializable
 	// object)
-	Input interface{} `json:"input"`
+	Input any `json:"input"`
 	// Whether this span is a root span
 	IsRoot bool `json:"is_root,nullable"`
 	// A dictionary with additional data about the test example, model outputs, or just
@@ -1063,35 +995,31 @@ type DatasetEvent struct {
 	// Indicates the event was copied from another object.
 	Origin ObjectReference `json:"origin,nullable"`
 	// A list of tags to log
-	Tags []string         `json:"tags,nullable"`
-	JSON datasetEventJSON `json:"-"`
+	Tags []string `json:"tags,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		XactID      respjson.Field
+		Created     respjson.Field
+		DatasetID   respjson.Field
+		ProjectID   respjson.Field
+		RootSpanID  respjson.Field
+		SpanID      respjson.Field
+		Expected    respjson.Field
+		Input       respjson.Field
+		IsRoot      respjson.Field
+		Metadata    respjson.Field
+		Origin      respjson.Field
+		Tags        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// datasetEventJSON contains the JSON metadata for the struct [DatasetEvent]
-type datasetEventJSON struct {
-	ID          apijson.Field
-	XactID      apijson.Field
-	Created     apijson.Field
-	DatasetID   apijson.Field
-	ProjectID   apijson.Field
-	RootSpanID  apijson.Field
-	SpanID      apijson.Field
-	Expected    apijson.Field
-	Input       apijson.Field
-	IsRoot      apijson.Field
-	Metadata    apijson.Field
-	Origin      apijson.Field
-	Tags        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *DatasetEvent) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r DatasetEvent) RawJSON() string { return r.JSON.raw }
+func (r *DatasetEvent) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r datasetEventJSON) RawJSON() string {
-	return r.raw
 }
 
 // A dictionary with additional data about the test example, model outputs, or just
@@ -1101,25 +1029,20 @@ func (r datasetEventJSON) RawJSON() string {
 // can be any JSON-serializable type, but its keys must be strings
 type DatasetEventMetadata struct {
 	// The model used for this example
-	Model       string                   `json:"model,nullable"`
-	ExtraFields map[string]interface{}   `json:"-,extras"`
-	JSON        datasetEventMetadataJSON `json:"-"`
+	Model       string         `json:"model,nullable"`
+	ExtraFields map[string]any `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Model       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// datasetEventMetadataJSON contains the JSON metadata for the struct
-// [DatasetEventMetadata]
-type datasetEventMetadataJSON struct {
-	Model       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *DatasetEventMetadata) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r DatasetEventMetadata) RawJSON() string { return r.JSON.raw }
+func (r *DatasetEventMetadata) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r datasetEventMetadataJSON) RawJSON() string {
-	return r.raw
 }
 
 type EnvVar struct {
@@ -1130,32 +1053,30 @@ type EnvVar struct {
 	// The id of the object the environment variable is scoped for
 	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The type of the object the environment variable is scoped for
+	//
+	// Any of "organization", "project", "function".
 	ObjectType EnvVarObjectType `json:"object_type,required"`
 	// Date of environment variable creation
 	Created time.Time `json:"created,nullable" format:"date-time"`
 	// Date the environment variable was last used
-	Used time.Time  `json:"used,nullable" format:"date-time"`
-	JSON envVarJSON `json:"-"`
+	Used time.Time `json:"used,nullable" format:"date-time"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Name        respjson.Field
+		ObjectID    respjson.Field
+		ObjectType  respjson.Field
+		Created     respjson.Field
+		Used        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// envVarJSON contains the JSON metadata for the struct [EnvVar]
-type envVarJSON struct {
-	ID          apijson.Field
-	Name        apijson.Field
-	ObjectID    apijson.Field
-	ObjectType  apijson.Field
-	Created     apijson.Field
-	Used        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *EnvVar) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r EnvVar) RawJSON() string { return r.JSON.raw }
+func (r *EnvVar) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r envVarJSON) RawJSON() string {
-	return r.raw
 }
 
 // The type of the object the environment variable is scoped for
@@ -1166,14 +1087,6 @@ const (
 	EnvVarObjectTypeProject      EnvVarObjectType = "project"
 	EnvVarObjectTypeFunction     EnvVarObjectType = "function"
 )
-
-func (r EnvVarObjectType) IsKnown() bool {
-	switch r {
-	case EnvVarObjectTypeOrganization, EnvVarObjectTypeProject, EnvVarObjectTypeFunction:
-		return true
-	}
-	return false
-}
 
 type Experiment struct {
 	// Unique identifier for the experiment
@@ -1202,40 +1115,36 @@ type Experiment struct {
 	// Textual description of the experiment
 	Description string `json:"description,nullable"`
 	// User-controlled metadata about the experiment
-	Metadata map[string]interface{} `json:"metadata,nullable"`
+	Metadata map[string]any `json:"metadata,nullable"`
 	// Metadata about the state of the repo when the experiment was created
 	RepoInfo RepoInfo `json:"repo_info,nullable"`
 	// Identifies the user who created the experiment
-	UserID string         `json:"user_id,nullable" format:"uuid"`
-	JSON   experimentJSON `json:"-"`
+	UserID string `json:"user_id,nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID             respjson.Field
+		Name           respjson.Field
+		ProjectID      respjson.Field
+		Public         respjson.Field
+		BaseExpID      respjson.Field
+		Commit         respjson.Field
+		Created        respjson.Field
+		DatasetID      respjson.Field
+		DatasetVersion respjson.Field
+		DeletedAt      respjson.Field
+		Description    respjson.Field
+		Metadata       respjson.Field
+		RepoInfo       respjson.Field
+		UserID         respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
+	} `json:"-"`
 }
 
-// experimentJSON contains the JSON metadata for the struct [Experiment]
-type experimentJSON struct {
-	ID             apijson.Field
-	Name           apijson.Field
-	ProjectID      apijson.Field
-	Public         apijson.Field
-	BaseExpID      apijson.Field
-	Commit         apijson.Field
-	Created        apijson.Field
-	DatasetID      apijson.Field
-	DatasetVersion apijson.Field
-	DeletedAt      apijson.Field
-	Description    apijson.Field
-	Metadata       apijson.Field
-	RepoInfo       apijson.Field
-	UserID         apijson.Field
-	raw            string
-	ExtraFields    map[string]apijson.Field
-}
-
-func (r *Experiment) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r Experiment) RawJSON() string { return r.JSON.raw }
+func (r *Experiment) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r experimentJSON) RawJSON() string {
-	return r.raw
 }
 
 type ExperimentEvent struct {
@@ -1266,7 +1175,7 @@ type ExperimentEvent struct {
 	// experiment event
 	Context ExperimentEventContext `json:"context,nullable"`
 	// The error that occurred, if any.
-	Error interface{} `json:"error"`
+	Error any `json:"error"`
 	// The ground truth value (an arbitrary, JSON serializable object) that you'd
 	// compare to `output` to determine if your `output` value is correct or not.
 	// Braintrust currently does not compare `output` to `expected` for you, since
@@ -1274,13 +1183,13 @@ type ExperimentEvent struct {
 	// just used to help you navigate your experiments while digging into analyses.
 	// However, we may later use these values to re-score outputs or fine-tune your
 	// models
-	Expected interface{} `json:"expected"`
+	Expected any `json:"expected"`
 	// The arguments that uniquely define a test case (an arbitrary, JSON serializable
 	// object). Later on, Braintrust will use the `input` to know whether two test
 	// cases are the same between experiments, so they should not contain
 	// experiment-specific state. A simple rule of thumb is that if you run the same
 	// experiment twice, the `input` should be identical
-	Input interface{} `json:"input"`
+	Input any `json:"input"`
 	// Whether this span is a root span
 	IsRoot bool `json:"is_root,nullable"`
 	// A dictionary with additional data about the test example, model outputs, or just
@@ -1300,7 +1209,7 @@ type ExperimentEvent struct {
 	// or not. For example, in an app that generates SQL queries, the `output` should
 	// be the _result_ of the SQL query generated by the model, not the query itself,
 	// because there may be multiple valid queries that answer a single question
-	Output interface{} `json:"output"`
+	Output any `json:"output"`
 	// A dictionary of numeric values (between 0 and 1) to log. The scores should give
 	// you a variety of signals that help you determine how accurate the outputs are
 	// compared to what you expect and diagnose failures. For example, a summarization
@@ -1317,42 +1226,38 @@ type ExperimentEvent struct {
 	// element for subspans
 	SpanParents []string `json:"span_parents,nullable"`
 	// A list of tags to log
-	Tags []string            `json:"tags,nullable"`
-	JSON experimentEventJSON `json:"-"`
+	Tags []string `json:"tags,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID             respjson.Field
+		XactID         respjson.Field
+		Created        respjson.Field
+		ExperimentID   respjson.Field
+		ProjectID      respjson.Field
+		RootSpanID     respjson.Field
+		SpanID         respjson.Field
+		Context        respjson.Field
+		Error          respjson.Field
+		Expected       respjson.Field
+		Input          respjson.Field
+		IsRoot         respjson.Field
+		Metadata       respjson.Field
+		Metrics        respjson.Field
+		Origin         respjson.Field
+		Output         respjson.Field
+		Scores         respjson.Field
+		SpanAttributes respjson.Field
+		SpanParents    respjson.Field
+		Tags           respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
+	} `json:"-"`
 }
 
-// experimentEventJSON contains the JSON metadata for the struct [ExperimentEvent]
-type experimentEventJSON struct {
-	ID             apijson.Field
-	XactID         apijson.Field
-	Created        apijson.Field
-	ExperimentID   apijson.Field
-	ProjectID      apijson.Field
-	RootSpanID     apijson.Field
-	SpanID         apijson.Field
-	Context        apijson.Field
-	Error          apijson.Field
-	Expected       apijson.Field
-	Input          apijson.Field
-	IsRoot         apijson.Field
-	Metadata       apijson.Field
-	Metrics        apijson.Field
-	Origin         apijson.Field
-	Output         apijson.Field
-	Scores         apijson.Field
-	SpanAttributes apijson.Field
-	SpanParents    apijson.Field
-	Tags           apijson.Field
-	raw            string
-	ExtraFields    map[string]apijson.Field
-}
-
-func (r *ExperimentEvent) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ExperimentEvent) RawJSON() string { return r.JSON.raw }
+func (r *ExperimentEvent) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r experimentEventJSON) RawJSON() string {
-	return r.raw
 }
 
 // Context is additional information about the code that produced the experiment
@@ -1365,27 +1270,22 @@ type ExperimentEventContext struct {
 	// The function in code which created the experiment event
 	CallerFunctionname string `json:"caller_functionname,nullable"`
 	// Line of code where the experiment event was created
-	CallerLineno int64                      `json:"caller_lineno,nullable"`
-	ExtraFields  map[string]interface{}     `json:"-,extras"`
-	JSON         experimentEventContextJSON `json:"-"`
+	CallerLineno int64          `json:"caller_lineno,nullable"`
+	ExtraFields  map[string]any `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		CallerFilename     respjson.Field
+		CallerFunctionname respjson.Field
+		CallerLineno       respjson.Field
+		ExtraFields        map[string]respjson.Field
+		raw                string
+	} `json:"-"`
 }
 
-// experimentEventContextJSON contains the JSON metadata for the struct
-// [ExperimentEventContext]
-type experimentEventContextJSON struct {
-	CallerFilename     apijson.Field
-	CallerFunctionname apijson.Field
-	CallerLineno       apijson.Field
-	raw                string
-	ExtraFields        map[string]apijson.Field
-}
-
-func (r *ExperimentEventContext) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ExperimentEventContext) RawJSON() string { return r.JSON.raw }
+func (r *ExperimentEventContext) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r experimentEventContextJSON) RawJSON() string {
-	return r.raw
 }
 
 // A dictionary with additional data about the test example, model outputs, or just
@@ -1395,25 +1295,20 @@ func (r experimentEventContextJSON) RawJSON() string {
 // can be any JSON-serializable type, but its keys must be strings
 type ExperimentEventMetadata struct {
 	// The model used for this example
-	Model       string                      `json:"model,nullable"`
-	ExtraFields map[string]interface{}      `json:"-,extras"`
-	JSON        experimentEventMetadataJSON `json:"-"`
+	Model       string         `json:"model,nullable"`
+	ExtraFields map[string]any `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Model       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// experimentEventMetadataJSON contains the JSON metadata for the struct
-// [ExperimentEventMetadata]
-type experimentEventMetadataJSON struct {
-	Model       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ExperimentEventMetadata) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ExperimentEventMetadata) RawJSON() string { return r.JSON.raw }
+func (r *ExperimentEventMetadata) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r experimentEventMetadataJSON) RawJSON() string {
-	return r.raw
 }
 
 // Metrics are numerical measurements tracking the execution of the code that
@@ -1421,11 +1316,11 @@ func (r experimentEventMetadataJSON) RawJSON() string {
 // which the experiment event was produced
 type ExperimentEventMetrics struct {
 	// This metric is deprecated
-	CallerFilename interface{} `json:"caller_filename"`
+	CallerFilename any `json:"caller_filename"`
 	// This metric is deprecated
-	CallerFunctionname interface{} `json:"caller_functionname"`
+	CallerFunctionname any `json:"caller_functionname"`
 	// This metric is deprecated
-	CallerLineno interface{} `json:"caller_lineno"`
+	CallerLineno any `json:"caller_lineno"`
 	// The number of tokens in the completion generated by the model (only set if this
 	// is an LLM span)
 	CompletionTokens int64 `json:"completion_tokens,nullable"`
@@ -1439,53 +1334,56 @@ type ExperimentEventMetrics struct {
 	// experiment event started
 	Start float64 `json:"start,nullable"`
 	// The total number of tokens in the input and output of the experiment event.
-	Tokens      int64                      `json:"tokens,nullable"`
-	ExtraFields map[string]float64         `json:"-,extras"`
-	JSON        experimentEventMetricsJSON `json:"-"`
+	Tokens      int64              `json:"tokens,nullable"`
+	ExtraFields map[string]float64 `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		CallerFilename     respjson.Field
+		CallerFunctionname respjson.Field
+		CallerLineno       respjson.Field
+		CompletionTokens   respjson.Field
+		End                respjson.Field
+		PromptTokens       respjson.Field
+		Start              respjson.Field
+		Tokens             respjson.Field
+		ExtraFields        map[string]respjson.Field
+		raw                string
+	} `json:"-"`
 }
 
-// experimentEventMetricsJSON contains the JSON metadata for the struct
-// [ExperimentEventMetrics]
-type experimentEventMetricsJSON struct {
-	CallerFilename     apijson.Field
-	CallerFunctionname apijson.Field
-	CallerLineno       apijson.Field
-	CompletionTokens   apijson.Field
-	End                apijson.Field
-	PromptTokens       apijson.Field
-	Start              apijson.Field
-	Tokens             apijson.Field
-	raw                string
-	ExtraFields        map[string]apijson.Field
-}
-
-func (r *ExperimentEventMetrics) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ExperimentEventMetrics) RawJSON() string { return r.JSON.raw }
+func (r *ExperimentEventMetrics) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r experimentEventMetricsJSON) RawJSON() string {
-	return r.raw
-}
-
+// The property ID is required.
 type FeedbackDatasetItemParam struct {
 	// The id of the dataset event to log feedback for. This is the row `id` returned
 	// by `POST /v1/dataset/{dataset_id}/insert`
-	ID param.Field[string] `json:"id,required"`
+	ID string `json:"id,required"`
 	// An optional comment string to log about the dataset event
-	Comment param.Field[string] `json:"comment"`
+	Comment param.Opt[string] `json:"comment,omitzero"`
 	// A dictionary with additional data about the feedback. If you have a `user_id`,
 	// you can log it here and access it in the Braintrust UI. Note, this metadata does
 	// not correspond to the main event itself, but rather the audit log attached to
 	// the event.
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
+	Metadata map[string]any `json:"metadata,omitzero"`
 	// The source of the feedback. Must be one of "external" (default), "app", or "api"
-	Source param.Field[FeedbackDatasetItemSource] `json:"source"`
+	//
+	// Any of "app", "api", "external".
+	Source FeedbackDatasetItemSource `json:"source,omitzero"`
 	// A list of tags to log
-	Tags param.Field[[]string] `json:"tags"`
+	Tags []string `json:"tags,omitzero"`
+	paramObj
 }
 
 func (r FeedbackDatasetItemParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FeedbackDatasetItemParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *FeedbackDatasetItemParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // The source of the feedback. Must be one of "external" (default), "app", or "api"
@@ -1497,39 +1395,39 @@ const (
 	FeedbackDatasetItemSourceExternal FeedbackDatasetItemSource = "external"
 )
 
-func (r FeedbackDatasetItemSource) IsKnown() bool {
-	switch r {
-	case FeedbackDatasetItemSourceApp, FeedbackDatasetItemSourceAPI, FeedbackDatasetItemSourceExternal:
-		return true
-	}
-	return false
-}
-
+// The property ID is required.
 type FeedbackExperimentItemParam struct {
 	// The id of the experiment event to log feedback for. This is the row `id`
 	// returned by `POST /v1/experiment/{experiment_id}/insert`
-	ID param.Field[string] `json:"id,required"`
+	ID string `json:"id,required"`
 	// An optional comment string to log about the experiment event
-	Comment param.Field[string] `json:"comment"`
-	// The ground truth value (an arbitrary, JSON serializable object) that you'd
-	// compare to `output` to determine if your `output` value is correct or not
-	Expected param.Field[interface{}] `json:"expected"`
+	Comment param.Opt[string] `json:"comment,omitzero"`
 	// A dictionary with additional data about the feedback. If you have a `user_id`,
 	// you can log it here and access it in the Braintrust UI. Note, this metadata does
 	// not correspond to the main event itself, but rather the audit log attached to
 	// the event.
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
+	Metadata map[string]any `json:"metadata,omitzero"`
 	// A dictionary of numeric values (between 0 and 1) to log. These scores will be
 	// merged into the existing scores for the experiment event
-	Scores param.Field[map[string]float64] `json:"scores"`
+	Scores map[string]float64 `json:"scores,omitzero"`
 	// The source of the feedback. Must be one of "external" (default), "app", or "api"
-	Source param.Field[FeedbackExperimentItemSource] `json:"source"`
+	//
+	// Any of "app", "api", "external".
+	Source FeedbackExperimentItemSource `json:"source,omitzero"`
 	// A list of tags to log
-	Tags param.Field[[]string] `json:"tags"`
+	Tags []string `json:"tags,omitzero"`
+	// The ground truth value (an arbitrary, JSON serializable object) that you'd
+	// compare to `output` to determine if your `output` value is correct or not
+	Expected any `json:"expected,omitzero"`
+	paramObj
 }
 
 func (r FeedbackExperimentItemParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FeedbackExperimentItemParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *FeedbackExperimentItemParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // The source of the feedback. Must be one of "external" (default), "app", or "api"
@@ -1541,39 +1439,39 @@ const (
 	FeedbackExperimentItemSourceExternal FeedbackExperimentItemSource = "external"
 )
 
-func (r FeedbackExperimentItemSource) IsKnown() bool {
-	switch r {
-	case FeedbackExperimentItemSourceApp, FeedbackExperimentItemSourceAPI, FeedbackExperimentItemSourceExternal:
-		return true
-	}
-	return false
-}
-
+// The property ID is required.
 type FeedbackProjectLogsItemParam struct {
 	// The id of the project logs event to log feedback for. This is the row `id`
 	// returned by `POST /v1/project_logs/{project_id}/insert`
-	ID param.Field[string] `json:"id,required"`
+	ID string `json:"id,required"`
 	// An optional comment string to log about the project logs event
-	Comment param.Field[string] `json:"comment"`
-	// The ground truth value (an arbitrary, JSON serializable object) that you'd
-	// compare to `output` to determine if your `output` value is correct or not
-	Expected param.Field[interface{}] `json:"expected"`
+	Comment param.Opt[string] `json:"comment,omitzero"`
 	// A dictionary with additional data about the feedback. If you have a `user_id`,
 	// you can log it here and access it in the Braintrust UI. Note, this metadata does
 	// not correspond to the main event itself, but rather the audit log attached to
 	// the event.
-	Metadata param.Field[map[string]interface{}] `json:"metadata"`
+	Metadata map[string]any `json:"metadata,omitzero"`
 	// A dictionary of numeric values (between 0 and 1) to log. These scores will be
 	// merged into the existing scores for the project logs event
-	Scores param.Field[map[string]float64] `json:"scores"`
+	Scores map[string]float64 `json:"scores,omitzero"`
 	// The source of the feedback. Must be one of "external" (default), "app", or "api"
-	Source param.Field[FeedbackProjectLogsItemSource] `json:"source"`
+	//
+	// Any of "app", "api", "external".
+	Source FeedbackProjectLogsItemSource `json:"source,omitzero"`
 	// A list of tags to log
-	Tags param.Field[[]string] `json:"tags"`
+	Tags []string `json:"tags,omitzero"`
+	// The ground truth value (an arbitrary, JSON serializable object) that you'd
+	// compare to `output` to determine if your `output` value is correct or not
+	Expected any `json:"expected,omitzero"`
+	paramObj
 }
 
 func (r FeedbackProjectLogsItemParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow FeedbackProjectLogsItemParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *FeedbackProjectLogsItemParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // The source of the feedback. Must be one of "external" (default), "app", or "api"
@@ -1585,33 +1483,21 @@ const (
 	FeedbackProjectLogsItemSourceExternal FeedbackProjectLogsItemSource = "external"
 )
 
-func (r FeedbackProjectLogsItemSource) IsKnown() bool {
-	switch r {
-	case FeedbackProjectLogsItemSourceApp, FeedbackProjectLogsItemSourceAPI, FeedbackProjectLogsItemSourceExternal:
-		return true
-	}
-	return false
-}
-
 type FeedbackResponseSchema struct {
+	// Any of "success".
 	Status FeedbackResponseSchemaStatus `json:"status,required"`
-	JSON   feedbackResponseSchemaJSON   `json:"-"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Status      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// feedbackResponseSchemaJSON contains the JSON metadata for the struct
-// [FeedbackResponseSchema]
-type feedbackResponseSchemaJSON struct {
-	Status      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FeedbackResponseSchema) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r FeedbackResponseSchema) RawJSON() string { return r.JSON.raw }
+func (r *FeedbackResponseSchema) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r feedbackResponseSchemaJSON) RawJSON() string {
-	return r.raw
 }
 
 type FeedbackResponseSchemaStatus string
@@ -1620,14 +1506,6 @@ const (
 	FeedbackResponseSchemaStatusSuccess FeedbackResponseSchemaStatus = "success"
 )
 
-func (r FeedbackResponseSchemaStatus) IsKnown() bool {
-	switch r {
-	case FeedbackResponseSchemaStatusSuccess:
-		return true
-	}
-	return false
-}
-
 type FetchDatasetEventsResponse struct {
 	// A list of fetched events
 	Events []DatasetEvent `json:"events,required"`
@@ -1635,25 +1513,20 @@ type FetchDatasetEventsResponse struct {
 	//
 	// Pass this string directly as the `cursor` param to your next fetch request to
 	// get the next page of results. Not provided if the returned result set is empty.
-	Cursor string                         `json:"cursor,nullable"`
-	JSON   fetchDatasetEventsResponseJSON `json:"-"`
+	Cursor string `json:"cursor,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Events      respjson.Field
+		Cursor      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// fetchDatasetEventsResponseJSON contains the JSON metadata for the struct
-// [FetchDatasetEventsResponse]
-type fetchDatasetEventsResponseJSON struct {
-	Events      apijson.Field
-	Cursor      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FetchDatasetEventsResponse) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r FetchDatasetEventsResponse) RawJSON() string { return r.JSON.raw }
+func (r *FetchDatasetEventsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r fetchDatasetEventsResponseJSON) RawJSON() string {
-	return r.raw
 }
 
 type FetchExperimentEventsResponse struct {
@@ -1663,25 +1536,20 @@ type FetchExperimentEventsResponse struct {
 	//
 	// Pass this string directly as the `cursor` param to your next fetch request to
 	// get the next page of results. Not provided if the returned result set is empty.
-	Cursor string                            `json:"cursor,nullable"`
-	JSON   fetchExperimentEventsResponseJSON `json:"-"`
+	Cursor string `json:"cursor,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Events      respjson.Field
+		Cursor      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// fetchExperimentEventsResponseJSON contains the JSON metadata for the struct
-// [FetchExperimentEventsResponse]
-type fetchExperimentEventsResponseJSON struct {
-	Events      apijson.Field
-	Cursor      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FetchExperimentEventsResponse) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r FetchExperimentEventsResponse) RawJSON() string { return r.JSON.raw }
+func (r *FetchExperimentEventsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r fetchExperimentEventsResponseJSON) RawJSON() string {
-	return r.raw
 }
 
 type FetchProjectLogsEventsResponse struct {
@@ -1691,25 +1559,20 @@ type FetchProjectLogsEventsResponse struct {
 	//
 	// Pass this string directly as the `cursor` param to your next fetch request to
 	// get the next page of results. Not provided if the returned result set is empty.
-	Cursor string                             `json:"cursor,nullable"`
-	JSON   fetchProjectLogsEventsResponseJSON `json:"-"`
+	Cursor string `json:"cursor,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Events      respjson.Field
+		Cursor      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// fetchProjectLogsEventsResponseJSON contains the JSON metadata for the struct
-// [FetchProjectLogsEventsResponse]
-type fetchProjectLogsEventsResponseJSON struct {
-	Events      apijson.Field
-	Cursor      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FetchProjectLogsEventsResponse) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r FetchProjectLogsEventsResponse) RawJSON() string { return r.JSON.raw }
+func (r *FetchProjectLogsEventsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r fetchProjectLogsEventsResponseJSON) RawJSON() string {
-	return r.raw
 }
 
 type Function struct {
@@ -1719,9 +1582,11 @@ type Function struct {
 	// the event insertion. Transaction ids are monotonically increasing over time and
 	// can be used to retrieve a versioned snapshot of the prompt (see the `version`
 	// parameter)
-	XactID       string               `json:"_xact_id,required"`
-	FunctionData FunctionFunctionData `json:"function_data,required"`
+	XactID       string                    `json:"_xact_id,required"`
+	FunctionData FunctionFunctionDataUnion `json:"function_data,required"`
 	// A literal 'p' which identifies the object as a project prompt
+	//
+	// Any of "p".
 	LogID FunctionLogID `json:"log_id,required"`
 	// Name of the prompt
 	Name string `json:"name,required"`
@@ -1737,446 +1602,262 @@ type Function struct {
 	Description string `json:"description,nullable"`
 	// JSON schema for the function's parameters and return type
 	FunctionSchema FunctionFunctionSchema `json:"function_schema,nullable"`
-	FunctionType   FunctionFunctionType   `json:"function_type,nullable"`
+	// Any of "llm", "scorer", "task", "tool".
+	FunctionType FunctionFunctionType `json:"function_type,nullable"`
 	// User-controlled metadata about the prompt
-	Metadata map[string]interface{} `json:"metadata,nullable"`
-	Origin   FunctionOrigin         `json:"origin,nullable"`
+	Metadata map[string]any `json:"metadata,nullable"`
+	Origin   FunctionOrigin `json:"origin,nullable"`
 	// The prompt, model, and its parameters
 	PromptData PromptData `json:"prompt_data,nullable"`
 	// A list of tags for the prompt
-	Tags []string     `json:"tags,nullable"`
-	JSON functionJSON `json:"-"`
+	Tags []string `json:"tags,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID             respjson.Field
+		XactID         respjson.Field
+		FunctionData   respjson.Field
+		LogID          respjson.Field
+		Name           respjson.Field
+		OrgID          respjson.Field
+		ProjectID      respjson.Field
+		Slug           respjson.Field
+		Created        respjson.Field
+		Description    respjson.Field
+		FunctionSchema respjson.Field
+		FunctionType   respjson.Field
+		Metadata       respjson.Field
+		Origin         respjson.Field
+		PromptData     respjson.Field
+		Tags           respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
+	} `json:"-"`
 }
 
-// functionJSON contains the JSON metadata for the struct [Function]
-type functionJSON struct {
-	ID             apijson.Field
-	XactID         apijson.Field
-	FunctionData   apijson.Field
-	LogID          apijson.Field
-	Name           apijson.Field
-	OrgID          apijson.Field
-	ProjectID      apijson.Field
-	Slug           apijson.Field
-	Created        apijson.Field
-	Description    apijson.Field
-	FunctionSchema apijson.Field
-	FunctionType   apijson.Field
-	Metadata       apijson.Field
-	Origin         apijson.Field
-	PromptData     apijson.Field
-	Tags           apijson.Field
-	raw            string
-	ExtraFields    map[string]apijson.Field
-}
-
-func (r *Function) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r Function) RawJSON() string { return r.JSON.raw }
+func (r *Function) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r functionJSON) RawJSON() string {
-	return r.raw
-}
-
-type FunctionFunctionData struct {
-	Type FunctionFunctionDataType `json:"type,required"`
-	// This field can have the runtime type of [FunctionFunctionDataCodeData].
-	Data  interface{}              `json:"data"`
-	Name  string                   `json:"name"`
-	JSON  functionFunctionDataJSON `json:"-"`
-	union FunctionFunctionDataUnion
-}
-
-// functionFunctionDataJSON contains the JSON metadata for the struct
-// [FunctionFunctionData]
-type functionFunctionDataJSON struct {
-	Type        apijson.Field
-	Data        apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r functionFunctionDataJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *FunctionFunctionData) UnmarshalJSON(data []byte) (err error) {
-	*r = FunctionFunctionData{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [FunctionFunctionDataUnion] interface which you can cast to
-// the specific types for more type safety.
+// FunctionFunctionDataUnion contains all possible properties and values from
+// [FunctionFunctionDataPrompt], [FunctionFunctionDataCode],
+// [FunctionFunctionDataGlobal].
 //
-// Possible runtime types of the union are [shared.FunctionFunctionDataPrompt],
-// [shared.FunctionFunctionDataCode], [shared.FunctionFunctionDataGlobal].
-func (r FunctionFunctionData) AsUnion() FunctionFunctionDataUnion {
-	return r.union
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type FunctionFunctionDataUnion struct {
+	Type string `json:"type"`
+	// This field is from variant [FunctionFunctionDataCode].
+	Data FunctionFunctionDataCodeDataUnion `json:"data"`
+	// This field is from variant [FunctionFunctionDataGlobal].
+	Name string `json:"name"`
+	JSON struct {
+		Type respjson.Field
+		Data respjson.Field
+		Name respjson.Field
+		raw  string
+	} `json:"-"`
 }
 
-// Union satisfied by [shared.FunctionFunctionDataPrompt],
-// [shared.FunctionFunctionDataCode] or [shared.FunctionFunctionDataGlobal].
-type FunctionFunctionDataUnion interface {
-	implementsFunctionFunctionData()
+func (u FunctionFunctionDataUnion) AsPrompt() (v FunctionFunctionDataPrompt) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
 }
 
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*FunctionFunctionDataUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(FunctionFunctionDataPrompt{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(FunctionFunctionDataCode{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(FunctionFunctionDataGlobal{}),
-		},
-	)
+func (u FunctionFunctionDataUnion) AsCode() (v FunctionFunctionDataCode) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u FunctionFunctionDataUnion) AsGlobal() (v FunctionFunctionDataGlobal) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u FunctionFunctionDataUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *FunctionFunctionDataUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type FunctionFunctionDataPrompt struct {
-	Type FunctionFunctionDataPromptType `json:"type,required"`
-	JSON functionFunctionDataPromptJSON `json:"-"`
+	// Any of "prompt".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// functionFunctionDataPromptJSON contains the JSON metadata for the struct
-// [FunctionFunctionDataPrompt]
-type functionFunctionDataPromptJSON struct {
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataPrompt) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r FunctionFunctionDataPrompt) RawJSON() string { return r.JSON.raw }
+func (r *FunctionFunctionDataPrompt) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r functionFunctionDataPromptJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r FunctionFunctionDataPrompt) implementsFunctionFunctionData() {}
-
-type FunctionFunctionDataPromptType string
-
-const (
-	FunctionFunctionDataPromptTypePrompt FunctionFunctionDataPromptType = "prompt"
-)
-
-func (r FunctionFunctionDataPromptType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataPromptTypePrompt:
-		return true
-	}
-	return false
 }
 
 type FunctionFunctionDataCode struct {
-	Data FunctionFunctionDataCodeData `json:"data,required"`
-	Type FunctionFunctionDataCodeType `json:"type,required"`
-	JSON functionFunctionDataCodeJSON `json:"-"`
+	Data FunctionFunctionDataCodeDataUnion `json:"data,required"`
+	// Any of "code".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// functionFunctionDataCodeJSON contains the JSON metadata for the struct
-// [FunctionFunctionDataCode]
-type functionFunctionDataCodeJSON struct {
-	Data        apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataCode) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r FunctionFunctionDataCode) RawJSON() string { return r.JSON.raw }
+func (r *FunctionFunctionDataCode) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r functionFunctionDataCodeJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r FunctionFunctionDataCode) implementsFunctionFunctionData() {}
-
-type FunctionFunctionDataCodeData struct {
-	BundleID string `json:"bundle_id"`
-	Code     string `json:"code"`
-	// This field can have the runtime type of [CodeBundleLocation].
-	Location interface{} `json:"location"`
-	// A preview of the code
-	Preview string `json:"preview,nullable"`
-	// This field can have the runtime type of [CodeBundleRuntimeContext],
-	// [FunctionFunctionDataCodeDataInlineRuntimeContext].
-	RuntimeContext interface{}                      `json:"runtime_context"`
-	Type           FunctionFunctionDataCodeDataType `json:"type"`
-	JSON           functionFunctionDataCodeDataJSON `json:"-"`
-	union          FunctionFunctionDataCodeDataUnion
-}
-
-// functionFunctionDataCodeDataJSON contains the JSON metadata for the struct
-// [FunctionFunctionDataCodeData]
-type functionFunctionDataCodeDataJSON struct {
-	BundleID       apijson.Field
-	Code           apijson.Field
-	Location       apijson.Field
-	Preview        apijson.Field
-	RuntimeContext apijson.Field
-	Type           apijson.Field
-	raw            string
-	ExtraFields    map[string]apijson.Field
-}
-
-func (r functionFunctionDataCodeDataJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *FunctionFunctionDataCodeData) UnmarshalJSON(data []byte) (err error) {
-	*r = FunctionFunctionDataCodeData{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [FunctionFunctionDataCodeDataUnion] interface which you can
-// cast to the specific types for more type safety.
+// FunctionFunctionDataCodeDataUnion contains all possible properties and values
+// from [FunctionFunctionDataCodeDataBundle], [FunctionFunctionDataCodeDataInline].
 //
-// Possible runtime types of the union are
-// [shared.FunctionFunctionDataCodeDataBundle],
-// [shared.FunctionFunctionDataCodeDataInline].
-func (r FunctionFunctionDataCodeData) AsUnion() FunctionFunctionDataCodeDataUnion {
-	return r.union
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type FunctionFunctionDataCodeDataUnion struct {
+	// This field is from variant [FunctionFunctionDataCodeDataBundle].
+	BundleID string `json:"bundle_id"`
+	// This field is from variant [FunctionFunctionDataCodeDataBundle].
+	Location CodeBundleLocationUnion `json:"location"`
+	// This field is a union of [CodeBundleRuntimeContext],
+	// [FunctionFunctionDataCodeDataInlineRuntimeContext]
+	RuntimeContext FunctionFunctionDataCodeDataUnionRuntimeContext `json:"runtime_context"`
+	// This field is from variant [FunctionFunctionDataCodeDataBundle].
+	Preview string `json:"preview"`
+	Type    string `json:"type"`
+	// This field is from variant [FunctionFunctionDataCodeDataInline].
+	Code string `json:"code"`
+	JSON struct {
+		BundleID       respjson.Field
+		Location       respjson.Field
+		RuntimeContext respjson.Field
+		Preview        respjson.Field
+		Type           respjson.Field
+		Code           respjson.Field
+		raw            string
+	} `json:"-"`
 }
 
-// Union satisfied by [shared.FunctionFunctionDataCodeDataBundle] or
-// [shared.FunctionFunctionDataCodeDataInline].
-type FunctionFunctionDataCodeDataUnion interface {
-	implementsFunctionFunctionDataCodeData()
+func (u FunctionFunctionDataCodeDataUnion) AsBundle() (v FunctionFunctionDataCodeDataBundle) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
 }
 
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*FunctionFunctionDataCodeDataUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(FunctionFunctionDataCodeDataBundle{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(FunctionFunctionDataCodeDataInline{}),
-		},
-	)
+func (u FunctionFunctionDataCodeDataUnion) AsInline() (v FunctionFunctionDataCodeDataInline) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u FunctionFunctionDataCodeDataUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *FunctionFunctionDataCodeDataUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// FunctionFunctionDataCodeDataUnionRuntimeContext is an implicit subunion of
+// [FunctionFunctionDataCodeDataUnion].
+// FunctionFunctionDataCodeDataUnionRuntimeContext provides convenient access to
+// the sub-properties of the union.
+//
+// For type safety it is recommended to directly use a variant of the
+// [FunctionFunctionDataCodeDataUnion].
+type FunctionFunctionDataCodeDataUnionRuntimeContext struct {
+	Runtime string `json:"runtime"`
+	Version string `json:"version"`
+	JSON    struct {
+		Runtime respjson.Field
+		Version respjson.Field
+		raw     string
+	} `json:"-"`
+}
+
+func (r *FunctionFunctionDataCodeDataUnionRuntimeContext) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type FunctionFunctionDataCodeDataBundle struct {
-	Type FunctionFunctionDataCodeDataBundleType `json:"type,required"`
-	JSON functionFunctionDataCodeDataBundleJSON `json:"-"`
+	// Any of "bundle".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 	CodeBundle
 }
 
-// functionFunctionDataCodeDataBundleJSON contains the JSON metadata for the struct
-// [FunctionFunctionDataCodeDataBundle]
-type functionFunctionDataCodeDataBundleJSON struct {
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataCodeDataBundle) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r FunctionFunctionDataCodeDataBundle) RawJSON() string { return r.JSON.raw }
+func (r *FunctionFunctionDataCodeDataBundle) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r functionFunctionDataCodeDataBundleJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r FunctionFunctionDataCodeDataBundle) implementsFunctionFunctionDataCodeData() {}
-
-type FunctionFunctionDataCodeDataBundleType string
-
-const (
-	FunctionFunctionDataCodeDataBundleTypeBundle FunctionFunctionDataCodeDataBundleType = "bundle"
-)
-
-func (r FunctionFunctionDataCodeDataBundleType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeDataBundleTypeBundle:
-		return true
-	}
-	return false
 }
 
 type FunctionFunctionDataCodeDataInline struct {
 	Code           string                                           `json:"code,required"`
 	RuntimeContext FunctionFunctionDataCodeDataInlineRuntimeContext `json:"runtime_context,required"`
-	Type           FunctionFunctionDataCodeDataInlineType           `json:"type,required"`
-	JSON           functionFunctionDataCodeDataInlineJSON           `json:"-"`
+	// Any of "inline".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Code           respjson.Field
+		RuntimeContext respjson.Field
+		Type           respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
+	} `json:"-"`
 }
 
-// functionFunctionDataCodeDataInlineJSON contains the JSON metadata for the struct
-// [FunctionFunctionDataCodeDataInline]
-type functionFunctionDataCodeDataInlineJSON struct {
-	Code           apijson.Field
-	RuntimeContext apijson.Field
-	Type           apijson.Field
-	raw            string
-	ExtraFields    map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataCodeDataInline) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r FunctionFunctionDataCodeDataInline) RawJSON() string { return r.JSON.raw }
+func (r *FunctionFunctionDataCodeDataInline) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-func (r functionFunctionDataCodeDataInlineJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r FunctionFunctionDataCodeDataInline) implementsFunctionFunctionDataCodeData() {}
 
 type FunctionFunctionDataCodeDataInlineRuntimeContext struct {
-	Runtime FunctionFunctionDataCodeDataInlineRuntimeContextRuntime `json:"runtime,required"`
-	Version string                                                  `json:"version,required"`
-	JSON    functionFunctionDataCodeDataInlineRuntimeContextJSON    `json:"-"`
+	// Any of "node", "python".
+	Runtime string `json:"runtime,required"`
+	Version string `json:"version,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Runtime     respjson.Field
+		Version     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// functionFunctionDataCodeDataInlineRuntimeContextJSON contains the JSON metadata
-// for the struct [FunctionFunctionDataCodeDataInlineRuntimeContext]
-type functionFunctionDataCodeDataInlineRuntimeContextJSON struct {
-	Runtime     apijson.Field
-	Version     apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataCodeDataInlineRuntimeContext) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r FunctionFunctionDataCodeDataInlineRuntimeContext) RawJSON() string { return r.JSON.raw }
+func (r *FunctionFunctionDataCodeDataInlineRuntimeContext) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r functionFunctionDataCodeDataInlineRuntimeContextJSON) RawJSON() string {
-	return r.raw
-}
-
-type FunctionFunctionDataCodeDataInlineRuntimeContextRuntime string
-
-const (
-	FunctionFunctionDataCodeDataInlineRuntimeContextRuntimeNode   FunctionFunctionDataCodeDataInlineRuntimeContextRuntime = "node"
-	FunctionFunctionDataCodeDataInlineRuntimeContextRuntimePython FunctionFunctionDataCodeDataInlineRuntimeContextRuntime = "python"
-)
-
-func (r FunctionFunctionDataCodeDataInlineRuntimeContextRuntime) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeDataInlineRuntimeContextRuntimeNode, FunctionFunctionDataCodeDataInlineRuntimeContextRuntimePython:
-		return true
-	}
-	return false
-}
-
-type FunctionFunctionDataCodeDataInlineType string
-
-const (
-	FunctionFunctionDataCodeDataInlineTypeInline FunctionFunctionDataCodeDataInlineType = "inline"
-)
-
-func (r FunctionFunctionDataCodeDataInlineType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeDataInlineTypeInline:
-		return true
-	}
-	return false
-}
-
-type FunctionFunctionDataCodeDataType string
-
-const (
-	FunctionFunctionDataCodeDataTypeBundle FunctionFunctionDataCodeDataType = "bundle"
-	FunctionFunctionDataCodeDataTypeInline FunctionFunctionDataCodeDataType = "inline"
-)
-
-func (r FunctionFunctionDataCodeDataType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeDataTypeBundle, FunctionFunctionDataCodeDataTypeInline:
-		return true
-	}
-	return false
-}
-
-type FunctionFunctionDataCodeType string
-
-const (
-	FunctionFunctionDataCodeTypeCode FunctionFunctionDataCodeType = "code"
-)
-
-func (r FunctionFunctionDataCodeType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataCodeTypeCode:
-		return true
-	}
-	return false
 }
 
 type FunctionFunctionDataGlobal struct {
-	Name string                         `json:"name,required"`
-	Type FunctionFunctionDataGlobalType `json:"type,required"`
-	JSON functionFunctionDataGlobalJSON `json:"-"`
+	Name string `json:"name,required"`
+	// Any of "global".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Name        respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// functionFunctionDataGlobalJSON contains the JSON metadata for the struct
-// [FunctionFunctionDataGlobal]
-type functionFunctionDataGlobalJSON struct {
-	Name        apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FunctionFunctionDataGlobal) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r FunctionFunctionDataGlobal) RawJSON() string { return r.JSON.raw }
+func (r *FunctionFunctionDataGlobal) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r functionFunctionDataGlobalJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r FunctionFunctionDataGlobal) implementsFunctionFunctionData() {}
-
-type FunctionFunctionDataGlobalType string
-
-const (
-	FunctionFunctionDataGlobalTypeGlobal FunctionFunctionDataGlobalType = "global"
-)
-
-func (r FunctionFunctionDataGlobalType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataGlobalTypeGlobal:
-		return true
-	}
-	return false
-}
-
-type FunctionFunctionDataType string
-
-const (
-	FunctionFunctionDataTypePrompt FunctionFunctionDataType = "prompt"
-	FunctionFunctionDataTypeCode   FunctionFunctionDataType = "code"
-	FunctionFunctionDataTypeGlobal FunctionFunctionDataType = "global"
-)
-
-func (r FunctionFunctionDataType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionDataTypePrompt, FunctionFunctionDataTypeCode, FunctionFunctionDataTypeGlobal:
-		return true
-	}
-	return false
 }
 
 // A literal 'p' which identifies the object as a project prompt
@@ -2186,36 +1867,23 @@ const (
 	FunctionLogIDP FunctionLogID = "p"
 )
 
-func (r FunctionLogID) IsKnown() bool {
-	switch r {
-	case FunctionLogIDP:
-		return true
-	}
-	return false
-}
-
 // JSON schema for the function's parameters and return type
 type FunctionFunctionSchema struct {
-	Parameters interface{}                `json:"parameters"`
-	Returns    interface{}                `json:"returns"`
-	JSON       functionFunctionSchemaJSON `json:"-"`
+	Parameters any `json:"parameters"`
+	Returns    any `json:"returns"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Parameters  respjson.Field
+		Returns     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// functionFunctionSchemaJSON contains the JSON metadata for the struct
-// [FunctionFunctionSchema]
-type functionFunctionSchemaJSON struct {
-	Parameters  apijson.Field
-	Returns     apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FunctionFunctionSchema) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r FunctionFunctionSchema) RawJSON() string { return r.JSON.raw }
+func (r *FunctionFunctionSchema) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r functionFunctionSchemaJSON) RawJSON() string {
-	return r.raw
 }
 
 type FunctionFunctionType string
@@ -2227,40 +1895,31 @@ const (
 	FunctionFunctionTypeTool   FunctionFunctionType = "tool"
 )
 
-func (r FunctionFunctionType) IsKnown() bool {
-	switch r {
-	case FunctionFunctionTypeLlm, FunctionFunctionTypeScorer, FunctionFunctionTypeTask, FunctionFunctionTypeTool:
-		return true
-	}
-	return false
-}
-
 type FunctionOrigin struct {
 	// Id of the object the function is originating from
 	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
 	ObjectType ACLObjectType `json:"object_type,required"`
 	// The function exists for internal purposes and should not be displayed in the
 	// list of functions.
-	Internal bool               `json:"internal,nullable"`
-	JSON     functionOriginJSON `json:"-"`
+	Internal bool `json:"internal,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ObjectID    respjson.Field
+		ObjectType  respjson.Field
+		Internal    respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// functionOriginJSON contains the JSON metadata for the struct [FunctionOrigin]
-type functionOriginJSON struct {
-	ObjectID    apijson.Field
-	ObjectType  apijson.Field
-	Internal    apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *FunctionOrigin) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r FunctionOrigin) RawJSON() string { return r.JSON.raw }
+func (r *FunctionOrigin) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r functionOriginJSON) RawJSON() string {
-	return r.raw
 }
 
 // A group is a collection of users which can be assigned an ACL
@@ -2290,38 +1949,34 @@ type Group struct {
 	// Ids of users which belong to this group
 	MemberUsers []string `json:"member_users,nullable" format:"uuid"`
 	// Identifies the user who created the group
-	UserID string    `json:"user_id,nullable" format:"uuid"`
-	JSON   groupJSON `json:"-"`
+	UserID string `json:"user_id,nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID           respjson.Field
+		Name         respjson.Field
+		OrgID        respjson.Field
+		Created      respjson.Field
+		DeletedAt    respjson.Field
+		Description  respjson.Field
+		MemberGroups respjson.Field
+		MemberUsers  respjson.Field
+		UserID       respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
 }
 
-// groupJSON contains the JSON metadata for the struct [Group]
-type groupJSON struct {
-	ID           apijson.Field
-	Name         apijson.Field
-	OrgID        apijson.Field
-	Created      apijson.Field
-	DeletedAt    apijson.Field
-	Description  apijson.Field
-	MemberGroups apijson.Field
-	MemberUsers  apijson.Field
-	UserID       apijson.Field
-	raw          string
-	ExtraFields  map[string]apijson.Field
-}
-
-func (r *Group) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r Group) RawJSON() string { return r.JSON.raw }
+func (r *Group) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r groupJSON) RawJSON() string {
-	return r.raw
 }
 
 // A dataset event
 type InsertDatasetEventParam struct {
 	// A unique identifier for the dataset event. If you don't provide one, BrainTrust
 	// will generate one for you
-	ID param.Field[string] `json:"id"`
+	ID param.Opt[string] `json:"id,omitzero"`
 	// The `_is_merge` field controls how the row is merged with any existing row with
 	// the same id in the DB. By default (or when set to `false`), the existing row is
 	// completely replaced by the new row. When set to `true`, the new row is
@@ -2334,24 +1989,10 @@ type InsertDatasetEventParam struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[bool] `json:"_is_merge"`
-	// The `_merge_paths` field allows controlling the depth of the merge, when
-	// `_is_merge=true`. `_merge_paths` is a list of paths, where each path is a list
-	// of field names. The deep merge will not descend below any of the specified merge
-	// paths.
-	//
-	// For example, say there is an existing row in the DB
-	// `{"id": "foo", "input": {"a": {"b": 10}, "c": {"d": 20}}, "output": {"a": 20}}`.
-	// If we merge a new row as
-	// `{"_is_merge": true, "_merge_paths": [["input", "a"], ["output"]], "input": {"a": {"q": 30}, "c": {"e": 30}, "bar": "baz"}, "output": {"d": 40}}`,
-	// the new row will be
-	// `{"id": "foo": "input": {"a": {"q": 30}, "c": {"d": 20, "e": 30}, "bar": "baz"}, "output": {"d": 40}}`.
-	// In this case, due to the merge paths, we have replaced `input.a` and `output`,
-	// but have still deep-merged `input` and `input.c`.
-	MergePaths param.Field[[][]string] `json:"_merge_paths"`
+	IsMerge param.Opt[bool] `json:"_is_merge,omitzero"`
 	// Pass `_object_delete=true` to mark the dataset event deleted. Deleted events
 	// will not show up in subsequent fetches for this dataset
-	ObjectDelete param.Field[bool] `json:"_object_delete"`
+	ObjectDelete param.Opt[bool] `json:"_object_delete,omitzero"`
 	// DEPRECATED: The `_parent_id` field is deprecated and should not be used. Support
 	// for `_parent_id` will be dropped in a future version of Braintrust. Log
 	// `span_id`, `root_span_id`, and `span_parents` explicitly instead.
@@ -2369,23 +2010,63 @@ type InsertDatasetEventParam struct {
 	// clicking on the "abc" row.
 	//
 	// If the row is being merged into an existing row, this field will be ignored.
-	ParentID param.Field[string] `json:"_parent_id"`
+	ParentID param.Opt[string] `json:"_parent_id,omitzero"`
 	// The timestamp the dataset event was created
-	Created param.Field[time.Time] `json:"created" format:"date-time"`
-	// The output of your application, including post-processing (an arbitrary, JSON
-	// serializable object)
-	Expected param.Field[interface{}] `json:"expected"`
-	// The argument that uniquely define an input case (an arbitrary, JSON serializable
-	// object)
-	Input param.Field[interface{}] `json:"input"`
+	Created param.Opt[time.Time] `json:"created,omitzero" format:"date-time"`
+	// Use `span_id`, `root_span_id`, and `span_parents` instead of `_parent_id`, which
+	// is now deprecated. The span_id is a unique identifier describing the row's place
+	// in the a trace, and the root_span_id is a unique identifier for the whole trace.
+	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
+	// details.
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
+	RootSpanID param.Opt[string] `json:"root_span_id,omitzero"`
+	// Use `span_id`, `root_span_id`, and `span_parents` instead of `_parent_id`, which
+	// is now deprecated. The span_id is a unique identifier describing the row's place
+	// in the a trace, and the root_span_id is a unique identifier for the whole trace.
+	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
+	// details.
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
+	SpanID param.Opt[string] `json:"span_id,omitzero"`
+	// The `_merge_paths` field allows controlling the depth of the merge, when
+	// `_is_merge=true`. `_merge_paths` is a list of paths, where each path is a list
+	// of field names. The deep merge will not descend below any of the specified merge
+	// paths.
+	//
+	// For example, say there is an existing row in the DB
+	// `{"id": "foo", "input": {"a": {"b": 10}, "c": {"d": 20}}, "output": {"a": 20}}`.
+	// If we merge a new row as
+	// `{"_is_merge": true, "_merge_paths": [["input", "a"], ["output"]], "input": {"a": {"q": 30}, "c": {"e": 30}, "bar": "baz"}, "output": {"d": 40}}`,
+	// the new row will be
+	// `{"id": "foo": "input": {"a": {"q": 30}, "c": {"d": 20, "e": 30}, "bar": "baz"}, "output": {"d": 40}}`.
+	// In this case, due to the merge paths, we have replaced `input.a` and `output`,
+	// but have still deep-merged `input` and `input.c`.
+	MergePaths [][]string `json:"_merge_paths,omitzero"`
 	// A dictionary with additional data about the test example, model outputs, or just
 	// about anything else that's relevant, that you can use to help find and analyze
 	// examples later. For example, you could log the `prompt`, example's `id`, or
 	// anything else that would be useful to slice/dice later. The values in `metadata`
 	// can be any JSON-serializable type, but its keys must be strings
-	Metadata param.Field[InsertDatasetEventMetadataParam] `json:"metadata"`
+	Metadata InsertDatasetEventMetadataParam `json:"metadata,omitzero"`
 	// Indicates the event was copied from another object.
-	Origin param.Field[ObjectReferenceParam] `json:"origin"`
+	Origin ObjectReferenceParam `json:"origin,omitzero"`
 	// Use `span_id`, `root_span_id`, and `span_parents` instead of `_parent_id`, which
 	// is now deprecated. The span_id is a unique identifier describing the row's place
 	// in the a trace, and the root_span_id is a unique identifier for the whole trace.
@@ -2401,45 +2082,24 @@ type InsertDatasetEventParam struct {
 	// clicking on the "abc" row.
 	//
 	// If the row is being merged into an existing row, this field will be ignored.
-	RootSpanID param.Field[string] `json:"root_span_id"`
-	// Use `span_id`, `root_span_id`, and `span_parents` instead of `_parent_id`, which
-	// is now deprecated. The span_id is a unique identifier describing the row's place
-	// in the a trace, and the root_span_id is a unique identifier for the whole trace.
-	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
-	// details.
-	//
-	// For example, say we have logged a row
-	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
-	// We can create a sub-span of the parent row by logging
-	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
-	// In the webapp, only the root span row `"abc"` will show up in the summary view.
-	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
-	// clicking on the "abc" row.
-	//
-	// If the row is being merged into an existing row, this field will be ignored.
-	SpanID param.Field[string] `json:"span_id"`
-	// Use `span_id`, `root_span_id`, and `span_parents` instead of `_parent_id`, which
-	// is now deprecated. The span_id is a unique identifier describing the row's place
-	// in the a trace, and the root_span_id is a unique identifier for the whole trace.
-	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
-	// details.
-	//
-	// For example, say we have logged a row
-	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
-	// We can create a sub-span of the parent row by logging
-	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
-	// In the webapp, only the root span row `"abc"` will show up in the summary view.
-	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
-	// clicking on the "abc" row.
-	//
-	// If the row is being merged into an existing row, this field will be ignored.
-	SpanParents param.Field[[]string] `json:"span_parents"`
+	SpanParents []string `json:"span_parents,omitzero"`
 	// A list of tags to log
-	Tags param.Field[[]string] `json:"tags"`
+	Tags []string `json:"tags,omitzero"`
+	// The output of your application, including post-processing (an arbitrary, JSON
+	// serializable object)
+	Expected any `json:"expected,omitzero"`
+	// The argument that uniquely define an input case (an arbitrary, JSON serializable
+	// object)
+	Input any `json:"input,omitzero"`
+	paramObj
 }
 
 func (r InsertDatasetEventParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow InsertDatasetEventParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *InsertDatasetEventParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // A dictionary with additional data about the test example, model outputs, or just
@@ -2449,42 +2109,42 @@ func (r InsertDatasetEventParam) MarshalJSON() (data []byte, err error) {
 // can be any JSON-serializable type, but its keys must be strings
 type InsertDatasetEventMetadataParam struct {
 	// The model used for this example
-	Model       param.Field[string]    `json:"model"`
-	ExtraFields map[string]interface{} `json:"-,extras"`
+	Model       param.Opt[string] `json:"model,omitzero"`
+	ExtraFields map[string]any    `json:"-"`
+	paramObj
 }
 
 func (r InsertDatasetEventMetadataParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow InsertDatasetEventMetadataParam
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *InsertDatasetEventMetadataParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type InsertEventsResponse struct {
 	// The ids of all rows that were inserted, aligning one-to-one with the rows
 	// provided as input
-	RowIDs []string                 `json:"row_ids,required"`
-	JSON   insertEventsResponseJSON `json:"-"`
+	RowIDs []string `json:"row_ids,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		RowIDs      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// insertEventsResponseJSON contains the JSON metadata for the struct
-// [InsertEventsResponse]
-type insertEventsResponseJSON struct {
-	RowIDs      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *InsertEventsResponse) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r InsertEventsResponse) RawJSON() string { return r.JSON.raw }
+func (r *InsertEventsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r insertEventsResponseJSON) RawJSON() string {
-	return r.raw
 }
 
 // An experiment event
 type InsertExperimentEventParam struct {
 	// A unique identifier for the experiment event. If you don't provide one,
 	// BrainTrust will generate one for you
-	ID param.Field[string] `json:"id"`
+	ID param.Opt[string] `json:"id,omitzero"`
 	// The `_is_merge` field controls how the row is merged with any existing row with
 	// the same id in the DB. By default (or when set to `false`), the existing row is
 	// completely replaced by the new row. When set to `true`, the new row is
@@ -2497,24 +2157,10 @@ type InsertExperimentEventParam struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[bool] `json:"_is_merge"`
-	// The `_merge_paths` field allows controlling the depth of the merge, when
-	// `_is_merge=true`. `_merge_paths` is a list of paths, where each path is a list
-	// of field names. The deep merge will not descend below any of the specified merge
-	// paths.
-	//
-	// For example, say there is an existing row in the DB
-	// `{"id": "foo", "input": {"a": {"b": 10}, "c": {"d": 20}}, "output": {"a": 20}}`.
-	// If we merge a new row as
-	// `{"_is_merge": true, "_merge_paths": [["input", "a"], ["output"]], "input": {"a": {"q": 30}, "c": {"e": 30}, "bar": "baz"}, "output": {"d": 40}}`,
-	// the new row will be
-	// `{"id": "foo": "input": {"a": {"q": 30}, "c": {"d": 20, "e": 30}, "bar": "baz"}, "output": {"d": 40}}`.
-	// In this case, due to the merge paths, we have replaced `input.a` and `output`,
-	// but have still deep-merged `input` and `input.c`.
-	MergePaths param.Field[[][]string] `json:"_merge_paths"`
+	IsMerge param.Opt[bool] `json:"_is_merge,omitzero"`
 	// Pass `_object_delete=true` to mark the experiment event deleted. Deleted events
 	// will not show up in subsequent fetches for this experiment
-	ObjectDelete param.Field[bool] `json:"_object_delete"`
+	ObjectDelete param.Opt[bool] `json:"_object_delete,omitzero"`
 	// DEPRECATED: The `_parent_id` field is deprecated and should not be used. Support
 	// for `_parent_id` will be dropped in a future version of Braintrust. Log
 	// `span_id`, `root_span_id`, and `span_parents` explicitly instead.
@@ -2532,48 +2178,9 @@ type InsertExperimentEventParam struct {
 	// clicking on the "abc" row.
 	//
 	// If the row is being merged into an existing row, this field will be ignored.
-	ParentID param.Field[string] `json:"_parent_id"`
-	// Context is additional information about the code that produced the experiment
-	// event. It is essentially the textual counterpart to `metrics`. Use the
-	// `caller_*` attributes to track the location in code which produced the
-	// experiment event
-	Context param.Field[InsertExperimentEventContextParam] `json:"context"`
+	ParentID param.Opt[string] `json:"_parent_id,omitzero"`
 	// The timestamp the experiment event was created
-	Created param.Field[time.Time] `json:"created" format:"date-time"`
-	// The error that occurred, if any.
-	Error param.Field[interface{}] `json:"error"`
-	// The ground truth value (an arbitrary, JSON serializable object) that you'd
-	// compare to `output` to determine if your `output` value is correct or not.
-	// Braintrust currently does not compare `output` to `expected` for you, since
-	// there are so many different ways to do that correctly. Instead, these values are
-	// just used to help you navigate your experiments while digging into analyses.
-	// However, we may later use these values to re-score outputs or fine-tune your
-	// models
-	Expected param.Field[interface{}] `json:"expected"`
-	// The arguments that uniquely define a test case (an arbitrary, JSON serializable
-	// object). Later on, Braintrust will use the `input` to know whether two test
-	// cases are the same between experiments, so they should not contain
-	// experiment-specific state. A simple rule of thumb is that if you run the same
-	// experiment twice, the `input` should be identical
-	Input param.Field[interface{}] `json:"input"`
-	// A dictionary with additional data about the test example, model outputs, or just
-	// about anything else that's relevant, that you can use to help find and analyze
-	// examples later. For example, you could log the `prompt`, example's `id`, or
-	// anything else that would be useful to slice/dice later. The values in `metadata`
-	// can be any JSON-serializable type, but its keys must be strings
-	Metadata param.Field[InsertExperimentEventMetadataParam] `json:"metadata"`
-	// Metrics are numerical measurements tracking the execution of the code that
-	// produced the experiment event. Use "start" and "end" to track the time span over
-	// which the experiment event was produced
-	Metrics param.Field[InsertExperimentEventMetricsParam] `json:"metrics"`
-	// Indicates the event was copied from another object.
-	Origin param.Field[ObjectReferenceParam] `json:"origin"`
-	// The output of your application, including post-processing (an arbitrary, JSON
-	// serializable object), that allows you to determine whether the result is correct
-	// or not. For example, in an app that generates SQL queries, the `output` should
-	// be the _result_ of the SQL query generated by the model, not the query itself,
-	// because there may be multiple valid queries that answer a single question
-	Output param.Field[interface{}] `json:"output"`
+	Created param.Opt[time.Time] `json:"created,omitzero" format:"date-time"`
 	// Use `span_id`, `root_span_id`, and `span_parents` instead of `_parent_id`, which
 	// is now deprecated. The span_id is a unique identifier describing the row's place
 	// in the a trace, and the root_span_id is a unique identifier for the whole trace.
@@ -2589,7 +2196,54 @@ type InsertExperimentEventParam struct {
 	// clicking on the "abc" row.
 	//
 	// If the row is being merged into an existing row, this field will be ignored.
-	RootSpanID param.Field[string] `json:"root_span_id"`
+	RootSpanID param.Opt[string] `json:"root_span_id,omitzero"`
+	// Use `span_id`, `root_span_id`, and `span_parents` instead of `_parent_id`, which
+	// is now deprecated. The span_id is a unique identifier describing the row's place
+	// in the a trace, and the root_span_id is a unique identifier for the whole trace.
+	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
+	// details.
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
+	SpanID param.Opt[string] `json:"span_id,omitzero"`
+	// The `_merge_paths` field allows controlling the depth of the merge, when
+	// `_is_merge=true`. `_merge_paths` is a list of paths, where each path is a list
+	// of field names. The deep merge will not descend below any of the specified merge
+	// paths.
+	//
+	// For example, say there is an existing row in the DB
+	// `{"id": "foo", "input": {"a": {"b": 10}, "c": {"d": 20}}, "output": {"a": 20}}`.
+	// If we merge a new row as
+	// `{"_is_merge": true, "_merge_paths": [["input", "a"], ["output"]], "input": {"a": {"q": 30}, "c": {"e": 30}, "bar": "baz"}, "output": {"d": 40}}`,
+	// the new row will be
+	// `{"id": "foo": "input": {"a": {"q": 30}, "c": {"d": 20, "e": 30}, "bar": "baz"}, "output": {"d": 40}}`.
+	// In this case, due to the merge paths, we have replaced `input.a` and `output`,
+	// but have still deep-merged `input` and `input.c`.
+	MergePaths [][]string `json:"_merge_paths,omitzero"`
+	// Context is additional information about the code that produced the experiment
+	// event. It is essentially the textual counterpart to `metrics`. Use the
+	// `caller_*` attributes to track the location in code which produced the
+	// experiment event
+	Context InsertExperimentEventContextParam `json:"context,omitzero"`
+	// A dictionary with additional data about the test example, model outputs, or just
+	// about anything else that's relevant, that you can use to help find and analyze
+	// examples later. For example, you could log the `prompt`, example's `id`, or
+	// anything else that would be useful to slice/dice later. The values in `metadata`
+	// can be any JSON-serializable type, but its keys must be strings
+	Metadata InsertExperimentEventMetadataParam `json:"metadata,omitzero"`
+	// Metrics are numerical measurements tracking the execution of the code that
+	// produced the experiment event. Use "start" and "end" to track the time span over
+	// which the experiment event was produced
+	Metrics InsertExperimentEventMetricsParam `json:"metrics,omitzero"`
+	// Indicates the event was copied from another object.
+	Origin ObjectReferenceParam `json:"origin,omitzero"`
 	// A dictionary of numeric values (between 0 and 1) to log. The scores should give
 	// you a variety of signals that help you determine how accurate the outputs are
 	// compared to what you expect and diagnose failures. For example, a summarization
@@ -2598,9 +2252,9 @@ type InsertExperimentEventParam struct {
 	// summary. The word similarity score could help you determine whether the
 	// summarization was covering similar concepts or not. You can use these scores to
 	// help you sort, filter, and compare experiments
-	Scores param.Field[map[string]float64] `json:"scores"`
+	Scores map[string]float64 `json:"scores,omitzero"`
 	// Human-identifying attributes of the span, such as name, type, etc.
-	SpanAttributes param.Field[SpanAttributesParam] `json:"span_attributes"`
+	SpanAttributes SpanAttributesParam `json:"span_attributes,omitzero"`
 	// Use `span_id`, `root_span_id`, and `span_parents` instead of `_parent_id`, which
 	// is now deprecated. The span_id is a unique identifier describing the row's place
 	// in the a trace, and the root_span_id is a unique identifier for the whole trace.
@@ -2616,29 +2270,40 @@ type InsertExperimentEventParam struct {
 	// clicking on the "abc" row.
 	//
 	// If the row is being merged into an existing row, this field will be ignored.
-	SpanID param.Field[string] `json:"span_id"`
-	// Use `span_id`, `root_span_id`, and `span_parents` instead of `_parent_id`, which
-	// is now deprecated. The span_id is a unique identifier describing the row's place
-	// in the a trace, and the root_span_id is a unique identifier for the whole trace.
-	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
-	// details.
-	//
-	// For example, say we have logged a row
-	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
-	// We can create a sub-span of the parent row by logging
-	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
-	// In the webapp, only the root span row `"abc"` will show up in the summary view.
-	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
-	// clicking on the "abc" row.
-	//
-	// If the row is being merged into an existing row, this field will be ignored.
-	SpanParents param.Field[[]string] `json:"span_parents"`
+	SpanParents []string `json:"span_parents,omitzero"`
 	// A list of tags to log
-	Tags param.Field[[]string] `json:"tags"`
+	Tags []string `json:"tags,omitzero"`
+	// The error that occurred, if any.
+	Error any `json:"error,omitzero"`
+	// The ground truth value (an arbitrary, JSON serializable object) that you'd
+	// compare to `output` to determine if your `output` value is correct or not.
+	// Braintrust currently does not compare `output` to `expected` for you, since
+	// there are so many different ways to do that correctly. Instead, these values are
+	// just used to help you navigate your experiments while digging into analyses.
+	// However, we may later use these values to re-score outputs or fine-tune your
+	// models
+	Expected any `json:"expected,omitzero"`
+	// The arguments that uniquely define a test case (an arbitrary, JSON serializable
+	// object). Later on, Braintrust will use the `input` to know whether two test
+	// cases are the same between experiments, so they should not contain
+	// experiment-specific state. A simple rule of thumb is that if you run the same
+	// experiment twice, the `input` should be identical
+	Input any `json:"input,omitzero"`
+	// The output of your application, including post-processing (an arbitrary, JSON
+	// serializable object), that allows you to determine whether the result is correct
+	// or not. For example, in an app that generates SQL queries, the `output` should
+	// be the _result_ of the SQL query generated by the model, not the query itself,
+	// because there may be multiple valid queries that answer a single question
+	Output any `json:"output,omitzero"`
+	paramObj
 }
 
 func (r InsertExperimentEventParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow InsertExperimentEventParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *InsertExperimentEventParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Context is additional information about the code that produced the experiment
@@ -2647,16 +2312,21 @@ func (r InsertExperimentEventParam) MarshalJSON() (data []byte, err error) {
 // experiment event
 type InsertExperimentEventContextParam struct {
 	// Name of the file in code where the experiment event was created
-	CallerFilename param.Field[string] `json:"caller_filename"`
+	CallerFilename param.Opt[string] `json:"caller_filename,omitzero"`
 	// The function in code which created the experiment event
-	CallerFunctionname param.Field[string] `json:"caller_functionname"`
+	CallerFunctionname param.Opt[string] `json:"caller_functionname,omitzero"`
 	// Line of code where the experiment event was created
-	CallerLineno param.Field[int64]     `json:"caller_lineno"`
-	ExtraFields  map[string]interface{} `json:"-,extras"`
+	CallerLineno param.Opt[int64] `json:"caller_lineno,omitzero"`
+	ExtraFields  map[string]any   `json:"-"`
+	paramObj
 }
 
 func (r InsertExperimentEventContextParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow InsertExperimentEventContextParam
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *InsertExperimentEventContextParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // A dictionary with additional data about the test example, model outputs, or just
@@ -2666,50 +2336,60 @@ func (r InsertExperimentEventContextParam) MarshalJSON() (data []byte, err error
 // can be any JSON-serializable type, but its keys must be strings
 type InsertExperimentEventMetadataParam struct {
 	// The model used for this example
-	Model       param.Field[string]    `json:"model"`
-	ExtraFields map[string]interface{} `json:"-,extras"`
+	Model       param.Opt[string] `json:"model,omitzero"`
+	ExtraFields map[string]any    `json:"-"`
+	paramObj
 }
 
 func (r InsertExperimentEventMetadataParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow InsertExperimentEventMetadataParam
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *InsertExperimentEventMetadataParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Metrics are numerical measurements tracking the execution of the code that
 // produced the experiment event. Use "start" and "end" to track the time span over
 // which the experiment event was produced
 type InsertExperimentEventMetricsParam struct {
-	// This metric is deprecated
-	CallerFilename param.Field[interface{}] `json:"caller_filename"`
-	// This metric is deprecated
-	CallerFunctionname param.Field[interface{}] `json:"caller_functionname"`
-	// This metric is deprecated
-	CallerLineno param.Field[interface{}] `json:"caller_lineno"`
 	// The number of tokens in the completion generated by the model (only set if this
 	// is an LLM span)
-	CompletionTokens param.Field[int64] `json:"completion_tokens"`
+	CompletionTokens param.Opt[int64] `json:"completion_tokens,omitzero"`
 	// A unix timestamp recording when the section of code which produced the
 	// experiment event finished
-	End param.Field[float64] `json:"end"`
+	End param.Opt[float64] `json:"end,omitzero"`
 	// The number of tokens in the prompt used to generate the experiment event (only
 	// set if this is an LLM span)
-	PromptTokens param.Field[int64] `json:"prompt_tokens"`
+	PromptTokens param.Opt[int64] `json:"prompt_tokens,omitzero"`
 	// A unix timestamp recording when the section of code which produced the
 	// experiment event started
-	Start param.Field[float64] `json:"start"`
+	Start param.Opt[float64] `json:"start,omitzero"`
 	// The total number of tokens in the input and output of the experiment event.
-	Tokens      param.Field[int64] `json:"tokens"`
-	ExtraFields map[string]float64 `json:"-,extras"`
+	Tokens param.Opt[int64] `json:"tokens,omitzero"`
+	// This metric is deprecated
+	CallerFilename any `json:"caller_filename,omitzero"`
+	// This metric is deprecated
+	CallerFunctionname any `json:"caller_functionname,omitzero"`
+	// This metric is deprecated
+	CallerLineno any                `json:"caller_lineno,omitzero"`
+	ExtraFields  map[string]float64 `json:"-"`
+	paramObj
 }
 
 func (r InsertExperimentEventMetricsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow InsertExperimentEventMetricsParam
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *InsertExperimentEventMetricsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // A project logs event
 type InsertProjectLogsEventParam struct {
 	// A unique identifier for the project logs event. If you don't provide one,
 	// BrainTrust will generate one for you
-	ID param.Field[string] `json:"id"`
+	ID param.Opt[string] `json:"id,omitzero"`
 	// The `_is_merge` field controls how the row is merged with any existing row with
 	// the same id in the DB. By default (or when set to `false`), the existing row is
 	// completely replaced by the new row. When set to `true`, the new row is
@@ -2722,24 +2402,10 @@ type InsertProjectLogsEventParam struct {
 	// will be `{"id": "foo", "input": {"a": 5, "b": 11, "c": 20}}`. If we replace the
 	// new row as `{"id": "foo", "input": {"b": 11, "c": 20}}`, the new row will be
 	// `{"id": "foo", "input": {"b": 11, "c": 20}}`
-	IsMerge param.Field[bool] `json:"_is_merge"`
-	// The `_merge_paths` field allows controlling the depth of the merge, when
-	// `_is_merge=true`. `_merge_paths` is a list of paths, where each path is a list
-	// of field names. The deep merge will not descend below any of the specified merge
-	// paths.
-	//
-	// For example, say there is an existing row in the DB
-	// `{"id": "foo", "input": {"a": {"b": 10}, "c": {"d": 20}}, "output": {"a": 20}}`.
-	// If we merge a new row as
-	// `{"_is_merge": true, "_merge_paths": [["input", "a"], ["output"]], "input": {"a": {"q": 30}, "c": {"e": 30}, "bar": "baz"}, "output": {"d": 40}}`,
-	// the new row will be
-	// `{"id": "foo": "input": {"a": {"q": 30}, "c": {"d": 20, "e": 30}, "bar": "baz"}, "output": {"d": 40}}`.
-	// In this case, due to the merge paths, we have replaced `input.a` and `output`,
-	// but have still deep-merged `input` and `input.c`.
-	MergePaths param.Field[[][]string] `json:"_merge_paths"`
+	IsMerge param.Opt[bool] `json:"_is_merge,omitzero"`
 	// Pass `_object_delete=true` to mark the project logs event deleted. Deleted
 	// events will not show up in subsequent fetches for this project logs
-	ObjectDelete param.Field[bool] `json:"_object_delete"`
+	ObjectDelete param.Opt[bool] `json:"_object_delete,omitzero"`
 	// DEPRECATED: The `_parent_id` field is deprecated and should not be used. Support
 	// for `_parent_id` will be dropped in a future version of Braintrust. Log
 	// `span_id`, `root_span_id`, and `span_parents` explicitly instead.
@@ -2757,44 +2423,9 @@ type InsertProjectLogsEventParam struct {
 	// clicking on the "abc" row.
 	//
 	// If the row is being merged into an existing row, this field will be ignored.
-	ParentID param.Field[string] `json:"_parent_id"`
-	// Context is additional information about the code that produced the project logs
-	// event. It is essentially the textual counterpart to `metrics`. Use the
-	// `caller_*` attributes to track the location in code which produced the project
-	// logs event
-	Context param.Field[InsertProjectLogsEventContextParam] `json:"context"`
+	ParentID param.Opt[string] `json:"_parent_id,omitzero"`
 	// The timestamp the project logs event was created
-	Created param.Field[time.Time] `json:"created" format:"date-time"`
-	// The error that occurred, if any.
-	Error param.Field[interface{}] `json:"error"`
-	// The ground truth value (an arbitrary, JSON serializable object) that you'd
-	// compare to `output` to determine if your `output` value is correct or not.
-	// Braintrust currently does not compare `output` to `expected` for you, since
-	// there are so many different ways to do that correctly. Instead, these values are
-	// just used to help you navigate while digging into analyses. However, we may
-	// later use these values to re-score outputs or fine-tune your models.
-	Expected param.Field[interface{}] `json:"expected"`
-	// The arguments that uniquely define a user input (an arbitrary, JSON serializable
-	// object).
-	Input param.Field[interface{}] `json:"input"`
-	// A dictionary with additional data about the test example, model outputs, or just
-	// about anything else that's relevant, that you can use to help find and analyze
-	// examples later. For example, you could log the `prompt`, example's `id`, or
-	// anything else that would be useful to slice/dice later. The values in `metadata`
-	// can be any JSON-serializable type, but its keys must be strings
-	Metadata param.Field[InsertProjectLogsEventMetadataParam] `json:"metadata"`
-	// Metrics are numerical measurements tracking the execution of the code that
-	// produced the project logs event. Use "start" and "end" to track the time span
-	// over which the project logs event was produced
-	Metrics param.Field[InsertProjectLogsEventMetricsParam] `json:"metrics"`
-	// Indicates the event was copied from another object.
-	Origin param.Field[ObjectReferenceParam] `json:"origin"`
-	// The output of your application, including post-processing (an arbitrary, JSON
-	// serializable object), that allows you to determine whether the result is correct
-	// or not. For example, in an app that generates SQL queries, the `output` should
-	// be the _result_ of the SQL query generated by the model, not the query itself,
-	// because there may be multiple valid queries that answer a single question.
-	Output param.Field[interface{}] `json:"output"`
+	Created param.Opt[time.Time] `json:"created,omitzero" format:"date-time"`
 	// Use `span_id`, `root_span_id`, and `span_parents` instead of `_parent_id`, which
 	// is now deprecated. The span_id is a unique identifier describing the row's place
 	// in the a trace, and the root_span_id is a unique identifier for the whole trace.
@@ -2810,7 +2441,54 @@ type InsertProjectLogsEventParam struct {
 	// clicking on the "abc" row.
 	//
 	// If the row is being merged into an existing row, this field will be ignored.
-	RootSpanID param.Field[string] `json:"root_span_id"`
+	RootSpanID param.Opt[string] `json:"root_span_id,omitzero"`
+	// Use `span_id`, `root_span_id`, and `span_parents` instead of `_parent_id`, which
+	// is now deprecated. The span_id is a unique identifier describing the row's place
+	// in the a trace, and the root_span_id is a unique identifier for the whole trace.
+	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
+	// details.
+	//
+	// For example, say we have logged a row
+	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
+	// We can create a sub-span of the parent row by logging
+	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
+	// In the webapp, only the root span row `"abc"` will show up in the summary view.
+	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
+	// clicking on the "abc" row.
+	//
+	// If the row is being merged into an existing row, this field will be ignored.
+	SpanID param.Opt[string] `json:"span_id,omitzero"`
+	// The `_merge_paths` field allows controlling the depth of the merge, when
+	// `_is_merge=true`. `_merge_paths` is a list of paths, where each path is a list
+	// of field names. The deep merge will not descend below any of the specified merge
+	// paths.
+	//
+	// For example, say there is an existing row in the DB
+	// `{"id": "foo", "input": {"a": {"b": 10}, "c": {"d": 20}}, "output": {"a": 20}}`.
+	// If we merge a new row as
+	// `{"_is_merge": true, "_merge_paths": [["input", "a"], ["output"]], "input": {"a": {"q": 30}, "c": {"e": 30}, "bar": "baz"}, "output": {"d": 40}}`,
+	// the new row will be
+	// `{"id": "foo": "input": {"a": {"q": 30}, "c": {"d": 20, "e": 30}, "bar": "baz"}, "output": {"d": 40}}`.
+	// In this case, due to the merge paths, we have replaced `input.a` and `output`,
+	// but have still deep-merged `input` and `input.c`.
+	MergePaths [][]string `json:"_merge_paths,omitzero"`
+	// Context is additional information about the code that produced the project logs
+	// event. It is essentially the textual counterpart to `metrics`. Use the
+	// `caller_*` attributes to track the location in code which produced the project
+	// logs event
+	Context InsertProjectLogsEventContextParam `json:"context,omitzero"`
+	// A dictionary with additional data about the test example, model outputs, or just
+	// about anything else that's relevant, that you can use to help find and analyze
+	// examples later. For example, you could log the `prompt`, example's `id`, or
+	// anything else that would be useful to slice/dice later. The values in `metadata`
+	// can be any JSON-serializable type, but its keys must be strings
+	Metadata InsertProjectLogsEventMetadataParam `json:"metadata,omitzero"`
+	// Metrics are numerical measurements tracking the execution of the code that
+	// produced the project logs event. Use "start" and "end" to track the time span
+	// over which the project logs event was produced
+	Metrics InsertProjectLogsEventMetricsParam `json:"metrics,omitzero"`
+	// Indicates the event was copied from another object.
+	Origin ObjectReferenceParam `json:"origin,omitzero"`
 	// A dictionary of numeric values (between 0 and 1) to log. The scores should give
 	// you a variety of signals that help you determine how accurate the outputs are
 	// compared to what you expect and diagnose failures. For example, a summarization
@@ -2819,9 +2497,9 @@ type InsertProjectLogsEventParam struct {
 	// summary. The word similarity score could help you determine whether the
 	// summarization was covering similar concepts or not. You can use these scores to
 	// help you sort, filter, and compare logs.
-	Scores param.Field[map[string]float64] `json:"scores"`
+	Scores map[string]float64 `json:"scores,omitzero"`
 	// Human-identifying attributes of the span, such as name, type, etc.
-	SpanAttributes param.Field[SpanAttributesParam] `json:"span_attributes"`
+	SpanAttributes SpanAttributesParam `json:"span_attributes,omitzero"`
 	// Use `span_id`, `root_span_id`, and `span_parents` instead of `_parent_id`, which
 	// is now deprecated. The span_id is a unique identifier describing the row's place
 	// in the a trace, and the root_span_id is a unique identifier for the whole trace.
@@ -2837,29 +2515,36 @@ type InsertProjectLogsEventParam struct {
 	// clicking on the "abc" row.
 	//
 	// If the row is being merged into an existing row, this field will be ignored.
-	SpanID param.Field[string] `json:"span_id"`
-	// Use `span_id`, `root_span_id`, and `span_parents` instead of `_parent_id`, which
-	// is now deprecated. The span_id is a unique identifier describing the row's place
-	// in the a trace, and the root_span_id is a unique identifier for the whole trace.
-	// See the [guide](https://www.braintrust.dev/docs/guides/tracing) for full
-	// details.
-	//
-	// For example, say we have logged a row
-	// `{"id": "abc", "span_id": "span0", "root_span_id": "root_span0", "input": "foo", "output": "bar", "expected": "boo", "scores": {"correctness": 0.33}}`.
-	// We can create a sub-span of the parent row by logging
-	// `{"id": "llm_call", "span_id": "span1", "root_span_id": "root_span0", "span_parents": ["span0"], "input": {"prompt": "What comes after foo?"}, "output": "bar", "metrics": {"tokens": 1}}`.
-	// In the webapp, only the root span row `"abc"` will show up in the summary view.
-	// You can view the full trace hierarchy (in this case, the `"llm_call"` row) by
-	// clicking on the "abc" row.
-	//
-	// If the row is being merged into an existing row, this field will be ignored.
-	SpanParents param.Field[[]string] `json:"span_parents"`
+	SpanParents []string `json:"span_parents,omitzero"`
 	// A list of tags to log
-	Tags param.Field[[]string] `json:"tags"`
+	Tags []string `json:"tags,omitzero"`
+	// The error that occurred, if any.
+	Error any `json:"error,omitzero"`
+	// The ground truth value (an arbitrary, JSON serializable object) that you'd
+	// compare to `output` to determine if your `output` value is correct or not.
+	// Braintrust currently does not compare `output` to `expected` for you, since
+	// there are so many different ways to do that correctly. Instead, these values are
+	// just used to help you navigate while digging into analyses. However, we may
+	// later use these values to re-score outputs or fine-tune your models.
+	Expected any `json:"expected,omitzero"`
+	// The arguments that uniquely define a user input (an arbitrary, JSON serializable
+	// object).
+	Input any `json:"input,omitzero"`
+	// The output of your application, including post-processing (an arbitrary, JSON
+	// serializable object), that allows you to determine whether the result is correct
+	// or not. For example, in an app that generates SQL queries, the `output` should
+	// be the _result_ of the SQL query generated by the model, not the query itself,
+	// because there may be multiple valid queries that answer a single question.
+	Output any `json:"output,omitzero"`
+	paramObj
 }
 
 func (r InsertProjectLogsEventParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow InsertProjectLogsEventParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *InsertProjectLogsEventParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Context is additional information about the code that produced the project logs
@@ -2868,16 +2553,21 @@ func (r InsertProjectLogsEventParam) MarshalJSON() (data []byte, err error) {
 // logs event
 type InsertProjectLogsEventContextParam struct {
 	// Name of the file in code where the project logs event was created
-	CallerFilename param.Field[string] `json:"caller_filename"`
+	CallerFilename param.Opt[string] `json:"caller_filename,omitzero"`
 	// The function in code which created the project logs event
-	CallerFunctionname param.Field[string] `json:"caller_functionname"`
+	CallerFunctionname param.Opt[string] `json:"caller_functionname,omitzero"`
 	// Line of code where the project logs event was created
-	CallerLineno param.Field[int64]     `json:"caller_lineno"`
-	ExtraFields  map[string]interface{} `json:"-,extras"`
+	CallerLineno param.Opt[int64] `json:"caller_lineno,omitzero"`
+	ExtraFields  map[string]any   `json:"-"`
+	paramObj
 }
 
 func (r InsertProjectLogsEventContextParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow InsertProjectLogsEventContextParam
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *InsertProjectLogsEventContextParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // A dictionary with additional data about the test example, model outputs, or just
@@ -2887,43 +2577,53 @@ func (r InsertProjectLogsEventContextParam) MarshalJSON() (data []byte, err erro
 // can be any JSON-serializable type, but its keys must be strings
 type InsertProjectLogsEventMetadataParam struct {
 	// The model used for this example
-	Model       param.Field[string]    `json:"model"`
-	ExtraFields map[string]interface{} `json:"-,extras"`
+	Model       param.Opt[string] `json:"model,omitzero"`
+	ExtraFields map[string]any    `json:"-"`
+	paramObj
 }
 
 func (r InsertProjectLogsEventMetadataParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow InsertProjectLogsEventMetadataParam
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *InsertProjectLogsEventMetadataParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Metrics are numerical measurements tracking the execution of the code that
 // produced the project logs event. Use "start" and "end" to track the time span
 // over which the project logs event was produced
 type InsertProjectLogsEventMetricsParam struct {
-	// This metric is deprecated
-	CallerFilename param.Field[interface{}] `json:"caller_filename"`
-	// This metric is deprecated
-	CallerFunctionname param.Field[interface{}] `json:"caller_functionname"`
-	// This metric is deprecated
-	CallerLineno param.Field[interface{}] `json:"caller_lineno"`
 	// The number of tokens in the completion generated by the model (only set if this
 	// is an LLM span)
-	CompletionTokens param.Field[int64] `json:"completion_tokens"`
+	CompletionTokens param.Opt[int64] `json:"completion_tokens,omitzero"`
 	// A unix timestamp recording when the section of code which produced the project
 	// logs event finished
-	End param.Field[float64] `json:"end"`
+	End param.Opt[float64] `json:"end,omitzero"`
 	// The number of tokens in the prompt used to generate the project logs event (only
 	// set if this is an LLM span)
-	PromptTokens param.Field[int64] `json:"prompt_tokens"`
+	PromptTokens param.Opt[int64] `json:"prompt_tokens,omitzero"`
 	// A unix timestamp recording when the section of code which produced the project
 	// logs event started
-	Start param.Field[float64] `json:"start"`
+	Start param.Opt[float64] `json:"start,omitzero"`
 	// The total number of tokens in the input and output of the project logs event.
-	Tokens      param.Field[int64] `json:"tokens"`
-	ExtraFields map[string]float64 `json:"-,extras"`
+	Tokens param.Opt[int64] `json:"tokens,omitzero"`
+	// This metric is deprecated
+	CallerFilename any `json:"caller_filename,omitzero"`
+	// This metric is deprecated
+	CallerFunctionname any `json:"caller_functionname,omitzero"`
+	// This metric is deprecated
+	CallerLineno any                `json:"caller_lineno,omitzero"`
+	ExtraFields  map[string]float64 `json:"-"`
+	paramObj
 }
 
 func (r InsertProjectLogsEventMetricsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow InsertProjectLogsEventMetricsParam
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *InsertProjectLogsEventMetricsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Summary of a metric's performance
@@ -2939,28 +2639,24 @@ type MetricSummary struct {
 	// Unit label for the metric
 	Unit string `json:"unit,required"`
 	// Difference in metric between the current and comparison experiment
-	Diff float64           `json:"diff"`
-	JSON metricSummaryJSON `json:"-"`
+	Diff float64 `json:"diff"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Improvements respjson.Field
+		Metric       respjson.Field
+		Name         respjson.Field
+		Regressions  respjson.Field
+		Unit         respjson.Field
+		Diff         respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
 }
 
-// metricSummaryJSON contains the JSON metadata for the struct [MetricSummary]
-type metricSummaryJSON struct {
-	Improvements apijson.Field
-	Metric       apijson.Field
-	Name         apijson.Field
-	Regressions  apijson.Field
-	Unit         apijson.Field
-	Diff         apijson.Field
-	raw          string
-	ExtraFields  map[string]apijson.Field
-}
-
-func (r *MetricSummary) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r MetricSummary) RawJSON() string { return r.JSON.raw }
+func (r *MetricSummary) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r metricSummaryJSON) RawJSON() string {
-	return r.raw
 }
 
 // Indicates the event was copied from another object.
@@ -2972,29 +2668,37 @@ type ObjectReference struct {
 	// ID of the object the event is originating from.
 	ObjectID string `json:"object_id,required" format:"uuid"`
 	// Type of the object the event is originating from.
+	//
+	// Any of "experiment", "dataset", "prompt", "function", "prompt_session",
+	// "project_logs".
 	ObjectType ObjectReferenceObjectType `json:"object_type,required"`
 	// Created timestamp of the original event. Used to help sort in the UI
-	Created string              `json:"created,nullable"`
-	JSON    objectReferenceJSON `json:"-"`
+	Created string `json:"created,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		XactID      respjson.Field
+		ObjectID    respjson.Field
+		ObjectType  respjson.Field
+		Created     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// objectReferenceJSON contains the JSON metadata for the struct [ObjectReference]
-type objectReferenceJSON struct {
-	ID          apijson.Field
-	XactID      apijson.Field
-	ObjectID    apijson.Field
-	ObjectType  apijson.Field
-	Created     apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ObjectReference) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ObjectReference) RawJSON() string { return r.JSON.raw }
+func (r *ObjectReference) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r objectReferenceJSON) RawJSON() string {
-	return r.raw
+// ToParam converts this ObjectReference to a ObjectReferenceParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// ObjectReferenceParam.Overrides()
+func (r ObjectReference) ToParam() ObjectReferenceParam {
+	return param.Override[ObjectReferenceParam](json.RawMessage(r.RawJSON()))
 }
 
 // Type of the object the event is originating from.
@@ -3009,272 +2713,257 @@ const (
 	ObjectReferenceObjectTypeProjectLogs   ObjectReferenceObjectType = "project_logs"
 )
 
-func (r ObjectReferenceObjectType) IsKnown() bool {
-	switch r {
-	case ObjectReferenceObjectTypeExperiment, ObjectReferenceObjectTypeDataset, ObjectReferenceObjectTypePrompt, ObjectReferenceObjectTypeFunction, ObjectReferenceObjectTypePromptSession, ObjectReferenceObjectTypeProjectLogs:
-		return true
-	}
-	return false
-}
-
 // Indicates the event was copied from another object.
+//
+// The properties ID, XactID, ObjectID, ObjectType are required.
 type ObjectReferenceParam struct {
 	// ID of the original event.
-	ID param.Field[string] `json:"id,required"`
+	ID string `json:"id,required"`
 	// Transaction ID of the original event.
-	XactID param.Field[string] `json:"_xact_id,required"`
+	XactID string `json:"_xact_id,required"`
 	// ID of the object the event is originating from.
-	ObjectID param.Field[string] `json:"object_id,required" format:"uuid"`
+	ObjectID string `json:"object_id,required" format:"uuid"`
 	// Type of the object the event is originating from.
-	ObjectType param.Field[ObjectReferenceObjectType] `json:"object_type,required"`
+	//
+	// Any of "experiment", "dataset", "prompt", "function", "prompt_session",
+	// "project_logs".
+	ObjectType ObjectReferenceObjectType `json:"object_type,omitzero,required"`
 	// Created timestamp of the original event. Used to help sort in the UI
-	Created param.Field[string] `json:"created"`
+	Created param.Opt[string] `json:"created,omitzero"`
+	paramObj
 }
 
 func (r ObjectReferenceParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ObjectReferenceParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ObjectReferenceParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type OnlineScoreConfig struct {
 	// The sampling rate for online scoring
 	SamplingRate float64 `json:"sampling_rate,required"`
 	// The list of scorers to use for online scoring
-	Scorers []OnlineScoreConfigScorer `json:"scorers,required"`
+	Scorers []OnlineScoreConfigScorerUnion `json:"scorers,required"`
 	// Whether to trigger online scoring on the root span of each trace
 	ApplyToRootSpan bool `json:"apply_to_root_span,nullable"`
 	// Trigger online scoring on any spans with a name in this list
-	ApplyToSpanNames []string              `json:"apply_to_span_names,nullable"`
-	JSON             onlineScoreConfigJSON `json:"-"`
+	ApplyToSpanNames []string `json:"apply_to_span_names,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		SamplingRate     respjson.Field
+		Scorers          respjson.Field
+		ApplyToRootSpan  respjson.Field
+		ApplyToSpanNames respjson.Field
+		ExtraFields      map[string]respjson.Field
+		raw              string
+	} `json:"-"`
 }
 
-// onlineScoreConfigJSON contains the JSON metadata for the struct
-// [OnlineScoreConfig]
-type onlineScoreConfigJSON struct {
-	SamplingRate     apijson.Field
-	Scorers          apijson.Field
-	ApplyToRootSpan  apijson.Field
-	ApplyToSpanNames apijson.Field
-	raw              string
-	ExtraFields      map[string]apijson.Field
-}
-
-func (r *OnlineScoreConfig) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r OnlineScoreConfig) RawJSON() string { return r.JSON.raw }
+func (r *OnlineScoreConfig) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r onlineScoreConfigJSON) RawJSON() string {
-	return r.raw
-}
-
-type OnlineScoreConfigScorer struct {
-	Type  OnlineScoreConfigScorersType `json:"type,required"`
-	ID    string                       `json:"id"`
-	Name  string                       `json:"name"`
-	JSON  onlineScoreConfigScorerJSON  `json:"-"`
-	union OnlineScoreConfigScorersUnion
-}
-
-// onlineScoreConfigScorerJSON contains the JSON metadata for the struct
-// [OnlineScoreConfigScorer]
-type onlineScoreConfigScorerJSON struct {
-	Type        apijson.Field
-	ID          apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r onlineScoreConfigScorerJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *OnlineScoreConfigScorer) UnmarshalJSON(data []byte) (err error) {
-	*r = OnlineScoreConfigScorer{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [OnlineScoreConfigScorersUnion] interface which you can cast
-// to the specific types for more type safety.
+// ToParam converts this OnlineScoreConfig to a OnlineScoreConfigParam.
 //
-// Possible runtime types of the union are
-// [shared.OnlineScoreConfigScorersFunction],
-// [shared.OnlineScoreConfigScorersGlobal].
-func (r OnlineScoreConfigScorer) AsUnion() OnlineScoreConfigScorersUnion {
-	return r.union
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// OnlineScoreConfigParam.Overrides()
+func (r OnlineScoreConfig) ToParam() OnlineScoreConfigParam {
+	return param.Override[OnlineScoreConfigParam](json.RawMessage(r.RawJSON()))
 }
 
-// Union satisfied by [shared.OnlineScoreConfigScorersFunction] or
-// [shared.OnlineScoreConfigScorersGlobal].
-type OnlineScoreConfigScorersUnion interface {
-	implementsOnlineScoreConfigScorer()
+// OnlineScoreConfigScorerUnion contains all possible properties and values from
+// [OnlineScoreConfigScorerFunction], [OnlineScoreConfigScorerGlobal].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type OnlineScoreConfigScorerUnion struct {
+	// This field is from variant [OnlineScoreConfigScorerFunction].
+	ID   string `json:"id"`
+	Type string `json:"type"`
+	// This field is from variant [OnlineScoreConfigScorerGlobal].
+	Name string `json:"name"`
+	JSON struct {
+		ID   respjson.Field
+		Type respjson.Field
+		Name respjson.Field
+		raw  string
+	} `json:"-"`
 }
 
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*OnlineScoreConfigScorersUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(OnlineScoreConfigScorersFunction{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(OnlineScoreConfigScorersGlobal{}),
-		},
-	)
+func (u OnlineScoreConfigScorerUnion) AsFunction() (v OnlineScoreConfigScorerFunction) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
 }
 
-type OnlineScoreConfigScorersFunction struct {
-	ID   string                               `json:"id,required"`
-	Type OnlineScoreConfigScorersFunctionType `json:"type,required"`
-	JSON onlineScoreConfigScorersFunctionJSON `json:"-"`
+func (u OnlineScoreConfigScorerUnion) AsGlobal() (v OnlineScoreConfigScorerGlobal) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
 }
 
-// onlineScoreConfigScorersFunctionJSON contains the JSON metadata for the struct
-// [OnlineScoreConfigScorersFunction]
-type onlineScoreConfigScorersFunctionJSON struct {
-	ID          apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
+// Returns the unmodified JSON received from the API
+func (u OnlineScoreConfigScorerUnion) RawJSON() string { return u.JSON.raw }
 
-func (r *OnlineScoreConfigScorersFunction) UnmarshalJSON(data []byte) (err error) {
+func (r *OnlineScoreConfigScorerUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r onlineScoreConfigScorersFunctionJSON) RawJSON() string {
-	return r.raw
+type OnlineScoreConfigScorerFunction struct {
+	ID string `json:"id,required"`
+	// Any of "function".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-func (r OnlineScoreConfigScorersFunction) implementsOnlineScoreConfigScorer() {}
-
-type OnlineScoreConfigScorersFunctionType string
-
-const (
-	OnlineScoreConfigScorersFunctionTypeFunction OnlineScoreConfigScorersFunctionType = "function"
-)
-
-func (r OnlineScoreConfigScorersFunctionType) IsKnown() bool {
-	switch r {
-	case OnlineScoreConfigScorersFunctionTypeFunction:
-		return true
-	}
-	return false
-}
-
-type OnlineScoreConfigScorersGlobal struct {
-	Name string                             `json:"name,required"`
-	Type OnlineScoreConfigScorersGlobalType `json:"type,required"`
-	JSON onlineScoreConfigScorersGlobalJSON `json:"-"`
-}
-
-// onlineScoreConfigScorersGlobalJSON contains the JSON metadata for the struct
-// [OnlineScoreConfigScorersGlobal]
-type onlineScoreConfigScorersGlobalJSON struct {
-	Name        apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *OnlineScoreConfigScorersGlobal) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r OnlineScoreConfigScorerFunction) RawJSON() string { return r.JSON.raw }
+func (r *OnlineScoreConfigScorerFunction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r onlineScoreConfigScorersGlobalJSON) RawJSON() string {
-	return r.raw
+type OnlineScoreConfigScorerGlobal struct {
+	Name string `json:"name,required"`
+	// Any of "global".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Name        respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-func (r OnlineScoreConfigScorersGlobal) implementsOnlineScoreConfigScorer() {}
-
-type OnlineScoreConfigScorersGlobalType string
-
-const (
-	OnlineScoreConfigScorersGlobalTypeGlobal OnlineScoreConfigScorersGlobalType = "global"
-)
-
-func (r OnlineScoreConfigScorersGlobalType) IsKnown() bool {
-	switch r {
-	case OnlineScoreConfigScorersGlobalTypeGlobal:
-		return true
-	}
-	return false
+// Returns the unmodified JSON received from the API
+func (r OnlineScoreConfigScorerGlobal) RawJSON() string { return r.JSON.raw }
+func (r *OnlineScoreConfigScorerGlobal) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-type OnlineScoreConfigScorersType string
-
-const (
-	OnlineScoreConfigScorersTypeFunction OnlineScoreConfigScorersType = "function"
-	OnlineScoreConfigScorersTypeGlobal   OnlineScoreConfigScorersType = "global"
-)
-
-func (r OnlineScoreConfigScorersType) IsKnown() bool {
-	switch r {
-	case OnlineScoreConfigScorersTypeFunction, OnlineScoreConfigScorersTypeGlobal:
-		return true
-	}
-	return false
-}
-
+// The properties SamplingRate, Scorers are required.
 type OnlineScoreConfigParam struct {
 	// The sampling rate for online scoring
-	SamplingRate param.Field[float64] `json:"sampling_rate,required"`
+	SamplingRate float64 `json:"sampling_rate,required"`
 	// The list of scorers to use for online scoring
-	Scorers param.Field[[]OnlineScoreConfigScorersUnionParam] `json:"scorers,required"`
+	Scorers []OnlineScoreConfigScorerUnionParam `json:"scorers,omitzero,required"`
 	// Whether to trigger online scoring on the root span of each trace
-	ApplyToRootSpan param.Field[bool] `json:"apply_to_root_span"`
+	ApplyToRootSpan param.Opt[bool] `json:"apply_to_root_span,omitzero"`
 	// Trigger online scoring on any spans with a name in this list
-	ApplyToSpanNames param.Field[[]string] `json:"apply_to_span_names"`
+	ApplyToSpanNames []string `json:"apply_to_span_names,omitzero"`
+	paramObj
 }
 
 func (r OnlineScoreConfigParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow OnlineScoreConfigParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OnlineScoreConfigParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-type OnlineScoreConfigScorerParam struct {
-	Type param.Field[OnlineScoreConfigScorersType] `json:"type,required"`
-	ID   param.Field[string]                       `json:"id"`
-	Name param.Field[string]                       `json:"name"`
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type OnlineScoreConfigScorerUnionParam struct {
+	OfFunction *OnlineScoreConfigScorerFunctionParam `json:",omitzero,inline"`
+	OfGlobal   *OnlineScoreConfigScorerGlobalParam   `json:",omitzero,inline"`
+	paramUnion
 }
 
-func (r OnlineScoreConfigScorerParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+func (u OnlineScoreConfigScorerUnionParam) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfFunction, u.OfGlobal)
+}
+func (u *OnlineScoreConfigScorerUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
-func (r OnlineScoreConfigScorerParam) implementsOnlineScoreConfigScorersUnionParam() {}
-
-// Satisfied by [shared.OnlineScoreConfigScorersFunctionParam],
-// [shared.OnlineScoreConfigScorersGlobalParam], [OnlineScoreConfigScorerParam].
-type OnlineScoreConfigScorersUnionParam interface {
-	implementsOnlineScoreConfigScorersUnionParam()
+func (u *OnlineScoreConfigScorerUnionParam) asAny() any {
+	if !param.IsOmitted(u.OfFunction) {
+		return u.OfFunction
+	} else if !param.IsOmitted(u.OfGlobal) {
+		return u.OfGlobal
+	}
+	return nil
 }
 
-type OnlineScoreConfigScorersFunctionParam struct {
-	ID   param.Field[string]                               `json:"id,required"`
-	Type param.Field[OnlineScoreConfigScorersFunctionType] `json:"type,required"`
+// Returns a pointer to the underlying variant's property, if present.
+func (u OnlineScoreConfigScorerUnionParam) GetID() *string {
+	if vt := u.OfFunction; vt != nil {
+		return &vt.ID
+	}
+	return nil
 }
 
-func (r OnlineScoreConfigScorersFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+// Returns a pointer to the underlying variant's property, if present.
+func (u OnlineScoreConfigScorerUnionParam) GetName() *string {
+	if vt := u.OfGlobal; vt != nil {
+		return &vt.Name
+	}
+	return nil
 }
 
-func (r OnlineScoreConfigScorersFunctionParam) implementsOnlineScoreConfigScorersUnionParam() {}
-
-type OnlineScoreConfigScorersGlobalParam struct {
-	Name param.Field[string]                             `json:"name,required"`
-	Type param.Field[OnlineScoreConfigScorersGlobalType] `json:"type,required"`
+// Returns a pointer to the underlying variant's property, if present.
+func (u OnlineScoreConfigScorerUnionParam) GetType() *string {
+	if vt := u.OfFunction; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfGlobal; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
 }
 
-func (r OnlineScoreConfigScorersGlobalParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+// The properties ID, Type are required.
+type OnlineScoreConfigScorerFunctionParam struct {
+	ID string `json:"id,required"`
+	// Any of "function".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
-func (r OnlineScoreConfigScorersGlobalParam) implementsOnlineScoreConfigScorersUnionParam() {}
+func (r OnlineScoreConfigScorerFunctionParam) MarshalJSON() (data []byte, err error) {
+	type shadow OnlineScoreConfigScorerFunctionParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OnlineScoreConfigScorerFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[OnlineScoreConfigScorerFunctionParam](
+		"type", "function",
+	)
+}
+
+// The properties Name, Type are required.
+type OnlineScoreConfigScorerGlobalParam struct {
+	Name string `json:"name,required"`
+	// Any of "global".
+	Type string `json:"type,omitzero,required"`
+	paramObj
+}
+
+func (r OnlineScoreConfigScorerGlobalParam) MarshalJSON() (data []byte, err error) {
+	type shadow OnlineScoreConfigScorerGlobalParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OnlineScoreConfigScorerGlobalParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[OnlineScoreConfigScorerGlobalParam](
+		"type", "global",
+	)
+}
 
 type Organization struct {
 	// Unique identifier for the organization
@@ -3283,60 +2972,52 @@ type Organization struct {
 	Name   string `json:"name,required"`
 	APIURL string `json:"api_url,nullable"`
 	// Date of organization creation
-	Created        time.Time        `json:"created,nullable" format:"date-time"`
-	IsUniversalAPI bool             `json:"is_universal_api,nullable"`
-	ProxyURL       string           `json:"proxy_url,nullable"`
-	RealtimeURL    string           `json:"realtime_url,nullable"`
-	JSON           organizationJSON `json:"-"`
+	Created        time.Time `json:"created,nullable" format:"date-time"`
+	IsUniversalAPI bool      `json:"is_universal_api,nullable"`
+	ProxyURL       string    `json:"proxy_url,nullable"`
+	RealtimeURL    string    `json:"realtime_url,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID             respjson.Field
+		Name           respjson.Field
+		APIURL         respjson.Field
+		Created        respjson.Field
+		IsUniversalAPI respjson.Field
+		ProxyURL       respjson.Field
+		RealtimeURL    respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
+	} `json:"-"`
 }
 
-// organizationJSON contains the JSON metadata for the struct [Organization]
-type organizationJSON struct {
-	ID             apijson.Field
-	Name           apijson.Field
-	APIURL         apijson.Field
-	Created        apijson.Field
-	IsUniversalAPI apijson.Field
-	ProxyURL       apijson.Field
-	RealtimeURL    apijson.Field
-	raw            string
-	ExtraFields    map[string]apijson.Field
-}
-
-func (r *Organization) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r Organization) RawJSON() string { return r.JSON.raw }
+func (r *Organization) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r organizationJSON) RawJSON() string {
-	return r.raw
 }
 
 type PatchOrganizationMembersOutput struct {
 	// The id of the org that was modified.
-	OrgID  string                               `json:"org_id,required"`
+	OrgID string `json:"org_id,required"`
+	// Any of "success".
 	Status PatchOrganizationMembersOutputStatus `json:"status,required"`
 	// If invite emails failed to send for some reason, the patch operation will still
 	// complete, but we will return an error message here
-	SendEmailError string                             `json:"send_email_error,nullable"`
-	JSON           patchOrganizationMembersOutputJSON `json:"-"`
+	SendEmailError string `json:"send_email_error,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		OrgID          respjson.Field
+		Status         respjson.Field
+		SendEmailError respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
+	} `json:"-"`
 }
 
-// patchOrganizationMembersOutputJSON contains the JSON metadata for the struct
-// [PatchOrganizationMembersOutput]
-type patchOrganizationMembersOutputJSON struct {
-	OrgID          apijson.Field
-	Status         apijson.Field
-	SendEmailError apijson.Field
-	raw            string
-	ExtraFields    map[string]apijson.Field
-}
-
-func (r *PatchOrganizationMembersOutput) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PatchOrganizationMembersOutput) RawJSON() string { return r.JSON.raw }
+func (r *PatchOrganizationMembersOutput) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r patchOrganizationMembersOutputJSON) RawJSON() string {
-	return r.raw
 }
 
 type PatchOrganizationMembersOutputStatus string
@@ -3344,14 +3025,6 @@ type PatchOrganizationMembersOutputStatus string
 const (
 	PatchOrganizationMembersOutputStatusSuccess PatchOrganizationMembersOutputStatus = "success"
 )
-
-func (r PatchOrganizationMembersOutputStatus) IsKnown() bool {
-	switch r {
-	case PatchOrganizationMembersOutputStatusSuccess:
-		return true
-	}
-	return false
-}
 
 // Each permission permits a certain type of operation on an object in the system
 //
@@ -3370,14 +3043,6 @@ const (
 	PermissionDeleteACLs Permission = "delete_acls"
 )
 
-func (r Permission) IsKnown() bool {
-	switch r {
-	case PermissionCreate, PermissionRead, PermissionUpdate, PermissionDelete, PermissionCreateACLs, PermissionReadACLs, PermissionUpdateACLs, PermissionDeleteACLs:
-		return true
-	}
-	return false
-}
-
 type Project struct {
 	// Unique identifier for the project
 	ID string `json:"id,required" format:"uuid"`
@@ -3391,29 +3056,25 @@ type Project struct {
 	DeletedAt time.Time       `json:"deleted_at,nullable" format:"date-time"`
 	Settings  ProjectSettings `json:"settings,nullable"`
 	// Identifies the user who created the project
-	UserID string      `json:"user_id,nullable" format:"uuid"`
-	JSON   projectJSON `json:"-"`
+	UserID string `json:"user_id,nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Name        respjson.Field
+		OrgID       respjson.Field
+		Created     respjson.Field
+		DeletedAt   respjson.Field
+		Settings    respjson.Field
+		UserID      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// projectJSON contains the JSON metadata for the struct [Project]
-type projectJSON struct {
-	ID          apijson.Field
-	Name        apijson.Field
-	OrgID       apijson.Field
-	Created     apijson.Field
-	DeletedAt   apijson.Field
-	Settings    apijson.Field
-	UserID      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *Project) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r Project) RawJSON() string { return r.JSON.raw }
+func (r *Project) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectJSON) RawJSON() string {
-	return r.raw
 }
 
 type ProjectLogsEvent struct {
@@ -3428,6 +3089,8 @@ type ProjectLogsEvent struct {
 	// The timestamp the project logs event was created
 	Created time.Time `json:"created,required" format:"date-time"`
 	// A literal 'g' which identifies the log as a project log
+	//
+	// Any of "g".
 	LogID ProjectLogsEventLogID `json:"log_id,required"`
 	// Unique id for the organization that the project belongs under
 	OrgID string `json:"org_id,required" format:"uuid"`
@@ -3446,17 +3109,17 @@ type ProjectLogsEvent struct {
 	// logs event
 	Context ProjectLogsEventContext `json:"context,nullable"`
 	// The error that occurred, if any.
-	Error interface{} `json:"error"`
+	Error any `json:"error"`
 	// The ground truth value (an arbitrary, JSON serializable object) that you'd
 	// compare to `output` to determine if your `output` value is correct or not.
 	// Braintrust currently does not compare `output` to `expected` for you, since
 	// there are so many different ways to do that correctly. Instead, these values are
 	// just used to help you navigate while digging into analyses. However, we may
 	// later use these values to re-score outputs or fine-tune your models.
-	Expected interface{} `json:"expected"`
+	Expected any `json:"expected"`
 	// The arguments that uniquely define a user input (an arbitrary, JSON serializable
 	// object).
-	Input interface{} `json:"input"`
+	Input any `json:"input"`
 	// Whether this span is a root span
 	IsRoot bool `json:"is_root,nullable"`
 	// A dictionary with additional data about the test example, model outputs, or just
@@ -3476,7 +3139,7 @@ type ProjectLogsEvent struct {
 	// or not. For example, in an app that generates SQL queries, the `output` should
 	// be the _result_ of the SQL query generated by the model, not the query itself,
 	// because there may be multiple valid queries that answer a single question.
-	Output interface{} `json:"output"`
+	Output any `json:"output"`
 	// A dictionary of numeric values (between 0 and 1) to log. The scores should give
 	// you a variety of signals that help you determine how accurate the outputs are
 	// compared to what you expect and diagnose failures. For example, a summarization
@@ -3493,44 +3156,39 @@ type ProjectLogsEvent struct {
 	// parent element for subspans
 	SpanParents []string `json:"span_parents,nullable"`
 	// A list of tags to log
-	Tags []string             `json:"tags,nullable"`
-	JSON projectLogsEventJSON `json:"-"`
+	Tags []string `json:"tags,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID             respjson.Field
+		XactID         respjson.Field
+		Created        respjson.Field
+		LogID          respjson.Field
+		OrgID          respjson.Field
+		ProjectID      respjson.Field
+		RootSpanID     respjson.Field
+		SpanID         respjson.Field
+		Context        respjson.Field
+		Error          respjson.Field
+		Expected       respjson.Field
+		Input          respjson.Field
+		IsRoot         respjson.Field
+		Metadata       respjson.Field
+		Metrics        respjson.Field
+		Origin         respjson.Field
+		Output         respjson.Field
+		Scores         respjson.Field
+		SpanAttributes respjson.Field
+		SpanParents    respjson.Field
+		Tags           respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
+	} `json:"-"`
 }
 
-// projectLogsEventJSON contains the JSON metadata for the struct
-// [ProjectLogsEvent]
-type projectLogsEventJSON struct {
-	ID             apijson.Field
-	XactID         apijson.Field
-	Created        apijson.Field
-	LogID          apijson.Field
-	OrgID          apijson.Field
-	ProjectID      apijson.Field
-	RootSpanID     apijson.Field
-	SpanID         apijson.Field
-	Context        apijson.Field
-	Error          apijson.Field
-	Expected       apijson.Field
-	Input          apijson.Field
-	IsRoot         apijson.Field
-	Metadata       apijson.Field
-	Metrics        apijson.Field
-	Origin         apijson.Field
-	Output         apijson.Field
-	Scores         apijson.Field
-	SpanAttributes apijson.Field
-	SpanParents    apijson.Field
-	Tags           apijson.Field
-	raw            string
-	ExtraFields    map[string]apijson.Field
-}
-
-func (r *ProjectLogsEvent) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ProjectLogsEvent) RawJSON() string { return r.JSON.raw }
+func (r *ProjectLogsEvent) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectLogsEventJSON) RawJSON() string {
-	return r.raw
 }
 
 // A literal 'g' which identifies the log as a project log
@@ -3539,14 +3197,6 @@ type ProjectLogsEventLogID string
 const (
 	ProjectLogsEventLogIDG ProjectLogsEventLogID = "g"
 )
-
-func (r ProjectLogsEventLogID) IsKnown() bool {
-	switch r {
-	case ProjectLogsEventLogIDG:
-		return true
-	}
-	return false
-}
 
 // Context is additional information about the code that produced the project logs
 // event. It is essentially the textual counterpart to `metrics`. Use the
@@ -3558,27 +3208,22 @@ type ProjectLogsEventContext struct {
 	// The function in code which created the project logs event
 	CallerFunctionname string `json:"caller_functionname,nullable"`
 	// Line of code where the project logs event was created
-	CallerLineno int64                       `json:"caller_lineno,nullable"`
-	ExtraFields  map[string]interface{}      `json:"-,extras"`
-	JSON         projectLogsEventContextJSON `json:"-"`
+	CallerLineno int64          `json:"caller_lineno,nullable"`
+	ExtraFields  map[string]any `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		CallerFilename     respjson.Field
+		CallerFunctionname respjson.Field
+		CallerLineno       respjson.Field
+		ExtraFields        map[string]respjson.Field
+		raw                string
+	} `json:"-"`
 }
 
-// projectLogsEventContextJSON contains the JSON metadata for the struct
-// [ProjectLogsEventContext]
-type projectLogsEventContextJSON struct {
-	CallerFilename     apijson.Field
-	CallerFunctionname apijson.Field
-	CallerLineno       apijson.Field
-	raw                string
-	ExtraFields        map[string]apijson.Field
-}
-
-func (r *ProjectLogsEventContext) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ProjectLogsEventContext) RawJSON() string { return r.JSON.raw }
+func (r *ProjectLogsEventContext) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectLogsEventContextJSON) RawJSON() string {
-	return r.raw
 }
 
 // A dictionary with additional data about the test example, model outputs, or just
@@ -3588,25 +3233,20 @@ func (r projectLogsEventContextJSON) RawJSON() string {
 // can be any JSON-serializable type, but its keys must be strings
 type ProjectLogsEventMetadata struct {
 	// The model used for this example
-	Model       string                       `json:"model,nullable"`
-	ExtraFields map[string]interface{}       `json:"-,extras"`
-	JSON        projectLogsEventMetadataJSON `json:"-"`
+	Model       string         `json:"model,nullable"`
+	ExtraFields map[string]any `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Model       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// projectLogsEventMetadataJSON contains the JSON metadata for the struct
-// [ProjectLogsEventMetadata]
-type projectLogsEventMetadataJSON struct {
-	Model       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ProjectLogsEventMetadata) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ProjectLogsEventMetadata) RawJSON() string { return r.JSON.raw }
+func (r *ProjectLogsEventMetadata) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectLogsEventMetadataJSON) RawJSON() string {
-	return r.raw
 }
 
 // Metrics are numerical measurements tracking the execution of the code that
@@ -3614,11 +3254,11 @@ func (r projectLogsEventMetadataJSON) RawJSON() string {
 // over which the project logs event was produced
 type ProjectLogsEventMetrics struct {
 	// This metric is deprecated
-	CallerFilename interface{} `json:"caller_filename"`
+	CallerFilename any `json:"caller_filename"`
 	// This metric is deprecated
-	CallerFunctionname interface{} `json:"caller_functionname"`
+	CallerFunctionname any `json:"caller_functionname"`
 	// This metric is deprecated
-	CallerLineno interface{} `json:"caller_lineno"`
+	CallerLineno any `json:"caller_lineno"`
 	// The number of tokens in the completion generated by the model (only set if this
 	// is an LLM span)
 	CompletionTokens int64 `json:"completion_tokens,nullable"`
@@ -3632,32 +3272,27 @@ type ProjectLogsEventMetrics struct {
 	// logs event started
 	Start float64 `json:"start,nullable"`
 	// The total number of tokens in the input and output of the project logs event.
-	Tokens      int64                       `json:"tokens,nullable"`
-	ExtraFields map[string]float64          `json:"-,extras"`
-	JSON        projectLogsEventMetricsJSON `json:"-"`
+	Tokens      int64              `json:"tokens,nullable"`
+	ExtraFields map[string]float64 `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		CallerFilename     respjson.Field
+		CallerFunctionname respjson.Field
+		CallerLineno       respjson.Field
+		CompletionTokens   respjson.Field
+		End                respjson.Field
+		PromptTokens       respjson.Field
+		Start              respjson.Field
+		Tokens             respjson.Field
+		ExtraFields        map[string]respjson.Field
+		raw                string
+	} `json:"-"`
 }
 
-// projectLogsEventMetricsJSON contains the JSON metadata for the struct
-// [ProjectLogsEventMetrics]
-type projectLogsEventMetricsJSON struct {
-	CallerFilename     apijson.Field
-	CallerFunctionname apijson.Field
-	CallerLineno       apijson.Field
-	CompletionTokens   apijson.Field
-	End                apijson.Field
-	PromptTokens       apijson.Field
-	Start              apijson.Field
-	Tokens             apijson.Field
-	raw                string
-	ExtraFields        map[string]apijson.Field
-}
-
-func (r *ProjectLogsEventMetrics) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ProjectLogsEventMetrics) RawJSON() string { return r.JSON.raw }
+func (r *ProjectLogsEventMetrics) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectLogsEventMetricsJSON) RawJSON() string {
-	return r.raw
 }
 
 // A project score is a user-configured score, which can be manually-labeled
@@ -3670,6 +3305,9 @@ type ProjectScore struct {
 	// Unique identifier for the project that the project score belongs under
 	ProjectID string `json:"project_id,required" format:"uuid"`
 	// The type of the configured score
+	//
+	// Any of "slider", "categorical", "weighted", "minimum", "maximum", "online",
+	// "free-form".
 	ScoreType ProjectScoreType `json:"score_type,required"`
 	UserID    string           `json:"user_id,required" format:"uuid"`
 	// For categorical-type project scores, the list of all categories
@@ -3681,136 +3319,158 @@ type ProjectScore struct {
 	Description string `json:"description,nullable"`
 	// An optional LexoRank-based string that sets the sort position for the score in
 	// the UI
-	Position string           `json:"position,nullable"`
-	JSON     projectScoreJSON `json:"-"`
+	Position string `json:"position,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Name        respjson.Field
+		ProjectID   respjson.Field
+		ScoreType   respjson.Field
+		UserID      respjson.Field
+		Categories  respjson.Field
+		Config      respjson.Field
+		Created     respjson.Field
+		Description respjson.Field
+		Position    respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// projectScoreJSON contains the JSON metadata for the struct [ProjectScore]
-type projectScoreJSON struct {
-	ID          apijson.Field
-	Name        apijson.Field
-	ProjectID   apijson.Field
-	ScoreType   apijson.Field
-	UserID      apijson.Field
-	Categories  apijson.Field
-	Config      apijson.Field
-	Created     apijson.Field
-	Description apijson.Field
-	Position    apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ProjectScore) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ProjectScore) RawJSON() string { return r.JSON.raw }
+func (r *ProjectScore) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r projectScoreJSON) RawJSON() string {
-	return r.raw
-}
-
-// For categorical-type project scores, the list of all categories
+// ProjectScoreCategoriesUnion contains all possible properties and values from
+// [[]ProjectScoreCategory], [[]string].
 //
-// Union satisfied by [shared.ProjectScoreCategoriesCategorical] or
-// [shared.ProjectScoreCategoriesMinimum].
-type ProjectScoreCategoriesUnion interface {
-	implementsProjectScoreCategoriesUnion()
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+//
+// If the underlying value is not a json object, one of the following properties
+// will be valid: OfCategorical OfMinimum]
+type ProjectScoreCategoriesUnion struct {
+	// This field will be present if the value is a [[]ProjectScoreCategory] instead of
+	// an object.
+	OfCategorical []ProjectScoreCategory `json:",inline"`
+	// This field will be present if the value is a [[]string] instead of an object.
+	OfMinimum []string `json:",inline"`
+	JSON      struct {
+		OfCategorical respjson.Field
+		OfMinimum     respjson.Field
+		raw           string
+	} `json:"-"`
 }
 
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*ProjectScoreCategoriesUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ProjectScoreCategoriesCategorical{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ProjectScoreCategoriesMinimum{}),
-		},
-	)
+func (u ProjectScoreCategoriesUnion) AsCategorical() (v []ProjectScoreCategory) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
 }
 
-type ProjectScoreCategoriesCategorical []ProjectScoreCategory
+func (u ProjectScoreCategoriesUnion) AsMinimum() (v []string) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
 
-func (r ProjectScoreCategoriesCategorical) implementsProjectScoreCategoriesUnion() {}
+// Returns the unmodified JSON received from the API
+func (u ProjectScoreCategoriesUnion) RawJSON() string { return u.JSON.raw }
 
-type ProjectScoreCategoriesMinimum []string
-
-func (r ProjectScoreCategoriesMinimum) implementsProjectScoreCategoriesUnion() {}
+func (r *ProjectScoreCategoriesUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // For categorical-type project scores, defines a single category
 type ProjectScoreCategory struct {
 	// Name of the category
 	Name string `json:"name,required"`
 	// Numerical value of the category. Must be between 0 and 1, inclusive
-	Value float64                  `json:"value,required"`
-	JSON  projectScoreCategoryJSON `json:"-"`
+	Value float64 `json:"value,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Name        respjson.Field
+		Value       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// projectScoreCategoryJSON contains the JSON metadata for the struct
-// [ProjectScoreCategory]
-type projectScoreCategoryJSON struct {
-	Name        apijson.Field
-	Value       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ProjectScoreCategory) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ProjectScoreCategory) RawJSON() string { return r.JSON.raw }
+func (r *ProjectScoreCategory) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r projectScoreCategoryJSON) RawJSON() string {
-	return r.raw
+// ToParam converts this ProjectScoreCategory to a ProjectScoreCategoryParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// ProjectScoreCategoryParam.Overrides()
+func (r ProjectScoreCategory) ToParam() ProjectScoreCategoryParam {
+	return param.Override[ProjectScoreCategoryParam](json.RawMessage(r.RawJSON()))
 }
 
 // For categorical-type project scores, defines a single category
+//
+// The properties Name, Value are required.
 type ProjectScoreCategoryParam struct {
 	// Name of the category
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
 	// Numerical value of the category. Must be between 0 and 1, inclusive
-	Value param.Field[float64] `json:"value,required"`
+	Value float64 `json:"value,required"`
+	paramObj
 }
 
 func (r ProjectScoreCategoryParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ProjectScoreCategoryParam
+	return param.MarshalObject(r, (*shadow)(&r))
 }
-
-type ProjectScoreConfig struct {
-	Destination string                 `json:"destination,nullable"`
-	MultiSelect bool                   `json:"multi_select,nullable"`
-	Online      OnlineScoreConfig      `json:"online,nullable"`
-	JSON        projectScoreConfigJSON `json:"-"`
-}
-
-// projectScoreConfigJSON contains the JSON metadata for the struct
-// [ProjectScoreConfig]
-type projectScoreConfigJSON struct {
-	Destination apijson.Field
-	MultiSelect apijson.Field
-	Online      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ProjectScoreConfig) UnmarshalJSON(data []byte) (err error) {
+func (r *ProjectScoreCategoryParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r projectScoreConfigJSON) RawJSON() string {
-	return r.raw
+type ProjectScoreConfig struct {
+	Destination string            `json:"destination,nullable"`
+	MultiSelect bool              `json:"multi_select,nullable"`
+	Online      OnlineScoreConfig `json:"online,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Destination respjson.Field
+		MultiSelect respjson.Field
+		Online      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ProjectScoreConfig) RawJSON() string { return r.JSON.raw }
+func (r *ProjectScoreConfig) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ToParam converts this ProjectScoreConfig to a ProjectScoreConfigParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// ProjectScoreConfigParam.Overrides()
+func (r ProjectScoreConfig) ToParam() ProjectScoreConfigParam {
+	return param.Override[ProjectScoreConfigParam](json.RawMessage(r.RawJSON()))
 }
 
 type ProjectScoreConfigParam struct {
-	Destination param.Field[string]                 `json:"destination"`
-	MultiSelect param.Field[bool]                   `json:"multi_select"`
-	Online      param.Field[OnlineScoreConfigParam] `json:"online"`
+	Destination param.Opt[string]      `json:"destination,omitzero"`
+	MultiSelect param.Opt[bool]        `json:"multi_select,omitzero"`
+	Online      OnlineScoreConfigParam `json:"online,omitzero"`
+	paramObj
 }
 
 func (r ProjectScoreConfigParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ProjectScoreConfigParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ProjectScoreConfigParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // The type of the configured score
@@ -3826,16 +3486,6 @@ const (
 	ProjectScoreTypeFreeForm    ProjectScoreType = "free-form"
 )
 
-func (r ProjectScoreType) IsKnown() bool {
-	switch r {
-	case ProjectScoreTypeSlider, ProjectScoreTypeCategorical, ProjectScoreTypeWeighted, ProjectScoreTypeMinimum, ProjectScoreTypeMaximum, ProjectScoreTypeOnline, ProjectScoreTypeFreeForm:
-		return true
-	}
-	return false
-}
-
-func (r ProjectScoreType) ImplementsProjectScoreListParamsScoreTypeUnion() {}
-
 type ProjectSettings struct {
 	// The id of the experiment to use as the default baseline for comparisons
 	BaselineExperimentID string `json:"baseline_experiment_id,nullable" format:"uuid"`
@@ -3843,51 +3493,52 @@ type ProjectSettings struct {
 	ComparisonKey string `json:"comparison_key,nullable"`
 	// The order of the fields to display in the trace view
 	SpanFieldOrder []ProjectSettingsSpanFieldOrder `json:"spanFieldOrder,nullable"`
-	JSON           projectSettingsJSON             `json:"-"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		BaselineExperimentID respjson.Field
+		ComparisonKey        respjson.Field
+		SpanFieldOrder       respjson.Field
+		ExtraFields          map[string]respjson.Field
+		raw                  string
+	} `json:"-"`
 }
 
-// projectSettingsJSON contains the JSON metadata for the struct [ProjectSettings]
-type projectSettingsJSON struct {
-	BaselineExperimentID apijson.Field
-	ComparisonKey        apijson.Field
-	SpanFieldOrder       apijson.Field
-	raw                  string
-	ExtraFields          map[string]apijson.Field
-}
-
-func (r *ProjectSettings) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ProjectSettings) RawJSON() string { return r.JSON.raw }
+func (r *ProjectSettings) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r projectSettingsJSON) RawJSON() string {
-	return r.raw
+// ToParam converts this ProjectSettings to a ProjectSettingsParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// ProjectSettingsParam.Overrides()
+func (r ProjectSettings) ToParam() ProjectSettingsParam {
+	return param.Override[ProjectSettingsParam](json.RawMessage(r.RawJSON()))
 }
 
 type ProjectSettingsSpanFieldOrder struct {
-	ColumnID   string                              `json:"column_id,required"`
-	ObjectType string                              `json:"object_type,required"`
-	Position   string                              `json:"position,required"`
-	Layout     ProjectSettingsSpanFieldOrderLayout `json:"layout,nullable"`
-	JSON       projectSettingsSpanFieldOrderJSON   `json:"-"`
+	ColumnID   string `json:"column_id,required"`
+	ObjectType string `json:"object_type,required"`
+	Position   string `json:"position,required"`
+	// Any of "full", "two_column".
+	Layout ProjectSettingsSpanFieldOrderLayout `json:"layout,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ColumnID    respjson.Field
+		ObjectType  respjson.Field
+		Position    respjson.Field
+		Layout      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// projectSettingsSpanFieldOrderJSON contains the JSON metadata for the struct
-// [ProjectSettingsSpanFieldOrder]
-type projectSettingsSpanFieldOrderJSON struct {
-	ColumnID    apijson.Field
-	ObjectType  apijson.Field
-	Position    apijson.Field
-	Layout      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ProjectSettingsSpanFieldOrder) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ProjectSettingsSpanFieldOrder) RawJSON() string { return r.JSON.raw }
+func (r *ProjectSettingsSpanFieldOrder) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectSettingsSpanFieldOrderJSON) RawJSON() string {
-	return r.raw
 }
 
 type ProjectSettingsSpanFieldOrderLayout string
@@ -3897,36 +3548,40 @@ const (
 	ProjectSettingsSpanFieldOrderLayoutTwoColumn ProjectSettingsSpanFieldOrderLayout = "two_column"
 )
 
-func (r ProjectSettingsSpanFieldOrderLayout) IsKnown() bool {
-	switch r {
-	case ProjectSettingsSpanFieldOrderLayoutFull, ProjectSettingsSpanFieldOrderLayoutTwoColumn:
-		return true
-	}
-	return false
-}
-
 type ProjectSettingsParam struct {
 	// The id of the experiment to use as the default baseline for comparisons
-	BaselineExperimentID param.Field[string] `json:"baseline_experiment_id" format:"uuid"`
+	BaselineExperimentID param.Opt[string] `json:"baseline_experiment_id,omitzero" format:"uuid"`
 	// The key used to join two experiments (defaults to `input`)
-	ComparisonKey param.Field[string] `json:"comparison_key"`
+	ComparisonKey param.Opt[string] `json:"comparison_key,omitzero"`
 	// The order of the fields to display in the trace view
-	SpanFieldOrder param.Field[[]ProjectSettingsSpanFieldOrderParam] `json:"spanFieldOrder"`
+	SpanFieldOrder []ProjectSettingsSpanFieldOrderParam `json:"spanFieldOrder,omitzero"`
+	paramObj
 }
 
 func (r ProjectSettingsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ProjectSettingsParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ProjectSettingsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
+// The properties ColumnID, ObjectType, Position are required.
 type ProjectSettingsSpanFieldOrderParam struct {
-	ColumnID   param.Field[string]                              `json:"column_id,required"`
-	ObjectType param.Field[string]                              `json:"object_type,required"`
-	Position   param.Field[string]                              `json:"position,required"`
-	Layout     param.Field[ProjectSettingsSpanFieldOrderLayout] `json:"layout"`
+	ColumnID   string `json:"column_id,required"`
+	ObjectType string `json:"object_type,required"`
+	Position   string `json:"position,required"`
+	// Any of "full", "two_column".
+	Layout ProjectSettingsSpanFieldOrderLayout `json:"layout,omitzero"`
+	paramObj
 }
 
 func (r ProjectSettingsSpanFieldOrderParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ProjectSettingsSpanFieldOrderParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ProjectSettingsSpanFieldOrderParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // A project tag is a user-configured tag for tracking and filtering your
@@ -3944,29 +3599,25 @@ type ProjectTag struct {
 	// Date of project tag creation
 	Created time.Time `json:"created,nullable" format:"date-time"`
 	// Textual description of the project tag
-	Description string         `json:"description,nullable"`
-	JSON        projectTagJSON `json:"-"`
+	Description string `json:"description,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Name        respjson.Field
+		ProjectID   respjson.Field
+		UserID      respjson.Field
+		Color       respjson.Field
+		Created     respjson.Field
+		Description respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// projectTagJSON contains the JSON metadata for the struct [ProjectTag]
-type projectTagJSON struct {
-	ID          apijson.Field
-	Name        apijson.Field
-	ProjectID   apijson.Field
-	UserID      apijson.Field
-	Color       apijson.Field
-	Created     apijson.Field
-	Description apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ProjectTag) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ProjectTag) RawJSON() string { return r.JSON.raw }
+func (r *ProjectTag) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r projectTagJSON) RawJSON() string {
-	return r.raw
 }
 
 type Prompt struct {
@@ -3978,6 +3629,8 @@ type Prompt struct {
 	// parameter)
 	XactID string `json:"_xact_id,required"`
 	// A literal 'p' which identifies the object as a project prompt
+	//
+	// Any of "p".
 	LogID PromptLogID `json:"log_id,required"`
 	// Name of the prompt
 	Name string `json:"name,required"`
@@ -3990,42 +3643,39 @@ type Prompt struct {
 	// Date of prompt creation
 	Created time.Time `json:"created,nullable" format:"date-time"`
 	// Textual description of the prompt
-	Description  string             `json:"description,nullable"`
+	Description string `json:"description,nullable"`
+	// Any of "llm", "scorer", "task", "tool".
 	FunctionType PromptFunctionType `json:"function_type,nullable"`
 	// User-controlled metadata about the prompt
-	Metadata map[string]interface{} `json:"metadata,nullable"`
+	Metadata map[string]any `json:"metadata,nullable"`
 	// The prompt, model, and its parameters
 	PromptData PromptData `json:"prompt_data,nullable"`
 	// A list of tags for the prompt
-	Tags []string   `json:"tags,nullable"`
-	JSON promptJSON `json:"-"`
+	Tags []string `json:"tags,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID           respjson.Field
+		XactID       respjson.Field
+		LogID        respjson.Field
+		Name         respjson.Field
+		OrgID        respjson.Field
+		ProjectID    respjson.Field
+		Slug         respjson.Field
+		Created      respjson.Field
+		Description  respjson.Field
+		FunctionType respjson.Field
+		Metadata     respjson.Field
+		PromptData   respjson.Field
+		Tags         respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
 }
 
-// promptJSON contains the JSON metadata for the struct [Prompt]
-type promptJSON struct {
-	ID           apijson.Field
-	XactID       apijson.Field
-	LogID        apijson.Field
-	Name         apijson.Field
-	OrgID        apijson.Field
-	ProjectID    apijson.Field
-	Slug         apijson.Field
-	Created      apijson.Field
-	Description  apijson.Field
-	FunctionType apijson.Field
-	Metadata     apijson.Field
-	PromptData   apijson.Field
-	Tags         apijson.Field
-	raw          string
-	ExtraFields  map[string]apijson.Field
-}
-
-func (r *Prompt) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r Prompt) RawJSON() string { return r.JSON.raw }
+func (r *Prompt) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptJSON) RawJSON() string {
-	return r.raw
 }
 
 // A literal 'p' which identifies the object as a project prompt
@@ -4034,14 +3684,6 @@ type PromptLogID string
 const (
 	PromptLogIDP PromptLogID = "p"
 )
-
-func (r PromptLogID) IsKnown() bool {
-	switch r {
-	case PromptLogIDP:
-		return true
-	}
-	return false
-}
 
 type PromptFunctionType string
 
@@ -4052,1226 +3694,1362 @@ const (
 	PromptFunctionTypeTool   PromptFunctionType = "tool"
 )
 
-func (r PromptFunctionType) IsKnown() bool {
-	switch r {
-	case PromptFunctionTypeLlm, PromptFunctionTypeScorer, PromptFunctionTypeTask, PromptFunctionTypeTool:
-		return true
-	}
-	return false
-}
-
 // The prompt, model, and its parameters
 type PromptData struct {
-	Options       PromptOptions            `json:"options,nullable"`
-	Origin        PromptDataOrigin         `json:"origin,nullable"`
-	Parser        PromptDataParser         `json:"parser,nullable"`
-	Prompt        PromptDataPrompt         `json:"prompt,nullable"`
-	ToolFunctions []PromptDataToolFunction `json:"tool_functions,nullable"`
-	JSON          promptDataJSON           `json:"-"`
+	Options       PromptOptions                 `json:"options,nullable"`
+	Origin        PromptDataOrigin              `json:"origin,nullable"`
+	Parser        PromptDataParser              `json:"parser,nullable"`
+	Prompt        PromptDataPromptUnion         `json:"prompt,nullable"`
+	ToolFunctions []PromptDataToolFunctionUnion `json:"tool_functions,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Options       respjson.Field
+		Origin        respjson.Field
+		Parser        respjson.Field
+		Prompt        respjson.Field
+		ToolFunctions respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
+	} `json:"-"`
 }
 
-// promptDataJSON contains the JSON metadata for the struct [PromptData]
-type promptDataJSON struct {
-	Options       apijson.Field
-	Origin        apijson.Field
-	Parser        apijson.Field
-	Prompt        apijson.Field
-	ToolFunctions apijson.Field
-	raw           string
-	ExtraFields   map[string]apijson.Field
-}
-
-func (r *PromptData) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PromptData) RawJSON() string { return r.JSON.raw }
+func (r *PromptData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptDataJSON) RawJSON() string {
-	return r.raw
+// ToParam converts this PromptData to a PromptDataParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// PromptDataParam.Overrides()
+func (r PromptData) ToParam() PromptDataParam {
+	return param.Override[PromptDataParam](json.RawMessage(r.RawJSON()))
 }
 
 type PromptDataOrigin struct {
-	ProjectID     string               `json:"project_id"`
-	PromptID      string               `json:"prompt_id"`
-	PromptVersion string               `json:"prompt_version"`
-	JSON          promptDataOriginJSON `json:"-"`
+	ProjectID     string `json:"project_id"`
+	PromptID      string `json:"prompt_id"`
+	PromptVersion string `json:"prompt_version"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ProjectID     respjson.Field
+		PromptID      respjson.Field
+		PromptVersion respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
+	} `json:"-"`
 }
 
-// promptDataOriginJSON contains the JSON metadata for the struct
-// [PromptDataOrigin]
-type promptDataOriginJSON struct {
-	ProjectID     apijson.Field
-	PromptID      apijson.Field
-	PromptVersion apijson.Field
-	raw           string
-	ExtraFields   map[string]apijson.Field
-}
-
-func (r *PromptDataOrigin) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PromptDataOrigin) RawJSON() string { return r.JSON.raw }
+func (r *PromptDataOrigin) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataOriginJSON) RawJSON() string {
-	return r.raw
 }
 
 type PromptDataParser struct {
-	ChoiceScores map[string]float64   `json:"choice_scores,required"`
-	Type         PromptDataParserType `json:"type,required"`
-	UseCot       bool                 `json:"use_cot,required"`
-	JSON         promptDataParserJSON `json:"-"`
+	ChoiceScores map[string]float64 `json:"choice_scores,required"`
+	// Any of "llm_classifier".
+	Type   string `json:"type,required"`
+	UseCot bool   `json:"use_cot,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ChoiceScores respjson.Field
+		Type         respjson.Field
+		UseCot       respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
 }
 
-// promptDataParserJSON contains the JSON metadata for the struct
-// [PromptDataParser]
-type promptDataParserJSON struct {
-	ChoiceScores apijson.Field
-	Type         apijson.Field
-	UseCot       apijson.Field
-	raw          string
-	ExtraFields  map[string]apijson.Field
-}
-
-func (r *PromptDataParser) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PromptDataParser) RawJSON() string { return r.JSON.raw }
+func (r *PromptDataParser) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptDataParserJSON) RawJSON() string {
-	return r.raw
-}
-
-type PromptDataParserType string
-
-const (
-	PromptDataParserTypeLlmClassifier PromptDataParserType = "llm_classifier"
-)
-
-func (r PromptDataParserType) IsKnown() bool {
-	switch r {
-	case PromptDataParserTypeLlmClassifier:
-		return true
-	}
-	return false
-}
-
-type PromptDataPrompt struct {
-	Type    PromptDataPromptType `json:"type,required"`
-	Content string               `json:"content"`
-	// This field can have the runtime type of [[]PromptDataPromptChatMessage].
-	Messages interface{}          `json:"messages"`
-	Tools    string               `json:"tools"`
-	JSON     promptDataPromptJSON `json:"-"`
-	union    PromptDataPromptUnion
-}
-
-// promptDataPromptJSON contains the JSON metadata for the struct
-// [PromptDataPrompt]
-type promptDataPromptJSON struct {
-	Type        apijson.Field
-	Content     apijson.Field
-	Messages    apijson.Field
-	Tools       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r promptDataPromptJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *PromptDataPrompt) UnmarshalJSON(data []byte) (err error) {
-	*r = PromptDataPrompt{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [PromptDataPromptUnion] interface which you can cast to the
-// specific types for more type safety.
+// PromptDataPromptUnion contains all possible properties and values from
+// [PromptDataPromptCompletion], [PromptDataPromptChat].
 //
-// Possible runtime types of the union are [shared.PromptDataPromptCompletion],
-// [shared.PromptDataPromptChat].
-func (r PromptDataPrompt) AsUnion() PromptDataPromptUnion {
-	return r.union
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type PromptDataPromptUnion struct {
+	// This field is from variant [PromptDataPromptCompletion].
+	Content string `json:"content"`
+	Type    string `json:"type"`
+	// This field is from variant [PromptDataPromptChat].
+	Messages []PromptDataPromptChatMessageUnion `json:"messages"`
+	// This field is from variant [PromptDataPromptChat].
+	Tools string `json:"tools"`
+	JSON  struct {
+		Content  respjson.Field
+		Type     respjson.Field
+		Messages respjson.Field
+		Tools    respjson.Field
+		raw      string
+	} `json:"-"`
 }
 
-// Union satisfied by [shared.PromptDataPromptCompletion] or
-// [shared.PromptDataPromptChat].
-type PromptDataPromptUnion interface {
-	implementsPromptDataPrompt()
+func (u PromptDataPromptUnion) AsCompletion() (v PromptDataPromptCompletion) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
 }
 
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptDataPromptUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptCompletion{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChat{}),
-		},
-	)
+func (u PromptDataPromptUnion) AsChat() (v PromptDataPromptChat) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u PromptDataPromptUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *PromptDataPromptUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type PromptDataPromptCompletion struct {
-	Content string                         `json:"content,required"`
-	Type    PromptDataPromptCompletionType `json:"type,required"`
-	JSON    promptDataPromptCompletionJSON `json:"-"`
+	Content string `json:"content,required"`
+	// Any of "completion".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Content     respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// promptDataPromptCompletionJSON contains the JSON metadata for the struct
-// [PromptDataPromptCompletion]
-type promptDataPromptCompletionJSON struct {
-	Content     apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptCompletion) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PromptDataPromptCompletion) RawJSON() string { return r.JSON.raw }
+func (r *PromptDataPromptCompletion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptCompletionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptCompletion) implementsPromptDataPrompt() {}
-
-type PromptDataPromptCompletionType string
-
-const (
-	PromptDataPromptCompletionTypeCompletion PromptDataPromptCompletionType = "completion"
-)
-
-func (r PromptDataPromptCompletionType) IsKnown() bool {
-	switch r {
-	case PromptDataPromptCompletionTypeCompletion:
-		return true
-	}
-	return false
 }
 
 type PromptDataPromptChat struct {
-	Messages []PromptDataPromptChatMessage `json:"messages,required"`
-	Type     PromptDataPromptChatType      `json:"type,required"`
-	Tools    string                        `json:"tools"`
-	JSON     promptDataPromptChatJSON      `json:"-"`
+	Messages []PromptDataPromptChatMessageUnion `json:"messages,required"`
+	// Any of "chat".
+	Type  string `json:"type,required"`
+	Tools string `json:"tools"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Messages    respjson.Field
+		Type        respjson.Field
+		Tools       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// promptDataPromptChatJSON contains the JSON metadata for the struct
-// [PromptDataPromptChat]
-type promptDataPromptChatJSON struct {
-	Messages    apijson.Field
-	Type        apijson.Field
-	Tools       apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChat) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PromptDataPromptChat) RawJSON() string { return r.JSON.raw }
+func (r *PromptDataPromptChat) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptDataPromptChatJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptChat) implementsPromptDataPrompt() {}
-
-type PromptDataPromptChatMessage struct {
-	Role PromptDataPromptChatMessagesRole `json:"role,required"`
-	// This field can have the runtime type of [string],
-	// [PromptDataPromptChatMessagesUserContentUnion].
-	Content interface{} `json:"content"`
-	// This field can have the runtime type of
-	// [PromptDataPromptChatMessagesAssistantFunctionCall].
-	FunctionCall interface{} `json:"function_call"`
-	Name         string      `json:"name,nullable"`
-	ToolCallID   string      `json:"tool_call_id"`
-	// This field can have the runtime type of [[]ChatCompletionMessageToolCall].
-	ToolCalls interface{}                     `json:"tool_calls"`
-	JSON      promptDataPromptChatMessageJSON `json:"-"`
-	union     PromptDataPromptChatMessagesUnion
-}
-
-// promptDataPromptChatMessageJSON contains the JSON metadata for the struct
-// [PromptDataPromptChatMessage]
-type promptDataPromptChatMessageJSON struct {
-	Role         apijson.Field
-	Content      apijson.Field
-	FunctionCall apijson.Field
-	Name         apijson.Field
-	ToolCallID   apijson.Field
-	ToolCalls    apijson.Field
-	raw          string
-	ExtraFields  map[string]apijson.Field
-}
-
-func (r promptDataPromptChatMessageJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *PromptDataPromptChatMessage) UnmarshalJSON(data []byte) (err error) {
-	*r = PromptDataPromptChatMessage{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [PromptDataPromptChatMessagesUnion] interface which you can
-// cast to the specific types for more type safety.
+// PromptDataPromptChatMessageUnion contains all possible properties and values
+// from [PromptDataPromptChatMessageSystem], [PromptDataPromptChatMessageUser],
+// [PromptDataPromptChatMessageAssistant], [PromptDataPromptChatMessageTool],
+// [PromptDataPromptChatMessageFunction], [PromptDataPromptChatMessageFallback].
 //
-// Possible runtime types of the union are
-// [shared.PromptDataPromptChatMessagesSystem],
-// [shared.PromptDataPromptChatMessagesUser],
-// [shared.PromptDataPromptChatMessagesAssistant],
-// [shared.PromptDataPromptChatMessagesTool],
-// [shared.PromptDataPromptChatMessagesFunction],
-// [shared.PromptDataPromptChatMessagesFallback].
-func (r PromptDataPromptChatMessage) AsUnion() PromptDataPromptChatMessagesUnion {
-	return r.union
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type PromptDataPromptChatMessageUnion struct {
+	Role string `json:"role"`
+	// This field is a union of [string],
+	// [PromptDataPromptChatMessageUserContentUnion], [string], [string], [string],
+	// [string]
+	Content PromptDataPromptChatMessageUnionContent `json:"content"`
+	Name    string                                  `json:"name"`
+	// This field is from variant [PromptDataPromptChatMessageAssistant].
+	FunctionCall PromptDataPromptChatMessageAssistantFunctionCall `json:"function_call"`
+	// This field is from variant [PromptDataPromptChatMessageAssistant].
+	ToolCalls []ChatCompletionMessageToolCall `json:"tool_calls"`
+	// This field is from variant [PromptDataPromptChatMessageTool].
+	ToolCallID string `json:"tool_call_id"`
+	JSON       struct {
+		Role         respjson.Field
+		Content      respjson.Field
+		Name         respjson.Field
+		FunctionCall respjson.Field
+		ToolCalls    respjson.Field
+		ToolCallID   respjson.Field
+		raw          string
+	} `json:"-"`
 }
 
-// Union satisfied by [shared.PromptDataPromptChatMessagesSystem],
-// [shared.PromptDataPromptChatMessagesUser],
-// [shared.PromptDataPromptChatMessagesAssistant],
-// [shared.PromptDataPromptChatMessagesTool],
-// [shared.PromptDataPromptChatMessagesFunction] or
-// [shared.PromptDataPromptChatMessagesFallback].
-type PromptDataPromptChatMessagesUnion interface {
-	implementsPromptDataPromptChatMessage()
+func (u PromptDataPromptChatMessageUnion) AsSystem() (v PromptDataPromptChatMessageSystem) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
 }
 
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptDataPromptChatMessagesUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesSystem{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesUser{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesAssistant{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesTool{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesFunction{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesFallback{}),
-		},
-	)
+func (u PromptDataPromptChatMessageUnion) AsUser() (v PromptDataPromptChatMessageUser) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
 }
 
-type PromptDataPromptChatMessagesSystem struct {
-	Role    PromptDataPromptChatMessagesSystemRole `json:"role,required"`
-	Content string                                 `json:"content"`
-	Name    string                                 `json:"name"`
-	JSON    promptDataPromptChatMessagesSystemJSON `json:"-"`
+func (u PromptDataPromptChatMessageUnion) AsAssistant() (v PromptDataPromptChatMessageAssistant) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
 }
 
-// promptDataPromptChatMessagesSystemJSON contains the JSON metadata for the struct
-// [PromptDataPromptChatMessagesSystem]
-type promptDataPromptChatMessagesSystemJSON struct {
-	Role        apijson.Field
-	Content     apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
+func (u PromptDataPromptChatMessageUnion) AsTool() (v PromptDataPromptChatMessageTool) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
 }
 
-func (r *PromptDataPromptChatMessagesSystem) UnmarshalJSON(data []byte) (err error) {
+func (u PromptDataPromptChatMessageUnion) AsFunction() (v PromptDataPromptChatMessageFunction) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u PromptDataPromptChatMessageUnion) AsFallback() (v PromptDataPromptChatMessageFallback) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u PromptDataPromptChatMessageUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *PromptDataPromptChatMessageUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptDataPromptChatMessagesSystemJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptChatMessagesSystem) implementsPromptDataPromptChatMessage() {}
-
-type PromptDataPromptChatMessagesSystemRole string
-
-const (
-	PromptDataPromptChatMessagesSystemRoleSystem PromptDataPromptChatMessagesSystemRole = "system"
-)
-
-func (r PromptDataPromptChatMessagesSystemRole) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesSystemRoleSystem:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatMessagesUser struct {
-	Role    PromptDataPromptChatMessagesUserRole         `json:"role,required"`
-	Content PromptDataPromptChatMessagesUserContentUnion `json:"content"`
-	Name    string                                       `json:"name"`
-	JSON    promptDataPromptChatMessagesUserJSON         `json:"-"`
-}
-
-// promptDataPromptChatMessagesUserJSON contains the JSON metadata for the struct
-// [PromptDataPromptChatMessagesUser]
-type promptDataPromptChatMessagesUserJSON struct {
-	Role        apijson.Field
-	Content     apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesUser) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesUserJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptChatMessagesUser) implementsPromptDataPromptChatMessage() {}
-
-type PromptDataPromptChatMessagesUserRole string
-
-const (
-	PromptDataPromptChatMessagesUserRoleUser PromptDataPromptChatMessagesUserRole = "user"
-)
-
-func (r PromptDataPromptChatMessagesUserRole) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesUserRoleUser:
-		return true
-	}
-	return false
-}
-
-// Union satisfied by [shared.UnionString] or
-// [shared.PromptDataPromptChatMessagesUserContentArray].
-type PromptDataPromptChatMessagesUserContentUnion interface {
-	ImplementsPromptDataPromptChatMessagesUserContentUnion()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptDataPromptChatMessagesUserContentUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(UnionString("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataPromptChatMessagesUserContentArray{}),
-		},
-	)
-}
-
-type PromptDataPromptChatMessagesUserContentArray []PromptDataPromptChatMessagesUserContentArrayUnionItem
-
-func (r PromptDataPromptChatMessagesUserContentArray) ImplementsPromptDataPromptChatMessagesUserContentUnion() {
-}
-
-// Union satisfied by [shared.ChatCompletionContentPartText] or
-// [shared.ChatCompletionContentPartImage].
-type PromptDataPromptChatMessagesUserContentArrayUnionItem interface {
-	ImplementsPromptDataPromptChatMessagesUserContentArrayUnionItem()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptDataPromptChatMessagesUserContentArrayUnionItem)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ChatCompletionContentPartText{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(ChatCompletionContentPartImage{}),
-		},
-	)
-}
-
-type PromptDataPromptChatMessagesAssistant struct {
-	Role         PromptDataPromptChatMessagesAssistantRole         `json:"role,required"`
-	Content      string                                            `json:"content,nullable"`
-	FunctionCall PromptDataPromptChatMessagesAssistantFunctionCall `json:"function_call,nullable"`
-	Name         string                                            `json:"name,nullable"`
-	ToolCalls    []ChatCompletionMessageToolCall                   `json:"tool_calls,nullable"`
-	JSON         promptDataPromptChatMessagesAssistantJSON         `json:"-"`
-}
-
-// promptDataPromptChatMessagesAssistantJSON contains the JSON metadata for the
-// struct [PromptDataPromptChatMessagesAssistant]
-type promptDataPromptChatMessagesAssistantJSON struct {
-	Role         apijson.Field
-	Content      apijson.Field
-	FunctionCall apijson.Field
-	Name         apijson.Field
-	ToolCalls    apijson.Field
-	raw          string
-	ExtraFields  map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesAssistant) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesAssistantJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptChatMessagesAssistant) implementsPromptDataPromptChatMessage() {}
-
-type PromptDataPromptChatMessagesAssistantRole string
-
-const (
-	PromptDataPromptChatMessagesAssistantRoleAssistant PromptDataPromptChatMessagesAssistantRole = "assistant"
-)
-
-func (r PromptDataPromptChatMessagesAssistantRole) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesAssistantRoleAssistant:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatMessagesAssistantFunctionCall struct {
-	Arguments string                                                `json:"arguments,required"`
-	Name      string                                                `json:"name,required"`
-	JSON      promptDataPromptChatMessagesAssistantFunctionCallJSON `json:"-"`
-}
-
-// promptDataPromptChatMessagesAssistantFunctionCallJSON contains the JSON metadata
-// for the struct [PromptDataPromptChatMessagesAssistantFunctionCall]
-type promptDataPromptChatMessagesAssistantFunctionCallJSON struct {
-	Arguments   apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesAssistantFunctionCall) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesAssistantFunctionCallJSON) RawJSON() string {
-	return r.raw
-}
-
-type PromptDataPromptChatMessagesTool struct {
-	Role       PromptDataPromptChatMessagesToolRole `json:"role,required"`
-	Content    string                               `json:"content"`
-	ToolCallID string                               `json:"tool_call_id"`
-	JSON       promptDataPromptChatMessagesToolJSON `json:"-"`
-}
-
-// promptDataPromptChatMessagesToolJSON contains the JSON metadata for the struct
-// [PromptDataPromptChatMessagesTool]
-type promptDataPromptChatMessagesToolJSON struct {
-	Role        apijson.Field
-	Content     apijson.Field
-	ToolCallID  apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesTool) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesToolJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptChatMessagesTool) implementsPromptDataPromptChatMessage() {}
-
-type PromptDataPromptChatMessagesToolRole string
-
-const (
-	PromptDataPromptChatMessagesToolRoleTool PromptDataPromptChatMessagesToolRole = "tool"
-)
-
-func (r PromptDataPromptChatMessagesToolRole) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesToolRoleTool:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatMessagesFunction struct {
-	Name    string                                   `json:"name,required"`
-	Role    PromptDataPromptChatMessagesFunctionRole `json:"role,required"`
-	Content string                                   `json:"content"`
-	JSON    promptDataPromptChatMessagesFunctionJSON `json:"-"`
-}
-
-// promptDataPromptChatMessagesFunctionJSON contains the JSON metadata for the
-// struct [PromptDataPromptChatMessagesFunction]
-type promptDataPromptChatMessagesFunctionJSON struct {
-	Name        apijson.Field
-	Role        apijson.Field
-	Content     apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesFunction) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesFunctionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptChatMessagesFunction) implementsPromptDataPromptChatMessage() {}
-
-type PromptDataPromptChatMessagesFunctionRole string
-
-const (
-	PromptDataPromptChatMessagesFunctionRoleFunction PromptDataPromptChatMessagesFunctionRole = "function"
-)
-
-func (r PromptDataPromptChatMessagesFunctionRole) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesFunctionRoleFunction:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatMessagesFallback struct {
-	Role    PromptDataPromptChatMessagesFallbackRole `json:"role,required"`
-	Content string                                   `json:"content,nullable"`
-	JSON    promptDataPromptChatMessagesFallbackJSON `json:"-"`
-}
-
-// promptDataPromptChatMessagesFallbackJSON contains the JSON metadata for the
-// struct [PromptDataPromptChatMessagesFallback]
-type promptDataPromptChatMessagesFallbackJSON struct {
-	Role        apijson.Field
-	Content     apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataPromptChatMessagesFallback) UnmarshalJSON(data []byte) (err error) {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptDataPromptChatMessagesFallbackJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptDataPromptChatMessagesFallback) implementsPromptDataPromptChatMessage() {}
-
-type PromptDataPromptChatMessagesFallbackRole string
-
-const (
-	PromptDataPromptChatMessagesFallbackRoleModel PromptDataPromptChatMessagesFallbackRole = "model"
-)
-
-func (r PromptDataPromptChatMessagesFallbackRole) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesFallbackRoleModel:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatMessagesRole string
-
-const (
-	PromptDataPromptChatMessagesRoleSystem    PromptDataPromptChatMessagesRole = "system"
-	PromptDataPromptChatMessagesRoleUser      PromptDataPromptChatMessagesRole = "user"
-	PromptDataPromptChatMessagesRoleAssistant PromptDataPromptChatMessagesRole = "assistant"
-	PromptDataPromptChatMessagesRoleTool      PromptDataPromptChatMessagesRole = "tool"
-	PromptDataPromptChatMessagesRoleFunction  PromptDataPromptChatMessagesRole = "function"
-	PromptDataPromptChatMessagesRoleModel     PromptDataPromptChatMessagesRole = "model"
-)
-
-func (r PromptDataPromptChatMessagesRole) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatMessagesRoleSystem, PromptDataPromptChatMessagesRoleUser, PromptDataPromptChatMessagesRoleAssistant, PromptDataPromptChatMessagesRoleTool, PromptDataPromptChatMessagesRoleFunction, PromptDataPromptChatMessagesRoleModel:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptChatType string
-
-const (
-	PromptDataPromptChatTypeChat PromptDataPromptChatType = "chat"
-)
-
-func (r PromptDataPromptChatType) IsKnown() bool {
-	switch r {
-	case PromptDataPromptChatTypeChat:
-		return true
-	}
-	return false
-}
-
-type PromptDataPromptType string
-
-const (
-	PromptDataPromptTypeCompletion PromptDataPromptType = "completion"
-	PromptDataPromptTypeChat       PromptDataPromptType = "chat"
-)
-
-func (r PromptDataPromptType) IsKnown() bool {
-	switch r {
-	case PromptDataPromptTypeCompletion, PromptDataPromptTypeChat:
-		return true
-	}
-	return false
-}
-
-type PromptDataToolFunction struct {
-	Type  PromptDataToolFunctionsType `json:"type,required"`
-	ID    string                      `json:"id"`
-	Name  string                      `json:"name"`
-	JSON  promptDataToolFunctionJSON  `json:"-"`
-	union PromptDataToolFunctionsUnion
-}
-
-// promptDataToolFunctionJSON contains the JSON metadata for the struct
-// [PromptDataToolFunction]
-type promptDataToolFunctionJSON struct {
-	Type        apijson.Field
-	ID          apijson.Field
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r promptDataToolFunctionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *PromptDataToolFunction) UnmarshalJSON(data []byte) (err error) {
-	*r = PromptDataToolFunction{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [PromptDataToolFunctionsUnion] interface which you can cast to
-// the specific types for more type safety.
+// PromptDataPromptChatMessageUnionContent is an implicit subunion of
+// [PromptDataPromptChatMessageUnion]. PromptDataPromptChatMessageUnionContent
+// provides convenient access to the sub-properties of the union.
 //
-// Possible runtime types of the union are
-// [shared.PromptDataToolFunctionsFunction],
-// [shared.PromptDataToolFunctionsGlobal].
-func (r PromptDataToolFunction) AsUnion() PromptDataToolFunctionsUnion {
-	return r.union
+// For type safety it is recommended to directly use a variant of the
+// [PromptDataPromptChatMessageUnion].
+//
+// If the underlying value is not a json object, one of the following properties
+// will be valid: OfString OfArray]
+type PromptDataPromptChatMessageUnionContent struct {
+	// This field will be present if the value is a [string] instead of an object.
+	OfString string `json:",inline"`
+	// This field will be present if the value is a
+	// [[]PromptDataPromptChatMessageUserContentArrayItemUnion] instead of an object.
+	OfArray []PromptDataPromptChatMessageUserContentArrayItemUnion `json:",inline"`
+	JSON    struct {
+		OfString respjson.Field
+		OfArray  respjson.Field
+		raw      string
+	} `json:"-"`
 }
 
-// Union satisfied by [shared.PromptDataToolFunctionsFunction] or
-// [shared.PromptDataToolFunctionsGlobal].
-type PromptDataToolFunctionsUnion interface {
-	implementsPromptDataToolFunction()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptDataToolFunctionsUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataToolFunctionsFunction{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptDataToolFunctionsGlobal{}),
-		},
-	)
-}
-
-type PromptDataToolFunctionsFunction struct {
-	ID   string                              `json:"id,required"`
-	Type PromptDataToolFunctionsFunctionType `json:"type,required"`
-	JSON promptDataToolFunctionsFunctionJSON `json:"-"`
-}
-
-// promptDataToolFunctionsFunctionJSON contains the JSON metadata for the struct
-// [PromptDataToolFunctionsFunction]
-type promptDataToolFunctionsFunctionJSON struct {
-	ID          apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataToolFunctionsFunction) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptDataPromptChatMessageUnionContent) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptDataToolFunctionsFunctionJSON) RawJSON() string {
-	return r.raw
+type PromptDataPromptChatMessageSystem struct {
+	// Any of "system".
+	Role    string `json:"role,required"`
+	Content string `json:"content"`
+	Name    string `json:"name"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Role        respjson.Field
+		Content     respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-func (r PromptDataToolFunctionsFunction) implementsPromptDataToolFunction() {}
-
-type PromptDataToolFunctionsFunctionType string
-
-const (
-	PromptDataToolFunctionsFunctionTypeFunction PromptDataToolFunctionsFunctionType = "function"
-)
-
-func (r PromptDataToolFunctionsFunctionType) IsKnown() bool {
-	switch r {
-	case PromptDataToolFunctionsFunctionTypeFunction:
-		return true
-	}
-	return false
-}
-
-type PromptDataToolFunctionsGlobal struct {
-	Name string                            `json:"name,required"`
-	Type PromptDataToolFunctionsGlobalType `json:"type,required"`
-	JSON promptDataToolFunctionsGlobalJSON `json:"-"`
-}
-
-// promptDataToolFunctionsGlobalJSON contains the JSON metadata for the struct
-// [PromptDataToolFunctionsGlobal]
-type promptDataToolFunctionsGlobalJSON struct {
-	Name        apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptDataToolFunctionsGlobal) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PromptDataPromptChatMessageSystem) RawJSON() string { return r.JSON.raw }
+func (r *PromptDataPromptChatMessageSystem) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptDataToolFunctionsGlobalJSON) RawJSON() string {
-	return r.raw
+type PromptDataPromptChatMessageUser struct {
+	// Any of "user".
+	Role    string                                      `json:"role,required"`
+	Content PromptDataPromptChatMessageUserContentUnion `json:"content"`
+	Name    string                                      `json:"name"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Role        respjson.Field
+		Content     respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-func (r PromptDataToolFunctionsGlobal) implementsPromptDataToolFunction() {}
-
-type PromptDataToolFunctionsGlobalType string
-
-const (
-	PromptDataToolFunctionsGlobalTypeGlobal PromptDataToolFunctionsGlobalType = "global"
-)
-
-func (r PromptDataToolFunctionsGlobalType) IsKnown() bool {
-	switch r {
-	case PromptDataToolFunctionsGlobalTypeGlobal:
-		return true
-	}
-	return false
+// Returns the unmodified JSON received from the API
+func (r PromptDataPromptChatMessageUser) RawJSON() string { return r.JSON.raw }
+func (r *PromptDataPromptChatMessageUser) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-type PromptDataToolFunctionsType string
+// PromptDataPromptChatMessageUserContentUnion contains all possible properties and
+// values from [string], [[]PromptDataPromptChatMessageUserContentArrayItemUnion].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+//
+// If the underlying value is not a json object, one of the following properties
+// will be valid: OfString OfArray]
+type PromptDataPromptChatMessageUserContentUnion struct {
+	// This field will be present if the value is a [string] instead of an object.
+	OfString string `json:",inline"`
+	// This field will be present if the value is a
+	// [[]PromptDataPromptChatMessageUserContentArrayItemUnion] instead of an object.
+	OfArray []PromptDataPromptChatMessageUserContentArrayItemUnion `json:",inline"`
+	JSON    struct {
+		OfString respjson.Field
+		OfArray  respjson.Field
+		raw      string
+	} `json:"-"`
+}
 
-const (
-	PromptDataToolFunctionsTypeFunction PromptDataToolFunctionsType = "function"
-	PromptDataToolFunctionsTypeGlobal   PromptDataToolFunctionsType = "global"
-)
+func (u PromptDataPromptChatMessageUserContentUnion) AsString() (v string) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
 
-func (r PromptDataToolFunctionsType) IsKnown() bool {
-	switch r {
-	case PromptDataToolFunctionsTypeFunction, PromptDataToolFunctionsTypeGlobal:
-		return true
-	}
-	return false
+func (u PromptDataPromptChatMessageUserContentUnion) AsArray() (v []PromptDataPromptChatMessageUserContentArrayItemUnion) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u PromptDataPromptChatMessageUserContentUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *PromptDataPromptChatMessageUserContentUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// PromptDataPromptChatMessageUserContentArrayItemUnion contains all possible
+// properties and values from [ChatCompletionContentPartText],
+// [ChatCompletionContentPartImage].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type PromptDataPromptChatMessageUserContentArrayItemUnion struct {
+	Type string `json:"type"`
+	// This field is from variant [ChatCompletionContentPartText].
+	Text string `json:"text"`
+	// This field is from variant [ChatCompletionContentPartImage].
+	ImageURL ChatCompletionContentPartImageImageURL `json:"image_url"`
+	JSON     struct {
+		Type     respjson.Field
+		Text     respjson.Field
+		ImageURL respjson.Field
+		raw      string
+	} `json:"-"`
+}
+
+func (u PromptDataPromptChatMessageUserContentArrayItemUnion) AsText() (v ChatCompletionContentPartText) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u PromptDataPromptChatMessageUserContentArrayItemUnion) AsImageURL() (v ChatCompletionContentPartImage) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u PromptDataPromptChatMessageUserContentArrayItemUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *PromptDataPromptChatMessageUserContentArrayItemUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type PromptDataPromptChatMessageAssistant struct {
+	// Any of "assistant".
+	Role         string                                           `json:"role,required"`
+	Content      string                                           `json:"content,nullable"`
+	FunctionCall PromptDataPromptChatMessageAssistantFunctionCall `json:"function_call,nullable"`
+	Name         string                                           `json:"name,nullable"`
+	ToolCalls    []ChatCompletionMessageToolCall                  `json:"tool_calls,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Role         respjson.Field
+		Content      respjson.Field
+		FunctionCall respjson.Field
+		Name         respjson.Field
+		ToolCalls    respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PromptDataPromptChatMessageAssistant) RawJSON() string { return r.JSON.raw }
+func (r *PromptDataPromptChatMessageAssistant) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type PromptDataPromptChatMessageAssistantFunctionCall struct {
+	Arguments string `json:"arguments,required"`
+	Name      string `json:"name,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Arguments   respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PromptDataPromptChatMessageAssistantFunctionCall) RawJSON() string { return r.JSON.raw }
+func (r *PromptDataPromptChatMessageAssistantFunctionCall) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type PromptDataPromptChatMessageTool struct {
+	// Any of "tool".
+	Role       string `json:"role,required"`
+	Content    string `json:"content"`
+	ToolCallID string `json:"tool_call_id"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Role        respjson.Field
+		Content     respjson.Field
+		ToolCallID  respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PromptDataPromptChatMessageTool) RawJSON() string { return r.JSON.raw }
+func (r *PromptDataPromptChatMessageTool) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type PromptDataPromptChatMessageFunction struct {
+	Name string `json:"name,required"`
+	// Any of "function".
+	Role    string `json:"role,required"`
+	Content string `json:"content"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Name        respjson.Field
+		Role        respjson.Field
+		Content     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PromptDataPromptChatMessageFunction) RawJSON() string { return r.JSON.raw }
+func (r *PromptDataPromptChatMessageFunction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type PromptDataPromptChatMessageFallback struct {
+	// Any of "model".
+	Role    string `json:"role,required"`
+	Content string `json:"content,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Role        respjson.Field
+		Content     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PromptDataPromptChatMessageFallback) RawJSON() string { return r.JSON.raw }
+func (r *PromptDataPromptChatMessageFallback) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// PromptDataToolFunctionUnion contains all possible properties and values from
+// [PromptDataToolFunctionFunction], [PromptDataToolFunctionGlobal].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type PromptDataToolFunctionUnion struct {
+	// This field is from variant [PromptDataToolFunctionFunction].
+	ID   string `json:"id"`
+	Type string `json:"type"`
+	// This field is from variant [PromptDataToolFunctionGlobal].
+	Name string `json:"name"`
+	JSON struct {
+		ID   respjson.Field
+		Type respjson.Field
+		Name respjson.Field
+		raw  string
+	} `json:"-"`
+}
+
+func (u PromptDataToolFunctionUnion) AsFunction() (v PromptDataToolFunctionFunction) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u PromptDataToolFunctionUnion) AsGlobal() (v PromptDataToolFunctionGlobal) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u PromptDataToolFunctionUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *PromptDataToolFunctionUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type PromptDataToolFunctionFunction struct {
+	ID string `json:"id,required"`
+	// Any of "function".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PromptDataToolFunctionFunction) RawJSON() string { return r.JSON.raw }
+func (r *PromptDataToolFunctionFunction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type PromptDataToolFunctionGlobal struct {
+	Name string `json:"name,required"`
+	// Any of "global".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Name        respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PromptDataToolFunctionGlobal) RawJSON() string { return r.JSON.raw }
+func (r *PromptDataToolFunctionGlobal) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // The prompt, model, and its parameters
 type PromptDataParam struct {
-	Options       param.Field[PromptOptionsParam]                  `json:"options"`
-	Origin        param.Field[PromptDataOriginParam]               `json:"origin"`
-	Parser        param.Field[PromptDataParserParam]               `json:"parser"`
-	Prompt        param.Field[PromptDataPromptUnionParam]          `json:"prompt"`
-	ToolFunctions param.Field[[]PromptDataToolFunctionsUnionParam] `json:"tool_functions"`
+	Options       PromptOptionsParam                 `json:"options,omitzero"`
+	Origin        PromptDataOriginParam              `json:"origin,omitzero"`
+	Parser        PromptDataParserParam              `json:"parser,omitzero"`
+	Prompt        PromptDataPromptUnionParam         `json:"prompt,omitzero"`
+	ToolFunctions []PromptDataToolFunctionUnionParam `json:"tool_functions,omitzero"`
+	paramObj
 }
 
 func (r PromptDataParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptDataParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type PromptDataOriginParam struct {
-	ProjectID     param.Field[string] `json:"project_id"`
-	PromptID      param.Field[string] `json:"prompt_id"`
-	PromptVersion param.Field[string] `json:"prompt_version"`
+	ProjectID     param.Opt[string] `json:"project_id,omitzero"`
+	PromptID      param.Opt[string] `json:"prompt_id,omitzero"`
+	PromptVersion param.Opt[string] `json:"prompt_version,omitzero"`
+	paramObj
 }
 
 func (r PromptDataOriginParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptDataOriginParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataOriginParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
+// The properties ChoiceScores, Type, UseCot are required.
 type PromptDataParserParam struct {
-	ChoiceScores param.Field[map[string]float64]   `json:"choice_scores,required"`
-	Type         param.Field[PromptDataParserType] `json:"type,required"`
-	UseCot       param.Field[bool]                 `json:"use_cot,required"`
+	ChoiceScores map[string]float64 `json:"choice_scores,omitzero,required"`
+	// Any of "llm_classifier".
+	Type   string `json:"type,omitzero,required"`
+	UseCot bool   `json:"use_cot,required"`
+	paramObj
 }
 
 func (r PromptDataParserParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptDataParserParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataParserParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-type PromptDataPromptParam struct {
-	Type     param.Field[PromptDataPromptType] `json:"type,required"`
-	Content  param.Field[string]               `json:"content"`
-	Messages param.Field[interface{}]          `json:"messages"`
-	Tools    param.Field[string]               `json:"tools"`
+func init() {
+	apijson.RegisterFieldValidator[PromptDataParserParam](
+		"type", "llm_classifier",
+	)
 }
 
-func (r PromptDataPromptParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type PromptDataPromptUnionParam struct {
+	OfCompletion *PromptDataPromptCompletionParam `json:",omitzero,inline"`
+	OfChat       *PromptDataPromptChatParam       `json:",omitzero,inline"`
+	paramUnion
 }
 
-func (r PromptDataPromptParam) implementsPromptDataPromptUnionParam() {}
-
-// Satisfied by [shared.PromptDataPromptCompletionParam],
-// [shared.PromptDataPromptChatParam], [PromptDataPromptParam].
-type PromptDataPromptUnionParam interface {
-	implementsPromptDataPromptUnionParam()
+func (u PromptDataPromptUnionParam) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfCompletion, u.OfChat)
+}
+func (u *PromptDataPromptUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
+func (u *PromptDataPromptUnionParam) asAny() any {
+	if !param.IsOmitted(u.OfCompletion) {
+		return u.OfCompletion
+	} else if !param.IsOmitted(u.OfChat) {
+		return u.OfChat
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptDataPromptUnionParam) GetContent() *string {
+	if vt := u.OfCompletion; vt != nil {
+		return &vt.Content
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptDataPromptUnionParam) GetMessages() []PromptDataPromptChatMessageUnionParam {
+	if vt := u.OfChat; vt != nil {
+		return vt.Messages
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptDataPromptUnionParam) GetTools() *string {
+	if vt := u.OfChat; vt != nil && vt.Tools.Valid() {
+		return &vt.Tools.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptDataPromptUnionParam) GetType() *string {
+	if vt := u.OfCompletion; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfChat; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
+}
+
+// The properties Content, Type are required.
 type PromptDataPromptCompletionParam struct {
-	Content param.Field[string]                         `json:"content,required"`
-	Type    param.Field[PromptDataPromptCompletionType] `json:"type,required"`
+	Content string `json:"content,required"`
+	// Any of "completion".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
 func (r PromptDataPromptCompletionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptDataPromptCompletionParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataPromptCompletionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r PromptDataPromptCompletionParam) implementsPromptDataPromptUnionParam() {}
+func init() {
+	apijson.RegisterFieldValidator[PromptDataPromptCompletionParam](
+		"type", "completion",
+	)
+}
 
+// The properties Messages, Type are required.
 type PromptDataPromptChatParam struct {
-	Messages param.Field[[]PromptDataPromptChatMessagesUnionParam] `json:"messages,required"`
-	Type     param.Field[PromptDataPromptChatType]                 `json:"type,required"`
-	Tools    param.Field[string]                                   `json:"tools"`
+	Messages []PromptDataPromptChatMessageUnionParam `json:"messages,omitzero,required"`
+	// Any of "chat".
+	Type  string            `json:"type,omitzero,required"`
+	Tools param.Opt[string] `json:"tools,omitzero"`
+	paramObj
 }
 
 func (r PromptDataPromptChatParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptDataPromptChatParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataPromptChatParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r PromptDataPromptChatParam) implementsPromptDataPromptUnionParam() {}
-
-type PromptDataPromptChatMessageParam struct {
-	Role         param.Field[PromptDataPromptChatMessagesRole] `json:"role,required"`
-	Content      param.Field[interface{}]                      `json:"content"`
-	FunctionCall param.Field[interface{}]                      `json:"function_call"`
-	Name         param.Field[string]                           `json:"name"`
-	ToolCallID   param.Field[string]                           `json:"tool_call_id"`
-	ToolCalls    param.Field[interface{}]                      `json:"tool_calls"`
+func init() {
+	apijson.RegisterFieldValidator[PromptDataPromptChatParam](
+		"type", "chat",
+	)
 }
 
-func (r PromptDataPromptChatMessageParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type PromptDataPromptChatMessageUnionParam struct {
+	OfSystem    *PromptDataPromptChatMessageSystemParam    `json:",omitzero,inline"`
+	OfUser      *PromptDataPromptChatMessageUserParam      `json:",omitzero,inline"`
+	OfAssistant *PromptDataPromptChatMessageAssistantParam `json:",omitzero,inline"`
+	OfTool      *PromptDataPromptChatMessageToolParam      `json:",omitzero,inline"`
+	OfFunction  *PromptDataPromptChatMessageFunctionParam  `json:",omitzero,inline"`
+	OfFallback  *PromptDataPromptChatMessageFallbackParam  `json:",omitzero,inline"`
+	paramUnion
 }
 
-func (r PromptDataPromptChatMessageParam) implementsPromptDataPromptChatMessagesUnionParam() {}
-
-// Satisfied by [shared.PromptDataPromptChatMessagesSystemParam],
-// [shared.PromptDataPromptChatMessagesUserParam],
-// [shared.PromptDataPromptChatMessagesAssistantParam],
-// [shared.PromptDataPromptChatMessagesToolParam],
-// [shared.PromptDataPromptChatMessagesFunctionParam],
-// [shared.PromptDataPromptChatMessagesFallbackParam],
-// [PromptDataPromptChatMessageParam].
-type PromptDataPromptChatMessagesUnionParam interface {
-	implementsPromptDataPromptChatMessagesUnionParam()
+func (u PromptDataPromptChatMessageUnionParam) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfSystem,
+		u.OfUser,
+		u.OfAssistant,
+		u.OfTool,
+		u.OfFunction,
+		u.OfFallback)
+}
+func (u *PromptDataPromptChatMessageUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
-type PromptDataPromptChatMessagesSystemParam struct {
-	Role    param.Field[PromptDataPromptChatMessagesSystemRole] `json:"role,required"`
-	Content param.Field[string]                                 `json:"content"`
-	Name    param.Field[string]                                 `json:"name"`
+func (u *PromptDataPromptChatMessageUnionParam) asAny() any {
+	if !param.IsOmitted(u.OfSystem) {
+		return u.OfSystem
+	} else if !param.IsOmitted(u.OfUser) {
+		return u.OfUser
+	} else if !param.IsOmitted(u.OfAssistant) {
+		return u.OfAssistant
+	} else if !param.IsOmitted(u.OfTool) {
+		return u.OfTool
+	} else if !param.IsOmitted(u.OfFunction) {
+		return u.OfFunction
+	} else if !param.IsOmitted(u.OfFallback) {
+		return u.OfFallback
+	}
+	return nil
 }
 
-func (r PromptDataPromptChatMessagesSystemParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptDataPromptChatMessageUnionParam) GetFunctionCall() *PromptDataPromptChatMessageAssistantFunctionCallParam {
+	if vt := u.OfAssistant; vt != nil {
+		return &vt.FunctionCall
+	}
+	return nil
 }
 
-func (r PromptDataPromptChatMessagesSystemParam) implementsPromptDataPromptChatMessagesUnionParam() {}
-
-type PromptDataPromptChatMessagesUserParam struct {
-	Role    param.Field[PromptDataPromptChatMessagesUserRole]              `json:"role,required"`
-	Content param.Field[PromptDataPromptChatMessagesUserContentUnionParam] `json:"content"`
-	Name    param.Field[string]                                            `json:"name"`
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptDataPromptChatMessageUnionParam) GetToolCalls() []ChatCompletionMessageToolCallParam {
+	if vt := u.OfAssistant; vt != nil {
+		return vt.ToolCalls
+	}
+	return nil
 }
 
-func (r PromptDataPromptChatMessagesUserParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptDataPromptChatMessageUnionParam) GetToolCallID() *string {
+	if vt := u.OfTool; vt != nil && vt.ToolCallID.Valid() {
+		return &vt.ToolCallID.Value
+	}
+	return nil
 }
 
-func (r PromptDataPromptChatMessagesUserParam) implementsPromptDataPromptChatMessagesUnionParam() {}
-
-// Satisfied by [shared.UnionString],
-// [shared.PromptDataPromptChatMessagesUserContentArrayParam].
-type PromptDataPromptChatMessagesUserContentUnionParam interface {
-	ImplementsPromptDataPromptChatMessagesUserContentUnionParam()
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptDataPromptChatMessageUnionParam) GetRole() *string {
+	if vt := u.OfSystem; vt != nil {
+		return (*string)(&vt.Role)
+	} else if vt := u.OfUser; vt != nil {
+		return (*string)(&vt.Role)
+	} else if vt := u.OfAssistant; vt != nil {
+		return (*string)(&vt.Role)
+	} else if vt := u.OfTool; vt != nil {
+		return (*string)(&vt.Role)
+	} else if vt := u.OfFunction; vt != nil {
+		return (*string)(&vt.Role)
+	} else if vt := u.OfFallback; vt != nil {
+		return (*string)(&vt.Role)
+	}
+	return nil
 }
 
-type PromptDataPromptChatMessagesUserContentArrayParam []PromptDataPromptChatMessagesUserContentArrayUnionItemParam
-
-func (r PromptDataPromptChatMessagesUserContentArrayParam) ImplementsPromptDataPromptChatMessagesUserContentUnionParam() {
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptDataPromptChatMessageUnionParam) GetName() *string {
+	if vt := u.OfSystem; vt != nil && vt.Name.Valid() {
+		return &vt.Name.Value
+	} else if vt := u.OfUser; vt != nil && vt.Name.Valid() {
+		return &vt.Name.Value
+	} else if vt := u.OfAssistant; vt != nil && vt.Name.Valid() {
+		return &vt.Name.Value
+	} else if vt := u.OfFunction; vt != nil {
+		return (*string)(&vt.Name)
+	}
+	return nil
 }
 
-// Satisfied by [shared.ChatCompletionContentPartTextParam],
-// [shared.ChatCompletionContentPartImageParam].
-type PromptDataPromptChatMessagesUserContentArrayUnionItemParam interface {
-	ImplementsPromptDataPromptChatMessagesUserContentArrayUnionItemParam()
+// Returns a subunion which exports methods to access subproperties
+//
+// Or use AsAny() to get the underlying value
+func (u PromptDataPromptChatMessageUnionParam) GetContent() (res promptDataPromptChatMessageUnionParamContent) {
+	if vt := u.OfSystem; vt != nil && vt.Content.Valid() {
+		res.any = &vt.Content.Value
+	} else if vt := u.OfUser; vt != nil {
+		res.any = vt.Content.asAny()
+	} else if vt := u.OfAssistant; vt != nil && vt.Content.Valid() {
+		res.any = &vt.Content.Value
+	} else if vt := u.OfTool; vt != nil && vt.Content.Valid() {
+		res.any = &vt.Content.Value
+	} else if vt := u.OfFunction; vt != nil && vt.Content.Valid() {
+		res.any = &vt.Content.Value
+	} else if vt := u.OfFallback; vt != nil && vt.Content.Valid() {
+		res.any = &vt.Content.Value
+	}
+	return
 }
 
-type PromptDataPromptChatMessagesAssistantParam struct {
-	Role         param.Field[PromptDataPromptChatMessagesAssistantRole]              `json:"role,required"`
-	Content      param.Field[string]                                                 `json:"content"`
-	FunctionCall param.Field[PromptDataPromptChatMessagesAssistantFunctionCallParam] `json:"function_call"`
-	Name         param.Field[string]                                                 `json:"name"`
-	ToolCalls    param.Field[[]ChatCompletionMessageToolCallParam]                   `json:"tool_calls"`
+// Can have the runtime types [*string],
+// [\*[]PromptDataPromptChatMessageUserContentArrayItemUnionParam]
+type promptDataPromptChatMessageUnionParamContent struct{ any }
+
+// Use the following switch statement to get the type of the union:
+//
+//	switch u.AsAny().(type) {
+//	case *string:
+//	case *[]shared.PromptDataPromptChatMessageUserContentArrayItemUnionParam:
+//	default:
+//	    fmt.Errorf("not present")
+//	}
+func (u promptDataPromptChatMessageUnionParamContent) AsAny() any { return u.any }
+
+// The property Role is required.
+type PromptDataPromptChatMessageSystemParam struct {
+	// Any of "system".
+	Role    string            `json:"role,omitzero,required"`
+	Content param.Opt[string] `json:"content,omitzero"`
+	Name    param.Opt[string] `json:"name,omitzero"`
+	paramObj
 }
 
-func (r PromptDataPromptChatMessagesAssistantParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+func (r PromptDataPromptChatMessageSystemParam) MarshalJSON() (data []byte, err error) {
+	type shadow PromptDataPromptChatMessageSystemParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataPromptChatMessageSystemParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r PromptDataPromptChatMessagesAssistantParam) implementsPromptDataPromptChatMessagesUnionParam() {
+func init() {
+	apijson.RegisterFieldValidator[PromptDataPromptChatMessageSystemParam](
+		"role", "system",
+	)
 }
 
-type PromptDataPromptChatMessagesAssistantFunctionCallParam struct {
-	Arguments param.Field[string] `json:"arguments,required"`
-	Name      param.Field[string] `json:"name,required"`
+// The property Role is required.
+type PromptDataPromptChatMessageUserParam struct {
+	// Any of "user".
+	Role    string                                           `json:"role,omitzero,required"`
+	Name    param.Opt[string]                                `json:"name,omitzero"`
+	Content PromptDataPromptChatMessageUserContentUnionParam `json:"content,omitzero"`
+	paramObj
 }
 
-func (r PromptDataPromptChatMessagesAssistantFunctionCallParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+func (r PromptDataPromptChatMessageUserParam) MarshalJSON() (data []byte, err error) {
+	type shadow PromptDataPromptChatMessageUserParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataPromptChatMessageUserParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-type PromptDataPromptChatMessagesToolParam struct {
-	Role       param.Field[PromptDataPromptChatMessagesToolRole] `json:"role,required"`
-	Content    param.Field[string]                               `json:"content"`
-	ToolCallID param.Field[string]                               `json:"tool_call_id"`
+func init() {
+	apijson.RegisterFieldValidator[PromptDataPromptChatMessageUserParam](
+		"role", "user",
+	)
 }
 
-func (r PromptDataPromptChatMessagesToolParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type PromptDataPromptChatMessageUserContentUnionParam struct {
+	OfString param.Opt[string]                                           `json:",omitzero,inline"`
+	OfArray  []PromptDataPromptChatMessageUserContentArrayItemUnionParam `json:",omitzero,inline"`
+	paramUnion
 }
 
-func (r PromptDataPromptChatMessagesToolParam) implementsPromptDataPromptChatMessagesUnionParam() {}
-
-type PromptDataPromptChatMessagesFunctionParam struct {
-	Name    param.Field[string]                                   `json:"name,required"`
-	Role    param.Field[PromptDataPromptChatMessagesFunctionRole] `json:"role,required"`
-	Content param.Field[string]                                   `json:"content"`
+func (u PromptDataPromptChatMessageUserContentUnionParam) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfString, u.OfArray)
+}
+func (u *PromptDataPromptChatMessageUserContentUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
-func (r PromptDataPromptChatMessagesFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+func (u *PromptDataPromptChatMessageUserContentUnionParam) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfArray) {
+		return &u.OfArray
+	}
+	return nil
 }
 
-func (r PromptDataPromptChatMessagesFunctionParam) implementsPromptDataPromptChatMessagesUnionParam() {
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type PromptDataPromptChatMessageUserContentArrayItemUnionParam struct {
+	OfText     *ChatCompletionContentPartTextParam  `json:",omitzero,inline"`
+	OfImageURL *ChatCompletionContentPartImageParam `json:",omitzero,inline"`
+	paramUnion
 }
 
-type PromptDataPromptChatMessagesFallbackParam struct {
-	Role    param.Field[PromptDataPromptChatMessagesFallbackRole] `json:"role,required"`
-	Content param.Field[string]                                   `json:"content"`
+func (u PromptDataPromptChatMessageUserContentArrayItemUnionParam) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfText, u.OfImageURL)
+}
+func (u *PromptDataPromptChatMessageUserContentArrayItemUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
-func (r PromptDataPromptChatMessagesFallbackParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+func (u *PromptDataPromptChatMessageUserContentArrayItemUnionParam) asAny() any {
+	if !param.IsOmitted(u.OfText) {
+		return u.OfText
+	} else if !param.IsOmitted(u.OfImageURL) {
+		return u.OfImageURL
+	}
+	return nil
 }
 
-func (r PromptDataPromptChatMessagesFallbackParam) implementsPromptDataPromptChatMessagesUnionParam() {
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptDataPromptChatMessageUserContentArrayItemUnionParam) GetText() *string {
+	if vt := u.OfText; vt != nil && vt.Text.Valid() {
+		return &vt.Text.Value
+	}
+	return nil
 }
 
-type PromptDataToolFunctionParam struct {
-	Type param.Field[PromptDataToolFunctionsType] `json:"type,required"`
-	ID   param.Field[string]                      `json:"id"`
-	Name param.Field[string]                      `json:"name"`
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptDataPromptChatMessageUserContentArrayItemUnionParam) GetImageURL() *ChatCompletionContentPartImageImageURLParam {
+	if vt := u.OfImageURL; vt != nil {
+		return &vt.ImageURL
+	}
+	return nil
 }
 
-func (r PromptDataToolFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptDataPromptChatMessageUserContentArrayItemUnionParam) GetType() *string {
+	if vt := u.OfText; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfImageURL; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
 }
 
-func (r PromptDataToolFunctionParam) implementsPromptDataToolFunctionsUnionParam() {}
-
-// Satisfied by [shared.PromptDataToolFunctionsFunctionParam],
-// [shared.PromptDataToolFunctionsGlobalParam], [PromptDataToolFunctionParam].
-type PromptDataToolFunctionsUnionParam interface {
-	implementsPromptDataToolFunctionsUnionParam()
+// The property Role is required.
+type PromptDataPromptChatMessageAssistantParam struct {
+	// Any of "assistant".
+	Role         string                                                `json:"role,omitzero,required"`
+	Content      param.Opt[string]                                     `json:"content,omitzero"`
+	Name         param.Opt[string]                                     `json:"name,omitzero"`
+	FunctionCall PromptDataPromptChatMessageAssistantFunctionCallParam `json:"function_call,omitzero"`
+	ToolCalls    []ChatCompletionMessageToolCallParam                  `json:"tool_calls,omitzero"`
+	paramObj
 }
 
-type PromptDataToolFunctionsFunctionParam struct {
-	ID   param.Field[string]                              `json:"id,required"`
-	Type param.Field[PromptDataToolFunctionsFunctionType] `json:"type,required"`
+func (r PromptDataPromptChatMessageAssistantParam) MarshalJSON() (data []byte, err error) {
+	type shadow PromptDataPromptChatMessageAssistantParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataPromptChatMessageAssistantParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r PromptDataToolFunctionsFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+func init() {
+	apijson.RegisterFieldValidator[PromptDataPromptChatMessageAssistantParam](
+		"role", "assistant",
+	)
 }
 
-func (r PromptDataToolFunctionsFunctionParam) implementsPromptDataToolFunctionsUnionParam() {}
-
-type PromptDataToolFunctionsGlobalParam struct {
-	Name param.Field[string]                            `json:"name,required"`
-	Type param.Field[PromptDataToolFunctionsGlobalType] `json:"type,required"`
+// The properties Arguments, Name are required.
+type PromptDataPromptChatMessageAssistantFunctionCallParam struct {
+	Arguments string `json:"arguments,required"`
+	Name      string `json:"name,required"`
+	paramObj
 }
 
-func (r PromptDataToolFunctionsGlobalParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+func (r PromptDataPromptChatMessageAssistantFunctionCallParam) MarshalJSON() (data []byte, err error) {
+	type shadow PromptDataPromptChatMessageAssistantFunctionCallParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataPromptChatMessageAssistantFunctionCallParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r PromptDataToolFunctionsGlobalParam) implementsPromptDataToolFunctionsUnionParam() {}
+// The property Role is required.
+type PromptDataPromptChatMessageToolParam struct {
+	// Any of "tool".
+	Role       string            `json:"role,omitzero,required"`
+	Content    param.Opt[string] `json:"content,omitzero"`
+	ToolCallID param.Opt[string] `json:"tool_call_id,omitzero"`
+	paramObj
+}
+
+func (r PromptDataPromptChatMessageToolParam) MarshalJSON() (data []byte, err error) {
+	type shadow PromptDataPromptChatMessageToolParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataPromptChatMessageToolParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[PromptDataPromptChatMessageToolParam](
+		"role", "tool",
+	)
+}
+
+// The properties Name, Role are required.
+type PromptDataPromptChatMessageFunctionParam struct {
+	Name string `json:"name,required"`
+	// Any of "function".
+	Role    string            `json:"role,omitzero,required"`
+	Content param.Opt[string] `json:"content,omitzero"`
+	paramObj
+}
+
+func (r PromptDataPromptChatMessageFunctionParam) MarshalJSON() (data []byte, err error) {
+	type shadow PromptDataPromptChatMessageFunctionParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataPromptChatMessageFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[PromptDataPromptChatMessageFunctionParam](
+		"role", "function",
+	)
+}
+
+// The property Role is required.
+type PromptDataPromptChatMessageFallbackParam struct {
+	// Any of "model".
+	Role    string            `json:"role,omitzero,required"`
+	Content param.Opt[string] `json:"content,omitzero"`
+	paramObj
+}
+
+func (r PromptDataPromptChatMessageFallbackParam) MarshalJSON() (data []byte, err error) {
+	type shadow PromptDataPromptChatMessageFallbackParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataPromptChatMessageFallbackParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[PromptDataPromptChatMessageFallbackParam](
+		"role", "model",
+	)
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type PromptDataToolFunctionUnionParam struct {
+	OfFunction *PromptDataToolFunctionFunctionParam `json:",omitzero,inline"`
+	OfGlobal   *PromptDataToolFunctionGlobalParam   `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u PromptDataToolFunctionUnionParam) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfFunction, u.OfGlobal)
+}
+func (u *PromptDataToolFunctionUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *PromptDataToolFunctionUnionParam) asAny() any {
+	if !param.IsOmitted(u.OfFunction) {
+		return u.OfFunction
+	} else if !param.IsOmitted(u.OfGlobal) {
+		return u.OfGlobal
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptDataToolFunctionUnionParam) GetID() *string {
+	if vt := u.OfFunction; vt != nil {
+		return &vt.ID
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptDataToolFunctionUnionParam) GetName() *string {
+	if vt := u.OfGlobal; vt != nil {
+		return &vt.Name
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptDataToolFunctionUnionParam) GetType() *string {
+	if vt := u.OfFunction; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfGlobal; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
+}
+
+// The properties ID, Type are required.
+type PromptDataToolFunctionFunctionParam struct {
+	ID string `json:"id,required"`
+	// Any of "function".
+	Type string `json:"type,omitzero,required"`
+	paramObj
+}
+
+func (r PromptDataToolFunctionFunctionParam) MarshalJSON() (data []byte, err error) {
+	type shadow PromptDataToolFunctionFunctionParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataToolFunctionFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[PromptDataToolFunctionFunctionParam](
+		"type", "function",
+	)
+}
+
+// The properties Name, Type are required.
+type PromptDataToolFunctionGlobalParam struct {
+	Name string `json:"name,required"`
+	// Any of "global".
+	Type string `json:"type,omitzero,required"`
+	paramObj
+}
+
+func (r PromptDataToolFunctionGlobalParam) MarshalJSON() (data []byte, err error) {
+	type shadow PromptDataToolFunctionGlobalParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptDataToolFunctionGlobalParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[PromptDataToolFunctionGlobalParam](
+		"type", "global",
+	)
+}
 
 type PromptOptions struct {
 	Model    string                   `json:"model"`
 	Params   PromptOptionsParamsUnion `json:"params"`
 	Position string                   `json:"position"`
-	JSON     promptOptionsJSON        `json:"-"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Model       respjson.Field
+		Params      respjson.Field
+		Position    respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// promptOptionsJSON contains the JSON metadata for the struct [PromptOptions]
-type promptOptionsJSON struct {
-	Model       apijson.Field
-	Params      apijson.Field
-	Position    apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptOptions) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PromptOptions) RawJSON() string { return r.JSON.raw }
+func (r *PromptOptions) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptOptionsJSON) RawJSON() string {
-	return r.raw
+// ToParam converts this PromptOptions to a PromptOptionsParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// PromptOptionsParam.Overrides()
+func (r PromptOptions) ToParam() PromptOptionsParam {
+	return param.Override[PromptOptionsParam](json.RawMessage(r.RawJSON()))
 }
 
-// Union satisfied by [shared.PromptOptionsParamsOpenAIModelParams],
-// [shared.PromptOptionsParamsAnthropicModelParams],
-// [shared.PromptOptionsParamsGoogleModelParams],
-// [shared.PromptOptionsParamsWindowAIModelParams] or
-// [shared.PromptOptionsParamsJsCompletionParams].
-type PromptOptionsParamsUnion interface {
-	implementsPromptOptionsParamsUnion()
+// PromptOptionsParamsUnion contains all possible properties and values from
+// [PromptOptionsParamsOpenAIModelParams],
+// [PromptOptionsParamsAnthropicModelParams],
+// [PromptOptionsParamsGoogleModelParams],
+// [PromptOptionsParamsWindowAIModelParams],
+// [PromptOptionsParamsJsCompletionParams].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type PromptOptionsParamsUnion struct {
+	// This field is from variant [PromptOptionsParamsOpenAIModelParams].
+	FrequencyPenalty float64 `json:"frequency_penalty"`
+	// This field is from variant [PromptOptionsParamsOpenAIModelParams].
+	FunctionCall PromptOptionsParamsOpenAIModelParamsFunctionCallUnion `json:"function_call"`
+	// This field is from variant [PromptOptionsParamsOpenAIModelParams].
+	MaxCompletionTokens float64 `json:"max_completion_tokens"`
+	MaxTokens           float64 `json:"max_tokens"`
+	// This field is from variant [PromptOptionsParamsOpenAIModelParams].
+	N float64 `json:"n"`
+	// This field is from variant [PromptOptionsParamsOpenAIModelParams].
+	PresencePenalty float64 `json:"presence_penalty"`
+	// This field is from variant [PromptOptionsParamsOpenAIModelParams].
+	ReasoningEffort string `json:"reasoning_effort"`
+	// This field is from variant [PromptOptionsParamsOpenAIModelParams].
+	ResponseFormat PromptOptionsParamsOpenAIModelParamsResponseFormatUnion `json:"response_format"`
+	// This field is from variant [PromptOptionsParamsOpenAIModelParams].
+	Stop        []string `json:"stop"`
+	Temperature float64  `json:"temperature"`
+	// This field is from variant [PromptOptionsParamsOpenAIModelParams].
+	ToolChoice PromptOptionsParamsOpenAIModelParamsToolChoiceUnion `json:"tool_choice"`
+	TopP       float64                                             `json:"top_p"`
+	UseCache   bool                                                `json:"use_cache"`
+	// This field is from variant [PromptOptionsParamsAnthropicModelParams].
+	MaxTokensToSample float64 `json:"max_tokens_to_sample"`
+	// This field is from variant [PromptOptionsParamsAnthropicModelParams].
+	StopSequences []string `json:"stop_sequences"`
+	TopK          float64  `json:"top_k"`
+	// This field is from variant [PromptOptionsParamsGoogleModelParams].
+	MaxOutputTokens float64 `json:"maxOutputTokens"`
+	JSON            struct {
+		FrequencyPenalty    respjson.Field
+		FunctionCall        respjson.Field
+		MaxCompletionTokens respjson.Field
+		MaxTokens           respjson.Field
+		N                   respjson.Field
+		PresencePenalty     respjson.Field
+		ReasoningEffort     respjson.Field
+		ResponseFormat      respjson.Field
+		Stop                respjson.Field
+		Temperature         respjson.Field
+		ToolChoice          respjson.Field
+		TopP                respjson.Field
+		UseCache            respjson.Field
+		MaxTokensToSample   respjson.Field
+		StopSequences       respjson.Field
+		TopK                respjson.Field
+		MaxOutputTokens     respjson.Field
+		raw                 string
+	} `json:"-"`
 }
 
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptOptionsParamsUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParams{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptOptionsParamsAnthropicModelParams{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptOptionsParamsGoogleModelParams{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptOptionsParamsWindowAIModelParams{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptOptionsParamsJsCompletionParams{}),
-		},
-	)
+func (u PromptOptionsParamsUnion) AsOpenAIModelParams() (v PromptOptionsParamsOpenAIModelParams) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u PromptOptionsParamsUnion) AsAnthropicModelParams() (v PromptOptionsParamsAnthropicModelParams) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u PromptOptionsParamsUnion) AsGoogleModelParams() (v PromptOptionsParamsGoogleModelParams) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u PromptOptionsParamsUnion) AsWindowAIModelParams() (v PromptOptionsParamsWindowAIModelParams) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u PromptOptionsParamsUnion) AsJsCompletionParams() (v PromptOptionsParamsJsCompletionParams) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u PromptOptionsParamsUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *PromptOptionsParamsUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type PromptOptionsParamsOpenAIModelParams struct {
 	FrequencyPenalty float64                                               `json:"frequency_penalty"`
 	FunctionCall     PromptOptionsParamsOpenAIModelParamsFunctionCallUnion `json:"function_call"`
 	// The successor to max_tokens
-	MaxCompletionTokens float64                                             `json:"max_completion_tokens"`
-	MaxTokens           float64                                             `json:"max_tokens"`
-	N                   float64                                             `json:"n"`
-	PresencePenalty     float64                                             `json:"presence_penalty"`
-	ReasoningEffort     PromptOptionsParamsOpenAIModelParamsReasoningEffort `json:"reasoning_effort"`
-	ResponseFormat      PromptOptionsParamsOpenAIModelParamsResponseFormat  `json:"response_format,nullable"`
-	Stop                []string                                            `json:"stop"`
-	Temperature         float64                                             `json:"temperature"`
-	ToolChoice          PromptOptionsParamsOpenAIModelParamsToolChoiceUnion `json:"tool_choice"`
-	TopP                float64                                             `json:"top_p"`
-	UseCache            bool                                                `json:"use_cache"`
-	JSON                promptOptionsParamsOpenAIModelParamsJSON            `json:"-"`
+	MaxCompletionTokens float64 `json:"max_completion_tokens"`
+	MaxTokens           float64 `json:"max_tokens"`
+	N                   float64 `json:"n"`
+	PresencePenalty     float64 `json:"presence_penalty"`
+	// Any of "low", "medium", "high".
+	ReasoningEffort string                                                  `json:"reasoning_effort"`
+	ResponseFormat  PromptOptionsParamsOpenAIModelParamsResponseFormatUnion `json:"response_format,nullable"`
+	Stop            []string                                                `json:"stop"`
+	Temperature     float64                                                 `json:"temperature"`
+	ToolChoice      PromptOptionsParamsOpenAIModelParamsToolChoiceUnion     `json:"tool_choice"`
+	TopP            float64                                                 `json:"top_p"`
+	UseCache        bool                                                    `json:"use_cache"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		FrequencyPenalty    respjson.Field
+		FunctionCall        respjson.Field
+		MaxCompletionTokens respjson.Field
+		MaxTokens           respjson.Field
+		N                   respjson.Field
+		PresencePenalty     respjson.Field
+		ReasoningEffort     respjson.Field
+		ResponseFormat      respjson.Field
+		Stop                respjson.Field
+		Temperature         respjson.Field
+		ToolChoice          respjson.Field
+		TopP                respjson.Field
+		UseCache            respjson.Field
+		ExtraFields         map[string]respjson.Field
+		raw                 string
+	} `json:"-"`
 }
 
-// promptOptionsParamsOpenAIModelParamsJSON contains the JSON metadata for the
-// struct [PromptOptionsParamsOpenAIModelParams]
-type promptOptionsParamsOpenAIModelParamsJSON struct {
-	FrequencyPenalty    apijson.Field
-	FunctionCall        apijson.Field
-	MaxCompletionTokens apijson.Field
-	MaxTokens           apijson.Field
-	N                   apijson.Field
-	PresencePenalty     apijson.Field
-	ReasoningEffort     apijson.Field
-	ResponseFormat      apijson.Field
-	Stop                apijson.Field
-	Temperature         apijson.Field
-	ToolChoice          apijson.Field
-	TopP                apijson.Field
-	UseCache            apijson.Field
-	raw                 string
-	ExtraFields         map[string]apijson.Field
-}
-
-func (r *PromptOptionsParamsOpenAIModelParams) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PromptOptionsParamsOpenAIModelParams) RawJSON() string { return r.JSON.raw }
+func (r *PromptOptionsParamsOpenAIModelParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptOptionsParamsOpenAIModelParamsJSON) RawJSON() string {
-	return r.raw
+// PromptOptionsParamsOpenAIModelParamsFunctionCallUnion contains all possible
+// properties and values from
+// [PromptOptionsParamsOpenAIModelParamsFunctionCallString],
+// [PromptOptionsParamsOpenAIModelParamsFunctionCallFunction].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+//
+// If the underlying value is not a json object, one of the following properties
+// will be valid: OfPromptOptionssOpenAIModelParamsFunctionCallString]
+type PromptOptionsParamsOpenAIModelParamsFunctionCallUnion struct {
+	// This field will be present if the value is a
+	// [PromptOptionsParamsOpenAIModelParamsFunctionCallString] instead of an object.
+	OfPromptOptionssOpenAIModelParamsFunctionCallString PromptOptionsParamsOpenAIModelParamsFunctionCallString `json:",inline"`
+	// This field is from variant
+	// [PromptOptionsParamsOpenAIModelParamsFunctionCallFunction].
+	Name string `json:"name"`
+	JSON struct {
+		OfPromptOptionssOpenAIModelParamsFunctionCallString respjson.Field
+		Name                                                respjson.Field
+		raw                                                 string
+	} `json:"-"`
 }
 
-func (r PromptOptionsParamsOpenAIModelParams) implementsPromptOptionsParamsUnion() {}
-
-// Union satisfied by
-// [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString] or
-// [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallFunction].
-type PromptOptionsParamsOpenAIModelParamsFunctionCallUnion interface {
-	implementsPromptOptionsParamsOpenAIModelParamsFunctionCallUnion()
+func (u PromptOptionsParamsOpenAIModelParamsFunctionCallUnion) AsPromptOptionsParamsOpenAIModelParamsFunctionCallString() (v PromptOptionsParamsOpenAIModelParamsFunctionCallString) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
 }
 
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptOptionsParamsOpenAIModelParamsFunctionCallUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsFunctionCallString("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsFunctionCallFunction{}),
-		},
-	)
+func (u PromptOptionsParamsOpenAIModelParamsFunctionCallUnion) AsFunction() (v PromptOptionsParamsOpenAIModelParamsFunctionCallFunction) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u PromptOptionsParamsOpenAIModelParamsFunctionCallUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *PromptOptionsParamsOpenAIModelParamsFunctionCallUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type PromptOptionsParamsOpenAIModelParamsFunctionCallString string
@@ -5281,311 +5059,186 @@ const (
 	PromptOptionsParamsOpenAIModelParamsFunctionCallStringNone PromptOptionsParamsOpenAIModelParamsFunctionCallString = "none"
 )
 
-func (r PromptOptionsParamsOpenAIModelParamsFunctionCallString) IsKnown() bool {
-	switch r {
-	case PromptOptionsParamsOpenAIModelParamsFunctionCallStringAuto, PromptOptionsParamsOpenAIModelParamsFunctionCallStringNone:
-		return true
-	}
-	return false
-}
-
-func (r PromptOptionsParamsOpenAIModelParamsFunctionCallString) implementsPromptOptionsParamsOpenAIModelParamsFunctionCallUnion() {
-}
-
-func (r PromptOptionsParamsOpenAIModelParamsFunctionCallString) implementsPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
-}
-
 type PromptOptionsParamsOpenAIModelParamsFunctionCallFunction struct {
-	Name string                                                       `json:"name,required"`
-	JSON promptOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON `json:"-"`
+	Name string `json:"name,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// promptOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON contains the JSON
-// metadata for the struct
-// [PromptOptionsParamsOpenAIModelParamsFunctionCallFunction]
-type promptOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON struct {
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptOptionsParamsOpenAIModelParamsFunctionCallFunction) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PromptOptionsParamsOpenAIModelParamsFunctionCallFunction) RawJSON() string { return r.JSON.raw }
+func (r *PromptOptionsParamsOpenAIModelParamsFunctionCallFunction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptOptionsParamsOpenAIModelParamsFunctionCallFunctionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptOptionsParamsOpenAIModelParamsFunctionCallFunction) implementsPromptOptionsParamsOpenAIModelParamsFunctionCallUnion() {
-}
-
-type PromptOptionsParamsOpenAIModelParamsReasoningEffort string
-
-const (
-	PromptOptionsParamsOpenAIModelParamsReasoningEffortLow    PromptOptionsParamsOpenAIModelParamsReasoningEffort = "low"
-	PromptOptionsParamsOpenAIModelParamsReasoningEffortMedium PromptOptionsParamsOpenAIModelParamsReasoningEffort = "medium"
-	PromptOptionsParamsOpenAIModelParamsReasoningEffortHigh   PromptOptionsParamsOpenAIModelParamsReasoningEffort = "high"
-)
-
-func (r PromptOptionsParamsOpenAIModelParamsReasoningEffort) IsKnown() bool {
-	switch r {
-	case PromptOptionsParamsOpenAIModelParamsReasoningEffortLow, PromptOptionsParamsOpenAIModelParamsReasoningEffortMedium, PromptOptionsParamsOpenAIModelParamsReasoningEffortHigh:
-		return true
-	}
-	return false
-}
-
-type PromptOptionsParamsOpenAIModelParamsResponseFormat struct {
-	Type PromptOptionsParamsOpenAIModelParamsResponseFormatType `json:"type,required"`
-	// This field can have the runtime type of
-	// [PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema].
-	JsonSchema interface{}                                            `json:"json_schema"`
-	JSON       promptOptionsParamsOpenAIModelParamsResponseFormatJSON `json:"-"`
-	union      PromptOptionsParamsOpenAIModelParamsResponseFormatUnion
-}
-
-// promptOptionsParamsOpenAIModelParamsResponseFormatJSON contains the JSON
-// metadata for the struct [PromptOptionsParamsOpenAIModelParamsResponseFormat]
-type promptOptionsParamsOpenAIModelParamsResponseFormatJSON struct {
-	Type        apijson.Field
-	JsonSchema  apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r promptOptionsParamsOpenAIModelParamsResponseFormatJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r *PromptOptionsParamsOpenAIModelParamsResponseFormat) UnmarshalJSON(data []byte) (err error) {
-	*r = PromptOptionsParamsOpenAIModelParamsResponseFormat{}
-	err = apijson.UnmarshalRoot(data, &r.union)
-	if err != nil {
-		return err
-	}
-	return apijson.Port(r.union, &r)
-}
-
-// AsUnion returns a [PromptOptionsParamsOpenAIModelParamsResponseFormatUnion]
-// interface which you can cast to the specific types for more type safety.
+// PromptOptionsParamsOpenAIModelParamsResponseFormatUnion contains all possible
+// properties and values from
+// [PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject],
+// [PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema],
+// [PromptOptionsParamsOpenAIModelParamsResponseFormatText].
 //
-// Possible runtime types of the union are
-// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject],
-// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema],
-// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatText].
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormat) AsUnion() PromptOptionsParamsOpenAIModelParamsResponseFormatUnion {
-	return r.union
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatUnion struct {
+	Type string `json:"type"`
+	// This field is from variant
+	// [PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema].
+	JsonSchema PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema `json:"json_schema"`
+	JSON       struct {
+		Type       respjson.Field
+		JsonSchema respjson.Field
+		raw        string
+	} `json:"-"`
 }
 
-// Union satisfied by
-// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject],
-// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema] or
-// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatText].
-type PromptOptionsParamsOpenAIModelParamsResponseFormatUnion interface {
-	implementsPromptOptionsParamsOpenAIModelParamsResponseFormat()
+func (u PromptOptionsParamsOpenAIModelParamsResponseFormatUnion) AsJsonObject() (v PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
 }
 
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptOptionsParamsOpenAIModelParamsResponseFormatUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema{}),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsResponseFormatText{}),
-		},
-	)
+func (u PromptOptionsParamsOpenAIModelParamsResponseFormatUnion) AsJsonSchema() (v PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u PromptOptionsParamsOpenAIModelParamsResponseFormatUnion) AsText() (v PromptOptionsParamsOpenAIModelParamsResponseFormatText) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u PromptOptionsParamsOpenAIModelParamsResponseFormatUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject struct {
-	Type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType `json:"type,required"`
-	JSON promptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectJSON `json:"-"`
+	// Any of "json_object".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// promptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectJSON contains the
-// JSON metadata for the struct
-// [PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject]
-type promptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectJSON struct {
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
+// Returns the unmodified JSON received from the API
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject) RawJSON() string {
+	return r.JSON.raw
 }
-
-func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObject) implementsPromptOptionsParamsOpenAIModelParamsResponseFormat() {
-}
-
-type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType string
-
-const (
-	PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType = "json_object"
-)
-
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType) IsKnown() bool {
-	switch r {
-	case PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectTypeJsonObject:
-		return true
-	}
-	return false
 }
 
 type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema struct {
 	JsonSchema PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema `json:"json_schema,required"`
-	Type       PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType       `json:"type,required"`
-	JSON       promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJSON       `json:"-"`
+	// Any of "json_schema".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		JsonSchema  respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJSON contains the
-// JSON metadata for the struct
-// [PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema]
-type promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJSON struct {
-	JsonSchema  apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
+// Returns the unmodified JSON received from the API
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema) RawJSON() string {
+	return r.JSON.raw
 }
-
-func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchema) implementsPromptOptionsParamsOpenAIModelParamsResponseFormat() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema struct {
-	Name        string                                                                     `json:"name,required"`
-	Description string                                                                     `json:"description"`
-	Schema      string                                                                     `json:"schema"`
-	Strict      bool                                                                       `json:"strict,nullable"`
-	JSON        promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaJSON `json:"-"`
+	Name        string `json:"name,required"`
+	Description string `json:"description"`
+	Schema      string `json:"schema"`
+	Strict      bool   `json:"strict,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Name        respjson.Field
+		Description respjson.Field
+		Schema      respjson.Field
+		Strict      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaJSON
-// contains the JSON metadata for the struct
-// [PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema]
-type promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaJSON struct {
-	Name        apijson.Field
-	Description apijson.Field
-	Schema      apijson.Field
-	Strict      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
+// Returns the unmodified JSON received from the API
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema) RawJSON() string {
+	return r.JSON.raw
 }
-
-func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchema) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaJSON) RawJSON() string {
-	return r.raw
-}
-
-type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType string
-
-const (
-	PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaTypeJsonSchema PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType = "json_schema"
-)
-
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType) IsKnown() bool {
-	switch r {
-	case PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaTypeJsonSchema:
-		return true
-	}
-	return false
 }
 
 type PromptOptionsParamsOpenAIModelParamsResponseFormatText struct {
-	Type PromptOptionsParamsOpenAIModelParamsResponseFormatTextType `json:"type,required"`
-	JSON promptOptionsParamsOpenAIModelParamsResponseFormatTextJSON `json:"-"`
+	// Any of "text".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// promptOptionsParamsOpenAIModelParamsResponseFormatTextJSON contains the JSON
-// metadata for the struct [PromptOptionsParamsOpenAIModelParamsResponseFormatText]
-type promptOptionsParamsOpenAIModelParamsResponseFormatTextJSON struct {
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatText) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PromptOptionsParamsOpenAIModelParamsResponseFormatText) RawJSON() string { return r.JSON.raw }
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatText) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptOptionsParamsOpenAIModelParamsResponseFormatTextJSON) RawJSON() string {
-	return r.raw
+// PromptOptionsParamsOpenAIModelParamsToolChoiceUnion contains all possible
+// properties and values from
+// [PromptOptionsParamsOpenAIModelParamsToolChoiceString],
+// [PromptOptionsParamsOpenAIModelParamsToolChoiceFunction].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+//
+// If the underlying value is not a json object, one of the following properties
+// will be valid: OfPromptOptionssOpenAIModelParamsToolChoiceString]
+type PromptOptionsParamsOpenAIModelParamsToolChoiceUnion struct {
+	// This field will be present if the value is a
+	// [PromptOptionsParamsOpenAIModelParamsToolChoiceString] instead of an object.
+	OfPromptOptionssOpenAIModelParamsToolChoiceString PromptOptionsParamsOpenAIModelParamsToolChoiceString `json:",inline"`
+	// This field is from variant
+	// [PromptOptionsParamsOpenAIModelParamsToolChoiceFunction].
+	Function PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction `json:"function"`
+	// This field is from variant
+	// [PromptOptionsParamsOpenAIModelParamsToolChoiceFunction].
+	Type string `json:"type"`
+	JSON struct {
+		OfPromptOptionssOpenAIModelParamsToolChoiceString respjson.Field
+		Function                                          respjson.Field
+		Type                                              respjson.Field
+		raw                                               string
+	} `json:"-"`
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatText) implementsPromptOptionsParamsOpenAIModelParamsResponseFormat() {
+func (u PromptOptionsParamsOpenAIModelParamsToolChoiceUnion) AsPromptOptionsParamsOpenAIModelParamsToolChoiceString() (v PromptOptionsParamsOpenAIModelParamsToolChoiceString) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
 }
 
-type PromptOptionsParamsOpenAIModelParamsResponseFormatTextType string
-
-const (
-	PromptOptionsParamsOpenAIModelParamsResponseFormatTextTypeText PromptOptionsParamsOpenAIModelParamsResponseFormatTextType = "text"
-)
-
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatTextType) IsKnown() bool {
-	switch r {
-	case PromptOptionsParamsOpenAIModelParamsResponseFormatTextTypeText:
-		return true
-	}
-	return false
+func (u PromptOptionsParamsOpenAIModelParamsToolChoiceUnion) AsFunction() (v PromptOptionsParamsOpenAIModelParamsToolChoiceFunction) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
 }
 
-type PromptOptionsParamsOpenAIModelParamsResponseFormatType string
+// Returns the unmodified JSON received from the API
+func (u PromptOptionsParamsOpenAIModelParamsToolChoiceUnion) RawJSON() string { return u.JSON.raw }
 
-const (
-	PromptOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject PromptOptionsParamsOpenAIModelParamsResponseFormatType = "json_object"
-	PromptOptionsParamsOpenAIModelParamsResponseFormatTypeJsonSchema PromptOptionsParamsOpenAIModelParamsResponseFormatType = "json_schema"
-	PromptOptionsParamsOpenAIModelParamsResponseFormatTypeText       PromptOptionsParamsOpenAIModelParamsResponseFormatType = "text"
-)
-
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatType) IsKnown() bool {
-	switch r {
-	case PromptOptionsParamsOpenAIModelParamsResponseFormatTypeJsonObject, PromptOptionsParamsOpenAIModelParamsResponseFormatTypeJsonSchema, PromptOptionsParamsOpenAIModelParamsResponseFormatTypeText:
-		return true
-	}
-	return false
-}
-
-// Union satisfied by [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceString]
-// or [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunction].
-type PromptOptionsParamsOpenAIModelParamsToolChoiceUnion interface {
-	implementsPromptOptionsParamsOpenAIModelParamsToolChoiceUnion()
-}
-
-func init() {
-	apijson.RegisterUnion(
-		reflect.TypeOf((*PromptOptionsParamsOpenAIModelParamsToolChoiceUnion)(nil)).Elem(),
-		"",
-		apijson.UnionVariant{
-			TypeFilter: gjson.String,
-			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsToolChoiceString("")),
-		},
-		apijson.UnionVariant{
-			TypeFilter: gjson.JSON,
-			Type:       reflect.TypeOf(PromptOptionsParamsOpenAIModelParamsToolChoiceFunction{}),
-		},
-	)
+func (r *PromptOptionsParamsOpenAIModelParamsToolChoiceUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type PromptOptionsParamsOpenAIModelParamsToolChoiceString string
@@ -5596,402 +5249,676 @@ const (
 	PromptOptionsParamsOpenAIModelParamsToolChoiceStringRequired PromptOptionsParamsOpenAIModelParamsToolChoiceString = "required"
 )
 
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceString) IsKnown() bool {
-	switch r {
-	case PromptOptionsParamsOpenAIModelParamsToolChoiceStringAuto, PromptOptionsParamsOpenAIModelParamsToolChoiceStringNone, PromptOptionsParamsOpenAIModelParamsToolChoiceStringRequired:
-		return true
-	}
-	return false
-}
-
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceString) implementsPromptOptionsParamsOpenAIModelParamsToolChoiceUnion() {
-}
-
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceString) implementsPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
-}
-
 type PromptOptionsParamsOpenAIModelParamsToolChoiceFunction struct {
 	Function PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction `json:"function,required"`
-	Type     PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionType     `json:"type,required"`
-	JSON     promptOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON     `json:"-"`
+	// Any of "function".
+	Type string `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Function    respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// promptOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON contains the JSON
-// metadata for the struct [PromptOptionsParamsOpenAIModelParamsToolChoiceFunction]
-type promptOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON struct {
-	Function    apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptOptionsParamsOpenAIModelParamsToolChoiceFunction) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunction) RawJSON() string { return r.JSON.raw }
+func (r *PromptOptionsParamsOpenAIModelParamsToolChoiceFunction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptOptionsParamsOpenAIModelParamsToolChoiceFunctionJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunction) implementsPromptOptionsParamsOpenAIModelParamsToolChoiceUnion() {
 }
 
 type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction struct {
-	Name string                                                             `json:"name,required"`
-	JSON promptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON `json:"-"`
+	Name string `json:"name,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// promptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON contains the
-// JSON metadata for the struct
-// [PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction]
-type promptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON struct {
-	Name        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
+// Returns the unmodified JSON received from the API
+func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction) RawJSON() string {
+	return r.JSON.raw
 }
-
-func (r *PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction) UnmarshalJSON(data []byte) (err error) {
+func (r *PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r promptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionJSON) RawJSON() string {
-	return r.raw
-}
-
-type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionType string
-
-const (
-	PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionType = "function"
-)
-
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionType) IsKnown() bool {
-	switch r {
-	case PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionTypeFunction:
-		return true
-	}
-	return false
 }
 
 type PromptOptionsParamsAnthropicModelParams struct {
 	MaxTokens   float64 `json:"max_tokens,required"`
 	Temperature float64 `json:"temperature,required"`
 	// This is a legacy parameter that should not be used.
-	MaxTokensToSample float64                                     `json:"max_tokens_to_sample"`
-	StopSequences     []string                                    `json:"stop_sequences"`
-	TopK              float64                                     `json:"top_k"`
-	TopP              float64                                     `json:"top_p"`
-	UseCache          bool                                        `json:"use_cache"`
-	JSON              promptOptionsParamsAnthropicModelParamsJSON `json:"-"`
+	MaxTokensToSample float64  `json:"max_tokens_to_sample"`
+	StopSequences     []string `json:"stop_sequences"`
+	TopK              float64  `json:"top_k"`
+	TopP              float64  `json:"top_p"`
+	UseCache          bool     `json:"use_cache"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		MaxTokens         respjson.Field
+		Temperature       respjson.Field
+		MaxTokensToSample respjson.Field
+		StopSequences     respjson.Field
+		TopK              respjson.Field
+		TopP              respjson.Field
+		UseCache          respjson.Field
+		ExtraFields       map[string]respjson.Field
+		raw               string
+	} `json:"-"`
 }
 
-// promptOptionsParamsAnthropicModelParamsJSON contains the JSON metadata for the
-// struct [PromptOptionsParamsAnthropicModelParams]
-type promptOptionsParamsAnthropicModelParamsJSON struct {
-	MaxTokens         apijson.Field
-	Temperature       apijson.Field
-	MaxTokensToSample apijson.Field
-	StopSequences     apijson.Field
-	TopK              apijson.Field
-	TopP              apijson.Field
-	UseCache          apijson.Field
-	raw               string
-	ExtraFields       map[string]apijson.Field
-}
-
-func (r *PromptOptionsParamsAnthropicModelParams) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PromptOptionsParamsAnthropicModelParams) RawJSON() string { return r.JSON.raw }
+func (r *PromptOptionsParamsAnthropicModelParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-func (r promptOptionsParamsAnthropicModelParamsJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptOptionsParamsAnthropicModelParams) implementsPromptOptionsParamsUnion() {}
 
 type PromptOptionsParamsGoogleModelParams struct {
-	MaxOutputTokens float64                                  `json:"maxOutputTokens"`
-	Temperature     float64                                  `json:"temperature"`
-	TopK            float64                                  `json:"topK"`
-	TopP            float64                                  `json:"topP"`
-	UseCache        bool                                     `json:"use_cache"`
-	JSON            promptOptionsParamsGoogleModelParamsJSON `json:"-"`
+	MaxOutputTokens float64 `json:"maxOutputTokens"`
+	Temperature     float64 `json:"temperature"`
+	TopK            float64 `json:"topK"`
+	TopP            float64 `json:"topP"`
+	UseCache        bool    `json:"use_cache"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		MaxOutputTokens respjson.Field
+		Temperature     respjson.Field
+		TopK            respjson.Field
+		TopP            respjson.Field
+		UseCache        respjson.Field
+		ExtraFields     map[string]respjson.Field
+		raw             string
+	} `json:"-"`
 }
 
-// promptOptionsParamsGoogleModelParamsJSON contains the JSON metadata for the
-// struct [PromptOptionsParamsGoogleModelParams]
-type promptOptionsParamsGoogleModelParamsJSON struct {
-	MaxOutputTokens apijson.Field
-	Temperature     apijson.Field
-	TopK            apijson.Field
-	TopP            apijson.Field
-	UseCache        apijson.Field
-	raw             string
-	ExtraFields     map[string]apijson.Field
-}
-
-func (r *PromptOptionsParamsGoogleModelParams) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PromptOptionsParamsGoogleModelParams) RawJSON() string { return r.JSON.raw }
+func (r *PromptOptionsParamsGoogleModelParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-func (r promptOptionsParamsGoogleModelParamsJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptOptionsParamsGoogleModelParams) implementsPromptOptionsParamsUnion() {}
 
 type PromptOptionsParamsWindowAIModelParams struct {
-	Temperature float64                                    `json:"temperature"`
-	TopK        float64                                    `json:"topK"`
-	UseCache    bool                                       `json:"use_cache"`
-	JSON        promptOptionsParamsWindowAIModelParamsJSON `json:"-"`
+	Temperature float64 `json:"temperature"`
+	TopK        float64 `json:"topK"`
+	UseCache    bool    `json:"use_cache"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Temperature respjson.Field
+		TopK        respjson.Field
+		UseCache    respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// promptOptionsParamsWindowAIModelParamsJSON contains the JSON metadata for the
-// struct [PromptOptionsParamsWindowAIModelParams]
-type promptOptionsParamsWindowAIModelParamsJSON struct {
-	Temperature apijson.Field
-	TopK        apijson.Field
-	UseCache    apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptOptionsParamsWindowAIModelParams) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PromptOptionsParamsWindowAIModelParams) RawJSON() string { return r.JSON.raw }
+func (r *PromptOptionsParamsWindowAIModelParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-func (r promptOptionsParamsWindowAIModelParamsJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptOptionsParamsWindowAIModelParams) implementsPromptOptionsParamsUnion() {}
 
 type PromptOptionsParamsJsCompletionParams struct {
-	UseCache bool                                      `json:"use_cache"`
-	JSON     promptOptionsParamsJsCompletionParamsJSON `json:"-"`
+	UseCache bool `json:"use_cache"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		UseCache    respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// promptOptionsParamsJsCompletionParamsJSON contains the JSON metadata for the
-// struct [PromptOptionsParamsJsCompletionParams]
-type promptOptionsParamsJsCompletionParamsJSON struct {
-	UseCache    apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *PromptOptionsParamsJsCompletionParams) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r PromptOptionsParamsJsCompletionParams) RawJSON() string { return r.JSON.raw }
+func (r *PromptOptionsParamsJsCompletionParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r promptOptionsParamsJsCompletionParamsJSON) RawJSON() string {
-	return r.raw
-}
-
-func (r PromptOptionsParamsJsCompletionParams) implementsPromptOptionsParamsUnion() {}
-
 type PromptOptionsParam struct {
-	Model    param.Field[string]                        `json:"model"`
-	Params   param.Field[PromptOptionsParamsUnionParam] `json:"params"`
-	Position param.Field[string]                        `json:"position"`
+	Model    param.Opt[string]             `json:"model,omitzero"`
+	Position param.Opt[string]             `json:"position,omitzero"`
+	Params   PromptOptionsParamsUnionParam `json:"params,omitzero"`
+	paramObj
 }
 
 func (r PromptOptionsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptOptionsParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptOptionsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-// Satisfied by [shared.PromptOptionsParamsOpenAIModelParamsParam],
-// [shared.PromptOptionsParamsAnthropicModelParamsParam],
-// [shared.PromptOptionsParamsGoogleModelParamsParam],
-// [shared.PromptOptionsParamsWindowAIModelParamsParam],
-// [shared.PromptOptionsParamsJsCompletionParamsParam].
-type PromptOptionsParamsUnionParam interface {
-	implementsPromptOptionsParamsUnionParam()
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type PromptOptionsParamsUnionParam struct {
+	OfOpenAIModels    *PromptOptionsParamsOpenAIModelParamsParam    `json:",omitzero,inline"`
+	OfAnthropicModels *PromptOptionsParamsAnthropicModelParamsParam `json:",omitzero,inline"`
+	OfGoogleModels    *PromptOptionsParamsGoogleModelParamsParam    `json:",omitzero,inline"`
+	OfWindowAIModels  *PromptOptionsParamsWindowAIModelParamsParam  `json:",omitzero,inline"`
+	OfJsCompletions   *PromptOptionsParamsJsCompletionParamsParam   `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u PromptOptionsParamsUnionParam) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfOpenAIModels,
+		u.OfAnthropicModels,
+		u.OfGoogleModels,
+		u.OfWindowAIModels,
+		u.OfJsCompletions)
+}
+func (u *PromptOptionsParamsUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *PromptOptionsParamsUnionParam) asAny() any {
+	if !param.IsOmitted(u.OfOpenAIModels) {
+		return u.OfOpenAIModels
+	} else if !param.IsOmitted(u.OfAnthropicModels) {
+		return u.OfAnthropicModels
+	} else if !param.IsOmitted(u.OfGoogleModels) {
+		return u.OfGoogleModels
+	} else if !param.IsOmitted(u.OfWindowAIModels) {
+		return u.OfWindowAIModels
+	} else if !param.IsOmitted(u.OfJsCompletions) {
+		return u.OfJsCompletions
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetFrequencyPenalty() *float64 {
+	if vt := u.OfOpenAIModels; vt != nil && vt.FrequencyPenalty.Valid() {
+		return &vt.FrequencyPenalty.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetFunctionCall() *PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam {
+	if vt := u.OfOpenAIModels; vt != nil {
+		return &vt.FunctionCall
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetMaxCompletionTokens() *float64 {
+	if vt := u.OfOpenAIModels; vt != nil && vt.MaxCompletionTokens.Valid() {
+		return &vt.MaxCompletionTokens.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetN() *float64 {
+	if vt := u.OfOpenAIModels; vt != nil && vt.N.Valid() {
+		return &vt.N.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetPresencePenalty() *float64 {
+	if vt := u.OfOpenAIModels; vt != nil && vt.PresencePenalty.Valid() {
+		return &vt.PresencePenalty.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetReasoningEffort() *string {
+	if vt := u.OfOpenAIModels; vt != nil {
+		return &vt.ReasoningEffort
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetResponseFormat() *PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam {
+	if vt := u.OfOpenAIModels; vt != nil {
+		return &vt.ResponseFormat
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetStop() []string {
+	if vt := u.OfOpenAIModels; vt != nil {
+		return vt.Stop
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetToolChoice() *PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam {
+	if vt := u.OfOpenAIModels; vt != nil {
+		return &vt.ToolChoice
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetMaxTokensToSample() *float64 {
+	if vt := u.OfAnthropicModels; vt != nil && vt.MaxTokensToSample.Valid() {
+		return &vt.MaxTokensToSample.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetStopSequences() []string {
+	if vt := u.OfAnthropicModels; vt != nil {
+		return vt.StopSequences
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetMaxOutputTokens() *float64 {
+	if vt := u.OfGoogleModels; vt != nil && vt.MaxOutputTokens.Valid() {
+		return &vt.MaxOutputTokens.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetMaxTokens() *float64 {
+	if vt := u.OfOpenAIModels; vt != nil && vt.MaxTokens.Valid() {
+		return &vt.MaxTokens.Value
+	} else if vt := u.OfAnthropicModels; vt != nil {
+		return (*float64)(&vt.MaxTokens)
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetTemperature() *float64 {
+	if vt := u.OfOpenAIModels; vt != nil && vt.Temperature.Valid() {
+		return &vt.Temperature.Value
+	} else if vt := u.OfAnthropicModels; vt != nil {
+		return (*float64)(&vt.Temperature)
+	} else if vt := u.OfGoogleModels; vt != nil && vt.Temperature.Valid() {
+		return &vt.Temperature.Value
+	} else if vt := u.OfWindowAIModels; vt != nil && vt.Temperature.Valid() {
+		return &vt.Temperature.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetTopP() *float64 {
+	if vt := u.OfOpenAIModels; vt != nil && vt.TopP.Valid() {
+		return &vt.TopP.Value
+	} else if vt := u.OfAnthropicModels; vt != nil && vt.TopP.Valid() {
+		return &vt.TopP.Value
+	} else if vt := u.OfGoogleModels; vt != nil && vt.TopP.Valid() {
+		return &vt.TopP.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetUseCache() *bool {
+	if vt := u.OfOpenAIModels; vt != nil && vt.UseCache.Valid() {
+		return &vt.UseCache.Value
+	} else if vt := u.OfAnthropicModels; vt != nil && vt.UseCache.Valid() {
+		return &vt.UseCache.Value
+	} else if vt := u.OfGoogleModels; vt != nil && vt.UseCache.Valid() {
+		return &vt.UseCache.Value
+	} else if vt := u.OfWindowAIModels; vt != nil && vt.UseCache.Valid() {
+		return &vt.UseCache.Value
+	} else if vt := u.OfJsCompletions; vt != nil && vt.UseCache.Valid() {
+		return &vt.UseCache.Value
+	}
+	return nil
+}
+
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsUnionParam) GetTopK() *float64 {
+	if vt := u.OfAnthropicModels; vt != nil && vt.TopK.Valid() {
+		return &vt.TopK.Value
+	} else if vt := u.OfGoogleModels; vt != nil && vt.TopK.Valid() {
+		return &vt.TopK.Value
+	} else if vt := u.OfWindowAIModels; vt != nil && vt.TopK.Valid() {
+		return &vt.TopK.Value
+	}
+	return nil
 }
 
 type PromptOptionsParamsOpenAIModelParamsParam struct {
-	FrequencyPenalty param.Field[float64]                                                    `json:"frequency_penalty"`
-	FunctionCall     param.Field[PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam] `json:"function_call"`
+	FrequencyPenalty param.Opt[float64] `json:"frequency_penalty,omitzero"`
 	// The successor to max_tokens
-	MaxCompletionTokens param.Field[float64]                                                      `json:"max_completion_tokens"`
-	MaxTokens           param.Field[float64]                                                      `json:"max_tokens"`
-	N                   param.Field[float64]                                                      `json:"n"`
-	PresencePenalty     param.Field[float64]                                                      `json:"presence_penalty"`
-	ReasoningEffort     param.Field[PromptOptionsParamsOpenAIModelParamsReasoningEffort]          `json:"reasoning_effort"`
-	ResponseFormat      param.Field[PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam] `json:"response_format"`
-	Stop                param.Field[[]string]                                                     `json:"stop"`
-	Temperature         param.Field[float64]                                                      `json:"temperature"`
-	ToolChoice          param.Field[PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam]     `json:"tool_choice"`
-	TopP                param.Field[float64]                                                      `json:"top_p"`
-	UseCache            param.Field[bool]                                                         `json:"use_cache"`
+	MaxCompletionTokens param.Opt[float64]                                           `json:"max_completion_tokens,omitzero"`
+	MaxTokens           param.Opt[float64]                                           `json:"max_tokens,omitzero"`
+	N                   param.Opt[float64]                                           `json:"n,omitzero"`
+	PresencePenalty     param.Opt[float64]                                           `json:"presence_penalty,omitzero"`
+	Temperature         param.Opt[float64]                                           `json:"temperature,omitzero"`
+	TopP                param.Opt[float64]                                           `json:"top_p,omitzero"`
+	UseCache            param.Opt[bool]                                              `json:"use_cache,omitzero"`
+	ResponseFormat      PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam `json:"response_format,omitzero"`
+	FunctionCall        PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam   `json:"function_call,omitzero"`
+	// Any of "low", "medium", "high".
+	ReasoningEffort string                                                   `json:"reasoning_effort,omitzero"`
+	Stop            []string                                                 `json:"stop,omitzero"`
+	ToolChoice      PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam `json:"tool_choice,omitzero"`
+	paramObj
 }
 
 func (r PromptOptionsParamsOpenAIModelParamsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptOptionsParamsOpenAIModelParamsParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptOptionsParamsOpenAIModelParamsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsParam) implementsPromptOptionsParamsUnionParam() {}
-
-// Satisfied by [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallString],
-// [shared.PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam].
-type PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam interface {
-	implementsPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam()
+func init() {
+	apijson.RegisterFieldValidator[PromptOptionsParamsOpenAIModelParamsParam](
+		"reasoning_effort", "low", "medium", "high",
+	)
 }
 
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfPromptOptionssOpenAIModelParamsFunctionCallString)
+	OfPromptOptionssOpenAIModelParamsFunctionCallString param.Opt[PromptOptionsParamsOpenAIModelParamsFunctionCallString] `json:",omitzero,inline"`
+	OfFunction                                          *PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam    `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfPromptOptionssOpenAIModelParamsFunctionCallString, u.OfFunction)
+}
+func (u *PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *PromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam) asAny() any {
+	if !param.IsOmitted(u.OfPromptOptionssOpenAIModelParamsFunctionCallString) {
+		return &u.OfPromptOptionssOpenAIModelParamsFunctionCallString
+	} else if !param.IsOmitted(u.OfFunction) {
+		return u.OfFunction
+	}
+	return nil
+}
+
+// The property Name is required.
 type PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam struct {
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
+	paramObj
 }
 
 func (r PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsFunctionCallFunctionParam) implementsPromptOptionsParamsOpenAIModelParamsFunctionCallUnionParam() {
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam struct {
+	OfJsonObject *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam `json:",omitzero,inline"`
+	OfJsonSchema *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam `json:",omitzero,inline"`
+	OfText       *PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam       `json:",omitzero,inline"`
+	paramUnion
 }
 
-type PromptOptionsParamsOpenAIModelParamsResponseFormatParam struct {
-	Type       param.Field[PromptOptionsParamsOpenAIModelParamsResponseFormatType] `json:"type,required"`
-	JsonSchema param.Field[interface{}]                                            `json:"json_schema"`
+func (u PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfJsonObject, u.OfJsonSchema, u.OfText)
+}
+func (u *PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+func (u *PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam) asAny() any {
+	if !param.IsOmitted(u.OfJsonObject) {
+		return u.OfJsonObject
+	} else if !param.IsOmitted(u.OfJsonSchema) {
+		return u.OfJsonSchema
+	} else if !param.IsOmitted(u.OfText) {
+		return u.OfText
+	}
+	return nil
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatParam) implementsPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam) GetJsonSchema() *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam {
+	if vt := u.OfJsonSchema; vt != nil {
+		return &vt.JsonSchema
+	}
+	return nil
 }
 
-// Satisfied by
-// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam],
-// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam],
-// [shared.PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam],
-// [PromptOptionsParamsOpenAIModelParamsResponseFormatParam].
-type PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam interface {
-	implementsPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam()
+// Returns a pointer to the underlying variant's property, if present.
+func (u PromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam) GetType() *string {
+	if vt := u.OfJsonObject; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfJsonSchema; vt != nil {
+		return (*string)(&vt.Type)
+	} else if vt := u.OfText; vt != nil {
+		return (*string)(&vt.Type)
+	}
+	return nil
 }
 
+// The property Type is required.
 type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam struct {
-	Type param.Field[PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectType] `json:"type,required"`
+	// Any of "json_object".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
 func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam) implementsPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
+func init() {
+	apijson.RegisterFieldValidator[PromptOptionsParamsOpenAIModelParamsResponseFormatJsonObjectParam](
+		"type", "json_object",
+	)
 }
 
+// The properties JsonSchema, Type are required.
 type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam struct {
-	JsonSchema param.Field[PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam] `json:"json_schema,required"`
-	Type       param.Field[PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaType]            `json:"type,required"`
+	JsonSchema PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam `json:"json_schema,omitzero,required"`
+	// Any of "json_schema".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
 func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam) implementsPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
+func init() {
+	apijson.RegisterFieldValidator[PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaParam](
+		"type", "json_schema",
+	)
 }
 
+// The property Name is required.
 type PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam struct {
-	Name        param.Field[string] `json:"name,required"`
-	Description param.Field[string] `json:"description"`
-	Schema      param.Field[string] `json:"schema"`
-	Strict      param.Field[bool]   `json:"strict"`
+	Name        string            `json:"name,required"`
+	Strict      param.Opt[bool]   `json:"strict,omitzero"`
+	Description param.Opt[string] `json:"description,omitzero"`
+	Schema      string            `json:"schema,omitzero"`
+	paramObj
 }
 
 func (r PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatJsonSchemaJsonSchemaParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
+// The property Type is required.
 type PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam struct {
-	Type param.Field[PromptOptionsParamsOpenAIModelParamsResponseFormatTextType] `json:"type,required"`
+	// Any of "text".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
 func (r PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam) implementsPromptOptionsParamsOpenAIModelParamsResponseFormatUnionParam() {
+func init() {
+	apijson.RegisterFieldValidator[PromptOptionsParamsOpenAIModelParamsResponseFormatTextParam](
+		"type", "text",
+	)
 }
 
-// Satisfied by [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceString],
-// [shared.PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam].
-type PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam interface {
-	implementsPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam()
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfPromptOptionssOpenAIModelParamsToolChoiceString)
+	OfPromptOptionssOpenAIModelParamsToolChoiceString param.Opt[PromptOptionsParamsOpenAIModelParamsToolChoiceString] `json:",omitzero,inline"`
+	OfFunction                                        *PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam    `json:",omitzero,inline"`
+	paramUnion
 }
 
+func (u PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfPromptOptionssOpenAIModelParamsToolChoiceString, u.OfFunction)
+}
+func (u *PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+func (u *PromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam) asAny() any {
+	if !param.IsOmitted(u.OfPromptOptionssOpenAIModelParamsToolChoiceString) {
+		return &u.OfPromptOptionssOpenAIModelParamsToolChoiceString
+	} else if !param.IsOmitted(u.OfFunction) {
+		return u.OfFunction
+	}
+	return nil
+}
+
+// The properties Function, Type are required.
 type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam struct {
-	Function param.Field[PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam] `json:"function,required"`
-	Type     param.Field[PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionType]          `json:"type,required"`
+	Function PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam `json:"function,omitzero,required"`
+	// Any of "function".
+	Type string `json:"type,omitzero,required"`
+	paramObj
 }
 
 func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam) implementsPromptOptionsParamsOpenAIModelParamsToolChoiceUnionParam() {
+func init() {
+	apijson.RegisterFieldValidator[PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionParam](
+		"type", "function",
+	)
 }
 
+// The property Name is required.
 type PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam struct {
-	Name param.Field[string] `json:"name,required"`
+	Name string `json:"name,required"`
+	paramObj
 }
 
 func (r PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptOptionsParamsOpenAIModelParamsToolChoiceFunctionFunctionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
+// The properties MaxTokens, Temperature are required.
 type PromptOptionsParamsAnthropicModelParamsParam struct {
-	MaxTokens   param.Field[float64] `json:"max_tokens,required"`
-	Temperature param.Field[float64] `json:"temperature,required"`
+	MaxTokens   float64 `json:"max_tokens,required"`
+	Temperature float64 `json:"temperature,required"`
 	// This is a legacy parameter that should not be used.
-	MaxTokensToSample param.Field[float64]  `json:"max_tokens_to_sample"`
-	StopSequences     param.Field[[]string] `json:"stop_sequences"`
-	TopK              param.Field[float64]  `json:"top_k"`
-	TopP              param.Field[float64]  `json:"top_p"`
-	UseCache          param.Field[bool]     `json:"use_cache"`
+	MaxTokensToSample param.Opt[float64] `json:"max_tokens_to_sample,omitzero"`
+	TopK              param.Opt[float64] `json:"top_k,omitzero"`
+	TopP              param.Opt[float64] `json:"top_p,omitzero"`
+	UseCache          param.Opt[bool]    `json:"use_cache,omitzero"`
+	StopSequences     []string           `json:"stop_sequences,omitzero"`
+	paramObj
 }
 
 func (r PromptOptionsParamsAnthropicModelParamsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptOptionsParamsAnthropicModelParamsParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptOptionsParamsAnthropicModelParamsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r PromptOptionsParamsAnthropicModelParamsParam) implementsPromptOptionsParamsUnionParam() {}
-
 type PromptOptionsParamsGoogleModelParamsParam struct {
-	MaxOutputTokens param.Field[float64] `json:"maxOutputTokens"`
-	Temperature     param.Field[float64] `json:"temperature"`
-	TopK            param.Field[float64] `json:"topK"`
-	TopP            param.Field[float64] `json:"topP"`
-	UseCache        param.Field[bool]    `json:"use_cache"`
+	MaxOutputTokens param.Opt[float64] `json:"maxOutputTokens,omitzero"`
+	Temperature     param.Opt[float64] `json:"temperature,omitzero"`
+	TopK            param.Opt[float64] `json:"topK,omitzero"`
+	TopP            param.Opt[float64] `json:"topP,omitzero"`
+	UseCache        param.Opt[bool]    `json:"use_cache,omitzero"`
+	paramObj
 }
 
 func (r PromptOptionsParamsGoogleModelParamsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptOptionsParamsGoogleModelParamsParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptOptionsParamsGoogleModelParamsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r PromptOptionsParamsGoogleModelParamsParam) implementsPromptOptionsParamsUnionParam() {}
-
 type PromptOptionsParamsWindowAIModelParamsParam struct {
-	Temperature param.Field[float64] `json:"temperature"`
-	TopK        param.Field[float64] `json:"topK"`
-	UseCache    param.Field[bool]    `json:"use_cache"`
+	Temperature param.Opt[float64] `json:"temperature,omitzero"`
+	TopK        param.Opt[float64] `json:"topK,omitzero"`
+	UseCache    param.Opt[bool]    `json:"use_cache,omitzero"`
+	paramObj
 }
 
 func (r PromptOptionsParamsWindowAIModelParamsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptOptionsParamsWindowAIModelParamsParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *PromptOptionsParamsWindowAIModelParamsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r PromptOptionsParamsWindowAIModelParamsParam) implementsPromptOptionsParamsUnionParam() {}
-
 type PromptOptionsParamsJsCompletionParamsParam struct {
-	UseCache param.Field[bool] `json:"use_cache"`
+	UseCache param.Opt[bool] `json:"use_cache,omitzero"`
+	paramObj
 }
 
 func (r PromptOptionsParamsJsCompletionParamsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow PromptOptionsParamsJsCompletionParamsParam
+	return param.MarshalObject(r, (*shadow)(&r))
 }
-
-func (r PromptOptionsParamsJsCompletionParamsParam) implementsPromptOptionsParamsUnionParam() {}
+func (r *PromptOptionsParamsJsCompletionParamsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Metadata about the state of the repo when the experiment was created
 type RepoInfo struct {
@@ -6013,58 +5940,68 @@ type RepoInfo struct {
 	// of the repo and the most recent commit.
 	GitDiff string `json:"git_diff,nullable"`
 	// Name of the tag on the most recent commit
-	Tag  string       `json:"tag,nullable"`
-	JSON repoInfoJSON `json:"-"`
+	Tag string `json:"tag,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AuthorEmail   respjson.Field
+		AuthorName    respjson.Field
+		Branch        respjson.Field
+		Commit        respjson.Field
+		CommitMessage respjson.Field
+		CommitTime    respjson.Field
+		Dirty         respjson.Field
+		GitDiff       respjson.Field
+		Tag           respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
+	} `json:"-"`
 }
 
-// repoInfoJSON contains the JSON metadata for the struct [RepoInfo]
-type repoInfoJSON struct {
-	AuthorEmail   apijson.Field
-	AuthorName    apijson.Field
-	Branch        apijson.Field
-	Commit        apijson.Field
-	CommitMessage apijson.Field
-	CommitTime    apijson.Field
-	Dirty         apijson.Field
-	GitDiff       apijson.Field
-	Tag           apijson.Field
-	raw           string
-	ExtraFields   map[string]apijson.Field
-}
-
-func (r *RepoInfo) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r RepoInfo) RawJSON() string { return r.JSON.raw }
+func (r *RepoInfo) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r repoInfoJSON) RawJSON() string {
-	return r.raw
+// ToParam converts this RepoInfo to a RepoInfoParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// RepoInfoParam.Overrides()
+func (r RepoInfo) ToParam() RepoInfoParam {
+	return param.Override[RepoInfoParam](json.RawMessage(r.RawJSON()))
 }
 
 // Metadata about the state of the repo when the experiment was created
 type RepoInfoParam struct {
 	// Email of the author of the most recent commit
-	AuthorEmail param.Field[string] `json:"author_email"`
+	AuthorEmail param.Opt[string] `json:"author_email,omitzero"`
 	// Name of the author of the most recent commit
-	AuthorName param.Field[string] `json:"author_name"`
+	AuthorName param.Opt[string] `json:"author_name,omitzero"`
 	// Name of the branch the most recent commit belongs to
-	Branch param.Field[string] `json:"branch"`
+	Branch param.Opt[string] `json:"branch,omitzero"`
 	// SHA of most recent commit
-	Commit param.Field[string] `json:"commit"`
+	Commit param.Opt[string] `json:"commit,omitzero"`
 	// Most recent commit message
-	CommitMessage param.Field[string] `json:"commit_message"`
+	CommitMessage param.Opt[string] `json:"commit_message,omitzero"`
 	// Time of the most recent commit
-	CommitTime param.Field[string] `json:"commit_time"`
+	CommitTime param.Opt[string] `json:"commit_time,omitzero"`
 	// Whether or not the repo had uncommitted changes when snapshotted
-	Dirty param.Field[bool] `json:"dirty"`
+	Dirty param.Opt[bool] `json:"dirty,omitzero"`
 	// If the repo was dirty when run, this includes the diff between the current state
 	// of the repo and the most recent commit.
-	GitDiff param.Field[string] `json:"git_diff"`
+	GitDiff param.Opt[string] `json:"git_diff,omitzero"`
 	// Name of the tag on the most recent commit
-	Tag param.Field[string] `json:"tag"`
+	Tag param.Opt[string] `json:"tag,omitzero"`
+	paramObj
 }
 
 func (r RepoInfoParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow RepoInfoParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *RepoInfoParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // A role is a collection of permissions which can be granted as part of an ACL
@@ -6097,31 +6034,27 @@ type Role struct {
 	// It is forbidden to change the org after creating a role
 	OrgID string `json:"org_id,nullable" format:"uuid"`
 	// Identifies the user who created the role
-	UserID string   `json:"user_id,nullable" format:"uuid"`
-	JSON   roleJSON `json:"-"`
+	UserID string `json:"user_id,nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID                respjson.Field
+		Name              respjson.Field
+		Created           respjson.Field
+		DeletedAt         respjson.Field
+		Description       respjson.Field
+		MemberPermissions respjson.Field
+		MemberRoles       respjson.Field
+		OrgID             respjson.Field
+		UserID            respjson.Field
+		ExtraFields       map[string]respjson.Field
+		raw               string
+	} `json:"-"`
 }
 
-// roleJSON contains the JSON metadata for the struct [Role]
-type roleJSON struct {
-	ID                apijson.Field
-	Name              apijson.Field
-	Created           apijson.Field
-	DeletedAt         apijson.Field
-	Description       apijson.Field
-	MemberPermissions apijson.Field
-	MemberRoles       apijson.Field
-	OrgID             apijson.Field
-	UserID            apijson.Field
-	raw               string
-	ExtraFields       map[string]apijson.Field
-}
-
-func (r *Role) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r Role) RawJSON() string { return r.JSON.raw }
+func (r *Role) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r roleJSON) RawJSON() string {
-	return r.raw
 }
 
 type RoleMemberPermission struct {
@@ -6129,27 +6062,28 @@ type RoleMemberPermission struct {
 	//
 	// Permissions can be assigned to to objects on an individual basis, or grouped
 	// into roles
+	//
+	// Any of "create", "read", "update", "delete", "create_acls", "read_acls",
+	// "update_acls", "delete_acls".
 	Permission Permission `json:"permission,required"`
 	// The object type that the ACL applies to
-	RestrictObjectType ACLObjectType            `json:"restrict_object_type,nullable"`
-	JSON               roleMemberPermissionJSON `json:"-"`
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
+	RestrictObjectType ACLObjectType `json:"restrict_object_type,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Permission         respjson.Field
+		RestrictObjectType respjson.Field
+		ExtraFields        map[string]respjson.Field
+		raw                string
+	} `json:"-"`
 }
 
-// roleMemberPermissionJSON contains the JSON metadata for the struct
-// [RoleMemberPermission]
-type roleMemberPermissionJSON struct {
-	Permission         apijson.Field
-	RestrictObjectType apijson.Field
-	raw                string
-	ExtraFields        map[string]apijson.Field
-}
-
-func (r *RoleMemberPermission) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r RoleMemberPermission) RawJSON() string { return r.JSON.raw }
+func (r *RoleMemberPermission) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r roleMemberPermissionJSON) RawJSON() string {
-	return r.raw
 }
 
 // Summary of a score's performance
@@ -6163,27 +6097,23 @@ type ScoreSummary struct {
 	// Average score across all examples
 	Score float64 `json:"score,required"`
 	// Difference in score between the current and comparison experiment
-	Diff float64          `json:"diff"`
-	JSON scoreSummaryJSON `json:"-"`
+	Diff float64 `json:"diff"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Improvements respjson.Field
+		Name         respjson.Field
+		Regressions  respjson.Field
+		Score        respjson.Field
+		Diff         respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
 }
 
-// scoreSummaryJSON contains the JSON metadata for the struct [ScoreSummary]
-type scoreSummaryJSON struct {
-	Improvements apijson.Field
-	Name         apijson.Field
-	Regressions  apijson.Field
-	Score        apijson.Field
-	Diff         apijson.Field
-	raw          string
-	ExtraFields  map[string]apijson.Field
-}
-
-func (r *ScoreSummary) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ScoreSummary) RawJSON() string { return r.JSON.raw }
+func (r *ScoreSummary) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r scoreSummaryJSON) RawJSON() string {
-	return r.raw
 }
 
 // Human-identifying attributes of the span, such as name, type, etc.
@@ -6191,38 +6121,52 @@ type SpanAttributes struct {
 	// Name of the span, for display purposes only
 	Name string `json:"name,nullable"`
 	// Type of the span, for display purposes only
-	Type        SpanType               `json:"type,nullable"`
-	ExtraFields map[string]interface{} `json:"-,extras"`
-	JSON        spanAttributesJSON     `json:"-"`
+	//
+	// Any of "llm", "score", "function", "eval", "task", "tool".
+	Type        SpanType       `json:"type,nullable"`
+	ExtraFields map[string]any `json:",extras"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Name        respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// spanAttributesJSON contains the JSON metadata for the struct [SpanAttributes]
-type spanAttributesJSON struct {
-	Name        apijson.Field
-	Type        apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *SpanAttributes) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r SpanAttributes) RawJSON() string { return r.JSON.raw }
+func (r *SpanAttributes) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r spanAttributesJSON) RawJSON() string {
-	return r.raw
+// ToParam converts this SpanAttributes to a SpanAttributesParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// SpanAttributesParam.Overrides()
+func (r SpanAttributes) ToParam() SpanAttributesParam {
+	return param.Override[SpanAttributesParam](json.RawMessage(r.RawJSON()))
 }
 
 // Human-identifying attributes of the span, such as name, type, etc.
 type SpanAttributesParam struct {
 	// Name of the span, for display purposes only
-	Name param.Field[string] `json:"name"`
+	Name param.Opt[string] `json:"name,omitzero"`
 	// Type of the span, for display purposes only
-	Type        param.Field[SpanType]  `json:"type"`
-	ExtraFields map[string]interface{} `json:"-,extras"`
+	//
+	// Any of "llm", "score", "function", "eval", "task", "tool".
+	Type        SpanType       `json:"type,omitzero"`
+	ExtraFields map[string]any `json:"-"`
+	paramObj
 }
 
 func (r SpanAttributesParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow SpanAttributesParam
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *SpanAttributesParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type SpanIFrame struct {
@@ -6244,31 +6188,27 @@ type SpanIFrame struct {
 	// useful when you want to render more data than fits in the URL.
 	PostMessage bool `json:"post_message,nullable"`
 	// Identifies the user who created the span iframe
-	UserID string         `json:"user_id,nullable" format:"uuid"`
-	JSON   spanIFrameJSON `json:"-"`
+	UserID string `json:"user_id,nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Name        respjson.Field
+		ProjectID   respjson.Field
+		URL         respjson.Field
+		Created     respjson.Field
+		DeletedAt   respjson.Field
+		Description respjson.Field
+		PostMessage respjson.Field
+		UserID      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// spanIFrameJSON contains the JSON metadata for the struct [SpanIFrame]
-type spanIFrameJSON struct {
-	ID          apijson.Field
-	Name        apijson.Field
-	ProjectID   apijson.Field
-	URL         apijson.Field
-	Created     apijson.Field
-	DeletedAt   apijson.Field
-	Description apijson.Field
-	PostMessage apijson.Field
-	UserID      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *SpanIFrame) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r SpanIFrame) RawJSON() string { return r.JSON.raw }
+func (r *SpanIFrame) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r spanIFrameJSON) RawJSON() string {
-	return r.raw
 }
 
 // Type of the span, for display purposes only
@@ -6283,14 +6223,6 @@ const (
 	SpanTypeTool     SpanType = "tool"
 )
 
-func (r SpanType) IsKnown() bool {
-	switch r {
-	case SpanTypeLlm, SpanTypeScore, SpanTypeFunction, SpanTypeEval, SpanTypeTask, SpanTypeTool:
-		return true
-	}
-	return false
-}
-
 // Summary of a dataset
 type SummarizeDatasetResponse struct {
 	// Name of the dataset
@@ -6302,28 +6234,23 @@ type SummarizeDatasetResponse struct {
 	// URL to the project's page in the Braintrust app
 	ProjectURL string `json:"project_url,required" format:"uri"`
 	// Summary of a dataset's data
-	DataSummary DataSummary                  `json:"data_summary,nullable"`
-	JSON        summarizeDatasetResponseJSON `json:"-"`
+	DataSummary DataSummary `json:"data_summary,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		DatasetName respjson.Field
+		DatasetURL  respjson.Field
+		ProjectName respjson.Field
+		ProjectURL  respjson.Field
+		DataSummary respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// summarizeDatasetResponseJSON contains the JSON metadata for the struct
-// [SummarizeDatasetResponse]
-type summarizeDatasetResponseJSON struct {
-	DatasetName apijson.Field
-	DatasetURL  apijson.Field
-	ProjectName apijson.Field
-	ProjectURL  apijson.Field
-	DataSummary apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *SummarizeDatasetResponse) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r SummarizeDatasetResponse) RawJSON() string { return r.JSON.raw }
+func (r *SummarizeDatasetResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r summarizeDatasetResponseJSON) RawJSON() string {
-	return r.raw
 }
 
 // Summary of an experiment
@@ -6341,30 +6268,25 @@ type SummarizeExperimentResponse struct {
 	// Summary of the experiment's metrics
 	Metrics map[string]MetricSummary `json:"metrics,nullable"`
 	// Summary of the experiment's scores
-	Scores map[string]ScoreSummary         `json:"scores,nullable"`
-	JSON   summarizeExperimentResponseJSON `json:"-"`
+	Scores map[string]ScoreSummary `json:"scores,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ExperimentName           respjson.Field
+		ExperimentURL            respjson.Field
+		ProjectName              respjson.Field
+		ProjectURL               respjson.Field
+		ComparisonExperimentName respjson.Field
+		Metrics                  respjson.Field
+		Scores                   respjson.Field
+		ExtraFields              map[string]respjson.Field
+		raw                      string
+	} `json:"-"`
 }
 
-// summarizeExperimentResponseJSON contains the JSON metadata for the struct
-// [SummarizeExperimentResponse]
-type summarizeExperimentResponseJSON struct {
-	ExperimentName           apijson.Field
-	ExperimentURL            apijson.Field
-	ProjectName              apijson.Field
-	ProjectURL               apijson.Field
-	ComparisonExperimentName apijson.Field
-	Metrics                  apijson.Field
-	Scores                   apijson.Field
-	raw                      string
-	ExtraFields              map[string]apijson.Field
-}
-
-func (r *SummarizeExperimentResponse) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r SummarizeExperimentResponse) RawJSON() string { return r.JSON.raw }
+func (r *SummarizeExperimentResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r summarizeExperimentResponseJSON) RawJSON() string {
-	return r.raw
 }
 
 type User struct {
@@ -6379,28 +6301,24 @@ type User struct {
 	// Family name of the user
 	FamilyName string `json:"family_name,nullable"`
 	// Given name of the user
-	GivenName string   `json:"given_name,nullable"`
-	JSON      userJSON `json:"-"`
+	GivenName string `json:"given_name,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		AvatarURL   respjson.Field
+		Created     respjson.Field
+		Email       respjson.Field
+		FamilyName  respjson.Field
+		GivenName   respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// userJSON contains the JSON metadata for the struct [User]
-type userJSON struct {
-	ID          apijson.Field
-	AvatarURL   apijson.Field
-	Created     apijson.Field
-	Email       apijson.Field
-	FamilyName  apijson.Field
-	GivenName   apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *User) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r User) RawJSON() string { return r.JSON.raw }
+func (r *User) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r userJSON) RawJSON() string {
-	return r.raw
 }
 
 type View struct {
@@ -6411,9 +6329,15 @@ type View struct {
 	// The id of the object the view applies to
 	ObjectID string `json:"object_id,required" format:"uuid"`
 	// The object type that the ACL applies to
+	//
+	// Any of "organization", "project", "experiment", "dataset", "prompt",
+	// "prompt_session", "group", "role", "org_member", "project_log", "org_project".
 	ObjectType ACLObjectType `json:"object_type,required"`
 	// Type of table that the view corresponds to.
-	ViewType ViewViewType `json:"view_type,required,nullable"`
+	//
+	// Any of "projects", "experiments", "experiment", "playgrounds", "playground",
+	// "datasets", "dataset", "prompts", "tools", "scorers", "logs".
+	ViewType ViewViewType `json:"view_type,required"`
 	// Date of view creation
 	Created time.Time `json:"created,nullable" format:"date-time"`
 	// Date of role deletion, or null if the role is still active
@@ -6424,31 +6348,27 @@ type View struct {
 	UserID string `json:"user_id,nullable" format:"uuid"`
 	// The view definition
 	ViewData ViewData `json:"view_data,nullable"`
-	JSON     viewJSON `json:"-"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Name        respjson.Field
+		ObjectID    respjson.Field
+		ObjectType  respjson.Field
+		ViewType    respjson.Field
+		Created     respjson.Field
+		DeletedAt   respjson.Field
+		Options     respjson.Field
+		UserID      respjson.Field
+		ViewData    respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// viewJSON contains the JSON metadata for the struct [View]
-type viewJSON struct {
-	ID          apijson.Field
-	Name        apijson.Field
-	ObjectID    apijson.Field
-	ObjectType  apijson.Field
-	ViewType    apijson.Field
-	Created     apijson.Field
-	DeletedAt   apijson.Field
-	Options     apijson.Field
-	UserID      apijson.Field
-	ViewData    apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *View) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r View) RawJSON() string { return r.JSON.raw }
+func (r *View) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func (r viewJSON) RawJSON() string {
-	return r.raw
 }
 
 // Type of table that the view corresponds to.
@@ -6468,79 +6388,91 @@ const (
 	ViewViewTypeLogs        ViewViewType = "logs"
 )
 
-func (r ViewViewType) IsKnown() bool {
-	switch r {
-	case ViewViewTypeProjects, ViewViewTypeExperiments, ViewViewTypeExperiment, ViewViewTypePlaygrounds, ViewViewTypePlayground, ViewViewTypeDatasets, ViewViewTypeDataset, ViewViewTypePrompts, ViewViewTypeTools, ViewViewTypeScorers, ViewViewTypeLogs:
-		return true
-	}
-	return false
-}
-
 // The view definition
 type ViewData struct {
 	Search ViewDataSearch `json:"search,nullable"`
-	JSON   viewDataJSON   `json:"-"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Search      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
 }
 
-// viewDataJSON contains the JSON metadata for the struct [ViewData]
-type viewDataJSON struct {
-	Search      apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ViewData) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ViewData) RawJSON() string { return r.JSON.raw }
+func (r *ViewData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r viewDataJSON) RawJSON() string {
-	return r.raw
+// ToParam converts this ViewData to a ViewDataParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// ViewDataParam.Overrides()
+func (r ViewData) ToParam() ViewDataParam {
+	return param.Override[ViewDataParam](json.RawMessage(r.RawJSON()))
 }
 
 // The view definition
 type ViewDataParam struct {
-	Search param.Field[ViewDataSearchParam] `json:"search"`
+	Search ViewDataSearchParam `json:"search,omitzero"`
+	paramObj
 }
 
 func (r ViewDataParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ViewDataParam
+	return param.MarshalObject(r, (*shadow)(&r))
 }
-
-type ViewDataSearch struct {
-	Filter []interface{}      `json:"filter,nullable"`
-	Match  []interface{}      `json:"match,nullable"`
-	Sort   []interface{}      `json:"sort,nullable"`
-	Tag    []interface{}      `json:"tag,nullable"`
-	JSON   viewDataSearchJSON `json:"-"`
-}
-
-// viewDataSearchJSON contains the JSON metadata for the struct [ViewDataSearch]
-type viewDataSearchJSON struct {
-	Filter      apijson.Field
-	Match       apijson.Field
-	Sort        apijson.Field
-	Tag         apijson.Field
-	raw         string
-	ExtraFields map[string]apijson.Field
-}
-
-func (r *ViewDataSearch) UnmarshalJSON(data []byte) (err error) {
+func (r *ViewDataParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r viewDataSearchJSON) RawJSON() string {
-	return r.raw
+type ViewDataSearch struct {
+	Filter []any `json:"filter,nullable"`
+	Match  []any `json:"match,nullable"`
+	Sort   []any `json:"sort,nullable"`
+	Tag    []any `json:"tag,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Filter      respjson.Field
+		Match       respjson.Field
+		Sort        respjson.Field
+		Tag         respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ViewDataSearch) RawJSON() string { return r.JSON.raw }
+func (r *ViewDataSearch) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ToParam converts this ViewDataSearch to a ViewDataSearchParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// ViewDataSearchParam.Overrides()
+func (r ViewDataSearch) ToParam() ViewDataSearchParam {
+	return param.Override[ViewDataSearchParam](json.RawMessage(r.RawJSON()))
 }
 
 type ViewDataSearchParam struct {
-	Filter param.Field[[]interface{}] `json:"filter"`
-	Match  param.Field[[]interface{}] `json:"match"`
-	Sort   param.Field[[]interface{}] `json:"sort"`
-	Tag    param.Field[[]interface{}] `json:"tag"`
+	Filter []any `json:"filter,omitzero"`
+	Match  []any `json:"match,omitzero"`
+	Sort   []any `json:"sort,omitzero"`
+	Tag    []any `json:"tag,omitzero"`
+	paramObj
 }
 
 func (r ViewDataSearchParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ViewDataSearchParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ViewDataSearchParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Options for the view in the app
@@ -6551,41 +6483,51 @@ type ViewOptions struct {
 	Grouping         string             `json:"grouping,nullable"`
 	Layout           string             `json:"layout,nullable"`
 	RowHeight        string             `json:"rowHeight,nullable"`
-	JSON             viewOptionsJSON    `json:"-"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ColumnOrder      respjson.Field
+		ColumnSizing     respjson.Field
+		ColumnVisibility respjson.Field
+		Grouping         respjson.Field
+		Layout           respjson.Field
+		RowHeight        respjson.Field
+		ExtraFields      map[string]respjson.Field
+		raw              string
+	} `json:"-"`
 }
 
-// viewOptionsJSON contains the JSON metadata for the struct [ViewOptions]
-type viewOptionsJSON struct {
-	ColumnOrder      apijson.Field
-	ColumnSizing     apijson.Field
-	ColumnVisibility apijson.Field
-	Grouping         apijson.Field
-	Layout           apijson.Field
-	RowHeight        apijson.Field
-	raw              string
-	ExtraFields      map[string]apijson.Field
-}
-
-func (r *ViewOptions) UnmarshalJSON(data []byte) (err error) {
+// Returns the unmodified JSON received from the API
+func (r ViewOptions) RawJSON() string { return r.JSON.raw }
+func (r *ViewOptions) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-func (r viewOptionsJSON) RawJSON() string {
-	return r.raw
+// ToParam converts this ViewOptions to a ViewOptionsParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// ViewOptionsParam.Overrides()
+func (r ViewOptions) ToParam() ViewOptionsParam {
+	return param.Override[ViewOptionsParam](json.RawMessage(r.RawJSON()))
 }
 
 // Options for the view in the app
 type ViewOptionsParam struct {
-	ColumnOrder      param.Field[[]string]           `json:"columnOrder"`
-	ColumnSizing     param.Field[map[string]float64] `json:"columnSizing"`
-	ColumnVisibility param.Field[map[string]bool]    `json:"columnVisibility"`
-	Grouping         param.Field[string]             `json:"grouping"`
-	Layout           param.Field[string]             `json:"layout"`
-	RowHeight        param.Field[string]             `json:"rowHeight"`
+	Grouping         param.Opt[string]  `json:"grouping,omitzero"`
+	Layout           param.Opt[string]  `json:"layout,omitzero"`
+	RowHeight        param.Opt[string]  `json:"rowHeight,omitzero"`
+	ColumnOrder      []string           `json:"columnOrder,omitzero"`
+	ColumnSizing     map[string]float64 `json:"columnSizing,omitzero"`
+	ColumnVisibility map[string]bool    `json:"columnVisibility,omitzero"`
+	paramObj
 }
 
 func (r ViewOptionsParam) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
+	type shadow ViewOptionsParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ViewOptionsParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Type of table that the view corresponds to.
@@ -6604,11 +6546,3 @@ const (
 	ViewTypeScorers     ViewType = "scorers"
 	ViewTypeLogs        ViewType = "logs"
 )
-
-func (r ViewType) IsKnown() bool {
-	switch r {
-	case ViewTypeProjects, ViewTypeExperiments, ViewTypeExperiment, ViewTypePlaygrounds, ViewTypePlayground, ViewTypeDatasets, ViewTypeDataset, ViewTypePrompts, ViewTypeTools, ViewTypeScorers, ViewTypeLogs:
-		return true
-	}
-	return false
-}

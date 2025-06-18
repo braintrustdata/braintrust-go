@@ -10,10 +10,10 @@ import (
 	"net/url"
 
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
-	"github.com/braintrustdata/braintrust-go/internal/param"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
 	"github.com/braintrustdata/braintrust-go/packages/pagination"
+	"github.com/braintrustdata/braintrust-go/packages/param"
 	"github.com/braintrustdata/braintrust-go/shared"
 )
 
@@ -30,8 +30,8 @@ type UserService struct {
 // NewUserService generates a new service that applies the given options to each
 // request. These options are applied after the parent client's options (if there
 // is one), and before any request-specific options.
-func NewUserService(opts ...option.RequestOption) (r *UserService) {
-	r = &UserService{}
+func NewUserService(opts ...option.RequestOption) (r UserService) {
+	r = UserService{}
 	r.Options = opts
 	return
 }
@@ -74,88 +74,113 @@ func (r *UserService) ListAutoPaging(ctx context.Context, query UserListParams, 
 }
 
 type UserListParams struct {
-	// Email of the user to search for. You may pass the param multiple times to filter
-	// for more than one email
-	Email param.Field[UserListParamsEmailUnion] `query:"email"`
+	// Limit the number of objects to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the initial item in the last page you fetched had an id of
 	// `foo`, pass `ending_before=foo` to fetch the previous page. Note: you may only
 	// pass one of `starting_after` and `ending_before`
-	EndingBefore param.Field[string] `query:"ending_before" format:"uuid"`
-	// Family name of the user to search for. You may pass the param multiple times to
-	// filter for more than one family name
-	FamilyName param.Field[UserListParamsFamilyNameUnion] `query:"family_name"`
-	// Given name of the user to search for. You may pass the param multiple times to
-	// filter for more than one given name
-	GivenName param.Field[UserListParamsGivenNameUnion] `query:"given_name"`
-	// Filter search results to a particular set of object IDs. To specify a list of
-	// IDs, include the query param multiple times
-	IDs param.Field[UserListParamsIDsUnion] `query:"ids" format:"uuid"`
-	// Limit the number of objects to return
-	Limit param.Field[int64] `query:"limit"`
+	EndingBefore param.Opt[string] `query:"ending_before,omitzero" format:"uuid" json:"-"`
 	// Filter search results to within a particular organization
-	OrgName param.Field[string] `query:"org_name"`
+	OrgName param.Opt[string] `query:"org_name,omitzero" json:"-"`
 	// Pagination cursor id.
 	//
 	// For example, if the final item in the last page you fetched had an id of `foo`,
 	// pass `starting_after=foo` to fetch the next page. Note: you may only pass one of
 	// `starting_after` and `ending_before`
-	StartingAfter param.Field[string] `query:"starting_after" format:"uuid"`
+	StartingAfter param.Opt[string] `query:"starting_after,omitzero" format:"uuid" json:"-"`
+	// Email of the user to search for. You may pass the param multiple times to filter
+	// for more than one email
+	Email UserListParamsEmailUnion `query:"email,omitzero" json:"-"`
+	// Family name of the user to search for. You may pass the param multiple times to
+	// filter for more than one family name
+	FamilyName UserListParamsFamilyNameUnion `query:"family_name,omitzero" json:"-"`
+	// Given name of the user to search for. You may pass the param multiple times to
+	// filter for more than one given name
+	GivenName UserListParamsGivenNameUnion `query:"given_name,omitzero" json:"-"`
+	// Filter search results to a particular set of object IDs. To specify a list of
+	// IDs, include the query param multiple times
+	IDs UserListParamsIDsUnion `query:"ids,omitzero" format:"uuid" json:"-"`
+	paramObj
 }
 
 // URLQuery serializes [UserListParams]'s query parameters as `url.Values`.
-func (r UserListParams) URLQuery() (v url.Values) {
+func (r UserListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
 
-// Email of the user to search for. You may pass the param multiple times to filter
-// for more than one email
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [UserListParamsEmailArray].
-type UserListParamsEmailUnion interface {
-	ImplementsUserListParamsEmailUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type UserListParamsEmailUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
 }
 
-type UserListParamsEmailArray []string
-
-func (r UserListParamsEmailArray) ImplementsUserListParamsEmailUnion() {}
-
-// Family name of the user to search for. You may pass the param multiple times to
-// filter for more than one family name
-//
-// Satisfied by [shared.UnionString], [UserListParamsFamilyNameArray].
-type UserListParamsFamilyNameUnion interface {
-	ImplementsUserListParamsFamilyNameUnion()
+func (u *UserListParamsEmailUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
+	}
+	return nil
 }
 
-type UserListParamsFamilyNameArray []string
-
-func (r UserListParamsFamilyNameArray) ImplementsUserListParamsFamilyNameUnion() {}
-
-// Given name of the user to search for. You may pass the param multiple times to
-// filter for more than one given name
+// Only one field can be non-zero.
 //
-// Satisfied by [shared.UnionString], [UserListParamsGivenNameArray].
-type UserListParamsGivenNameUnion interface {
-	ImplementsUserListParamsGivenNameUnion()
+// Use [param.IsOmitted] to confirm if a field is set.
+type UserListParamsFamilyNameUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
 }
 
-type UserListParamsGivenNameArray []string
-
-func (r UserListParamsGivenNameArray) ImplementsUserListParamsGivenNameUnion() {}
-
-// Filter search results to a particular set of object IDs. To specify a list of
-// IDs, include the query param multiple times
-//
-// Satisfied by [shared.UnionString], [UserListParamsIDsArray].
-type UserListParamsIDsUnion interface {
-	ImplementsUserListParamsIDsUnion()
+func (u *UserListParamsFamilyNameUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
+	}
+	return nil
 }
 
-type UserListParamsIDsArray []string
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type UserListParamsGivenNameUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
 
-func (r UserListParamsIDsArray) ImplementsUserListParamsIDsUnion() {}
+func (u *UserListParamsGivenNameUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
+	}
+	return nil
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type UserListParamsIDsUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+func (u *UserListParamsIDsUnion) asAny() any {
+	if !param.IsOmitted(u.OfString) {
+		return &u.OfString.Value
+	} else if !param.IsOmitted(u.OfStringArray) {
+		return &u.OfStringArray
+	}
+	return nil
+}
