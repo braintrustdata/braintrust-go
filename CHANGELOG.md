@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.9.0 (2025-06-21)
+
+Full Changelog: [v0.8.0...v0.9.0](https://github.com/braintrustdata/braintrust-go/compare/v0.8.0...v0.9.0)
+
+### Features
+
+* **client:** add escape hatch for null slice & maps ([33c00ba](https://github.com/braintrustdata/braintrust-go/commit/33c00badf26ff8f6dfcbc545d76f81474e58c429))
+
+
+### Chores
+
+* fix documentation of null map ([83f8295](https://github.com/braintrustdata/braintrust-go/commit/83f8295992bfdbfe54e87a6c1058f0ab47d465d8))
+
 ## 0.8.0 (2025-06-17)
 
 Full Changelog: [v0.7.0...v0.8.0](https://github.com/braintrustdata/braintrust-go/compare/v0.7.0...v0.8.0)
