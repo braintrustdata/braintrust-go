@@ -41,6 +41,9 @@ func (r *ListObjects[T]) UnmarshalJSON(data []byte) error {
 // there is no next page, this function will return a 'nil' for the page value, but
 // will not return an error
 func (r *ListObjects[T]) GetNextPage() (res *ListObjects[T], err error) {
+	if len(r.Objects) == 0 {
+		return nil, nil
+	}
 	items := r.Objects
 	if items == nil || len(items) == 0 {
 		return nil, nil
