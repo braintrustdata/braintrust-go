@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.9.0 (2025-09-03)
+
+Full Changelog: [v0.8.0...v0.9.0](https://github.com/braintrustdata/braintrust-go/compare/v0.8.0...v0.9.0)
+
+### Features
+
+* **client:** add escape hatch for null slice & maps ([33c00ba](https://github.com/braintrustdata/braintrust-go/commit/33c00badf26ff8f6dfcbc545d76f81474e58c429))
+* **client:** support optional json html escaping ([096f6dc](https://github.com/braintrustdata/braintrust-go/commit/096f6dc7516bcd4c20a0adeed6f99c40890dd6c8))
+
+
+### Bug Fixes
+
+* **client:** process custom base url ahead of time ([be53584](https://github.com/braintrustdata/braintrust-go/commit/be53584557027b6e0f320561c4d2d1913d2a647a))
+* close body before retrying ([5dcd71a](https://github.com/braintrustdata/braintrust-go/commit/5dcd71a9d8bea4345fde5168e3c189d97f670476))
+* don't try to deserialize as json when ResponseBodyInto is []byte ([12d42a5](https://github.com/braintrustdata/braintrust-go/commit/12d42a5a16de6b676c0b22f3518aee9da8169bf4))
+* **pagination:** check if page data is empty in GetNextPage ([35e3ff7](https://github.com/braintrustdata/braintrust-go/commit/35e3ff7fa9e28ee69ee679d20f33a4442d86815d))
+* remove null from release please manifest ([1ac9ab8](https://github.com/braintrustdata/braintrust-go/commit/1ac9ab8d6f4d5e52e34a1844b430def94867a905))
+* use release please annotations on more places ([381cd2d](https://github.com/braintrustdata/braintrust-go/commit/381cd2dfb198869f42239c5c1f51d37c0f9a82c5))
+
+
+### Chores
+
+* **ci:** only run for pushes and fork pull requests ([ad6db38](https://github.com/braintrustdata/braintrust-go/commit/ad6db38645ef41fdd3452b5b3dc864efb19e4e58))
+* fix documentation of null map ([83f8295](https://github.com/braintrustdata/braintrust-go/commit/83f8295992bfdbfe54e87a6c1058f0ab47d465d8))
+* **internal:** fix lint script for tests ([fe16aef](https://github.com/braintrustdata/braintrust-go/commit/fe16aef1530b67421ee6ad0742b2d3349735494b))
+* **internal:** update comment in script ([9d3a15f](https://github.com/braintrustdata/braintrust-go/commit/9d3a15fc144d99d83de9c07930ddd24a6288420d))
+* lint tests ([e4b83e7](https://github.com/braintrustdata/braintrust-go/commit/e4b83e7cf5a53b054f33e164a060d3a50e3a08b6))
+* lint tests in subpackages ([b9f53a6](https://github.com/braintrustdata/braintrust-go/commit/b9f53a61179ed27731e19bf4584fcccea4d9a5cf))
+* update @stainless-api/prism-cli to v5.15.0 ([c5fae67](https://github.com/braintrustdata/braintrust-go/commit/c5fae677935f88a47beae9afcb472749631fd847))
+
 ## 0.8.0 (2025-06-17)
 
 Full Changelog: [v0.7.0...v0.8.0](https://github.com/braintrustdata/braintrust-go/compare/v0.7.0...v0.8.0)
