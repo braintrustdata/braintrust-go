@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -41,7 +42,7 @@ func NewProjectScoreService(opts ...option.RequestOption) (r ProjectScoreService
 // with the same name as the one specified in the request, will return the existing
 // project_score unmodified
 func (r *ProjectScoreService) New(ctx context.Context, body ProjectScoreNewParams, opts ...option.RequestOption) (res *shared.ProjectScore, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/project_score"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -49,7 +50,7 @@ func (r *ProjectScoreService) New(ctx context.Context, body ProjectScoreNewParam
 
 // Get a project_score object by its id
 func (r *ProjectScoreService) Get(ctx context.Context, projectScoreID string, opts ...option.RequestOption) (res *shared.ProjectScore, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if projectScoreID == "" {
 		err = errors.New("missing required project_score_id parameter")
 		return
@@ -63,7 +64,7 @@ func (r *ProjectScoreService) Get(ctx context.Context, projectScoreID string, op
 // payload. Any object-type fields will be deep-merged with existing content.
 // Currently we do not support removing fields or setting them to null.
 func (r *ProjectScoreService) Update(ctx context.Context, projectScoreID string, body ProjectScoreUpdateParams, opts ...option.RequestOption) (res *shared.ProjectScore, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if projectScoreID == "" {
 		err = errors.New("missing required project_score_id parameter")
 		return
@@ -77,7 +78,7 @@ func (r *ProjectScoreService) Update(ctx context.Context, projectScoreID string,
 // with the most recently-created project_scores coming first
 func (r *ProjectScoreService) List(ctx context.Context, query ProjectScoreListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.ProjectScore], err error) {
 	var raw *http.Response
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "v1/project_score"
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -100,7 +101,7 @@ func (r *ProjectScoreService) ListAutoPaging(ctx context.Context, query ProjectS
 
 // Delete a project_score object by its id
 func (r *ProjectScoreService) Delete(ctx context.Context, projectScoreID string, opts ...option.RequestOption) (res *shared.ProjectScore, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if projectScoreID == "" {
 		err = errors.New("missing required project_score_id parameter")
 		return
@@ -114,7 +115,7 @@ func (r *ProjectScoreService) Delete(ctx context.Context, projectScoreID string,
 // project with the same name as the one specified in the request, will replace the
 // existing project_score with the provided fields
 func (r *ProjectScoreService) Replace(ctx context.Context, body ProjectScoreReplaceParams, opts ...option.RequestOption) (res *shared.ProjectScore, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/project_score"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
 	return

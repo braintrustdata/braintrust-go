@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -41,7 +42,7 @@ func NewProjectTagService(opts ...option.RequestOption) (r ProjectTagService) {
 // with the same name as the one specified in the request, will return the existing
 // project_tag unmodified
 func (r *ProjectTagService) New(ctx context.Context, body ProjectTagNewParams, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/project_tag"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -49,7 +50,7 @@ func (r *ProjectTagService) New(ctx context.Context, body ProjectTagNewParams, o
 
 // Get a project_tag object by its id
 func (r *ProjectTagService) Get(ctx context.Context, projectTagID string, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if projectTagID == "" {
 		err = errors.New("missing required project_tag_id parameter")
 		return
@@ -63,7 +64,7 @@ func (r *ProjectTagService) Get(ctx context.Context, projectTagID string, opts .
 // payload. Any object-type fields will be deep-merged with existing content.
 // Currently we do not support removing fields or setting them to null.
 func (r *ProjectTagService) Update(ctx context.Context, projectTagID string, body ProjectTagUpdateParams, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if projectTagID == "" {
 		err = errors.New("missing required project_tag_id parameter")
 		return
@@ -77,7 +78,7 @@ func (r *ProjectTagService) Update(ctx context.Context, projectTagID string, bod
 // the most recently-created project_tags coming first
 func (r *ProjectTagService) List(ctx context.Context, query ProjectTagListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.ProjectTag], err error) {
 	var raw *http.Response
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "v1/project_tag"
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -100,7 +101,7 @@ func (r *ProjectTagService) ListAutoPaging(ctx context.Context, query ProjectTag
 
 // Delete a project_tag object by its id
 func (r *ProjectTagService) Delete(ctx context.Context, projectTagID string, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if projectTagID == "" {
 		err = errors.New("missing required project_tag_id parameter")
 		return
@@ -114,7 +115,7 @@ func (r *ProjectTagService) Delete(ctx context.Context, projectTagID string, opt
 // project with the same name as the one specified in the request, will replace the
 // existing project_tag with the provided fields
 func (r *ProjectTagService) Replace(ctx context.Context, body ProjectTagReplaceParams, opts ...option.RequestOption) (res *shared.ProjectTag, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/project_tag"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
 	return

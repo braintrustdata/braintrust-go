@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -40,7 +41,7 @@ func NewEnvVarService(opts ...option.RequestOption) (r EnvVarService) {
 // Create a new env_var. If there is an existing env_var with the same name as the
 // one specified in the request, will return the existing env_var unmodified
 func (r *EnvVarService) New(ctx context.Context, body EnvVarNewParams, opts ...option.RequestOption) (res *shared.EnvVar, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/env_var"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -48,7 +49,7 @@ func (r *EnvVarService) New(ctx context.Context, body EnvVarNewParams, opts ...o
 
 // Get an env_var object by its id
 func (r *EnvVarService) Get(ctx context.Context, envVarID string, opts ...option.RequestOption) (res *shared.EnvVar, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if envVarID == "" {
 		err = errors.New("missing required env_var_id parameter")
 		return
@@ -62,7 +63,7 @@ func (r *EnvVarService) Get(ctx context.Context, envVarID string, opts ...option
 // Any object-type fields will be deep-merged with existing content. Currently we
 // do not support removing fields or setting them to null.
 func (r *EnvVarService) Update(ctx context.Context, envVarID string, body EnvVarUpdateParams, opts ...option.RequestOption) (res *shared.EnvVar, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if envVarID == "" {
 		err = errors.New("missing required env_var_id parameter")
 		return
@@ -75,7 +76,7 @@ func (r *EnvVarService) Update(ctx context.Context, envVarID string, body EnvVar
 // List out all env_vars. The env_vars are sorted by creation date, with the most
 // recently-created env_vars coming first
 func (r *EnvVarService) List(ctx context.Context, query EnvVarListParams, opts ...option.RequestOption) (res *EnvVarListResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/env_var"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
@@ -83,7 +84,7 @@ func (r *EnvVarService) List(ctx context.Context, query EnvVarListParams, opts .
 
 // Delete an env_var object by its id
 func (r *EnvVarService) Delete(ctx context.Context, envVarID string, opts ...option.RequestOption) (res *shared.EnvVar, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if envVarID == "" {
 		err = errors.New("missing required env_var_id parameter")
 		return
@@ -97,7 +98,7 @@ func (r *EnvVarService) Delete(ctx context.Context, envVarID string, opts ...opt
 // the one specified in the request, will replace the existing env_var with the
 // provided fields
 func (r *EnvVarService) Replace(ctx context.Context, body EnvVarReplaceParams, opts ...option.RequestOption) (res *shared.EnvVar, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/env_var"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
 	return

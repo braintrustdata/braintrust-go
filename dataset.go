@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -41,7 +42,7 @@ func NewDatasetService(opts ...option.RequestOption) (r DatasetService) {
 // same name as the one specified in the request, will return the existing dataset
 // unmodified
 func (r *DatasetService) New(ctx context.Context, body DatasetNewParams, opts ...option.RequestOption) (res *shared.Dataset, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/dataset"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -49,7 +50,7 @@ func (r *DatasetService) New(ctx context.Context, body DatasetNewParams, opts ..
 
 // Get a dataset object by its id
 func (r *DatasetService) Get(ctx context.Context, datasetID string, opts ...option.RequestOption) (res *shared.Dataset, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if datasetID == "" {
 		err = errors.New("missing required dataset_id parameter")
 		return
@@ -63,7 +64,7 @@ func (r *DatasetService) Get(ctx context.Context, datasetID string, opts ...opti
 // Any object-type fields will be deep-merged with existing content. Currently we
 // do not support removing fields or setting them to null.
 func (r *DatasetService) Update(ctx context.Context, datasetID string, body DatasetUpdateParams, opts ...option.RequestOption) (res *shared.Dataset, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if datasetID == "" {
 		err = errors.New("missing required dataset_id parameter")
 		return
@@ -77,7 +78,7 @@ func (r *DatasetService) Update(ctx context.Context, datasetID string, body Data
 // recently-created datasets coming first
 func (r *DatasetService) List(ctx context.Context, query DatasetListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.Dataset], err error) {
 	var raw *http.Response
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "v1/dataset"
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -100,7 +101,7 @@ func (r *DatasetService) ListAutoPaging(ctx context.Context, query DatasetListPa
 
 // Delete a dataset object by its id
 func (r *DatasetService) Delete(ctx context.Context, datasetID string, opts ...option.RequestOption) (res *shared.Dataset, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if datasetID == "" {
 		err = errors.New("missing required dataset_id parameter")
 		return
@@ -112,7 +113,7 @@ func (r *DatasetService) Delete(ctx context.Context, datasetID string, opts ...o
 
 // Log feedback for a set of dataset events
 func (r *DatasetService) Feedback(ctx context.Context, datasetID string, body DatasetFeedbackParams, opts ...option.RequestOption) (res *shared.FeedbackResponseSchema, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if datasetID == "" {
 		err = errors.New("missing required dataset_id parameter")
 		return
@@ -126,7 +127,7 @@ func (r *DatasetService) Feedback(ctx context.Context, datasetID string, body Da
 // with the parameters in the URL query rather than in the request body. For more
 // complex queries, use the `POST /btql` endpoint.
 func (r *DatasetService) Fetch(ctx context.Context, datasetID string, query DatasetFetchParams, opts ...option.RequestOption) (res *shared.FetchDatasetEventsResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if datasetID == "" {
 		err = errors.New("missing required dataset_id parameter")
 		return
@@ -140,7 +141,7 @@ func (r *DatasetService) Fetch(ctx context.Context, datasetID string, query Data
 // with the parameters in the request body rather than in the URL query. For more
 // complex queries, use the `POST /btql` endpoint.
 func (r *DatasetService) FetchPost(ctx context.Context, datasetID string, body DatasetFetchPostParams, opts ...option.RequestOption) (res *shared.FetchDatasetEventsResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if datasetID == "" {
 		err = errors.New("missing required dataset_id parameter")
 		return
@@ -152,7 +153,7 @@ func (r *DatasetService) FetchPost(ctx context.Context, datasetID string, body D
 
 // Insert a set of events into the dataset
 func (r *DatasetService) Insert(ctx context.Context, datasetID string, body DatasetInsertParams, opts ...option.RequestOption) (res *shared.InsertEventsResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if datasetID == "" {
 		err = errors.New("missing required dataset_id parameter")
 		return
@@ -164,7 +165,7 @@ func (r *DatasetService) Insert(ctx context.Context, datasetID string, body Data
 
 // Summarize dataset
 func (r *DatasetService) Summarize(ctx context.Context, datasetID string, query DatasetSummarizeParams, opts ...option.RequestOption) (res *shared.SummarizeDatasetResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if datasetID == "" {
 		err = errors.New("missing required dataset_id parameter")
 		return

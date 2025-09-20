@@ -5,6 +5,7 @@ package braintrust
 import (
 	"context"
 	"net/http"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
 	"github.com/braintrustdata/braintrust-go/option"
@@ -32,7 +33,7 @@ func NewTopLevelService(opts ...option.RequestOption) (r TopLevelService) {
 // Default endpoint. Simply replies with 'Hello, World!'. Authorization is not
 // required
 func (r *TopLevelService) HelloWorld(ctx context.Context, opts ...option.RequestOption) (res *string, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "text/plain")}, opts...)
 	path := "v1"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -40,7 +41,7 @@ func NewGroupService(opts ...option.RequestOption) (r GroupService) {
 // Create a new group. If there is an existing group with the same name as the one
 // specified in the request, will return the existing group unmodified
 func (r *GroupService) New(ctx context.Context, body GroupNewParams, opts ...option.RequestOption) (res *shared.Group, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/group"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -48,7 +49,7 @@ func (r *GroupService) New(ctx context.Context, body GroupNewParams, opts ...opt
 
 // Get a group object by its id
 func (r *GroupService) Get(ctx context.Context, groupID string, opts ...option.RequestOption) (res *shared.Group, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if groupID == "" {
 		err = errors.New("missing required group_id parameter")
 		return
@@ -62,7 +63,7 @@ func (r *GroupService) Get(ctx context.Context, groupID string, opts ...option.R
 // Any object-type fields will be deep-merged with existing content. Currently we
 // do not support removing fields or setting them to null.
 func (r *GroupService) Update(ctx context.Context, groupID string, body GroupUpdateParams, opts ...option.RequestOption) (res *shared.Group, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if groupID == "" {
 		err = errors.New("missing required group_id parameter")
 		return
@@ -76,7 +77,7 @@ func (r *GroupService) Update(ctx context.Context, groupID string, body GroupUpd
 // recently-created groups coming first
 func (r *GroupService) List(ctx context.Context, query GroupListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.Group], err error) {
 	var raw *http.Response
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "v1/group"
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -99,7 +100,7 @@ func (r *GroupService) ListAutoPaging(ctx context.Context, query GroupListParams
 
 // Delete a group object by its id
 func (r *GroupService) Delete(ctx context.Context, groupID string, opts ...option.RequestOption) (res *shared.Group, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if groupID == "" {
 		err = errors.New("missing required group_id parameter")
 		return
@@ -113,7 +114,7 @@ func (r *GroupService) Delete(ctx context.Context, groupID string, opts ...optio
 // one specified in the request, will replace the existing group with the provided
 // fields
 func (r *GroupService) Replace(ctx context.Context, body GroupReplaceParams, opts ...option.RequestOption) (res *shared.Group, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/group"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
 	return

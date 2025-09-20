@@ -5,6 +5,7 @@ package braintrust
 import (
 	"context"
 	"net/http"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
@@ -34,7 +35,7 @@ func NewOrganizationMemberService(opts ...option.RequestOption) (r OrganizationM
 
 // Modify organization membership
 func (r *OrganizationMemberService) Update(ctx context.Context, body OrganizationMemberUpdateParams, opts ...option.RequestOption) (res *shared.PatchOrganizationMembersOutput, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/organization/members"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
 	return

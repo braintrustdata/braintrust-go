@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -38,7 +39,7 @@ func NewProjectLogService(opts ...option.RequestOption) (r ProjectLogService) {
 
 // Log feedback for a set of project logs events
 func (r *ProjectLogService) Feedback(ctx context.Context, projectID string, body ProjectLogFeedbackParams, opts ...option.RequestOption) (res *shared.FeedbackResponseSchema, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
 		return
@@ -52,7 +53,7 @@ func (r *ProjectLogService) Feedback(ctx context.Context, projectID string, body
 // path, but with the parameters in the URL query rather than in the request body.
 // For more complex queries, use the `POST /btql` endpoint.
 func (r *ProjectLogService) Fetch(ctx context.Context, projectID string, query ProjectLogFetchParams, opts ...option.RequestOption) (res *shared.FetchProjectLogsEventsResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
 		return
@@ -66,7 +67,7 @@ func (r *ProjectLogService) Fetch(ctx context.Context, projectID string, query P
 // but with the parameters in the request body rather than in the URL query. For
 // more complex queries, use the `POST /btql` endpoint.
 func (r *ProjectLogService) FetchPost(ctx context.Context, projectID string, body ProjectLogFetchPostParams, opts ...option.RequestOption) (res *shared.FetchProjectLogsEventsResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
 		return
@@ -78,7 +79,7 @@ func (r *ProjectLogService) FetchPost(ctx context.Context, projectID string, bod
 
 // Insert a set of events into the project logs
 func (r *ProjectLogService) Insert(ctx context.Context, projectID string, body ProjectLogInsertParams, opts ...option.RequestOption) (res *shared.InsertEventsResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if projectID == "" {
 		err = errors.New("missing required project_id parameter")
 		return

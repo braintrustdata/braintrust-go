@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -40,7 +41,7 @@ func NewRoleService(opts ...option.RequestOption) (r RoleService) {
 // Create a new role. If there is an existing role with the same name as the one
 // specified in the request, will return the existing role unmodified
 func (r *RoleService) New(ctx context.Context, body RoleNewParams, opts ...option.RequestOption) (res *shared.Role, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/role"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -48,7 +49,7 @@ func (r *RoleService) New(ctx context.Context, body RoleNewParams, opts ...optio
 
 // Get a role object by its id
 func (r *RoleService) Get(ctx context.Context, roleID string, opts ...option.RequestOption) (res *shared.Role, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if roleID == "" {
 		err = errors.New("missing required role_id parameter")
 		return
@@ -62,7 +63,7 @@ func (r *RoleService) Get(ctx context.Context, roleID string, opts ...option.Req
 // object-type fields will be deep-merged with existing content. Currently we do
 // not support removing fields or setting them to null.
 func (r *RoleService) Update(ctx context.Context, roleID string, body RoleUpdateParams, opts ...option.RequestOption) (res *shared.Role, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if roleID == "" {
 		err = errors.New("missing required role_id parameter")
 		return
@@ -76,7 +77,7 @@ func (r *RoleService) Update(ctx context.Context, roleID string, body RoleUpdate
 // recently-created roles coming first
 func (r *RoleService) List(ctx context.Context, query RoleListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.Role], err error) {
 	var raw *http.Response
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "v1/role"
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -99,7 +100,7 @@ func (r *RoleService) ListAutoPaging(ctx context.Context, query RoleListParams, 
 
 // Delete a role object by its id
 func (r *RoleService) Delete(ctx context.Context, roleID string, opts ...option.RequestOption) (res *shared.Role, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if roleID == "" {
 		err = errors.New("missing required role_id parameter")
 		return
@@ -113,7 +114,7 @@ func (r *RoleService) Delete(ctx context.Context, roleID string, opts ...option.
 // one specified in the request, will replace the existing role with the provided
 // fields
 func (r *RoleService) Replace(ctx context.Context, body RoleReplaceParams, opts ...option.RequestOption) (res *shared.Role, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/role"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
 	return

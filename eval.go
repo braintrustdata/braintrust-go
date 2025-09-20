@@ -5,6 +5,7 @@ package braintrust
 import (
 	"context"
 	"net/http"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
@@ -39,7 +40,7 @@ func NewEvalService(opts ...option.RequestOption) (r EvalService) {
 // the experiment. To learn more about evals, see the
 // [Evals guide](https://www.braintrust.dev/docs/guides/evals).
 func (r *EvalService) New(ctx context.Context, body EvalNewParams, opts ...option.RequestOption) (res *shared.SummarizeExperimentResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/eval"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return

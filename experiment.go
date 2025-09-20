@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -41,7 +42,7 @@ func NewExperimentService(opts ...option.RequestOption) (r ExperimentService) {
 // the same name as the one specified in the request, will return the existing
 // experiment unmodified
 func (r *ExperimentService) New(ctx context.Context, body ExperimentNewParams, opts ...option.RequestOption) (res *shared.Experiment, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/experiment"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -49,7 +50,7 @@ func (r *ExperimentService) New(ctx context.Context, body ExperimentNewParams, o
 
 // Get an experiment object by its id
 func (r *ExperimentService) Get(ctx context.Context, experimentID string, opts ...option.RequestOption) (res *shared.Experiment, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
 		return
@@ -63,7 +64,7 @@ func (r *ExperimentService) Get(ctx context.Context, experimentID string, opts .
 // payload. Any object-type fields will be deep-merged with existing content.
 // Currently we do not support removing fields or setting them to null.
 func (r *ExperimentService) Update(ctx context.Context, experimentID string, body ExperimentUpdateParams, opts ...option.RequestOption) (res *shared.Experiment, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
 		return
@@ -77,7 +78,7 @@ func (r *ExperimentService) Update(ctx context.Context, experimentID string, bod
 // most recently-created experiments coming first
 func (r *ExperimentService) List(ctx context.Context, query ExperimentListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.Experiment], err error) {
 	var raw *http.Response
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "v1/experiment"
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -100,7 +101,7 @@ func (r *ExperimentService) ListAutoPaging(ctx context.Context, query Experiment
 
 // Delete an experiment object by its id
 func (r *ExperimentService) Delete(ctx context.Context, experimentID string, opts ...option.RequestOption) (res *shared.Experiment, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
 		return
@@ -112,7 +113,7 @@ func (r *ExperimentService) Delete(ctx context.Context, experimentID string, opt
 
 // Log feedback for a set of experiment events
 func (r *ExperimentService) Feedback(ctx context.Context, experimentID string, body ExperimentFeedbackParams, opts ...option.RequestOption) (res *shared.FeedbackResponseSchema, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
 		return
@@ -126,7 +127,7 @@ func (r *ExperimentService) Feedback(ctx context.Context, experimentID string, b
 // but with the parameters in the URL query rather than in the request body. For
 // more complex queries, use the `POST /btql` endpoint.
 func (r *ExperimentService) Fetch(ctx context.Context, experimentID string, query ExperimentFetchParams, opts ...option.RequestOption) (res *shared.FetchExperimentEventsResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
 		return
@@ -140,7 +141,7 @@ func (r *ExperimentService) Fetch(ctx context.Context, experimentID string, quer
 // but with the parameters in the request body rather than in the URL query. For
 // more complex queries, use the `POST /btql` endpoint.
 func (r *ExperimentService) FetchPost(ctx context.Context, experimentID string, body ExperimentFetchPostParams, opts ...option.RequestOption) (res *shared.FetchExperimentEventsResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
 		return
@@ -152,7 +153,7 @@ func (r *ExperimentService) FetchPost(ctx context.Context, experimentID string, 
 
 // Insert a set of events into the experiment
 func (r *ExperimentService) Insert(ctx context.Context, experimentID string, body ExperimentInsertParams, opts ...option.RequestOption) (res *shared.InsertEventsResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
 		return
@@ -164,7 +165,7 @@ func (r *ExperimentService) Insert(ctx context.Context, experimentID string, bod
 
 // Summarize experiment
 func (r *ExperimentService) Summarize(ctx context.Context, experimentID string, query ExperimentSummarizeParams, opts ...option.RequestOption) (res *shared.SummarizeExperimentResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if experimentID == "" {
 		err = errors.New("missing required experiment_id parameter")
 		return

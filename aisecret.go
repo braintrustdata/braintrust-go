@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -40,7 +41,7 @@ func NewAISecretService(opts ...option.RequestOption) (r AISecretService) {
 // Create a new ai_secret. If there is an existing ai_secret with the same name as
 // the one specified in the request, will return the existing ai_secret unmodified
 func (r *AISecretService) New(ctx context.Context, body AISecretNewParams, opts ...option.RequestOption) (res *shared.AISecret, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/ai_secret"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -48,7 +49,7 @@ func (r *AISecretService) New(ctx context.Context, body AISecretNewParams, opts 
 
 // Get an ai_secret object by its id
 func (r *AISecretService) Get(ctx context.Context, aiSecretID string, opts ...option.RequestOption) (res *shared.AISecret, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if aiSecretID == "" {
 		err = errors.New("missing required ai_secret_id parameter")
 		return
@@ -62,7 +63,7 @@ func (r *AISecretService) Get(ctx context.Context, aiSecretID string, opts ...op
 // payload. Any object-type fields will be deep-merged with existing content.
 // Currently we do not support removing fields or setting them to null.
 func (r *AISecretService) Update(ctx context.Context, aiSecretID string, body AISecretUpdateParams, opts ...option.RequestOption) (res *shared.AISecret, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if aiSecretID == "" {
 		err = errors.New("missing required ai_secret_id parameter")
 		return
@@ -76,7 +77,7 @@ func (r *AISecretService) Update(ctx context.Context, aiSecretID string, body AI
 // most recently-created ai_secrets coming first
 func (r *AISecretService) List(ctx context.Context, query AISecretListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.AISecret], err error) {
 	var raw *http.Response
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "v1/ai_secret"
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -99,7 +100,7 @@ func (r *AISecretService) ListAutoPaging(ctx context.Context, query AISecretList
 
 // Delete an ai_secret object by its id
 func (r *AISecretService) Delete(ctx context.Context, aiSecretID string, opts ...option.RequestOption) (res *shared.AISecret, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if aiSecretID == "" {
 		err = errors.New("missing required ai_secret_id parameter")
 		return
@@ -111,7 +112,7 @@ func (r *AISecretService) Delete(ctx context.Context, aiSecretID string, opts ..
 
 // Delete a single ai_secret
 func (r *AISecretService) FindAndDelete(ctx context.Context, body AISecretFindAndDeleteParams, opts ...option.RequestOption) (res *shared.AISecret, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/ai_secret"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, body, &res, opts...)
 	return
@@ -121,7 +122,7 @@ func (r *AISecretService) FindAndDelete(ctx context.Context, body AISecretFindAn
 // name as the one specified in the request, will replace the existing ai_secret
 // with the provided fields
 func (r *AISecretService) Replace(ctx context.Context, body AISecretReplaceParams, opts ...option.RequestOption) (res *shared.AISecret, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/ai_secret"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
 	return

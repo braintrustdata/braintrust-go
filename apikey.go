@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -40,7 +41,7 @@ func NewAPIKeyService(opts ...option.RequestOption) (r APIKeyService) {
 // Create a new api_key. It is possible to have multiple API keys with the same
 // name. There is no de-duplication
 func (r *APIKeyService) New(ctx context.Context, body APIKeyNewParams, opts ...option.RequestOption) (res *shared.CreateAPIKeyOutput, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/api_key"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -48,7 +49,7 @@ func (r *APIKeyService) New(ctx context.Context, body APIKeyNewParams, opts ...o
 
 // Get an api_key object by its id
 func (r *APIKeyService) Get(ctx context.Context, apiKeyID string, opts ...option.RequestOption) (res *shared.APIKey, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if apiKeyID == "" {
 		err = errors.New("missing required api_key_id parameter")
 		return
@@ -62,7 +63,7 @@ func (r *APIKeyService) Get(ctx context.Context, apiKeyID string, opts ...option
 // recently-created api_keys coming first
 func (r *APIKeyService) List(ctx context.Context, query APIKeyListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.APIKey], err error) {
 	var raw *http.Response
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "v1/api_key"
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -85,7 +86,7 @@ func (r *APIKeyService) ListAutoPaging(ctx context.Context, query APIKeyListPara
 
 // Delete an api_key object by its id
 func (r *APIKeyService) Delete(ctx context.Context, apiKeyID string, opts ...option.RequestOption) (res *shared.APIKey, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if apiKeyID == "" {
 		err = errors.New("missing required api_key_id parameter")
 		return

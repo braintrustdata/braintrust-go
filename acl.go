@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -40,7 +41,7 @@ func NewACLService(opts ...option.RequestOption) (r ACLService) {
 // Create a new acl. If there is an existing acl with the same contents as the one
 // specified in the request, will return the existing acl unmodified
 func (r *ACLService) New(ctx context.Context, body ACLNewParams, opts ...option.RequestOption) (res *shared.ACL, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/acl"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -48,7 +49,7 @@ func (r *ACLService) New(ctx context.Context, body ACLNewParams, opts ...option.
 
 // Get an acl object by its id
 func (r *ACLService) Get(ctx context.Context, aclID string, opts ...option.RequestOption) (res *shared.ACL, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if aclID == "" {
 		err = errors.New("missing required acl_id parameter")
 		return
@@ -62,7 +63,7 @@ func (r *ACLService) Get(ctx context.Context, aclID string, opts ...option.Reque
 // recently-created acls coming first
 func (r *ACLService) List(ctx context.Context, query ACLListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.ACL], err error) {
 	var raw *http.Response
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "v1/acl"
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -85,7 +86,7 @@ func (r *ACLService) ListAutoPaging(ctx context.Context, query ACLListParams, op
 
 // Delete an acl object by its id
 func (r *ACLService) Delete(ctx context.Context, aclID string, opts ...option.RequestOption) (res *shared.ACL, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if aclID == "" {
 		err = errors.New("missing required acl_id parameter")
 		return
@@ -99,7 +100,7 @@ func (r *ACLService) Delete(ctx context.Context, aclID string, opts ...option.Re
 // exist will have no effect, and removing acls which do not exist will have no
 // effect.
 func (r *ACLService) BatchUpdate(ctx context.Context, body ACLBatchUpdateParams, opts ...option.RequestOption) (res *shared.ACLBatchUpdateResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/acl/batch_update"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -107,7 +108,7 @@ func (r *ACLService) BatchUpdate(ctx context.Context, body ACLBatchUpdateParams,
 
 // Delete a single acl
 func (r *ACLService) FindAndDelete(ctx context.Context, body ACLFindAndDeleteParams, opts ...option.RequestOption) (res *shared.ACL, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/acl"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, body, &res, opts...)
 	return

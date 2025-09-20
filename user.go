@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
 	"github.com/braintrustdata/braintrust-go/internal/requestconfig"
@@ -38,7 +39,7 @@ func NewUserService(opts ...option.RequestOption) (r UserService) {
 
 // Get a user object by its id
 func (r *UserService) Get(ctx context.Context, userID string, opts ...option.RequestOption) (res *shared.User, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if userID == "" {
 		err = errors.New("missing required user_id parameter")
 		return
@@ -52,7 +53,7 @@ func (r *UserService) Get(ctx context.Context, userID string, opts ...option.Req
 // recently-created users coming first
 func (r *UserService) List(ctx context.Context, query UserListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.User], err error) {
 	var raw *http.Response
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "v1/user"
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 	"time"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
@@ -41,7 +42,7 @@ func NewViewService(opts ...option.RequestOption) (r ViewService) {
 // Create a new view. If there is an existing view with the same name as the one
 // specified in the request, will return the existing view unmodified
 func (r *ViewService) New(ctx context.Context, body ViewNewParams, opts ...option.RequestOption) (res *shared.View, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/view"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -49,7 +50,7 @@ func (r *ViewService) New(ctx context.Context, body ViewNewParams, opts ...optio
 
 // Get a view object by its id
 func (r *ViewService) Get(ctx context.Context, viewID string, query ViewGetParams, opts ...option.RequestOption) (res *shared.View, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if viewID == "" {
 		err = errors.New("missing required view_id parameter")
 		return
@@ -63,7 +64,7 @@ func (r *ViewService) Get(ctx context.Context, viewID string, query ViewGetParam
 // object-type fields will be deep-merged with existing content. Currently we do
 // not support removing fields or setting them to null.
 func (r *ViewService) Update(ctx context.Context, viewID string, body ViewUpdateParams, opts ...option.RequestOption) (res *shared.View, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if viewID == "" {
 		err = errors.New("missing required view_id parameter")
 		return
@@ -77,7 +78,7 @@ func (r *ViewService) Update(ctx context.Context, viewID string, body ViewUpdate
 // recently-created views coming first
 func (r *ViewService) List(ctx context.Context, query ViewListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.View], err error) {
 	var raw *http.Response
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "v1/view"
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -100,7 +101,7 @@ func (r *ViewService) ListAutoPaging(ctx context.Context, query ViewListParams, 
 
 // Delete a view object by its id
 func (r *ViewService) Delete(ctx context.Context, viewID string, body ViewDeleteParams, opts ...option.RequestOption) (res *shared.View, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if viewID == "" {
 		err = errors.New("missing required view_id parameter")
 		return
@@ -114,7 +115,7 @@ func (r *ViewService) Delete(ctx context.Context, viewID string, body ViewDelete
 // one specified in the request, will replace the existing view with the provided
 // fields
 func (r *ViewService) Replace(ctx context.Context, body ViewReplaceParams, opts ...option.RequestOption) (res *shared.View, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/view"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
 	return

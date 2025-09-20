@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -41,7 +42,7 @@ func NewSpanIframeService(opts ...option.RequestOption) (r SpanIframeService) {
 // as the one specified in the request, will return the existing span_iframe
 // unmodified
 func (r *SpanIframeService) New(ctx context.Context, body SpanIframeNewParams, opts ...option.RequestOption) (res *shared.SpanIFrame, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/span_iframe"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -49,7 +50,7 @@ func (r *SpanIframeService) New(ctx context.Context, body SpanIframeNewParams, o
 
 // Get a span_iframe object by its id
 func (r *SpanIframeService) Get(ctx context.Context, spanIframeID string, opts ...option.RequestOption) (res *shared.SpanIFrame, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if spanIframeID == "" {
 		err = errors.New("missing required span_iframe_id parameter")
 		return
@@ -63,7 +64,7 @@ func (r *SpanIframeService) Get(ctx context.Context, spanIframeID string, opts .
 // payload. Any object-type fields will be deep-merged with existing content.
 // Currently we do not support removing fields or setting them to null.
 func (r *SpanIframeService) Update(ctx context.Context, spanIframeID string, body SpanIframeUpdateParams, opts ...option.RequestOption) (res *shared.SpanIFrame, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if spanIframeID == "" {
 		err = errors.New("missing required span_iframe_id parameter")
 		return
@@ -77,7 +78,7 @@ func (r *SpanIframeService) Update(ctx context.Context, spanIframeID string, bod
 // the most recently-created span_iframes coming first
 func (r *SpanIframeService) List(ctx context.Context, query SpanIframeListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.SpanIFrame], err error) {
 	var raw *http.Response
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "v1/span_iframe"
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -100,7 +101,7 @@ func (r *SpanIframeService) ListAutoPaging(ctx context.Context, query SpanIframe
 
 // Delete a span_iframe object by its id
 func (r *SpanIframeService) Delete(ctx context.Context, spanIframeID string, opts ...option.RequestOption) (res *shared.SpanIFrame, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if spanIframeID == "" {
 		err = errors.New("missing required span_iframe_id parameter")
 		return
@@ -114,7 +115,7 @@ func (r *SpanIframeService) Delete(ctx context.Context, spanIframeID string, opt
 // name as the one specified in the request, will replace the existing span_iframe
 // with the provided fields
 func (r *SpanIframeService) Replace(ctx context.Context, body SpanIframeReplaceParams, opts ...option.RequestOption) (res *shared.SpanIFrame, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/span_iframe"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
 	return

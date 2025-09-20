@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -41,7 +42,7 @@ func NewPromptService(opts ...option.RequestOption) (r PromptService) {
 // slug as the one specified in the request, will return the existing prompt
 // unmodified
 func (r *PromptService) New(ctx context.Context, body PromptNewParams, opts ...option.RequestOption) (res *shared.Prompt, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/prompt"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -49,7 +50,7 @@ func (r *PromptService) New(ctx context.Context, body PromptNewParams, opts ...o
 
 // Get a prompt object by its id
 func (r *PromptService) Get(ctx context.Context, promptID string, opts ...option.RequestOption) (res *shared.Prompt, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if promptID == "" {
 		err = errors.New("missing required prompt_id parameter")
 		return
@@ -63,7 +64,7 @@ func (r *PromptService) Get(ctx context.Context, promptID string, opts ...option
 // Any object-type fields will be deep-merged with existing content. Currently we
 // do not support removing fields or setting them to null.
 func (r *PromptService) Update(ctx context.Context, promptID string, body PromptUpdateParams, opts ...option.RequestOption) (res *shared.Prompt, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if promptID == "" {
 		err = errors.New("missing required prompt_id parameter")
 		return
@@ -77,7 +78,7 @@ func (r *PromptService) Update(ctx context.Context, promptID string, body Prompt
 // recently-created prompts coming first
 func (r *PromptService) List(ctx context.Context, query PromptListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.Prompt], err error) {
 	var raw *http.Response
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "v1/prompt"
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -100,7 +101,7 @@ func (r *PromptService) ListAutoPaging(ctx context.Context, query PromptListPara
 
 // Delete a prompt object by its id
 func (r *PromptService) Delete(ctx context.Context, promptID string, opts ...option.RequestOption) (res *shared.Prompt, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if promptID == "" {
 		err = errors.New("missing required prompt_id parameter")
 		return
@@ -114,7 +115,7 @@ func (r *PromptService) Delete(ctx context.Context, promptID string, opts ...opt
 // same slug as the one specified in the request, will replace the existing prompt
 // with the provided fields
 func (r *PromptService) Replace(ctx context.Context, body PromptReplaceParams, opts ...option.RequestOption) (res *shared.Prompt, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/prompt"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
 	return

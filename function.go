@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/braintrustdata/braintrust-go/internal/apijson"
 	"github.com/braintrustdata/braintrust-go/internal/apiquery"
@@ -41,7 +42,7 @@ func NewFunctionService(opts ...option.RequestOption) (r FunctionService) {
 // same slug as the one specified in the request, will return the existing function
 // unmodified
 func (r *FunctionService) New(ctx context.Context, body FunctionNewParams, opts ...option.RequestOption) (res *shared.Function, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/function"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -49,7 +50,7 @@ func (r *FunctionService) New(ctx context.Context, body FunctionNewParams, opts 
 
 // Get a function object by its id
 func (r *FunctionService) Get(ctx context.Context, functionID string, opts ...option.RequestOption) (res *shared.Function, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if functionID == "" {
 		err = errors.New("missing required function_id parameter")
 		return
@@ -63,7 +64,7 @@ func (r *FunctionService) Get(ctx context.Context, functionID string, opts ...op
 // Any object-type fields will be deep-merged with existing content. Currently we
 // do not support removing fields or setting them to null.
 func (r *FunctionService) Update(ctx context.Context, functionID string, body FunctionUpdateParams, opts ...option.RequestOption) (res *shared.Function, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if functionID == "" {
 		err = errors.New("missing required function_id parameter")
 		return
@@ -77,7 +78,7 @@ func (r *FunctionService) Update(ctx context.Context, functionID string, body Fu
 // recently-created functions coming first
 func (r *FunctionService) List(ctx context.Context, query FunctionListParams, opts ...option.RequestOption) (res *pagination.ListObjects[shared.Function], err error) {
 	var raw *http.Response
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithResponseInto(&raw)}, opts...)
 	path := "v1/function"
 	cfg, err := requestconfig.NewRequestConfig(ctx, http.MethodGet, path, query, &res, opts...)
@@ -100,7 +101,7 @@ func (r *FunctionService) ListAutoPaging(ctx context.Context, query FunctionList
 
 // Delete a function object by its id
 func (r *FunctionService) Delete(ctx context.Context, functionID string, opts ...option.RequestOption) (res *shared.Function, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if functionID == "" {
 		err = errors.New("missing required function_id parameter")
 		return
@@ -112,7 +113,7 @@ func (r *FunctionService) Delete(ctx context.Context, functionID string, opts ..
 
 // Invoke a function.
 func (r *FunctionService) Invoke(ctx context.Context, functionID string, body FunctionInvokeParams, opts ...option.RequestOption) (res *FunctionInvokeResponse, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	if functionID == "" {
 		err = errors.New("missing required function_id parameter")
 		return
@@ -126,7 +127,7 @@ func (r *FunctionService) Invoke(ctx context.Context, functionID string, body Fu
 // the same slug as the one specified in the request, will replace the existing
 // function with the provided fields
 func (r *FunctionService) Replace(ctx context.Context, body FunctionReplaceParams, opts ...option.RequestOption) (res *shared.Function, err error) {
-	opts = append(r.Options[:], opts...)
+	opts = slices.Concat(r.Options, opts)
 	path := "v1/function"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, body, &res, opts...)
 	return
