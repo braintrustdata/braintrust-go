@@ -35,7 +35,7 @@ go get -u 'github.com/braintrustdata/braintrust-go@v0.8.0'
 
 ## Requirements
 
-This library requires Go 1.18+.
+This library requires Go 1.22+.
 
 ## Usage
 
