@@ -285,7 +285,7 @@ type ProjectScoreListParamsScoreTypeUnion struct {
 	// Check if union is this variant with
 	// !param.IsOmitted(union.OfProjectScoreTypeSingle)
 	OfProjectScoreTypeSingle param.Opt[shared.ProjectScoreType] `query:",omitzero,inline"`
-	OfProjectScoreTypeArray  []string                           `query:",omitzero,inline"`
+	OfProjectScoreTypeArray  []shared.ProjectScoreType          `query:",omitzero,inline"`
 	paramUnion
 }
 
