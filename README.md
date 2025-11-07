@@ -2,8 +2,8 @@
 
 <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go"><img src="https://pkg.go.dev/badge/github.com/braintrustdata/braintrust-go.svg" alt="Go Reference"></a>
 
-The Braintrust Go library provides convenient access to the [Braintrust REST API](https://www.braintrustdata.com/docs/api/spec)
-from applications written in Go.
+The Braintrust Go API library provides convenient access to the [Braintrust REST API](https://www.braintrustdata.com/docs/api/spec)
+from applications written in Go. **If you want to trace production applications or run Evals, use the [Braintrust Go SDK](https://github.com/braintrustdata/braintrust-sdk-go/).**
 
 It is generated with [Stainless](https://www.stainless.com/).
 
