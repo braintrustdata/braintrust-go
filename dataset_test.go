@@ -275,8 +275,8 @@ func TestDatasetInsert(t *testing.T) {
 				ObjectDelete: braintrust.Bool(true),
 				ParentID:     braintrust.String("_parent_id"),
 				Created:      braintrust.Time(time.Now()),
-				Expected:     map[string]interface{}{},
-				Input:        map[string]interface{}{},
+				Expected:     map[string]any{},
+				Input:        map[string]any{},
 				Metadata: shared.InsertDatasetEventMetadataParam{
 					Model: braintrust.String("model"),
 				},

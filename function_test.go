@@ -37,8 +37,8 @@ func TestFunctionNewWithOptionalParams(t *testing.T) {
 		Slug:        "x",
 		Description: braintrust.String("description"),
 		FunctionSchema: braintrust.FunctionNewParamsFunctionSchema{
-			Parameters: map[string]interface{}{},
-			Returns:    map[string]interface{}{},
+			Parameters: map[string]any{},
+			Returns:    map[string]any{},
 		},
 		FunctionType: braintrust.FunctionNewParamsFunctionTypeLlm,
 		Origin: braintrust.FunctionNewParamsOrigin{
@@ -297,8 +297,8 @@ func TestFunctionInvokeWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		braintrust.FunctionInvokeParams{
-			Expected: map[string]interface{}{},
-			Input:    map[string]interface{}{},
+			Expected: map[string]any{},
+			Input:    map[string]any{},
 			Messages: []braintrust.FunctionInvokeParamsMessageUnion{{
 				OfSystem: &braintrust.FunctionInvokeParamsMessageSystem{
 					Role:    "system",
@@ -360,8 +360,8 @@ func TestFunctionReplaceWithOptionalParams(t *testing.T) {
 		Slug:        "x",
 		Description: braintrust.String("description"),
 		FunctionSchema: braintrust.FunctionReplaceParamsFunctionSchema{
-			Parameters: map[string]interface{}{},
-			Returns:    map[string]interface{}{},
+			Parameters: map[string]any{},
+			Returns:    map[string]any{},
 		},
 		FunctionType: braintrust.FunctionReplaceParamsFunctionTypeLlm,
 		Origin: braintrust.FunctionReplaceParamsOrigin{

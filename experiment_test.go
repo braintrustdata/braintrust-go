@@ -203,7 +203,7 @@ func TestExperimentFeedback(t *testing.T) {
 			Feedback: []shared.FeedbackExperimentItemParam{{
 				ID:       "id",
 				Comment:  braintrust.String("comment"),
-				Expected: map[string]interface{}{},
+				Expected: map[string]any{},
 				Metadata: map[string]any{
 					"foo": "bar",
 				},
@@ -315,16 +315,16 @@ func TestExperimentInsert(t *testing.T) {
 					CallerLineno:       braintrust.Int(0),
 				},
 				Created:  braintrust.Time(time.Now()),
-				Error:    map[string]interface{}{},
-				Expected: map[string]interface{}{},
-				Input:    map[string]interface{}{},
+				Error:    map[string]any{},
+				Expected: map[string]any{},
+				Input:    map[string]any{},
 				Metadata: shared.InsertExperimentEventMetadataParam{
 					Model: braintrust.String("model"),
 				},
 				Metrics: shared.InsertExperimentEventMetricsParam{
-					CallerFilename:     map[string]interface{}{},
-					CallerFunctionname: map[string]interface{}{},
-					CallerLineno:       map[string]interface{}{},
+					CallerFilename:     map[string]any{},
+					CallerFunctionname: map[string]any{},
+					CallerLineno:       map[string]any{},
 					CompletionTokens:   braintrust.Int(0),
 					End:                braintrust.Float(0),
 					PromptTokens:       braintrust.Int(0),
@@ -338,7 +338,7 @@ func TestExperimentInsert(t *testing.T) {
 					ObjectType: shared.ObjectReferenceObjectTypeExperiment,
 					Created:    braintrust.String("created"),
 				},
-				Output:     map[string]interface{}{},
+				Output:     map[string]any{},
 				RootSpanID: braintrust.String("root_span_id"),
 				Scores: map[string]float64{
 					"foo": 0,
