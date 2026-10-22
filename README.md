@@ -1,3 +1,9 @@
+# Deprecation Notice
+
+This client is no longer maintained. Please use the Braintrust Go SDK api client instead.
+
+https://github.com/braintrustdata/braintrust-sdk-go/blob/main/docs/api-client.md
+
 # Braintrust Go API Library
 
 <a href="https://pkg.go.dev/github.com/braintrustdata/braintrust-go"><img src="https://pkg.go.dev/badge/github.com/braintrustdata/braintrust-go.svg" alt="Go Reference"></a>
